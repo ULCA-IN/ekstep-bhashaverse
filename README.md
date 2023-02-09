@@ -1,6 +1,6 @@
 # Bhashaverse
 
-A Speech to Speech Application build using Flutter which leverages the Indian Languages AI/ML models offered by Government of Indian under the ambitious project called [Bhashini](www.bhashini.gov.in).
+A Speech to Speech Application build using Flutter which leverages the Indian Languages AI/ML models offered by Government of India under the ambitious project called [Bhashini](www.bhashini.gov.in).
 
 ## Getting Started
 Follow the below steps to successfully run this Flutter application:
