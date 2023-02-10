@@ -10,6 +10,29 @@
 # Java class files
 *.class
 
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/android/
+/ios/
+/web/
+/linux/
+/windows/
+/macos/
+.metadata
+analysis_options.yaml
+pubspec.yaml
+pubspec.lock
+*.g.dart
+*.freezed.dart
+
 # Generated files
 bin/
 gen/
@@ -36,8 +59,18 @@ proguard/
 # Android Studio captures folder
 captures/
 
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+.vscode/launch.json
+.vscode/settings.json
+
 # IntelliJ
 *.iml
+*.ipr
+*.iws
+.idea/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/gradle.xml
@@ -83,3 +116,21 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
