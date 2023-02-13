@@ -6,13 +6,8 @@ class SocketIOClient extends GetxService {
   RxBool isMicConnected = false.obs;
   RxString socketResponseText = ''.obs;
 
-  void socketEmit(
-      {required String emittingStatus,
-      required dynamic emittingData,
-      required bool isDataToSend}) {
-    isDataToSend
-        ? _socket?.emit(emittingStatus, emittingData)
-        : _socket?.emit(emittingStatus);
+  void socketEmit({required String emittingStatus, required dynamic emittingData, required bool isDataToSend}) {
+    isDataToSend ? _socket?.emit(emittingStatus, emittingData) : _socket?.emit(emittingStatus);
   }
 
   void socketConnect({
@@ -45,24 +40,20 @@ class SocketIOClient extends GetxService {
 
     _socket?.on('connect-success', (data) {
       isMicConnected.value = true;
-      print('socket: $data');
     });
 
     _socket?.on('response', (data) {
       if (data is List && data.isNotEmpty && data[0].isNotEmpty) {
         socketResponseText.value = data[0];
       }
-      print('socket: $data');
     });
 
     _socket?.on('terminate', (data) {
       isMicConnected.value = false;
-      print('socket: $data');
     });
 
     _socket?.onDisconnect((data) {
       isMicConnected.value = false;
-      print('socket: $data');
     });
   }
 

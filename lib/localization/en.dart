@@ -10,34 +10,27 @@ final Map<String, String> en = {
   skip: 'Skip',
   getStarted: 'Get started',
   speechRecognition: 'Speech Recognition',
-  automaticallyRecognizeAndConvert:
-      'Automatically recognize and convert your voice into text',
+  automaticallyRecognizeAndConvert: 'Automatically recognize and convert your voice into text',
   speechToSpeechTranslation: 'Speech to Speech Translation',
-  translateYourVoiceInOneIndianLanguage:
-      'Translate your voice in one Indian language to another',
+  translateYourVoiceInOneIndianLanguage: 'Translate your voice in one Indian language to another',
   languageTranslation: 'Language Translation',
-  translateSentencesFromOneIndianLanguageToAnother:
-      'Translate sentences from one Indian language to another',
+  translateSentencesFromOneIndianLanguageToAnother: 'Translate sentences from one Indian language to another',
   bhashaverseChatBot: 'Bhashaverse Chat bot',
   selectVoiceAssistant: 'Select Voice Assistant Avatar',
-  youWillHearTheTranslationText:
-      'You will hear the translation in the voice of the avatar you selected. You can always change avatar from settings.',
+  youWillHearTheTranslationText: 'You will hear the translation in the voice of the avatar you selected. You can always change avatar from settings.',
   male: 'Male',
   female: 'Female',
   letsTranslate: 'Let’s translate',
   appTheme: 'App Theme',
-  appInterfaceWillChange:
-      'App interface will change in selected mode accordingly',
+  appInterfaceWillChange: 'App interface will change in selected mode accordingly',
   light: 'Light',
   dark: 'Dark',
   systemDefault: 'System Default',
   appLanguage: 'App Language',
-  appInterfaceWillChangeInSelected:
-      'App interface will change in selected app language.',
+  appInterfaceWillChangeInSelected: 'App interface will change in selected app language.',
   voiceAssistant: 'Voice Assistant',
   transLiteration: 'Transliteration',
-  transLiterationWillInitiateWord:
-      'Transliteration will initiate word suggestions while you type',
+  transLiterationWillInitiateWord: 'Transliteration will initiate word suggestions while you type',
   advanceSettings: 'Advanced Settings',
   kTranslation: 'Translation',
   kChat: 'Chat',
@@ -51,8 +44,7 @@ final Map<String, String> en = {
   kTranslate: 'Translate',
   kReset: 'Reset',
   kErrorNoSourceText: 'Please enter text first',
-  kErrorSelectSourceAndTargetScreen:
-      'Please select source and target language first',
+  kErrorSelectSourceAndTargetScreen: 'Please select source and target language first',
   errorMicPermission: 'Mic permission required for recording sound',
   errorInRecording: 'Error voice recording',
   noVoiceAssistantAvailable: 'No voice assistant available at the moment',
@@ -63,9 +55,7 @@ final Map<String, String> en = {
   noTextForShare: 'No text found for share',
   noTextForCopy: 'No text found for copy',
   textCopiedToClipboard: 'Text copied to clipboard',
-  femaleVoiceAssistantNotAvailable:
-      'Female Voice assistant is not available, Playing from male voice assistant',
-  maleVoiceAssistantNotAvailable:
-      'Male Voice assistant is not available, Playing from female voice assistant',
+  femaleVoiceAssistantNotAvailable: 'Female Voice assistant is not available, Playing from male voice assistant',
+  maleVoiceAssistantNotAvailable: 'Male Voice assistant is not available, Playing from female voice assistant',
   errorNoTextInClipboard: 'No text available in clipboard',
 };

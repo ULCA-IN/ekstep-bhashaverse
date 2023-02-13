@@ -21,8 +21,7 @@ class BottomNavSettings extends StatefulWidget {
   State<BottomNavSettings> createState() => _BottomNavSettingsState();
 }
 
-class _BottomNavSettingsState extends State<BottomNavSettings>
-    with SingleTickerProviderStateMixin {
+class _BottomNavSettingsState extends State<BottomNavSettings> with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -64,9 +63,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                 SizedBox(height: 16.toHeight),
                 Text(
                   kSettings.tr,
-                  style: AppTextStyle()
-                      .semibold24BalticSea
-                      .copyWith(fontSize: 20.toFont),
+                  style: AppTextStyle().semibold24BalticSea.copyWith(fontSize: 20.toFont),
                 ),
                 SizedBox(height: 48.toHeight),
                 _settingHeading(
@@ -77,8 +74,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                 SizedBox(height: 24.toHeight),
                 InkWell(
                   onTap: () {
-                    Get.toNamed(AppRoutes.appLanguageRoute)?.then(
-                        (_) => _settingsController.getPreferredLanguage());
+                    Get.toNamed(AppRoutes.appLanguageRoute)?.then((_) => _settingsController.getPreferredLanguage());
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: _settingHeading(
@@ -86,9 +82,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                       children: [
                         Text(
                           _settingsController.preferredLanguage.value,
-                          style: AppTextStyle()
-                              .light16BalticSea
-                              .copyWith(color: arsenicColor),
+                          style: AppTextStyle().light16BalticSea.copyWith(color: arsenicColor),
                         ),
                         SizedBox(width: 8.toWidth),
                         RotatedBox(
@@ -110,8 +104,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                       value: _settingsController.isTransLiterationEnabled.value,
                       activeColor: japaneseLaurel,
                       trackColor: americanSilver,
-                      onChanged: (value) =>
-                          _settingsController.changeTransliterationPref(value),
+                      onChanged: (value) => _settingsController.changeTransliterationPref(value),
                     ),
                   ),
                   title: transLiteration.tr,
@@ -121,17 +114,12 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                 Obx(
                   () => InkWell(
                     onTap: () {
-                      _settingsController.isAdvanceMenuOpened.value =
-                          !_settingsController.isAdvanceMenuOpened.value;
-                      _settingsController.isAdvanceMenuOpened.value
-                          ? _controller.forward()
-                          : _controller.reverse();
+                      _settingsController.isAdvanceMenuOpened.value = !_settingsController.isAdvanceMenuOpened.value;
+                      _settingsController.isAdvanceMenuOpened.value ? _controller.forward() : _controller.reverse();
                     },
                     borderRadius: BorderRadius.circular(10),
                     child: _expandableSettingHeading(
-                      height: _settingsController.isAdvanceMenuOpened.value
-                          ? 130.toHeight
-                          : 60.toHeight,
+                      height: _settingsController.isAdvanceMenuOpened.value ? 130.toHeight : 60.toHeight,
                       action: AnimatedBuilder(
                           animation: _controller,
                           builder: (context, child) {
@@ -147,9 +135,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                           }),
                       title: advanceSettings.tr,
                       child: AnimatedOpacity(
-                        opacity: _settingsController.isAdvanceMenuOpened.value
-                            ? 1
-                            : 0,
+                        opacity: _settingsController.isAdvanceMenuOpened.value ? 1 : 0,
                         duration: defaultAnimationTime,
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -163,9 +149,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                                   ///TODO: localize title
                                   Text(
                                     'S2S Streaming',
-                                    style: AppTextStyle()
-                                        .regular18DolphinGrey
-                                        .copyWith(
+                                    style: AppTextStyle().regular18DolphinGrey.copyWith(
                                           fontSize: 18.toFont,
                                           color: balticSea,
                                         ),
@@ -173,13 +157,11 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                                   const Spacer(),
                                   Obx(
                                     () => CupertinoSwitch(
-                                      value: _settingsController
-                                          .isStreamingEnabled.value,
+                                      value: _settingsController.isStreamingEnabled.value,
                                       activeColor: japaneseLaurel,
                                       trackColor: americanSilver,
                                       onChanged: (value) {
-                                        _settingsController
-                                            .changeStreamingPref(value);
+                                        _settingsController.changeStreamingPref(value);
                                       },
                                     ),
                                   ),
@@ -338,39 +320,27 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
   ) {
     return Obx(
       () => InkWell(
-        onTap: () =>
-            _settingsController.changeVoiceAssistantPref(currentGender),
+        onTap: () => _settingsController.changeVoiceAssistantPref(currentGender),
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
               width: 1.toWidth,
-              color: (_settingsController.preferredVoiceAssistant.value ==
-                      currentGender)
-                  ? japaneseLaurel
-                  : americanSilver,
+              color: (_settingsController.preferredVoiceAssistant.value == currentGender) ? japaneseLaurel : americanSilver,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
-          padding:
-              AppEdgeInsets.instance.symmetric(horizontal: 10, vertical: 8),
+          padding: AppEdgeInsets.instance.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             children: <Widget>[
               SvgPicture.asset(
-                (_settingsController.preferredVoiceAssistant.value ==
-                        currentGender)
-                    ? iconSelectedRadio
-                    : iconUnSelectedRadio,
+                (_settingsController.preferredVoiceAssistant.value == currentGender) ? iconSelectedRadio : iconUnSelectedRadio,
               ),
               SizedBox(width: 5.toWidth),
               Text(
                 title,
                 style: AppTextStyle().regular18DolphinGrey.copyWith(
                       fontSize: 16.toFont,
-                      color:
-                          (_settingsController.preferredVoiceAssistant.value ==
-                                  currentGender)
-                              ? japaneseLaurel
-                              : dolphinGray,
+                      color: (_settingsController.preferredVoiceAssistant.value == currentGender) ? japaneseLaurel : dolphinGray,
                     ),
               ),
             ],
@@ -390,8 +360,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
           children: [
             Text(
               _getThemeModeName(_settingsController.selectedThemeMode.value),
-              style:
-                  AppTextStyle().light16BalticSea.copyWith(color: arsenicColor),
+              style: AppTextStyle().light16BalticSea.copyWith(color: arsenicColor),
             ),
             SizedBox(width: 8.toWidth),
             SvgPicture.asset(iconArrowDown),

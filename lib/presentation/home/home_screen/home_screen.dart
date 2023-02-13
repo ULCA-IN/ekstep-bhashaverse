@@ -56,9 +56,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             children: [
               Column(
                 children: [
-                  Expanded(
-                      child: getCurrentBottomWidget(
-                          _homeController.bottomBarIndex.value)),
+                  Expanded(child: getCurrentBottomWidget(_homeController.bottomBarIndex.value)),
                   _homeController.isKeyboardVisible.value
                       ? const SizedBox.shrink()
                       : CustomBottomBar(
@@ -69,14 +67,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         )
                 ],
               ),
-              if (_homeController.isModelsLoading.value ||
-                  _bottomNavTranslationController.isLsLoading.value)
+              if (_homeController.isModelsLoading.value || _bottomNavTranslationController.isLsLoading.value)
                 LottieAnimation(
                     context: context,
                     lottieAsset: animationLoadingLine,
-                    footerText: _homeController.isModelsLoading.value
-                        ? kHomeLoadingAnimationText.tr
-                        : kTranslationLoadingAnimationText.tr),
+                    footerText: _homeController.isModelsLoading.value ? kHomeLoadingAnimationText.tr : kTranslationLoadingAnimationText.tr),
             ],
           ),
         ),
@@ -88,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     switch (index) {
       case 0:
         return const BottomNavTranslation();
-      // TODO: uncomment after chat feature added
       // case 1:
       //   return const BottomNavChat();
       case 1:

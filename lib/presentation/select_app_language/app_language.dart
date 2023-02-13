@@ -64,9 +64,7 @@ class _AppLanguageState extends State<AppLanguage> {
               SizedBox(height: 8.toHeight),
               Text(
                 youCanAlwaysChange.tr,
-                style: AppTextStyle()
-                    .light16BalticSea
-                    .copyWith(color: dolphinGray),
+                style: AppTextStyle().light16BalticSea.copyWith(color: dolphinGray),
               ),
               SizedBox(height: 24.toHeight),
               _textFormFieldContainer(),
@@ -81,23 +79,16 @@ class _AppLanguageState extends State<AppLanguage> {
                         crossAxisCount: 2,
                         childAspectRatio: 2,
                       ),
-                      itemCount:
-                          _appLanguageController.getAppLanguageList().length,
+                      itemCount: _appLanguageController.getAppLanguageList().length,
                       itemBuilder: (context, index) {
                         return Obx(
                           () {
                             return LanguageSelectionWidget(
-                              title: _appLanguageController
-                                      .getAppLanguageList()[index]
-                                  [APIConstants.kNativeName],
-                              subTitle: _appLanguageController
-                                      .getAppLanguageList()[index]
-                                  [APIConstants.kEnglishName],
-                              onItemTap: () => _appLanguageController
-                                  .setSelectedLanguageIndex(index),
+                              title: _appLanguageController.getAppLanguageList()[index][APIConstants.kNativeName],
+                              subTitle: _appLanguageController.getAppLanguageList()[index][APIConstants.kEnglishName],
+                              onItemTap: () => _appLanguageController.setSelectedLanguageIndex(index),
                               index: index,
-                              selectedIndex: _appLanguageController
-                                  .getSelectedLanguageIndex(),
+                              selectedIndex: _appLanguageController.getSelectedLanguageIndex(),
                             );
                           },
                         );
@@ -109,9 +100,7 @@ class _AppLanguageState extends State<AppLanguage> {
               SizedBox(height: 16.toHeight),
               elevatedButton(
                 buttonText: continueText.tr,
-                textStyle: AppTextStyle()
-                    .semibold24BalticSea
-                    .copyWith(fontSize: 18.toFont),
+                textStyle: AppTextStyle().semibold24BalticSea.copyWith(fontSize: 18.toFont),
                 backgroundColor: primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
@@ -119,17 +108,12 @@ class _AppLanguageState extends State<AppLanguage> {
                     _focusNodeLanguageSearch.unfocus();
                   }
                   _languageSearchController.clear();
-                  if (_appLanguageController.getSelectedLanguageIndex() !=
-                      null) {
+                  if (_appLanguageController.getSelectedLanguageIndex() != null) {
                     Future.delayed(const Duration(milliseconds: 200)).then((_) {
-                      String selectedLocale = _appLanguageController
-                              .getAppLanguageList()[
-                          _appLanguageController.getSelectedLanguageIndex() ??
-                              0][APIConstants.kLanguageCode];
-                      _appLanguageController.setSelectedAppLocale(
-                          selectedLocale == 'hi' ? selectedLocale : 'en');
-                      if (_hiveDBInstance.get(introShownAlreadyKey,
-                          defaultValue: false)) {
+                      String selectedLocale = _appLanguageController.getAppLanguageList()[_appLanguageController.getSelectedLanguageIndex() ?? 0]
+                          [APIConstants.kLanguageCode];
+                      _appLanguageController.setSelectedAppLocale(selectedLocale);
+                      if (_hiveDBInstance.get(introShownAlreadyKey, defaultValue: false)) {
                         Get.back();
                       } else {
                         Get.toNamed(AppRoutes.onboardingRoute);
@@ -167,9 +151,7 @@ class _AppLanguageState extends State<AppLanguage> {
             color: dolphinGray,
           ),
           hintText: searchLanguage.tr,
-          hintStyle: AppTextStyle()
-              .light16BalticSea
-              .copyWith(fontSize: 18.toFont, color: manateeGray),
+          hintStyle: AppTextStyle().light16BalticSea.copyWith(fontSize: 18.toFont, color: manateeGray),
         ),
         onChanged: ((value) => performLanguageSearch(value)),
         controller: _languageSearchController,
@@ -179,17 +161,12 @@ class _AppLanguageState extends State<AppLanguage> {
   }
 
   void performLanguageSearch(String searchString) {
-    List<Map<String, dynamic>> tempList =
-        _appLanguageController.getAppLanguageList();
+    List<Map<String, dynamic>> tempList = _appLanguageController.getAppLanguageList();
     if (searchString.isNotEmpty) {
       List<Map<String, dynamic>> searchedLanguageList = tempList.where(
         (language) {
-          return language[APIConstants.kEnglishName]
-                  .toLowerCase()
-                  .contains(searchString.toLowerCase()) ||
-              language[APIConstants.kNativeName]
-                  .toLowerCase()
-                  .contains(searchString.toLowerCase());
+          return language[APIConstants.kEnglishName].toLowerCase().contains(searchString.toLowerCase()) ||
+              language[APIConstants.kNativeName].toLowerCase().contains(searchString.toLowerCase());
         },
       ).toList();
       _appLanguageController.setCustomLanguageList(searchedLanguageList);

@@ -24,7 +24,6 @@ class CustomBottomBar extends StatelessWidget {
       label: kTranslation.tr,
     ),
 
-    // TODO: uncomment after chat feature added
     // BottomMenuItemModel(
     //   icon: iconChat,
     //   label:kChat.tr,
@@ -41,9 +40,7 @@ class CustomBottomBar extends StatelessWidget {
       padding: AppEdgeInsets.instance.only(top: 12, bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.toWidth),
-            topRight: Radius.circular(20.toWidth)),
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(20.toWidth), topRight: Radius.circular(20.toWidth)),
       ),
       child: BottomNavigationBar(
         backgroundColor: Colors.transparent,
@@ -56,16 +53,14 @@ class CustomBottomBar extends StatelessWidget {
         items: List.generate(bottomMenuList.length, (index) {
           return BottomNavigationBarItem(
             icon: Padding(
-              padding:
-                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              padding: AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
               child: SvgPicture.asset(
                 bottomMenuList[index].icon,
               ),
             ),
             label: bottomMenuList[index].label,
             activeIcon: Container(
-              padding:
-                  AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
+              padding: AppEdgeInsets.instance.symmetric(horizontal: 20, vertical: 8),
               decoration: const BoxDecoration(
                 color: approxKarry,
                 borderRadius: BorderRadius.all(Radius.circular(20)),

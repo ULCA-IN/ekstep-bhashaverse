@@ -28,8 +28,7 @@ class BottomNavTranslation extends StatefulWidget {
   State<BottomNavTranslation> createState() => _BottomNavTranslationState();
 }
 
-class _BottomNavTranslationState extends State<BottomNavTranslation>
-    with WidgetsBindingObserver {
+class _BottomNavTranslationState extends State<BottomNavTranslation> with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
@@ -99,28 +98,22 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                         child: Column(
                           children: [
                             Visibility(
-                              visible: _bottomNavTranslationController
-                                  .isTranslateCompleted.value,
+                              visible: _bottomNavTranslationController.isTranslateCompleted.value,
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    _bottomNavTranslationController
-                                        .selectedSourceLanguage.value,
+                                    _bottomNavTranslationController.selectedSourceLanguage.value,
                                     style: AppTextStyle().regular16DolphinGrey,
                                   ),
                                   GestureDetector(
                                     onTap: () {
                                       unFocusTextFields();
-                                      _bottomNavTranslationController
-                                          .resetAllValues();
+                                      _bottomNavTranslationController.resetAllValues();
                                     },
                                     child: Text(
                                       kReset.tr,
-                                      style: AppTextStyle()
-                                          .regular18DolphinGrey
-                                          .copyWith(color: japaneseLaurel),
+                                      style: AppTextStyle().regular18DolphinGrey.copyWith(color: japaneseLaurel),
                                     ),
                                   )
                                 ],
@@ -128,70 +121,51 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                             ),
                             SizedBox(height: 6.toHeight),
                             // Source language text field
-                            //TODO: connecting string in localization
                             Flexible(
                               child: TextField(
-                                controller: _bottomNavTranslationController
-                                    .sourceLanTextController,
+                                controller: _bottomNavTranslationController.sourceLanTextController,
                                 focusNode: _sourceLangFocusNode,
-                                readOnly: _bottomNavTranslationController
-                                    .isTranslateCompleted.value,
-                                style: _bottomNavTranslationController
-                                        .isTranslateCompleted.value
+                                readOnly: _bottomNavTranslationController.isTranslateCompleted.value,
+                                style: _bottomNavTranslationController.isTranslateCompleted.value
                                     ? AppTextStyle().regular18balticSea
                                     : AppTextStyle().regular28balticSea,
                                 expands: true,
                                 maxLines: null,
                                 textInputAction: TextInputAction.done,
                                 decoration: InputDecoration(
-                                  hintText: _bottomNavTranslationController
-                                          .isTranslateCompleted.value
+                                  hintText: _bottomNavTranslationController.isTranslateCompleted.value
                                       ? null
                                       : isRecordingStarted()
                                           ? kListeningHintText.tr
-                                          : _bottomNavTranslationController
-                                                  .isMicButtonTapped.value
+                                          : _bottomNavTranslationController.isMicButtonTapped.value
                                               ? 'Connecting...'
                                               : kTranslationHintText.tr,
-                                  hintStyle: AppTextStyle()
-                                      .regular28balticSea
-                                      .copyWith(color: mischkaGrey),
-                                  hintMaxLines: _bottomNavTranslationController
-                                          .isTranslateCompleted.value
-                                      ? null
-                                      : 2,
+                                  hintStyle: AppTextStyle().regular28balticSea.copyWith(color: mischkaGrey),
+                                  hintMaxLines: _bottomNavTranslationController.isTranslateCompleted.value ? null : 2,
                                   border: InputBorder.none,
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                 ),
                                 onChanged: (newText) {
-                                  if (_bottomNavTranslationController
-                                      .isTransliterationEnabled()) {
+                                  if (_bottomNavTranslationController.isTransliterationEnabled()) {
                                     getTransliterationHints(newText);
                                   } else {
-                                    _bottomNavTranslationController
-                                        .transliterationWordHints
-                                        .clear();
+                                    _bottomNavTranslationController.transliterationWordHints.clear();
                                   }
                                 },
                               ),
                             ),
                             SizedBox(height: 6.toHeight),
-                            if (_bottomNavTranslationController
-                                .isTranslateCompleted.value)
+                            if (_bottomNavTranslationController.isTranslateCompleted.value)
                               _buildSourceTargetTextActions(
-                                  isForTargetSection: false,
-                                  showSoundButton:
-                                      _bottomNavTranslationController
-                                          .isRecordedViaMic.value),
+                                  isForTargetSection: false, showSoundButton: _bottomNavTranslationController.isRecordedViaMic.value),
                           ],
                         ),
                       ),
                       SizedBox(height: 6.toHeight),
                       _buildInputActionButtons(),
                       Visibility(
-                        visible: _bottomNavTranslationController
-                            .isTranslateCompleted.value,
+                        visible: _bottomNavTranslationController.isTranslateCompleted.value,
                         child: Expanded(
                           child: Column(
                             children: [
@@ -207,10 +181,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     Align(
                                       alignment: Alignment.topLeft,
                                       child: Text(
-                                        _bottomNavTranslationController
-                                            .selectedTargetLanguage.value,
-                                        style:
-                                            AppTextStyle().regular16DolphinGrey,
+                                        _bottomNavTranslationController.selectedTargetLanguage.value,
+                                        style: AppTextStyle().regular16DolphinGrey,
                                       ),
                                     ),
                                     SizedBox(
@@ -218,17 +190,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     ),
                                     Flexible(
                                       child: TextField(
-                                        controller:
-                                            _bottomNavTranslationController
-                                                .targetLangTextController,
+                                        controller: _bottomNavTranslationController.targetLangTextController,
                                         focusNode: _transLangFocusNode,
                                         expands: true,
                                         maxLines: null,
-                                        style:
-                                            AppTextStyle().regular18balticSea,
-                                        readOnly:
-                                            _bottomNavTranslationController
-                                                .isTranslateCompleted.value,
+                                        style: AppTextStyle().regular18balticSea,
+                                        readOnly: _bottomNavTranslationController.isTranslateCompleted.value,
                                         textInputAction: TextInputAction.done,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
@@ -238,10 +205,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       ),
                                     ),
                                     SizedBox(height: 6.toHeight),
-                                    if (_bottomNavTranslationController
-                                        .isTranslateCompleted.value)
-                                      _buildSourceTargetTextActions(
-                                          isForTargetSection: true),
+                                    if (_bottomNavTranslationController.isTranslateCompleted.value)
+                                      _buildSourceTargetTextActions(isForTargetSection: true),
                                   ],
                                 ),
                               ),
@@ -263,61 +228,50 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             height: 75.toHeight,
             child: Obx(
               () => Visibility(
-                visible:
-                    _bottomNavTranslationController.isKeyboardVisible.value,
+                visible: _bottomNavTranslationController.isKeyboardVisible.value,
                 child: Column(
                   children: [
                     SingleChildScrollView(
-                      controller: _bottomNavTranslationController
-                          .transliterationHintsScrollController,
+                      controller: _bottomNavTranslationController.transliterationHintsScrollController,
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          ..._bottomNavTranslationController
-                              .transliterationWordHints
-                              .map((hintText) => GestureDetector(
-                                    onTap: () {
-                                      replaceTextWithTransliterationHint(
-                                          hintText);
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(4),
-                                        color: lilyWhite,
-                                      ),
-                                      margin: AppEdgeInsets.instance.all(4),
-                                      padding: AppEdgeInsets.instance.symmetric(
-                                          vertical: 4, horizontal: 6),
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        constraints: BoxConstraints(
-                                          minWidth: (ScreenUtil.screenWidth / 6)
-                                              .toWidth,
-                                          // maxWidth: 300,
-                                        ),
-                                        child: Text(
-                                          hintText,
-                                          style: AppTextStyle()
-                                              .regular18DolphinGrey
-                                              .copyWith(
-                                                color: Colors.black,
-                                              ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
+                          ..._bottomNavTranslationController.transliterationWordHints.map((hintText) => GestureDetector(
+                                onTap: () {
+                                  replaceTextWithTransliterationHint(hintText);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: lilyWhite,
+                                  ),
+                                  margin: AppEdgeInsets.instance.all(4),
+                                  padding: AppEdgeInsets.instance.symmetric(vertical: 4, horizontal: 6),
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    constraints: BoxConstraints(
+                                      minWidth: (ScreenUtil.screenWidth / 6).toWidth,
+                                      // maxWidth: 300,
                                     ),
-                                  )),
+                                    child: Text(
+                                      hintText,
+                                      style: AppTextStyle().regular18DolphinGrey.copyWith(
+                                            color: Colors.black,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              )),
                         ],
                       ),
                     ),
                     Visibility(
-                      visible: !_bottomNavTranslationController
-                              .isScrolledTransliterationHints.value &&
-                          _bottomNavTranslationController
-                              .transliterationWordHints.isNotEmpty,
+                      visible: !_bottomNavTranslationController.isScrolledTransliterationHints.value &&
+                          _bottomNavTranslationController.transliterationWordHints.isNotEmpty,
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Icon(
@@ -337,16 +291,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             height: 20.toHeight,
           ),
           Obx(
-            () => _bottomNavTranslationController.isKeyboardVisible.value
-                ? const SizedBox.shrink()
-                : _buildSourceTargetLangButtons(),
+            () => _bottomNavTranslationController.isKeyboardVisible.value ? const SizedBox.shrink() : _buildSourceTargetLangButtons(),
           ),
 
           // mic button
           Obx(
-            () => _bottomNavTranslationController.isKeyboardVisible.value
-                ? const SizedBox.shrink()
-                : _buildMicButton(),
+            () => _bottomNavTranslationController.isKeyboardVisible.value ? const SizedBox.shrink() : _buildMicButton(),
           ),
         ],
       ),
@@ -364,12 +314,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               icon: iconClipBoardText,
               title: kPaste.tr,
               onTap: () async {
-                ClipboardData? clipboardData =
-                    await Clipboard.getData(Clipboard.kTextPlain);
-                if (clipboardData != null &&
-                    (clipboardData.text ?? '').isNotEmpty) {
-                  _bottomNavTranslationController.sourceLanTextController.text =
-                      clipboardData.text ?? '';
+                ClipboardData? clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+                if (clipboardData != null && (clipboardData.text ?? '').isNotEmpty) {
+                  _bottomNavTranslationController.sourceLanTextController.text = clipboardData.text ?? '';
                 } else {
                   showDefaultSnackbar(message: errorNoTextInClipboard.tr);
                 }
@@ -380,15 +327,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               isHighlighted: true,
               onTap: () {
                 unFocusTextFields();
-                if (_bottomNavTranslationController
-                    .sourceLanTextController.text.isEmpty) {
+                if (_bottomNavTranslationController.sourceLanTextController.text.isEmpty) {
                   showDefaultSnackbar(message: kErrorNoSourceText.tr);
-                } else if (_bottomNavTranslationController
-                    .isSourceAndTargetLangSelected()) {
+                } else if (_bottomNavTranslationController.isSourceAndTargetLangSelected()) {
                   _bottomNavTranslationController.translateSourceLanguage();
                 } else {
-                  showDefaultSnackbar(
-                      message: kErrorSelectSourceAndTargetScreen.tr);
+                  showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
                 }
               },
             ),
@@ -407,24 +351,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
 
-            List<dynamic> sourceLanguageList =
-                _languageModelController.allAvailableSourceLanguages.toList();
+            List<dynamic> sourceLanguageList = _languageModelController.allAvailableSourceLanguages.toList();
 
             dynamic selectedSourceLangIndex =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: sourceLanguageList,
-              kIsSourceLanguage: true
-            });
+                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {kLanguageList: sourceLanguageList, kIsSourceLanguage: true});
             if (selectedSourceLangIndex != null) {
-              String selectedLanguage =
-                  sourceLanguageList[selectedSourceLangIndex];
-              _bottomNavTranslationController.selectedSourceLanguage.value =
-                  selectedLanguage;
-              if (selectedLanguage ==
-                  _bottomNavTranslationController
-                      .selectedTargetLanguage.value) {
-                _bottomNavTranslationController.selectedTargetLanguage.value =
-                    '';
+              String selectedLanguage = sourceLanguageList[selectedSourceLangIndex];
+              _bottomNavTranslationController.selectedSourceLanguage.value = selectedLanguage;
+              if (selectedLanguage == _bottomNavTranslationController.selectedTargetLanguage.value) {
+                _bottomNavTranslationController.selectedTargetLanguage.value = '';
               }
 
               if (_bottomNavTranslationController.isTransliterationEnabled()) {
@@ -443,12 +378,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             child: Obx(
               () {
                 return Text(
-                  _bottomNavTranslationController
-                      .getSelectedSourceLanguageName(),
+                  _bottomNavTranslationController.getSelectedSourceLanguageName(),
                   overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
+                  style: AppTextStyle().regular18DolphinGrey.copyWith(fontSize: 16.toFont),
                 );
               },
             ),
@@ -469,26 +401,18 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
 
-            List<dynamic> targetLanguageList =
-                _languageModelController.allAvailableTargetLanguages.toList();
+            List<dynamic> targetLanguageList = _languageModelController.allAvailableTargetLanguages.toList();
 
-            if (_bottomNavTranslationController
-                .selectedSourceLanguage.value.isNotEmpty) {
+            if (_bottomNavTranslationController.selectedSourceLanguage.value.isNotEmpty) {
               targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
-                return eachAvailableTargetLanguage ==
-                    _bottomNavTranslationController
-                        .selectedSourceLanguage.value;
+                return eachAvailableTargetLanguage == _bottomNavTranslationController.selectedSourceLanguage.value;
               });
             }
 
             dynamic selectedTargetLangIndex =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: targetLanguageList,
-              kIsSourceLanguage: false
-            });
+                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {kLanguageList: targetLanguageList, kIsSourceLanguage: false});
             if (selectedTargetLangIndex != null) {
-              _bottomNavTranslationController.selectedTargetLanguage.value =
-                  targetLanguageList[selectedTargetLangIndex];
+              _bottomNavTranslationController.selectedTargetLanguage.value = targetLanguageList[selectedTargetLangIndex];
             }
           },
           child: Container(
@@ -502,9 +426,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             child: Obx(
               () => Text(
                 _bottomNavTranslationController.getSelectedTargetLanguageName(),
-                style: AppTextStyle()
-                    .regular18DolphinGrey
-                    .copyWith(fontSize: 16.toFont),
+                style: AppTextStyle().regular18DolphinGrey.copyWith(fontSize: 16.toFont),
               ),
             ),
           ),
@@ -548,9 +470,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 child: Padding(
                   padding: AppEdgeInsets.instance.all(20.0),
                   child: SvgPicture.asset(
-                    _bottomNavTranslationController.isMicButtonTapped.value
-                        ? iconMicStop
-                        : iconMicroPhone,
+                    _bottomNavTranslationController.isMicButtonTapped.value ? iconMicStop : iconMicroPhone,
                     height: 32.toHeight,
                     width: 32.toWidth,
                     color: Colors.black.withOpacity(0.7),
@@ -579,11 +499,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 onTap: () {
                   String shareText = '';
                   if (isForTargetSection) {
-                    shareText = _bottomNavTranslationController
-                        .targetLangTextController.text;
+                    shareText = _bottomNavTranslationController.targetLangTextController.text;
                   } else {
-                    shareText = _bottomNavTranslationController
-                        .sourceLanTextController.text;
+                    shareText = _bottomNavTranslationController.sourceLanTextController.text;
                   }
                   if (shareText.isEmpty) {
                     showDefaultSnackbar(message: noTextForShare.tr);
@@ -607,11 +525,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 onTap: () async {
                   String copyText = '';
                   if (isForTargetSection) {
-                    copyText = _bottomNavTranslationController
-                        .targetLangTextController.text;
+                    copyText = _bottomNavTranslationController.targetLangTextController.text;
                   } else {
-                    copyText = _bottomNavTranslationController
-                        .sourceLanTextController.text;
+                    copyText = _bottomNavTranslationController.sourceLanTextController.text;
                   }
                   if (copyText.isEmpty) {
                     showDefaultSnackbar(message: noTextForCopy.tr);
@@ -642,13 +558,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   AudioFileWaveforms(
-                    size: Size(WaveformStyle.getDefaultWidth,
-                        WaveformStyle.getDefaultHeight),
-                    playerController:
-                        _bottomNavTranslationController.controller,
+                    size: Size(WaveformStyle.getDefaultWidth, WaveformStyle.getDefaultHeight),
+                    playerController: _bottomNavTranslationController.controller,
                     waveformType: WaveformType.fitWidth,
-                    playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                        isRecordedAudio: !isForTargetSection),
+                    playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(isRecordedAudio: !isForTargetSection),
                   ),
                   SizedBox(width: 8.toWidth),
                   SizedBox(
@@ -656,24 +569,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                            DateTImeUtils().getTimeFromMilliseconds(
-                                timeInMillisecond:
-                                    _bottomNavTranslationController
-                                        .currentDuration.value),
-                            style: AppTextStyle()
-                                .regular12Arsenic
-                                .copyWith(color: manateeGray),
-                            textAlign: TextAlign.start),
-                        Text(
-                            DateTImeUtils().getTimeFromMilliseconds(
-                                timeInMillisecond:
-                                    _bottomNavTranslationController
-                                        .maxDuration.value),
-                            style: AppTextStyle()
-                                .regular12Arsenic
-                                .copyWith(color: manateeGray),
-                            textAlign: TextAlign.end),
+                        Text(DateTImeUtils().getTimeFromMilliseconds(timeInMillisecond: _bottomNavTranslationController.currentDuration.value),
+                            style: AppTextStyle().regular12Arsenic.copyWith(color: manateeGray), textAlign: TextAlign.start),
+                        Text(DateTImeUtils().getTimeFromMilliseconds(timeInMillisecond: _bottomNavTranslationController.maxDuration.value),
+                            style: AppTextStyle().regular12Arsenic.copyWith(color: manateeGray), textAlign: TextAlign.end),
                       ],
                     ),
                   ),
@@ -689,8 +588,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             onTap: () async {
               shouldShowWaveforms(isForTargetSection)
                   ? await _bottomNavTranslationController.stopPlayer()
-                  : _bottomNavTranslationController
-                      .playTTSOutput(isForTargetSection);
+                  : _bottomNavTranslationController.playTTSOutput(isForTargetSection);
             },
             child: Container(
               decoration: const BoxDecoration(
@@ -700,9 +598,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               padding: AppEdgeInsets.instance.all(8),
               child: Obx(
                 () => SvgPicture.asset(
-                  shouldShowWaveforms(isForTargetSection)
-                      ? iconStopPlayback
-                      : iconSound,
+                  shouldShowWaveforms(isForTargetSection) ? iconStopPlayback : iconSound,
                   height: 24.toWidth,
                   width: 24.toWidth,
                   color: balticSea,
@@ -718,8 +614,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   void getTransliterationHints(String newText) {
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
-      if (_bottomNavTranslationController
-          .selectedSourceLanguage.value.isNotEmpty) {
+      if (_bottomNavTranslationController.selectedSourceLanguage.value.isNotEmpty) {
         _bottomNavTranslationController.getTransliterationOutput(wordToSend);
       }
     } else {
@@ -728,26 +623,18 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   }
 
   void replaceTextWithTransliterationHint(String currentHintText) {
-    List<String> oldString = _bottomNavTranslationController
-        .sourceLanTextController.text
-        .trim()
-        .split(' ');
+    List<String> oldString = _bottomNavTranslationController.sourceLanTextController.text.trim().split(' ');
     oldString.removeLast();
     oldString.add(currentHintText);
-    _bottomNavTranslationController.sourceLanTextController.text =
-        '${oldString.join(' ')} ';
+    _bottomNavTranslationController.sourceLanTextController.text = '${oldString.join(' ')} ';
     _bottomNavTranslationController.sourceLanTextController.selection =
-        TextSelection.fromPosition(TextPosition(
-            offset: _bottomNavTranslationController
-                .sourceLanTextController.text.length));
+        TextSelection.fromPosition(TextPosition(offset: _bottomNavTranslationController.sourceLanTextController.text.length));
     _bottomNavTranslationController.clearTransliterationHints();
   }
 
   bool shouldShowWaveforms(bool isForTargetSection) {
-    return ((isForTargetSection &&
-            _bottomNavTranslationController.isPlayingTarget.value) ||
-        (!isForTargetSection &&
-            _bottomNavTranslationController.isPlayingSource.value));
+    return ((isForTargetSection && _bottomNavTranslationController.isPlayingTarget.value) ||
+        (!isForTargetSection && _bottomNavTranslationController.isPlayingSource.value));
   }
 
   void unFocusTextFields() {
@@ -756,9 +643,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   }
 
   bool isRecordingStarted() {
-    return _hiveDBInstance.get(isStreamingPreferred)
-        ? _socketIOClient.isMicConnected.value
-        : _bottomNavTranslationController.isMicButtonTapped.value;
+    return _hiveDBInstance.get(isStreamingPreferred) ? _socketIOClient.isMicConnected.value : _bottomNavTranslationController.isMicButtonTapped.value;
   }
 
   void micButtonActions({required bool startMicRecording}) {

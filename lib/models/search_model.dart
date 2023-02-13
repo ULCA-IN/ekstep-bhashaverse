@@ -60,8 +60,7 @@ class SearchModelData {
     description = json['description'];
     refUrl = json['refUrl'];
     task = Task.fromJson(json['task']);
-    languages =
-        List.from(json['languages']).map((e) => Languages.fromJson(e)).toList();
+    languages = List.from(json['languages']).map((e) => Languages.fromJson(e)).toList();
 
     submitter = Submitter.fromJson(json['submitter']);
     inferenceEndPoint = InferenceEndPoint.fromJson(json['inferenceEndPoint']);
@@ -71,21 +70,21 @@ class SearchModelData {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['name'] = name;
+    final data = <String, dynamic>{};
+    data['name'] = name;
 
-    _data['description'] = description;
-    _data['refUrl'] = refUrl;
-    _data['task'] = task.toJson();
-    _data['languages'] = languages.map((e) => e.toJson()).toList();
+    data['description'] = description;
+    data['refUrl'] = refUrl;
+    data['task'] = task.toJson();
+    data['languages'] = languages.map((e) => e.toJson()).toList();
 
-    _data['submitter'] = submitter.toJson();
-    _data['inferenceEndPoint'] = inferenceEndPoint.toJson();
+    data['submitter'] = submitter.toJson();
+    data['inferenceEndPoint'] = inferenceEndPoint.toJson();
 
-    _data['modelId'] = modelId;
-    _data['userId'] = userId;
+    data['modelId'] = modelId;
+    data['userId'] = userId;
 
-    return _data;
+    return data;
   }
 }
 
