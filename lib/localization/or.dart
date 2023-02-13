@@ -1,6 +1,6 @@
 import 'localization_keys.dart';
 
-final Map<String, String> od = {
+final Map<String, String> or = {
   appName: 'ଭାଷାଭର୍ସ',
   selectAppLanguage: 'ଆପ୍ଲିକେଶନ୍‌ର ଭାଷା ବାଛନ୍ତୁ',
   youCanAlwaysChange: 'ଆପଣ ସେଟିଙ୍ଗସ୍‌ରୁ ଏହା କେତେବେଳେ ବି ବଦଳେଇ ପାରିବେ',

@@ -12,11 +12,12 @@ import 'mai.dart';
 import 'ml.dart';
 import 'mr.dart';
 import 'ne.dart';
-import 'od.dart';
+import 'or.dart';
 import 'pa.dart';
 import 'sa.dart';
 import 'ta.dart';
 import 'te.dart';
+import 'ur.dart';
 
 class AppLocalization extends Translations {
   @override
@@ -33,10 +34,11 @@ class AppLocalization extends Translations {
         'ml': ml,
         'mr': mr,
         'ne': ne,
-        'od': od,
+        'or': or,
         'pa': pa,
         'sa': sa,
         'ta': ta,
         'te': te,
+        'ur': ur,
       };
 }
