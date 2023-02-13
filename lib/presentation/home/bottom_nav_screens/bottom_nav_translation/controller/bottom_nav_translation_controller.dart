@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
+import '../../../../../enums/asr_details_enum.dart';
 import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
 import '../../../../../localization/localization_keys.dart';
+import '../../../../../services/socket_io_client.dart';
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
@@ -53,6 +56,7 @@ class BottomNavTranslationController extends GetxController {
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
   RxBool isScrolledTransliterationHints = false.obs;
+  late SocketIOClient _socketIOClient;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -60,12 +64,18 @@ class BottomNavTranslationController extends GetxController {
 
   late PlayerController controller;
 
+  StreamSubscription<Uint8List>? micStreamSubscription;
+
+  int silenceSize = 20;
+
+  late Worker worker;
+
   @override
   void onInit() {
+    _socketIOClient = Get.find();
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-
     controller = PlayerController();
 
     controller.onCompletion.listen((event) {
@@ -93,15 +103,22 @@ class BottomNavTranslationController extends GetxController {
         default:
       }
     });
-
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
     });
     super.onInit();
+    worker = ever(_socketIOClient.socketResponseText, (socketResponseText) {
+      sourceLanTextController.text = socketResponseText;
+      if (!_socketIOClient.isMicConnected.value) {
+        worker.dispose();
+      }
+    }, condition: () => _socketIOClient.isMicConnected.value);
   }
 
   @override
   void onClose() {
+    worker.dispose();
+    _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
     disposePlayer();
@@ -152,15 +169,78 @@ class BottomNavTranslationController extends GetxController {
       lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
 
   void startVoiceRecording() async {
+    isMicButtonTapped.value = true;
+
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
       isMicPermissionGranted = isPermissionGranted;
     });
     if (isMicPermissionGranted) {
-      // clear previous recording files and
-      // update state
-      resetAllValues();
-      isMicButtonTapped.value = true;
-      await _voiceRecorder.startRecordingVoice();
+      // / if user quickly released tap than [isMicButtonTapped] would be false
+      //So need to check before starting mic streaming
+      if (isMicButtonTapped.value == true) {
+        sourceLanTextController.clear();
+
+        if (_hiveDBInstance.get(isStreamingPreferred)) {
+          connectToSocket();
+
+          _socketIOClient.socketEmit(
+              emittingStatus: 'connect_mic_stream',
+              emittingData: [],
+              isDataToSend: false);
+
+          MicStream.microphone(
+                  audioSource: AudioSource.DEFAULT,
+                  sampleRate: 44100,
+                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
+              .then((stream) {
+            List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
+            micStreamSubscription = stream?.listen((value) {
+              double meanSquared = meanSquare(value.buffer.asInt8List());
+              _socketIOClient.socketEmit(
+                  emittingStatus: 'mic_data',
+                  emittingData: [
+                    value.buffer.asInt32List(),
+                    getSelectedSourceLangCode(),
+                    true,
+                    false
+                  ],
+                  isDataToSend: true);
+
+              if (meanSquared >= 0.3) {
+                checkSilenceList.add(0);
+              }
+              if (meanSquared < 0.3) {
+                checkSilenceList.add(1);
+
+                if (checkSilenceList.length > silenceSize) {
+                  checkSilenceList = checkSilenceList
+                      .sublist(checkSilenceList.length - silenceSize);
+                }
+                int sumValue = checkSilenceList
+                    .reduce((value, element) => value + element);
+                if (sumValue == silenceSize) {
+                  _socketIOClient.socketEmit(
+                      emittingStatus: 'mic_data',
+                      emittingData: [
+                        null,
+                        getSelectedSourceLangCode(),
+                        false,
+                        false
+                      ],
+                      isDataToSend: true);
+                  checkSilenceList.clear();
+                }
+              }
+            });
+          });
+        } else {
+          // clear previous recording files and
+          // update state
+          resetAllValues();
+          await _voiceRecorder.startRecordingVoice();
+        }
+      }
     } else {
       showDefaultSnackbar(message: errorMicPermission.tr);
     }
@@ -168,14 +248,25 @@ class BottomNavTranslationController extends GetxController {
 
   void stopVoiceRecordingAndGetResult() async {
     isMicButtonTapped.value = false;
-    String? base64EncodedAudioContent =
-        await _voiceRecorder.stopRecordingVoiceAndGetOutput();
-    if (base64EncodedAudioContent == null ||
-        base64EncodedAudioContent.isEmpty) {
-      showDefaultSnackbar(message: errorInRecording.tr);
-      return;
+    if (_hiveDBInstance.get(isStreamingPreferred)) {
+      micStreamSubscription?.cancel();
+      _socketIOClient.socketEmit(
+          emittingStatus: 'mic_data',
+          emittingData: [null, getSelectedSourceLangCode(), false, true],
+          isDataToSend: true);
+
+      _socketIOClient.disconnect();
+      translateSourceLanguage();
     } else {
-      await getASROutput(base64EncodedAudioContent);
+      String? base64EncodedAudioContent =
+          await _voiceRecorder.stopRecordingVoiceAndGetOutput();
+      if (base64EncodedAudioContent == null ||
+          base64EncodedAudioContent.isEmpty) {
+        showDefaultSnackbar(message: errorInRecording.tr);
+        return;
+      } else {
+        await getASROutput(base64EncodedAudioContent);
+      }
     }
   }
 
@@ -219,8 +310,10 @@ class BottomNavTranslationController extends GetxController {
   Future<void> getASROutput(String base64EncodedAudioContent) async {
     isLsLoading.value = true;
     var asrPayloadToSend = {};
-    asrPayloadToSend['modelId'] = _languageModelController
-        .getAvailableASRModelsForLanguage(getSelectedSourceLangCode());
+    asrPayloadToSend['modelId'] =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: getSelectedSourceLangCode(),
+            requiredASRDetails: ASRModelDetails.modelId);
     asrPayloadToSend['task'] = 'asr';
     asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
     asrPayloadToSend['source'] = getSelectedSourceLangCode();
@@ -391,7 +484,7 @@ class BottomNavTranslationController extends GetxController {
   void resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
-    isMicButtonTapped.value = false;
+    // isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
     await deleteAudioFiles();
@@ -456,5 +549,27 @@ class BottomNavTranslationController extends GetxController {
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
+  }
+
+  void connectToSocket() {
+    if (_socketIOClient.isConnected()) {
+      _socketIOClient.disconnect();
+    }
+
+    String languageCode = getSelectedSourceLangCode();
+    String callbackURL =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: languageCode,
+            requiredASRDetails: ASRModelDetails.streamingCallbackURL);
+    _socketIOClient.socketConnect(
+        apiCallbackURL: callbackURL, languageCode: languageCode);
+  }
+
+  double meanSquare(Int8List value) {
+    var sqrValue = 0;
+    for (int indValue in value) {
+      sqrValue = indValue * indValue;
+    }
+    return (sqrValue / value.length) * 1000;
   }
 }
