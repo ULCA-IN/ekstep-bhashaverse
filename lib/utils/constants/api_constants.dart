@@ -60,6 +60,11 @@ class APIConstants {
     TYPES_OF_MODELS_LIST[3]: 'AI4Bharat,',
   };
 
+  static final ASR_MODEL_TYPES = [
+    'streaming',
+    'batch',
+  ];
+
   static const kNativeName = 'native_name';
   static const kEnglishName = 'english_name';
   static const kLanguageCode = 'language_code';
