@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'dart:math' show pi;
 
 import '../../../../enums/gender_enum.dart';
 import '../../../../localization/localization_keys.dart';
@@ -20,14 +21,33 @@ class BottomNavSettings extends StatefulWidget {
   State<BottomNavSettings> createState() => _BottomNavSettingsState();
 }
 
-class _BottomNavSettingsState extends State<BottomNavSettings> {
+class _BottomNavSettingsState extends State<BottomNavSettings>
+    with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  Duration defaultAnimationTime = const Duration(milliseconds: 300);
 
   @override
   void initState() {
     _settingsController = Get.find();
-    ScreenUtil().init();
+
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: defaultAnimationTime,
+    );
+    _animation = Tween<double>(
+      begin: pi / 2,
+      end: 0.0,
+    ).animate(_controller);
+    ScreenUtil().init();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,120 +55,146 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     return Scaffold(
       backgroundColor: honeydew,
       body: SafeArea(
-        child: Padding(
-          padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 16.toHeight),
-              Text(
-                kSettings.tr,
-                style: AppTextStyle()
-                    .semibold24BalticSea
-                    .copyWith(fontSize: 20.toFont),
-              ),
-              SizedBox(height: 48.toHeight),
-              _settingHeading(
-                action: _popupMenuBuilder(),
-                title: appTheme.tr,
-                subtitle: appInterfaceWillChange.tr,
-              ),
-              SizedBox(height: 24.toHeight),
-              InkWell(
-                onTap: () {
-                  Get.toNamed(AppRoutes.appLanguageRoute)
-                      ?.then((_) => _settingsController.getPreferredLanguage());
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: _settingHeading(
-                  action: Row(
-                    children: [
-                      Text(
-                        _settingsController.preferredLanguage.value,
-                        style: AppTextStyle()
-                            .light16BalticSea
-                            .copyWith(color: arsenicColor),
-                      ),
-                      SizedBox(width: 8.toWidth),
-                      RotatedBox(
-                        quarterTurns: 3,
-                        child: SvgPicture.asset(iconArrowDown),
-                      ),
-                    ],
-                  ),
-                  title: appLanguage.tr,
-                  subtitle: appInterfaceWillChangeInSelected.tr,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 16.toHeight),
+                Text(
+                  kSettings.tr,
+                  style: AppTextStyle()
+                      .semibold24BalticSea
+                      .copyWith(fontSize: 20.toFont),
                 ),
-              ),
-              SizedBox(height: 24.toHeight),
-              _voiceAssistantTileWidget(),
-              SizedBox(height: 24.toHeight),
-              _settingHeading(
-                action: Obx(
-                  () => CupertinoSwitch(
-                    value: _settingsController.isTransLiterationEnabled.value,
-                    activeColor: japaneseLaurel,
-                    trackColor: americanSilver,
-                    onChanged: (value) =>
-                        _settingsController.changeTransliterationPref(value),
-                  ),
+                SizedBox(height: 48.toHeight),
+                _settingHeading(
+                  action: _popupMenuBuilder(),
+                  title: appTheme.tr,
+                  subtitle: appInterfaceWillChange.tr,
                 ),
-                title: transLiteration.tr,
-                subtitle: transLiterationWillInitiateWord.tr,
-              ),
-              SizedBox(height: 24.toHeight),
-              Obx(
-                () => InkWell(
+                SizedBox(height: 24.toHeight),
+                InkWell(
                   onTap: () {
-                    _settingsController.isAdvanceMenuOpened.value =
-                        !_settingsController.isAdvanceMenuOpened.value;
+                    Get.toNamed(AppRoutes.appLanguageRoute)?.then(
+                        (_) => _settingsController.getPreferredLanguage());
                   },
                   borderRadius: BorderRadius.circular(10),
                   child: _settingHeading(
-                    height: _settingsController.isAdvanceMenuOpened.value
-                        ? 150.toHeight
-                        : 70.toHeight,
-                    action: AnimatedRotation(
-                      duration: const Duration(milliseconds: 300),
-                      turns: _settingsController.isAdvanceMenuOpened.value
-                          ? 0
-                          : 0.25,
-                      child: SvgPicture.asset(iconArrowDown),
+                    action: Row(
+                      children: [
+                        Text(
+                          _settingsController.preferredLanguage.value,
+                          style: AppTextStyle()
+                              .light16BalticSea
+                              .copyWith(color: arsenicColor),
+                        ),
+                        SizedBox(width: 8.toWidth),
+                        RotatedBox(
+                          quarterTurns: 3,
+                          child: SvgPicture.asset(iconArrowDown),
+                        ),
+                      ],
                     ),
-                    title: advanceSettings.tr,
-                    child: AnimatedOpacity(
-                      opacity:
-                          _settingsController.isAdvanceMenuOpened.value ? 1 : 0,
-                      duration: const Duration(milliseconds: 300),
-                      child: Row(
-                        children: [
-                          ///TODO: localize title
-                          Text(
-                            'Streaming for ASR',
-                            style: AppTextStyle().regular18DolphinGrey.copyWith(
-                                  fontSize: 18.toFont,
-                                  color: balticSea,
-                                ),
-                          ),
-                          const Spacer(),
-                          Obx(
-                            () => CupertinoSwitch(
-                              value:
-                                  _settingsController.isStreamingEnabled.value,
-                              activeColor: japaneseLaurel,
-                              trackColor: americanSilver,
-                              onChanged: (value) {
-                                _settingsController.changeStreamingPref(value);
-                              },
+                    title: appLanguage.tr,
+                    subtitle: appInterfaceWillChangeInSelected.tr,
+                  ),
+                ),
+                SizedBox(height: 24.toHeight),
+                _voiceAssistantTileWidget(),
+                SizedBox(height: 24.toHeight),
+                _settingHeading(
+                  action: Obx(
+                    () => CupertinoSwitch(
+                      value: _settingsController.isTransLiterationEnabled.value,
+                      activeColor: japaneseLaurel,
+                      trackColor: americanSilver,
+                      onChanged: (value) =>
+                          _settingsController.changeTransliterationPref(value),
+                    ),
+                  ),
+                  title: transLiteration.tr,
+                  subtitle: transLiterationWillInitiateWord.tr,
+                ),
+                SizedBox(height: 24.toHeight),
+                Obx(
+                  () => InkWell(
+                    onTap: () {
+                      _settingsController.isAdvanceMenuOpened.value =
+                          !_settingsController.isAdvanceMenuOpened.value;
+                      _settingsController.isAdvanceMenuOpened.value
+                          ? _controller.forward()
+                          : _controller.reverse();
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: _expandableSettingHeading(
+                      height: _settingsController.isAdvanceMenuOpened.value
+                          ? 130.toHeight
+                          : 60.toHeight,
+                      action: AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..rotateZ(
+                                  _animation.value,
+                                )
+                                ..invert(),
+                              child: SvgPicture.asset(iconArrowDown),
+                            );
+                          }),
+                      title: advanceSettings.tr,
+                      child: AnimatedOpacity(
+                        opacity: _settingsController.isAdvanceMenuOpened.value
+                            ? 1
+                            : 0,
+                        duration: defaultAnimationTime,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(child: SizedBox(height: 8.toHeight)),
+                            const Flexible(child: Divider()),
+                            Flexible(child: SizedBox(height: 14.toHeight)),
+                            Flexible(
+                              child: Row(
+                                children: [
+                                  ///TODO: localize title
+                                  Text(
+                                    'S2S Streaming',
+                                    style: AppTextStyle()
+                                        .regular18DolphinGrey
+                                        .copyWith(
+                                          fontSize: 18.toFont,
+                                          color: balticSea,
+                                        ),
+                                  ),
+                                  const Spacer(),
+                                  Obx(
+                                    () => CupertinoSwitch(
+                                      value: _settingsController
+                                          .isStreamingEnabled.value,
+                                      activeColor: japaneseLaurel,
+                                      trackColor: americanSilver,
+                                      onChanged: (value) {
+                                        _settingsController
+                                            .changeStreamingPref(value);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                // SizedBox(height: 16.toHeight),
+              ],
+            ),
           ),
         ),
       ),
@@ -163,7 +209,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     double? height,
   }) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: defaultAnimationTime,
       padding: AppEdgeInsets.instance.all(16),
       height: height,
       decoration: BoxDecoration(
@@ -205,6 +251,46 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
               ],
             ),
           if (child != null) Expanded(child: child),
+        ],
+      ),
+    );
+  }
+
+  Widget _expandableSettingHeading({
+    required String title,
+    required Widget action,
+    Widget? child,
+    double? height,
+  }) {
+    return AnimatedContainer(
+      duration: defaultAnimationTime,
+      padding: AppEdgeInsets.instance.only(top: 16, left: 16, right: 16),
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: 1.toWidth,
+          color: goastWhite,
+        ),
+        color: Colors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              action,
+              SizedBox(width: 20.toWidth),
+              Text(
+                title,
+                style: AppTextStyle().regular18DolphinGrey.copyWith(
+                      fontSize: 20.toFont,
+                      color: balticSea,
+                    ),
+              ),
+            ],
+          ),
+          if (child != null) Flexible(child: child),
         ],
       ),
     );
