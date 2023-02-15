@@ -44,7 +44,9 @@ class HomeController extends GetxController {
     allModelResponse.when(
       success: ((data) {
         _languageModelController.calcAvailableSourceAndTargetLanguages(
-            data, _hiveDBInstance.get(isStreamingPreferred));
+          allModelList: data,
+          isStreamingPreferred: _hiveDBInstance.get(isStreamingPreferred),
+        );
         isModelsLoading.value = false;
       }),
       failure: (error) {
