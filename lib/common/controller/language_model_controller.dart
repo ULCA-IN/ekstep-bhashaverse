@@ -8,6 +8,8 @@ import '../../models/search_model.dart';
 import '../../utils/constants/api_constants.dart';
 
 class LanguageModelController extends GetxController {
+  final List<dynamic> _allModelList = [];
+
   final Set<String> _allAvailableSourceLanguages = {};
   RxList<dynamic> get allAvailableSourceLanguages =>
       SplayTreeSet.from(_allAvailableSourceLanguages).toList().obs;
@@ -34,8 +36,11 @@ class LanguageModelController extends GetxController {
       _availableTransliterationModels;
 
   void calcAvailableSourceAndTargetLanguages(
-      List<dynamic> allModelList, bool isStreamingPreferred) {
-    _availableASRModels = allModelList
+      {List<dynamic>? allModelList, required bool isStreamingPreferred}) {
+    if (allModelList != null && allModelList.isNotEmpty) {
+      _allModelList.addAll(allModelList);
+    }
+    _availableASRModels = _allModelList
         .firstWhere((eachTaskResponse) {
           return eachTaskResponse['taskType'] == 'asr';
         })['modelInstance']
@@ -46,11 +51,11 @@ class LanguageModelController extends GetxController {
                   APIConstants.ASR_MODEL_TYPES[0];
         })
         .toList();
-    _availableTranslationModels = allModelList.firstWhere((eachTaskResponse) =>
+    _availableTranslationModels = _allModelList.firstWhere((eachTaskResponse) =>
         eachTaskResponse['taskType'] == 'translation')['modelInstance'];
-    _availableTTSModels = allModelList.firstWhere((eachTaskResponse) =>
+    _availableTTSModels = _allModelList.firstWhere((eachTaskResponse) =>
         eachTaskResponse['taskType'] == 'tts')['modelInstance'];
-    _availableTransliterationModels = allModelList.firstWhere(
+    _availableTransliterationModels = _allModelList.firstWhere(
         (eachTaskResponse) =>
             eachTaskResponse['taskType'] == 'transliteration')['modelInstance'];
 
