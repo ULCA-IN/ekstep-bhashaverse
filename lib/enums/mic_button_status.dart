@@ -1,0 +1,4 @@
+enum MicButtonStatus {
+  pressed,
+  released,
+}
