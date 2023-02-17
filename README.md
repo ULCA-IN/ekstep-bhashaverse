@@ -27,7 +27,6 @@ name: bhashaverse
   get: ^4.6.5
   dio: ^4.0.6
   permission_handler: ^10.2.0
-  flutter_sound: ^9.2.13
   path_provider: ^2.0.11
   connectivity_plus: ^3.0.2
   hive: ^2.2.3
@@ -40,8 +39,10 @@ name: bhashaverse
   avatar_glow: ^2.0.2
   lottie: ^2.1.0
   share_plus: ^6.3.0
-  audio_session: ^0.1.13
   audio_waveforms: ^1.0.0
+  socket_io_client: ^2.0.1
+  mic_stream: ^0.6.4
+  record: ^4.4.4
 ```
 
 * Dev Dependencies:
@@ -107,8 +108,6 @@ flutter_icons:
 ```
 
 ### Steps for iOS
-
-- Open Xcode and add -lc++ flag in `Runner > Build Settings > Other Linker Flags`
 
 - Open `Info.plist` and add following permission:
 
