@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -128,7 +129,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                             ),
                             SizedBox(height: 6.toHeight),
                             // Source language text field
-                            //TODO: connecting string in localization
+                            //TODO: add "Connecting" string in localization
                             Flexible(
                               child: TextField(
                                 controller: _bottomNavTranslationController
@@ -183,7 +184,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   isForTargetSection: false,
                                   showSoundButton:
                                       _bottomNavTranslationController
-                                          .isRecordedViaMic.value),
+                                              .isRecordedViaMic.value ||
+                                          _hiveDBInstance
+                                              .get(isStreamingPreferred)),
                           ],
                         ),
                       ),
@@ -648,7 +651,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                         _bottomNavTranslationController.controller,
                     waveformType: WaveformType.fitWidth,
                     playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                        isRecordedAudio: !isForTargetSection),
+                        isRecordedAudio: !isForTargetSection &&
+                            !_hiveDBInstance.get(isStreamingPreferred)),
                   ),
                   SizedBox(width: 8.toWidth),
                   SizedBox(
@@ -766,9 +770,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       unFocusTextFields();
 
       if (startMicRecording) {
+        _bottomNavTranslationController.micButtonStatus =
+            MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        _bottomNavTranslationController.micButtonStatus =
+            MicButtonStatus.released;
+        if (_bottomNavTranslationController.isMicButtonTapped.value) {
+          _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        }
       }
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
