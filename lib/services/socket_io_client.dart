@@ -45,24 +45,20 @@ class SocketIOClient extends GetxService {
 
     _socket?.on('connect-success', (data) {
       isMicConnected.value = true;
-      print('socket: $data');
     });
 
     _socket?.on('response', (data) {
       if (data is List && data.isNotEmpty && data[0].isNotEmpty) {
         socketResponseText.value = data[0];
       }
-      print('socket: $data');
     });
 
     _socket?.on('terminate', (data) {
       isMicConnected.value = false;
-      print('socket: $data');
     });
 
     _socket?.onDisconnect((data) {
       isMicConnected.value = false;
-      print('socket: $data');
     });
   }
 
