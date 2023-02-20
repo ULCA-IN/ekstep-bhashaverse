@@ -66,4 +66,6 @@ final Map<String, String> hi = {
   maleVoiceAssistantNotAvailable:
       'पुरुष वॉइस असिस्टेंट उपलब्ध नहीं है, स्त्री वॉइस असिस्टेंट से ध्वनि चल रही है',
   errorNoTextInClipboard: 'क्लिपबोर्ड में कोई टेक्स्ट उपलब्ध नहीं है',
+  s2sStreaming: 'S2S स्ट्रीमिंग',
+  connecting: 'कनेक्ट हो रहा है...',
 };

@@ -68,3 +68,5 @@ const String femaleVoiceAssistantNotAvailable =
     'femaleVoiceAssistantNotAvailable';
 const String maleVoiceAssistantNotAvailable = 'maleVoiceAssistantNotAvailable';
 const String errorNoTextInClipboard = 'errorNoTextInClipboard';
+const String s2sStreaming = 's2sStreaming';
+const String connecting = 'connecting';
