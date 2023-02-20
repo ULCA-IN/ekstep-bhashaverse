@@ -412,7 +412,7 @@ class BottomNavTranslationController extends GetxController {
 
     responseList.when(
       success: (data) async {
-        await deleteAudioFiles();
+        await deleteAudioFiles(deleteRecordedFile: false);
         if (data != null && data.isNotEmpty) {
           targetTTSResponseMale =
               data[0]['output']['audio'][0]['audioContent'] ?? '';
@@ -580,8 +580,8 @@ class BottomNavTranslationController extends GetxController {
     isPlayingSource.value = false;
   }
 
-  Future<void> deleteAudioFiles() async {
-    _voiceRecorder.deleteRecordedFile();
+  Future<void> deleteAudioFiles({bool deleteRecordedFile = true}) async {
+    if (deleteRecordedFile) _voiceRecorder.deleteRecordedFile();
     if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
       await ttsAudioFile?.delete();
     }
