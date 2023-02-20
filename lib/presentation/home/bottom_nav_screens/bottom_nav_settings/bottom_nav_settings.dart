@@ -160,9 +160,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                             Flexible(
                               child: Row(
                                 children: [
-                                  ///TODO: localize title
                                   Text(
-                                    'S2S Streaming',
+                                    s2sStreaming.tr,
                                     style: AppTextStyle()
                                         .regular18DolphinGrey
                                         .copyWith(
