@@ -54,7 +54,7 @@ class BottomNavTranslationController extends GetxController {
   String targetPath = '';
   RxInt maxDuration = 0.obs;
   RxInt currentDuration = 0.obs;
-  File? targetLanAudioFile;
+  File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
@@ -387,6 +387,8 @@ class BottomNavTranslationController extends GetxController {
     targetTTSPayloadForFemale['gender'] = 'female';
 
     List<dynamic> ttsPayloadList = [];
+    // ordering of list matters in TTS Payload
+    // first target then source
     ttsPayloadList.addAll([targetTTSPayloadMale, targetTTSPayloadForFemale]);
 
     if (_hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
@@ -409,18 +411,25 @@ class BottomNavTranslationController extends GetxController {
         ttsPayloadList: ttsPayloadList);
 
     responseList.when(
-      success: (data) {
+      success: (data) async {
+        await deleteAudioFiles();
         if (data != null && data.isNotEmpty) {
           targetTTSResponseMale =
               data[0]['output']['audio'][0]['audioContent'] ?? '';
-          targetTTSResponseFemale =
-              data[1]['output']['audio'][0]['audioContent'] ?? '';
+          if (data.length > 1) {
+            targetTTSResponseFemale =
+                data[1]['output']['audio'][0]['audioContent'] ?? '';
+          }
+
           if (_hiveDBInstance.get(isStreamingPreferred) &&
-              isRecordedViaMic.value) {
+              isRecordedViaMic.value &&
+              data.length > 2) {
             sourceTTSResponseMale =
                 data[2]['output']['audio'][0]['audioContent'] ?? '';
-            sourceTTSResponseFemale =
-                data[3]['output']['audio'][0]['audioContent'] ?? '';
+            if (data.length > 3) {
+              sourceTTSResponseFemale =
+                  data[3]['output']['audio'][0]['audioContent'] ?? '';
+            }
           }
         }
         isTranslateCompleted.value = true;
@@ -474,9 +483,9 @@ class BottomNavTranslationController extends GetxController {
         Directory appDocDir = await getApplicationDocumentsDirectory();
         targetPath =
             '${appDocDir.path}/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
-        targetLanAudioFile = File(targetPath);
-        if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
-          await targetLanAudioFile?.writeAsBytes(fileAsBytes);
+        ttsAudioFile = File(targetPath);
+        if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+          await ttsAudioFile?.writeAsBytes(fileAsBytes);
         }
 
         isPlayingTarget.value = isPlayingForTarget;
@@ -524,8 +533,6 @@ class BottomNavTranslationController extends GetxController {
     maxDuration.value = 0;
     currentDuration.value = 0;
     sourcePath = '';
-    targetTTSResponseMale = null;
-    targetTTSResponseFemale = null;
     await stopPlayer();
     sourcePath = '';
     targetPath = '';
@@ -575,9 +582,14 @@ class BottomNavTranslationController extends GetxController {
 
   Future<void> deleteAudioFiles() async {
     _voiceRecorder.deleteRecordedFile();
-    if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
-      await targetLanAudioFile?.delete();
+    if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+      await ttsAudioFile?.delete();
     }
+
+    targetTTSResponseMale = null;
+    targetTTSResponseFemale = null;
+    sourceTTSResponseFemale = null;
+    sourceTTSResponseMale = null;
   }
 
   bool isTransliterationEnabled() {
