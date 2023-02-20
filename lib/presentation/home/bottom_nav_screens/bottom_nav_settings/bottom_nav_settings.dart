@@ -119,74 +119,70 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                 ),
                 SizedBox(height: 24.toHeight),
                 Obx(
-                  () => InkWell(
-                    onTap: () {
+                  () => _expandableSettingHeading(
+                    height: _settingsController.isAdvanceMenuOpened.value
+                        ? 130.toHeight
+                        : 60.toHeight,
+                    icon: AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          return Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..rotateZ(
+                                _animation.value,
+                              )
+                              ..invert(),
+                            child: SvgPicture.asset(iconArrowDown),
+                          );
+                        }),
+                    title: advanceSettings.tr,
+                    onTitleClick: () {
                       _settingsController.isAdvanceMenuOpened.value =
                           !_settingsController.isAdvanceMenuOpened.value;
                       _settingsController.isAdvanceMenuOpened.value
                           ? _controller.forward()
                           : _controller.reverse();
                     },
-                    borderRadius: BorderRadius.circular(10),
-                    child: _expandableSettingHeading(
-                      height: _settingsController.isAdvanceMenuOpened.value
-                          ? 130.toHeight
-                          : 60.toHeight,
-                      action: AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return Transform(
-                              alignment: Alignment.center,
-                              transform: Matrix4.identity()
-                                ..rotateZ(
-                                  _animation.value,
-                                )
-                                ..invert(),
-                              child: SvgPicture.asset(iconArrowDown),
-                            );
-                          }),
-                      title: advanceSettings.tr,
-                      child: AnimatedOpacity(
-                        opacity: _settingsController.isAdvanceMenuOpened.value
-                            ? 1
-                            : 0,
-                        duration: defaultAnimationTime,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(child: SizedBox(height: 8.toHeight)),
-                            const Flexible(child: Divider()),
-                            Flexible(child: SizedBox(height: 14.toHeight)),
-                            Flexible(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    s2sStreaming.tr,
-                                    style: AppTextStyle()
-                                        .regular18DolphinGrey
-                                        .copyWith(
-                                          fontSize: 18.toFont,
-                                          color: balticSea,
-                                        ),
+                    child: AnimatedOpacity(
+                      opacity:
+                          _settingsController.isAdvanceMenuOpened.value ? 1 : 0,
+                      duration: defaultAnimationTime,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(child: SizedBox(height: 8.toHeight)),
+                          const Flexible(child: Divider()),
+                          Flexible(child: SizedBox(height: 14.toHeight)),
+                          Flexible(
+                            child: Row(
+                              children: [
+                                Text(
+                                  s2sStreaming.tr,
+                                  style: AppTextStyle()
+                                      .regular18DolphinGrey
+                                      .copyWith(
+                                        fontSize: 18.toFont,
+                                        color: balticSea,
+                                      ),
+                                ),
+                                const Spacer(),
+                                Obx(
+                                  () => CupertinoSwitch(
+                                    value: _settingsController
+                                        .isStreamingEnabled.value,
+                                    activeColor: japaneseLaurel,
+                                    trackColor: americanSilver,
+                                    onChanged: (value) {
+                                      _settingsController
+                                          .changeStreamingPref(value);
+                                    },
                                   ),
-                                  const Spacer(),
-                                  Obx(
-                                    () => CupertinoSwitch(
-                                      value: _settingsController
-                                          .isStreamingEnabled.value,
-                                      activeColor: japaneseLaurel,
-                                      trackColor: americanSilver,
-                                      onChanged: (value) {
-                                        _settingsController
-                                            .changeStreamingPref(value);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -257,9 +253,10 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
 
   Widget _expandableSettingHeading({
     required String title,
-    required Widget action,
+    required Widget icon,
     Widget? child,
     double? height,
+    required Function onTitleClick,
   }) {
     return AnimatedContainer(
       duration: defaultAnimationTime,
@@ -276,18 +273,21 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              action,
-              SizedBox(width: 20.toWidth),
-              Text(
-                title,
-                style: AppTextStyle().regular18DolphinGrey.copyWith(
-                      fontSize: 20.toFont,
-                      color: balticSea,
-                    ),
-              ),
-            ],
+          InkWell(
+            onTap: () => onTitleClick(),
+            child: Row(
+              children: [
+                icon,
+                SizedBox(width: 20.toWidth),
+                Text(
+                  title,
+                  style: AppTextStyle().regular18DolphinGrey.copyWith(
+                        fontSize: 20.toFont,
+                        color: balticSea,
+                      ),
+                ),
+              ],
+            ),
           ),
           if (child != null) Flexible(child: child),
         ],
