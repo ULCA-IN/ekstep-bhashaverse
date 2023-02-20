@@ -27,7 +27,7 @@ name: bhashaverse
   get: ^4.6.5
   dio: ^4.0.6
   permission_handler: ^10.2.0
-  path_provider: ^2.0.11
+  path_provider: ^2.0.12
   connectivity_plus: ^3.0.2
   hive: ^2.2.3
   hive_flutter: ^1.1.0
