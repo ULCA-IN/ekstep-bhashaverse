@@ -129,7 +129,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                             ),
                             SizedBox(height: 6.toHeight),
                             // Source language text field
-                            //TODO: add "Connecting" string in localization
                             Flexible(
                               child: TextField(
                                 controller: _bottomNavTranslationController
@@ -152,7 +151,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                           ? kListeningHintText.tr
                                           : _bottomNavTranslationController
                                                   .isMicButtonTapped.value
-                                              ? 'Connecting...'
+                                              ? connecting.tr
                                               : kTranslationHintText.tr,
                                   hintStyle: AppTextStyle()
                                       .regular28balticSea
@@ -185,8 +184,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   showSoundButton:
                                       _bottomNavTranslationController
                                               .isRecordedViaMic.value ||
-                                          _hiveDBInstance
-                                              .get(isStreamingPreferred)),
+                                          (_hiveDBInstance
+                                                  .get(isStreamingPreferred) &&
+                                              _bottomNavTranslationController
+                                                  .isRecordedViaMic.value)),
                           ],
                         ),
                       ),
