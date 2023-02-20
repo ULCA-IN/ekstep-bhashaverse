@@ -113,6 +113,7 @@ class BottomNavTranslationController extends GetxController {
     super.onInit();
     worker = ever(_socketIOClient.socketResponseText, (socketResponseText) {
       sourceLanTextController.text = socketResponseText;
+      if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
       if (!_socketIOClient.isMicConnected.value) {
         worker.dispose();
       }
@@ -181,7 +182,6 @@ class BottomNavTranslationController extends GetxController {
       //So need to check before starting mic streaming
       if (micButtonStatus == MicButtonStatus.pressed) {
         isMicButtonTapped.value = true;
-        sourceLanTextController.clear();
 
         if (_hiveDBInstance.get(isStreamingPreferred)) {
           connectToSocket();
@@ -386,38 +386,42 @@ class BottomNavTranslationController extends GetxController {
     targetTTSPayloadForFemale.addAll(targetTTSPayloadMale);
     targetTTSPayloadForFemale['gender'] = 'female';
 
-    var sourceTTSPayloadForMale = {};
-    sourceTTSPayloadForMale.addAll(targetTTSPayloadMale);
-    sourceTTSPayloadForMale['modelId'] = _languageModelController
-        .getAvailableTTSModel(getSelectedSourceLangCode());
-    sourceTTSPayloadForMale['input'] = [
-      {'source': sourceLanTextController.text}
-    ];
+    List<dynamic> ttsPayloadList = [];
+    ttsPayloadList.addAll([targetTTSPayloadMale, targetTTSPayloadForFemale]);
 
-    var sourceTTSPayloadForFemale = {};
-    sourceTTSPayloadForFemale.addAll(sourceTTSPayloadForMale);
-    sourceTTSPayloadForFemale['gender'] = 'female';
+    if (_hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
+      var sourceTTSPayloadForMale = {};
+      sourceTTSPayloadForMale.addAll(targetTTSPayloadMale);
+      sourceTTSPayloadForMale['modelId'] = _languageModelController
+          .getAvailableTTSModel(getSelectedSourceLangCode());
+      sourceTTSPayloadForMale['input'] = [
+        {'source': sourceLanTextController.text}
+      ];
 
-    var responseList =
-        await _translationAppAPIClient.sendTTSReqTranslation(ttsPayloadList: [
-      sourceTTSPayloadForMale,
-      sourceTTSPayloadForFemale,
-      targetTTSPayloadMale,
-      targetTTSPayloadForFemale,
-    ]);
+      var sourceTTSPayloadForFemale = {};
+      sourceTTSPayloadForFemale.addAll(sourceTTSPayloadForMale);
+      sourceTTSPayloadForFemale['gender'] = 'female';
+      ttsPayloadList
+          .addAll([sourceTTSPayloadForMale, sourceTTSPayloadForFemale]);
+    }
+
+    var responseList = await _translationAppAPIClient.sendTTSReqTranslation(
+        ttsPayloadList: ttsPayloadList);
 
     responseList.when(
       success: (data) {
         if (data != null && data.isNotEmpty) {
-          for (var i = 0; i < data.length; i++) {}
-          sourceTTSResponseMale =
-              data[0]['output']['audio'][0]['audioContent'] ?? '';
-          sourceTTSResponseFemale =
-              data[1]['output']['audio'][0]['audioContent'] ?? '';
           targetTTSResponseMale =
-              data[2]['output']['audio'][0]['audioContent'] ?? '';
+              data[0]['output']['audio'][0]['audioContent'] ?? '';
           targetTTSResponseFemale =
-              data[3]['output']['audio'][0]['audioContent'] ?? '';
+              data[1]['output']['audio'][0]['audioContent'] ?? '';
+          if (_hiveDBInstance.get(isStreamingPreferred) &&
+              isRecordedViaMic.value) {
+            sourceTTSResponseMale =
+                data[2]['output']['audio'][0]['audioContent'] ?? '';
+            sourceTTSResponseFemale =
+                data[3]['output']['audio'][0]['audioContent'] ?? '';
+          }
         }
         isTranslateCompleted.value = true;
         isLsLoading.value = false;
@@ -433,7 +437,8 @@ class BottomNavTranslationController extends GetxController {
   void playTTSOutput(bool isPlayingForTarget) async {
     GenderEnum? preferredGender = GenderEnum.values
         .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
-    if (isPlayingForTarget || _hiveDBInstance.get(isStreamingPreferred)) {
+    if (isPlayingForTarget ||
+        _hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
       bool isMaleTTSAvailable = isPlayingForTarget
           ? targetTTSResponseMale != null && targetTTSResponseMale.isNotEmpty
           : sourceTTSResponseMale != null && sourceTTSResponseMale.isNotEmpty;
@@ -479,8 +484,8 @@ class BottomNavTranslationController extends GetxController {
             !isPlayingForTarget; // playing from streaming
         await prepareWaveforms(targetPath,
             isForTargeLanguage: isPlayingForTarget ||
-                _hiveDBInstance.get(isStreamingPreferred));
-        // isPlayingSource.value = false;
+                (_hiveDBInstance.get(isStreamingPreferred) &&
+                    isRecordedViaMic.value));
       }
     } else {
       String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
