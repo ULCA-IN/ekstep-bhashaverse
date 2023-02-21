@@ -38,8 +38,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
       duration: defaultAnimationTime,
     );
     _animation = Tween<double>(
-      begin: pi / 2,
-      end: 0.0,
+      begin: 0.0,
+      end: pi,
     ).animate(_controller);
     ScreenUtil().init();
   }
@@ -131,8 +131,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                             transform: Matrix4.identity()
                               ..rotateZ(
                                 _animation.value,
-                              )
-                              ..invert(),
+                              ),
                             child: SvgPicture.asset(iconArrowDown),
                           );
                         }),
@@ -277,8 +276,6 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
             onTap: () => onTitleClick(),
             child: Row(
               children: [
-                icon,
-                SizedBox(width: 20.toWidth),
                 Text(
                   title,
                   style: AppTextStyle().regular18DolphinGrey.copyWith(
@@ -286,6 +283,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                         color: balticSea,
                       ),
                 ),
+                const Spacer(),
+                icon,
               ],
             ),
           ),
