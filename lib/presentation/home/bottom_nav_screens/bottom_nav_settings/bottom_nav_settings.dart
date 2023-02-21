@@ -186,7 +186,6 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                     ),
                   ),
                 ),
-                // SizedBox(height: 16.toHeight),
               ],
             ),
           ),
