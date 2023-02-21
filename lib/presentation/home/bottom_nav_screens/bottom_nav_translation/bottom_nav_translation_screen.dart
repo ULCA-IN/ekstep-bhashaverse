@@ -1,8 +1,10 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -10,6 +12,7 @@ import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
 import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../services/socket_io_client.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/snackbar_utils.dart';
@@ -29,14 +32,19 @@ class BottomNavTranslation extends StatefulWidget {
 class _BottomNavTranslationState extends State<BottomNavTranslation>
     with WidgetsBindingObserver {
   late BottomNavTranslationController _bottomNavTranslationController;
+  late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _transLangFocusNode = FocusNode();
+
+  late final Box _hiveDBInstance;
 
   @override
   void initState() {
     _bottomNavTranslationController = Get.find();
     _languageModelController = Get.find();
+    _socketIOClient = Get.find();
+    _hiveDBInstance = Hive.box(hiveDBName);
     WidgetsBinding.instance.addObserver(this);
 
     ScreenUtil().init();
@@ -139,10 +147,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   hintText: _bottomNavTranslationController
                                           .isTranslateCompleted.value
                                       ? null
-                                      : _bottomNavTranslationController
-                                              .isMicButtonTapped.value
+                                      : isRecordingStarted()
                                           ? kListeningHintText.tr
-                                          : kTranslationHintText.tr,
+                                          : _bottomNavTranslationController
+                                                      .micButtonStatus.value ==
+                                                  MicButtonStatus.pressed
+                                              ? connecting.tr
+                                              : kTranslationHintText.tr,
                                   hintStyle: AppTextStyle()
                                       .regular28balticSea
                                       .copyWith(color: mischkaGrey),
@@ -173,7 +184,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   isForTargetSection: false,
                                   showSoundButton:
                                       _bottomNavTranslationController
-                                          .isRecordedViaMic.value),
+                                              .isRecordedViaMic.value ||
+                                          (_hiveDBInstance
+                                                  .get(isStreamingPreferred) &&
+                                              _bottomNavTranslationController
+                                                  .isRecordedViaMic.value)),
                           ],
                         ),
                       ),
@@ -510,35 +525,22 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         alignment: Alignment.center,
         children: [
           AnimatedOpacity(
-            opacity:
-                _bottomNavTranslationController.isMicButtonTapped.value ? 1 : 0,
+            opacity: isRecordingStarted() ? 1 : 0,
             duration: const Duration(milliseconds: 600),
             child: Padding(
               padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
               child: LottieBuilder.asset(
                 animationStaticWaveForRecording,
                 fit: BoxFit.cover,
-                animate:
-                    _bottomNavTranslationController.isMicButtonTapped.value,
+                animate: isRecordingStarted(),
               ),
             ),
           ),
           GestureDetector(
-            onTap: () {
-              if (_bottomNavTranslationController
-                  .isSourceAndTargetLangSelected()) {
-                unFocusTextFields();
-                if (!_bottomNavTranslationController.isMicButtonTapped.value) {
-                  _bottomNavTranslationController.startVoiceRecording();
-                } else {
-                  _bottomNavTranslationController
-                      .stopVoiceRecordingAndGetResult();
-                }
-              } else {
-                showDefaultSnackbar(
-                    message: kErrorSelectSourceAndTargetScreen.tr);
-              }
-            },
+            onTapDown: (_) => micButtonActions(startMicRecording: true),
+            onTapUp: (_) => micButtonActions(startMicRecording: false),
+            onTapCancel: () => micButtonActions(startMicRecording: false),
+            onPanEnd: (_) => micButtonActions(startMicRecording: false),
             child: PhysicalModel(
               color: Colors.transparent,
               shape: BoxShape.circle,
@@ -551,7 +553,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 child: Padding(
                   padding: AppEdgeInsets.instance.all(20.0),
                   child: SvgPicture.asset(
-                    _bottomNavTranslationController.isMicButtonTapped.value
+                    _bottomNavTranslationController.micButtonStatus.value ==
+                            MicButtonStatus.pressed
                         ? iconMicStop
                         : iconMicroPhone,
                     height: 32.toHeight,
@@ -651,7 +654,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                         _bottomNavTranslationController.controller,
                     waveformType: WaveformType.fitWidth,
                     playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                        isRecordedAudio: !isForTargetSection),
+                        isRecordedAudio: !isForTargetSection &&
+                            !_hiveDBInstance.get(isStreamingPreferred)),
                   ),
                   SizedBox(width: 8.toWidth),
                   SizedBox(
@@ -756,5 +760,30 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   void unFocusTextFields() {
     _sourceLangFocusNode.unfocus();
     _transLangFocusNode.unfocus();
+  }
+
+  bool isRecordingStarted() {
+    return _hiveDBInstance.get(isStreamingPreferred)
+        ? _socketIOClient.isMicConnected.value
+        : _bottomNavTranslationController.micButtonStatus.value ==
+            MicButtonStatus.pressed;
+  }
+
+  void micButtonActions({required bool startMicRecording}) {
+    if (_bottomNavTranslationController.isSourceAndTargetLangSelected()) {
+      unFocusTextFields();
+
+      if (startMicRecording) {
+        _bottomNavTranslationController.micButtonStatus.value =
+            MicButtonStatus.pressed;
+        _bottomNavTranslationController.startVoiceRecording();
+      } else {
+        _bottomNavTranslationController.micButtonStatus.value =
+            MicButtonStatus.released;
+        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+      }
+    } else {
+      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+    }
   }
 }

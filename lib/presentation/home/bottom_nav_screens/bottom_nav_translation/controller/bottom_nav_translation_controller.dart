@@ -1,19 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
+import '../../../../../enums/asr_details_enum.dart';
 import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
 import '../../../../../localization/localization_keys.dart';
+import '../../../../../services/socket_io_client.dart';
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
@@ -33,13 +37,14 @@ class BottomNavTranslationController extends GetxController {
       ScrollController();
 
   RxBool isTranslateCompleted = false.obs;
-  RxBool isMicButtonTapped = false.obs;
   bool isMicPermissionGranted = false;
   RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
   RxString selectedTargetLanguage = ''.obs;
-  dynamic targetTTSResponseForMale;
-  dynamic targetTTSResponseForFemale;
+  dynamic sourceTTSResponseMale,
+      sourceTTSResponseFemale,
+      targetTTSResponseMale,
+      targetTTSResponseFemale;
   RxBool isRecordedViaMic = false.obs;
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
@@ -48,11 +53,13 @@ class BottomNavTranslationController extends GetxController {
   String targetPath = '';
   RxInt maxDuration = 0.obs;
   RxInt currentDuration = 0.obs;
-  File? targetLanAudioFile;
+  File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
   RxBool isScrolledTransliterationHints = false.obs;
+  late SocketIOClient _socketIOClient;
+  Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -60,12 +67,18 @@ class BottomNavTranslationController extends GetxController {
 
   late PlayerController controller;
 
+  StreamSubscription<Uint8List>? micStreamSubscription;
+
+  int silenceSize = 20;
+
+  late Worker worker;
+
   @override
   void onInit() {
+    _socketIOClient = Get.find();
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-
     controller = PlayerController();
 
     controller.onCompletion.listen((event) {
@@ -93,15 +106,23 @@ class BottomNavTranslationController extends GetxController {
         default:
       }
     });
-
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
     });
     super.onInit();
+    worker = ever(_socketIOClient.socketResponseText, (socketResponseText) {
+      sourceLanTextController.text = socketResponseText;
+      if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
+      if (!_socketIOClient.isMicConnected.value) {
+        worker.dispose();
+      }
+    }, condition: () => _socketIOClient.isMicConnected.value);
   }
 
   @override
   void onClose() {
+    worker.dispose();
+    _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
     disposePlayer();
@@ -156,26 +177,96 @@ class BottomNavTranslationController extends GetxController {
       isMicPermissionGranted = isPermissionGranted;
     });
     if (isMicPermissionGranted) {
-      // clear previous recording files and
-      // update state
-      resetAllValues();
-      isMicButtonTapped.value = true;
-      await _voiceRecorder.startRecordingVoice();
+      // / if user quickly released tap than Socket continue emit the data
+      //So need to check before starting mic streaming
+      if (micButtonStatus.value == MicButtonStatus.pressed) {
+        if (_hiveDBInstance.get(isStreamingPreferred)) {
+          connectToSocket();
+
+          _socketIOClient.socketEmit(
+              emittingStatus: 'connect_mic_stream',
+              emittingData: [],
+              isDataToSend: false);
+
+          MicStream.microphone(
+                  audioSource: AudioSource.DEFAULT,
+                  sampleRate: 44100,
+                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
+              .then((stream) {
+            List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
+            micStreamSubscription = stream?.listen((value) {
+              double meanSquared = meanSquare(value.buffer.asInt8List());
+              _socketIOClient.socketEmit(
+                  emittingStatus: 'mic_data',
+                  emittingData: [
+                    value.buffer.asInt32List(),
+                    getSelectedSourceLangCode(),
+                    true,
+                    false
+                  ],
+                  isDataToSend: true);
+
+              if (meanSquared >= 0.3) {
+                checkSilenceList.add(0);
+              }
+              if (meanSquared < 0.3) {
+                checkSilenceList.add(1);
+
+                if (checkSilenceList.length > silenceSize) {
+                  checkSilenceList = checkSilenceList
+                      .sublist(checkSilenceList.length - silenceSize);
+                }
+                int sumValue = checkSilenceList
+                    .reduce((value, element) => value + element);
+                if (sumValue == silenceSize) {
+                  _socketIOClient.socketEmit(
+                      emittingStatus: 'mic_data',
+                      emittingData: [
+                        null,
+                        getSelectedSourceLangCode(),
+                        false,
+                        false
+                      ],
+                      isDataToSend: true);
+                  checkSilenceList.clear();
+                }
+              }
+            });
+          });
+        } else {
+          // clear previous recording files and
+          // update state
+          resetAllValues();
+          await _voiceRecorder.startRecordingVoice();
+        }
+      }
     } else {
       showDefaultSnackbar(message: errorMicPermission.tr);
     }
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    isMicButtonTapped.value = false;
-    String? base64EncodedAudioContent =
-        await _voiceRecorder.stopRecordingVoiceAndGetOutput();
-    if (base64EncodedAudioContent == null ||
-        base64EncodedAudioContent.isEmpty) {
-      showDefaultSnackbar(message: errorInRecording.tr);
-      return;
+    if (_hiveDBInstance.get(isStreamingPreferred)) {
+      micStreamSubscription?.cancel();
+      if (_socketIOClient.isMicConnected.value) {
+        _socketIOClient.socketEmit(
+            emittingStatus: 'mic_data',
+            emittingData: [null, getSelectedSourceLangCode(), false, true],
+            isDataToSend: true);
+        if (sourceLanTextController.text.isNotEmpty) translateSourceLanguage();
+      }
+      _socketIOClient.disconnect();
     } else {
-      await getASROutput(base64EncodedAudioContent);
+      String? base64EncodedAudioContent =
+          await _voiceRecorder.stopRecordingVoiceAndGetOutput();
+      if (base64EncodedAudioContent == null ||
+          base64EncodedAudioContent.isEmpty) {
+        showDefaultSnackbar(message: errorInRecording.tr);
+        return;
+      } else {
+        await getASROutput(base64EncodedAudioContent);
+      }
     }
   }
 
@@ -219,8 +310,10 @@ class BottomNavTranslationController extends GetxController {
   Future<void> getASROutput(String base64EncodedAudioContent) async {
     isLsLoading.value = true;
     var asrPayloadToSend = {};
-    asrPayloadToSend['modelId'] = _languageModelController
-        .getAvailableASRModelsForLanguage(getSelectedSourceLangCode());
+    asrPayloadToSend['modelId'] =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: getSelectedSourceLangCode(),
+            requiredASRDetails: ASRModelDetails.modelId);
     asrPayloadToSend['task'] = 'asr';
     asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
     asrPayloadToSend['source'] = getSelectedSourceLangCode();
@@ -238,7 +331,6 @@ class BottomNavTranslationController extends GetxController {
       failure: (error) {
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isTranslateCompleted.value = true;
         isLsLoading.value = false;
       },
     );
@@ -269,67 +361,98 @@ class BottomNavTranslationController extends GetxController {
       failure: (error) {
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isTranslateCompleted.value = true;
         isLsLoading.value = false;
       },
     );
   }
 
   Future<void> getTTSOutput() async {
-    var ttsPayloadForMale = {};
+    var targetTTSPayloadMale = {};
 
-    ttsPayloadForMale['input'] = [
+    targetTTSPayloadMale['input'] = [
       {'source': targetLangTextController.text}
     ];
 
-    ttsPayloadForMale['modelId'] = _languageModelController
+    targetTTSPayloadMale['modelId'] = _languageModelController
         .getAvailableTTSModel(getSelectedTargetLangCode());
-    ttsPayloadForMale['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
-    ttsPayloadForMale['gender'] = 'male';
+    targetTTSPayloadMale['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
+    targetTTSPayloadMale['gender'] = 'male';
 
-    var ttsPayloadForFemale = {};
-    ttsPayloadForFemale.addAll(ttsPayloadForMale);
-    ttsPayloadForFemale['gender'] = 'female';
+    var targetTTSPayloadForFemale = {};
+    targetTTSPayloadForFemale.addAll(targetTTSPayloadMale);
+    targetTTSPayloadForFemale['gender'] = 'female';
+
+    List<dynamic> ttsPayloadList = [];
+    // ordering of list matters in TTS Payload
+    // first target then source
+    ttsPayloadList.addAll([targetTTSPayloadMale, targetTTSPayloadForFemale]);
+
+    if (_hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
+      var sourceTTSPayloadForMale = {};
+      sourceTTSPayloadForMale.addAll(targetTTSPayloadMale);
+      sourceTTSPayloadForMale['modelId'] = _languageModelController
+          .getAvailableTTSModel(getSelectedSourceLangCode());
+      sourceTTSPayloadForMale['input'] = [
+        {'source': sourceLanTextController.text}
+      ];
+
+      var sourceTTSPayloadForFemale = {};
+      sourceTTSPayloadForFemale.addAll(sourceTTSPayloadForMale);
+      sourceTTSPayloadForFemale['gender'] = 'female';
+      ttsPayloadList
+          .addAll([sourceTTSPayloadForMale, sourceTTSPayloadForFemale]);
+    }
 
     var responseList = await _translationAppAPIClient.sendTTSReqTranslation(
-        ttsPayloadList: [ttsPayloadForMale, ttsPayloadForFemale]);
+        ttsPayloadList: ttsPayloadList);
 
     responseList.when(
-      success: (data) {
+      success: (data) async {
+        await deleteAudioFiles(deleteRecordedFile: false);
         if (data != null && data.isNotEmpty) {
-          for (var genderResponse in data) {
-            if (genderResponse['gender'] == 'male') {
-              targetTTSResponseForMale =
-                  genderResponse['output']['audio'][0]['audioContent'] ?? '';
-            } else {
-              targetTTSResponseForFemale =
-                  genderResponse['output']['audio'][0]['audioContent'] ?? '';
+          targetTTSResponseMale =
+              data[0]['output']['audio'][0]['audioContent'] ?? '';
+          if (data.length > 1) {
+            targetTTSResponseFemale =
+                data[1]['output']['audio'][0]['audioContent'] ?? '';
+          }
+
+          if (_hiveDBInstance.get(isStreamingPreferred) &&
+              isRecordedViaMic.value &&
+              data.length > 2) {
+            sourceTTSResponseMale =
+                data[2]['output']['audio'][0]['audioContent'] ?? '';
+            if (data.length > 3) {
+              sourceTTSResponseFemale =
+                  data[3]['output']['audio'][0]['audioContent'] ?? '';
             }
           }
         }
-
         isTranslateCompleted.value = true;
         isLsLoading.value = false;
       },
       failure: (error) {
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isTranslateCompleted.value = true;
         isLsLoading.value = false;
       },
     );
   }
 
   void playTTSOutput(bool isPlayingForTarget) async {
-    if (isPlayingForTarget) {
-      GenderEnum? preferredGender = GenderEnum.values
-          .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+    GenderEnum? preferredGender = GenderEnum.values
+        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+    if (isPlayingForTarget ||
+        _hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
+      bool isMaleTTSAvailable = isPlayingForTarget
+          ? targetTTSResponseMale != null && targetTTSResponseMale.isNotEmpty
+          : sourceTTSResponseMale != null && sourceTTSResponseMale.isNotEmpty;
 
-      bool isMaleTTSAvailable = targetTTSResponseForMale != null &&
-          targetTTSResponseForMale.isNotEmpty;
-
-      bool isFemaleTTSAvailable = targetTTSResponseForFemale != null &&
-          targetTTSResponseForFemale.isNotEmpty;
+      bool isFemaleTTSAvailable = isPlayingForTarget
+          ? targetTTSResponseFemale != null &&
+              targetTTSResponseFemale.isNotEmpty
+          : sourceTTSResponseFemale != null &&
+              sourceTTSResponseFemale.isNotEmpty;
 
       Uint8List? fileAsBytes;
       if ((preferredGender == GenderEnum.male && isMaleTTSAvailable) ||
@@ -337,14 +460,17 @@ class BottomNavTranslationController extends GetxController {
         if (preferredGender == GenderEnum.female) {
           showDefaultSnackbar(message: femaleVoiceAssistantNotAvailable.tr);
         }
-        fileAsBytes = base64Decode(targetTTSResponseForMale);
+        fileAsBytes = base64Decode(
+            isPlayingForTarget ? targetTTSResponseMale : sourceTTSResponseMale);
       } else if ((preferredGender == GenderEnum.female &&
               isFemaleTTSAvailable) ||
           (!isMaleTTSAvailable && isFemaleTTSAvailable)) {
         if (preferredGender == GenderEnum.male) {
           showDefaultSnackbar(message: maleVoiceAssistantNotAvailable.tr);
         }
-        fileAsBytes = base64Decode(targetTTSResponseForFemale);
+        fileAsBytes = base64Decode(isPlayingForTarget
+            ? targetTTSResponseFemale
+            : sourceTTSResponseFemale);
       } else {
         showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
       }
@@ -353,13 +479,18 @@ class BottomNavTranslationController extends GetxController {
         Directory appDocDir = await getApplicationDocumentsDirectory();
         targetPath =
             '${appDocDir.path}/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
-        targetLanAudioFile = File(targetPath);
-        if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
-          await targetLanAudioFile?.writeAsBytes(fileAsBytes);
+        ttsAudioFile = File(targetPath);
+        if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+          await ttsAudioFile?.writeAsBytes(fileAsBytes);
         }
-        isPlayingTarget.value = true;
-        await prepareWaveforms(targetPath, isForTargeLanguage: true);
-        isPlayingSource.value = false;
+
+        isPlayingTarget.value = isPlayingForTarget;
+        isPlayingSource.value = _hiveDBInstance.get(isStreamingPreferred) &&
+            !isPlayingForTarget; // playing from streaming
+        await prepareWaveforms(targetPath,
+            isForTargeLanguage: isPlayingForTarget ||
+                (_hiveDBInstance.get(isStreamingPreferred) &&
+                    isRecordedViaMic.value));
       }
     } else {
       String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
@@ -391,15 +522,12 @@ class BottomNavTranslationController extends GetxController {
   void resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
-    isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
     await deleteAudioFiles();
     maxDuration.value = 0;
     currentDuration.value = 0;
     sourcePath = '';
-    targetTTSResponseForMale = null;
-    targetTTSResponseForFemale = null;
     await stopPlayer();
     sourcePath = '';
     targetPath = '';
@@ -447,14 +575,41 @@ class BottomNavTranslationController extends GetxController {
     isPlayingSource.value = false;
   }
 
-  Future<void> deleteAudioFiles() async {
-    _voiceRecorder.deleteRecordedFile();
-    if (targetLanAudioFile != null && !await targetLanAudioFile!.exists()) {
-      await targetLanAudioFile?.delete();
+  Future<void> deleteAudioFiles({bool deleteRecordedFile = true}) async {
+    if (deleteRecordedFile) _voiceRecorder.deleteRecordedFile();
+    if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+      await ttsAudioFile?.delete();
     }
+
+    targetTTSResponseMale = null;
+    targetTTSResponseFemale = null;
+    sourceTTSResponseFemale = null;
+    sourceTTSResponseMale = null;
   }
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
+  }
+
+  void connectToSocket() {
+    if (_socketIOClient.isConnected()) {
+      _socketIOClient.disconnect();
+    }
+
+    String languageCode = getSelectedSourceLangCode();
+    String callbackURL =
+        _languageModelController.getAvailableASRModelsForLanguage(
+            languageCode: languageCode,
+            requiredASRDetails: ASRModelDetails.streamingCallbackURL);
+    _socketIOClient.socketConnect(
+        apiCallbackURL: callbackURL, languageCode: languageCode);
+  }
+
+  double meanSquare(Int8List value) {
+    var sqrValue = 0;
+    for (int indValue in value) {
+      sqrValue = indValue * indValue;
+    }
+    return (sqrValue / value.length) * 1000;
   }
 }

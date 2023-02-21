@@ -106,6 +106,9 @@ class TranslationAppAPIClient {
           data: asrPayload,
           options: Options(
               headers: {'Content-Type': 'application/json', 'Accept': '*/*'}));
+      if (response.data == null) {
+        return Result.failure(AppException('Something went wrong'));
+      }
       return Result.success(response.data['data']);
     } on DioError catch (error) {
       return Result.failure(

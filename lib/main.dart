@@ -34,12 +34,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Box hiveDBInstance = Hive.box(hiveDBName);
+
+    // Localization preference
     String appLocale =
         hiveDBInstance.get(preferredAppLocale, defaultValue: 'en');
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
     }
-    hiveDBInstance.put(enableTransliteration, true);
+
+    // Transliteration preference
+    if (hiveDBInstance.get(enableTransliteration) == null) {
+      hiveDBInstance.put(enableTransliteration, true);
+    }
+
+    // Streaming vs Batch model preference
+    if (hiveDBInstance.get(isStreamingPreferred) == null) {
+      hiveDBInstance.put(isStreamingPreferred, true);
+    }
+
     return GetMaterialApp(
       title: appName.tr,
       debugShowCheckedModeBanner: false,

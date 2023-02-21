@@ -68,4 +68,6 @@ final Map<String, String> en = {
   maleVoiceAssistantNotAvailable:
       'Male Voice assistant is not available, Playing from female voice assistant',
   errorNoTextInClipboard: 'No text available in clipboard',
+  s2sStreaming: 'S2S Streaming',
+  connecting: 'Connecting...',
 };

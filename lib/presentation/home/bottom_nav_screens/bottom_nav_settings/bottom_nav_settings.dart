@@ -2,13 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
+import 'dart:math' show pi;
 
 import '../../../../enums/gender_enum.dart';
-import '../../../../enums/language_enum.dart';
 import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
-import '../../../../utils/constants/api_constants.dart';
 import '../../../../utils/constants/app_constants.dart';
 import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/snackbar_utils.dart';
@@ -23,19 +21,33 @@ class BottomNavSettings extends StatefulWidget {
   State<BottomNavSettings> createState() => _BottomNavSettingsState();
 }
 
-class _BottomNavSettingsState extends State<BottomNavSettings> {
+class _BottomNavSettingsState extends State<BottomNavSettings>
+    with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
-  late final Box _hiveDBInstance;
-  String preferredLanguage = '';
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  Duration defaultAnimationTime = const Duration(milliseconds: 300);
 
   @override
   void initState() {
     _settingsController = Get.find();
-    ScreenUtil().init();
-    _hiveDBInstance = Hive.box(hiveDBName);
+
     super.initState();
-    setPreferredLanguage();
-    setPreferredGender();
+    _controller = AnimationController(
+      vsync: this,
+      duration: defaultAnimationTime,
+    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: pi,
+    ).animate(_controller);
+    ScreenUtil().init();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -43,96 +55,156 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     return Scaffold(
       backgroundColor: honeydew,
       body: SafeArea(
-        child: Padding(
-          padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 16.toHeight),
-              Text(
-                kSettings.tr,
-                style: AppTextStyle()
-                    .semibold24BalticSea
-                    .copyWith(fontSize: 20.toFont),
-              ),
-              SizedBox(height: 48.toHeight),
-              _containerWidget(
-                widget: _popupMenuBuilder(),
-                title: appTheme.tr,
-                subtitle: appInterfaceWillChange.tr,
-              ),
-              SizedBox(height: 24.toHeight),
-              InkWell(
-                onTap: () {
-                  Get.toNamed(AppRoutes.appLanguageRoute)
-                      ?.then((_) => setPreferredLanguage());
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: _containerWidget(
-                  widget: Row(
-                    children: [
-                      Text(
-                        preferredLanguage,
-                        style: AppTextStyle()
-                            .light16BalticSea
-                            .copyWith(color: arsenicColor),
-                      ),
-                      SizedBox(width: 8.toWidth),
-                      RotatedBox(
-                        quarterTurns: 3,
-                        child: SvgPicture.asset(iconArrowDown),
-                      ),
-                    ],
-                  ),
-                  title: appLanguage.tr,
-                  subtitle: appInterfaceWillChangeInSelected.tr,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 16.toHeight),
+                Text(
+                  kSettings.tr,
+                  style: AppTextStyle()
+                      .semibold24BalticSea
+                      .copyWith(fontSize: 20.toFont),
                 ),
-              ),
-              SizedBox(height: 24.toHeight),
-              _voiceAssistantTileWidget(),
-              SizedBox(height: 24.toHeight),
-              _containerWidget(
-                widget: Obx(
-                  () => CupertinoSwitch(
-                    value: _settingsController.isTransLiterationEnabled.value,
-                    activeColor: japaneseLaurel,
-                    trackColor: americanSilver,
-                    onChanged: (value) {
-                      _hiveDBInstance.put(enableTransliteration, value);
-                      _settingsController.isTransLiterationEnabled.value =
-                          value;
-                    },
-                  ),
+                SizedBox(height: 48.toHeight),
+                _settingHeading(
+                  action: _popupMenuBuilder(),
+                  title: appTheme.tr,
+                  subtitle: appInterfaceWillChange.tr,
                 ),
-                title: transLiteration.tr,
-                subtitle: transLiterationWillInitiateWord.tr,
-              ),
-              SizedBox(height: 24.toHeight),
-              Visibility(
-                visible: false,
-                child: InkWell(
-                  onTap: () {},
+                SizedBox(height: 24.toHeight),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.appLanguageRoute)?.then(
+                        (_) => _settingsController.getPreferredLanguage());
+                  },
                   borderRadius: BorderRadius.circular(10),
-                  child: _containerWidget(
-                    widget: SvgPicture.asset(iconArrowDown),
-                    title: advanceSettings.tr,
+                  child: _settingHeading(
+                    action: Row(
+                      children: [
+                        Text(
+                          _settingsController.preferredLanguage.value,
+                          style: AppTextStyle()
+                              .light16BalticSea
+                              .copyWith(color: arsenicColor),
+                        ),
+                        SizedBox(width: 8.toWidth),
+                        RotatedBox(
+                          quarterTurns: 3,
+                          child: SvgPicture.asset(iconArrowDown),
+                        ),
+                      ],
+                    ),
+                    title: appLanguage.tr,
+                    subtitle: appInterfaceWillChangeInSelected.tr,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 24.toHeight),
+                _voiceAssistantTileWidget(),
+                SizedBox(height: 24.toHeight),
+                _settingHeading(
+                  action: Obx(
+                    () => CupertinoSwitch(
+                      value: _settingsController.isTransLiterationEnabled.value,
+                      activeColor: japaneseLaurel,
+                      trackColor: americanSilver,
+                      onChanged: (value) =>
+                          _settingsController.changeTransliterationPref(value),
+                    ),
+                  ),
+                  title: transLiteration.tr,
+                  subtitle: transLiterationWillInitiateWord.tr,
+                ),
+                SizedBox(height: 24.toHeight),
+                Obx(
+                  () => _expandableSettingHeading(
+                    height: _settingsController.isAdvanceMenuOpened.value
+                        ? 130.toHeight
+                        : 60.toHeight,
+                    icon: AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          return Transform(
+                            alignment: Alignment.center,
+                            transform: Matrix4.identity()
+                              ..rotateZ(
+                                _animation.value,
+                              ),
+                            child: SvgPicture.asset(iconArrowDown),
+                          );
+                        }),
+                    title: advanceSettings.tr,
+                    onTitleClick: () {
+                      _settingsController.isAdvanceMenuOpened.value =
+                          !_settingsController.isAdvanceMenuOpened.value;
+                      _settingsController.isAdvanceMenuOpened.value
+                          ? _controller.forward()
+                          : _controller.reverse();
+                    },
+                    child: AnimatedOpacity(
+                      opacity:
+                          _settingsController.isAdvanceMenuOpened.value ? 1 : 0,
+                      duration: defaultAnimationTime,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(child: SizedBox(height: 8.toHeight)),
+                          const Flexible(child: Divider()),
+                          Flexible(child: SizedBox(height: 14.toHeight)),
+                          Flexible(
+                            child: Row(
+                              children: [
+                                Text(
+                                  s2sStreaming.tr,
+                                  style: AppTextStyle()
+                                      .regular18DolphinGrey
+                                      .copyWith(
+                                        fontSize: 18.toFont,
+                                        color: balticSea,
+                                      ),
+                                ),
+                                const Spacer(),
+                                Obx(
+                                  () => CupertinoSwitch(
+                                    value: _settingsController
+                                        .isStreamingEnabled.value,
+                                    activeColor: japaneseLaurel,
+                                    trackColor: americanSilver,
+                                    onChanged: (value) {
+                                      _settingsController
+                                          .changeStreamingPref(value);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _containerWidget({
-    required Widget widget,
+  Widget _settingHeading({
     required String title,
-    String subtitle = '',
+    required Widget action,
+    String? subtitle,
+    Widget? child,
+    double? height,
   }) {
-    return Container(
+    return AnimatedContainer(
+      duration: defaultAnimationTime,
       padding: AppEdgeInsets.instance.all(16),
+      height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
@@ -154,18 +226,68 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                     ),
               ),
               const Spacer(),
-              widget,
+              action,
             ],
           ),
-          if (subtitle.isNotEmpty) SizedBox(height: 16.toHeight),
-          if (subtitle.isNotEmpty)
-            Text(
-              subtitle,
-              style: AppTextStyle().light16BalticSea.copyWith(
-                    fontSize: 14.toFont,
-                    color: dolphinGray,
-                  ),
+          if (subtitle != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 16.toHeight),
+                Text(
+                  subtitle,
+                  style: AppTextStyle().light16BalticSea.copyWith(
+                        fontSize: 14.toFont,
+                        color: dolphinGray,
+                      ),
+                ),
+              ],
             ),
+          if (child != null) Expanded(child: child),
+        ],
+      ),
+    );
+  }
+
+  Widget _expandableSettingHeading({
+    required String title,
+    required Widget icon,
+    Widget? child,
+    double? height,
+    required Function onTitleClick,
+  }) {
+    return AnimatedContainer(
+      duration: defaultAnimationTime,
+      padding: AppEdgeInsets.instance.only(top: 16, left: 16, right: 16),
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: 1.toWidth,
+          color: goastWhite,
+        ),
+        color: Colors.white,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InkWell(
+            onTap: () => onTitleClick(),
+            child: Row(
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyle().regular18DolphinGrey.copyWith(
+                        fontSize: 20.toFont,
+                        color: balticSea,
+                      ),
+                ),
+                const Spacer(),
+                icon,
+              ],
+            ),
+          ),
+          if (child != null) Flexible(child: child),
         ],
       ),
     );
@@ -213,17 +335,14 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
   ) {
     return Obx(
       () => InkWell(
-        onTap: () {
-          _settingsController.selectedGender.value = currentGender;
-          _hiveDBInstance.put(
-              preferredVoiceAssistantGender, currentGender.name);
-          setPreferredGender();
-        },
+        onTap: () =>
+            _settingsController.changeVoiceAssistantPref(currentGender),
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
               width: 1.toWidth,
-              color: (_settingsController.selectedGender.value == currentGender)
+              color: (_settingsController.preferredVoiceAssistant.value ==
+                      currentGender)
                   ? japaneseLaurel
                   : americanSilver,
             ),
@@ -234,7 +353,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
           child: Row(
             children: <Widget>[
               SvgPicture.asset(
-                (_settingsController.selectedGender.value == currentGender)
+                (_settingsController.preferredVoiceAssistant.value ==
+                        currentGender)
                     ? iconSelectedRadio
                     : iconUnSelectedRadio,
               ),
@@ -243,10 +363,11 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
                 title,
                 style: AppTextStyle().regular18DolphinGrey.copyWith(
                       fontSize: 16.toFont,
-                      color: (_settingsController.selectedGender.value ==
-                              currentGender)
-                          ? japaneseLaurel
-                          : dolphinGray,
+                      color:
+                          (_settingsController.preferredVoiceAssistant.value ==
+                                  currentGender)
+                              ? japaneseLaurel
+                              : dolphinGray,
                     ),
               ),
             ],
@@ -260,7 +381,6 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
     return Obx(
       () => PopupMenuButton(
         onSelected: (value) {
-          // _settingsController.selectedThemeMode.value = value;
           showDefaultSnackbar(message: featureAvailableSoonInfo.tr);
         },
         child: Row(
@@ -301,17 +421,5 @@ class _BottomNavSettingsState extends State<BottomNavSettings> {
       case ThemeMode.dark:
         return dark.tr;
     }
-  }
-
-  void setPreferredLanguage() {
-    preferredLanguage = APIConstants.getLanguageCodeOrName(
-        value: _hiveDBInstance.get(preferredAppLocale, defaultValue: 'en'),
-        returnWhat: LanguageMap.nativeName,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-  }
-
-  void setPreferredGender() {
-    _settingsController.selectedGender.value = GenderEnum.values
-        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
   }
 }

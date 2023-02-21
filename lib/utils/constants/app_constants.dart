@@ -3,6 +3,7 @@ const hiveDBName = 'db_bhashaverse';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
 const preferredAppLocale = 'preferred_app_locale';
+const isStreamingPreferred = 'is_streaming_preferred';
 const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
 const defaultAudioRecordingName = 'ASRAudio';
