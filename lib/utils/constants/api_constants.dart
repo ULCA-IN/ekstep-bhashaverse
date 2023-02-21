@@ -98,6 +98,10 @@ class APIConstants {
       },
       {kNativeName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
       {kNativeName: 'মানিপুরি', kLanguageCode: 'mni', kEnglishName: 'Manipuri'},
+      {kNativeName: 'كٲشُر', kLanguageCode: 'ks', kEnglishName: 'Kashmiri'},
+      {kNativeName: 'कोंकणी', kLanguageCode: 'kok', kEnglishName: 'Konkani'},
+      {kNativeName: 'सिंधी', kLanguageCode: 'sd', kEnglishName: 'Sindhi'},
+      {kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ', kLanguageCode: 'sat', kEnglishName: 'Santali'},
     ]
   };
 
