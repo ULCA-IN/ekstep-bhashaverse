@@ -126,8 +126,8 @@ class _AppLanguageState extends State<AppLanguage> {
                               .getAppLanguageList()[
                           _appLanguageController.getSelectedLanguageIndex() ??
                               0][APIConstants.kLanguageCode];
-                      _appLanguageController.setSelectedAppLocale(
-                          selectedLocale == 'hi' ? selectedLocale : 'en');
+                      _appLanguageController
+                          .setSelectedAppLocale(selectedLocale);
                       if (_hiveDBInstance.get(introShownAlreadyKey,
                           defaultValue: false)) {
                         Get.back();
