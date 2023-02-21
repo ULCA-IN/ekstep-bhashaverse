@@ -37,7 +37,6 @@ class BottomNavTranslationController extends GetxController {
       ScrollController();
 
   RxBool isTranslateCompleted = false.obs;
-  RxBool isMicButtonTapped = false.obs;
   bool isMicPermissionGranted = false;
   RxBool isLsLoading = false.obs;
   RxString selectedSourceLanguage = ''.obs;
@@ -60,7 +59,7 @@ class BottomNavTranslationController extends GetxController {
   String currentlyTypedWordForTransliteration = '';
   RxBool isScrolledTransliterationHints = false.obs;
   late SocketIOClient _socketIOClient;
-  MicButtonStatus micButtonStatus = MicButtonStatus.released;
+  Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -180,9 +179,7 @@ class BottomNavTranslationController extends GetxController {
     if (isMicPermissionGranted) {
       // / if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
-      if (micButtonStatus == MicButtonStatus.pressed) {
-        isMicButtonTapped.value = true;
-
+      if (micButtonStatus.value == MicButtonStatus.pressed) {
         if (_hiveDBInstance.get(isStreamingPreferred)) {
           connectToSocket();
 
@@ -250,7 +247,6 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    isMicButtonTapped.value = false;
     if (_hiveDBInstance.get(isStreamingPreferred)) {
       micStreamSubscription?.cancel();
       if (_socketIOClient.isMicConnected.value) {
@@ -526,7 +522,6 @@ class BottomNavTranslationController extends GetxController {
   void resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
-    // isMicButtonTapped.value = false;
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
     await deleteAudioFiles();

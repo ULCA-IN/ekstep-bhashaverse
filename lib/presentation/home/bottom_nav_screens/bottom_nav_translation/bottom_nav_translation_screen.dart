@@ -150,7 +150,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       : isRecordingStarted()
                                           ? kListeningHintText.tr
                                           : _bottomNavTranslationController
-                                                  .isMicButtonTapped.value
+                                                      .micButtonStatus.value ==
+                                                  MicButtonStatus.pressed
                                               ? connecting.tr
                                               : kTranslationHintText.tr,
                                   hintStyle: AppTextStyle()
@@ -552,7 +553,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 child: Padding(
                   padding: AppEdgeInsets.instance.all(20.0),
                   child: SvgPicture.asset(
-                    _bottomNavTranslationController.isMicButtonTapped.value
+                    _bottomNavTranslationController.micButtonStatus.value ==
+                            MicButtonStatus.pressed
                         ? iconMicStop
                         : iconMicroPhone,
                     height: 32.toHeight,
@@ -763,7 +765,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   bool isRecordingStarted() {
     return _hiveDBInstance.get(isStreamingPreferred)
         ? _socketIOClient.isMicConnected.value
-        : _bottomNavTranslationController.isMicButtonTapped.value;
+        : _bottomNavTranslationController.micButtonStatus.value ==
+            MicButtonStatus.pressed;
   }
 
   void micButtonActions({required bool startMicRecording}) {
@@ -771,15 +774,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       unFocusTextFields();
 
       if (startMicRecording) {
-        _bottomNavTranslationController.micButtonStatus =
+        _bottomNavTranslationController.micButtonStatus.value =
             MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        _bottomNavTranslationController.micButtonStatus =
+        _bottomNavTranslationController.micButtonStatus.value =
             MicButtonStatus.released;
-        if (_bottomNavTranslationController.isMicButtonTapped.value) {
-          _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
-        }
+        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
       }
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
