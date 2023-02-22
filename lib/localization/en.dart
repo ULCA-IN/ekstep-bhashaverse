@@ -70,4 +70,5 @@ final Map<String, String> en = {
   errorNoTextInClipboard: 'No text available in clipboard',
   s2sStreaming: 'S2S Streaming',
   connecting: 'Connecting...',
+  somethingWentWrong: 'Something went wrong',
 };
