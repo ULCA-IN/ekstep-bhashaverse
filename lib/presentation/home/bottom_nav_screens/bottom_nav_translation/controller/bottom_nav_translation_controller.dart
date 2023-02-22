@@ -60,6 +60,7 @@ class BottomNavTranslationController extends GetxController {
   RxBool isScrolledTransliterationHints = false.obs;
   late SocketIOClient _socketIOClient;
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
+  DateTime? recordingStartTime;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -191,6 +192,7 @@ class BottomNavTranslationController extends GetxController {
       // / if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
+        recordingStartTime = DateTime.now();
         if (_hiveDBInstance.get(isStreamingPreferred)) {
           connectToSocket();
 
@@ -258,6 +260,14 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
+    if (DateTime.now().difference(recordingStartTime ?? DateTime.now()) <
+        const Duration(milliseconds: 600)) {
+      showDefaultSnackbar(message: tapAndHoldForRecording.tr);
+      if (!_hiveDBInstance.get(isStreamingPreferred)) return;
+    }
+
+    recordingStartTime = null;
+
     if (_hiveDBInstance.get(isStreamingPreferred)) {
       micStreamSubscription?.cancel();
       if (_socketIOClient.isMicConnected.value) {
@@ -269,14 +279,16 @@ class BottomNavTranslationController extends GetxController {
       }
       _socketIOClient.disconnect();
     } else {
-      String? base64EncodedAudioContent =
-          await _voiceRecorder.stopRecordingVoiceAndGetOutput();
-      if (base64EncodedAudioContent == null ||
-          base64EncodedAudioContent.isEmpty) {
-        showDefaultSnackbar(message: errorInRecording.tr);
-        return;
-      } else {
-        await getASROutput(base64EncodedAudioContent);
+      if (await _voiceRecorder.isVoiceRecording()) {
+        String? base64EncodedAudioContent =
+            await _voiceRecorder.stopRecordingVoiceAndGetOutput();
+        if (base64EncodedAudioContent == null ||
+            base64EncodedAudioContent.isEmpty) {
+          showDefaultSnackbar(message: errorInRecording.tr);
+          return;
+        } else {
+          await getASROutput(base64EncodedAudioContent);
+        }
       }
     }
   }
