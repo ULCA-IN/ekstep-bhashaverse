@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 
+import '../localization/localization_keys.dart';
 import '../models/search_model.dart';
 import '../utils/constants/api_constants.dart';
 import 'data_source_manager/exception/app_exceptions.dart';
@@ -69,7 +71,7 @@ class TranslationAppAPIClient {
       if (kDebugMode) {
         print('Other Exception::: ${error.toString()}');
       }
-      return Result.failure(AppException('Something went wrong'));
+      return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
 
@@ -95,7 +97,7 @@ class TranslationAppAPIClient {
       if (kDebugMode) {
         print('Other Exception::: ${error.toString()}');
       }
-      return Result.failure(AppException('Something went wrong'));
+      return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
 
@@ -107,7 +109,7 @@ class TranslationAppAPIClient {
           options: Options(
               headers: {'Content-Type': 'application/json', 'Accept': '*/*'}));
       if (response.data == null) {
-        return Result.failure(AppException('Something went wrong'));
+        return Result.failure(AppException(somethingWentWrong.tr));
       }
       return Result.success(response.data['data']);
     } on DioError catch (error) {
@@ -117,7 +119,7 @@ class TranslationAppAPIClient {
       if (kDebugMode) {
         print('Other Exception::: ${error.toString()}');
       }
-      return Result.failure(AppException('Something went wrong'));
+      return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
 
@@ -136,7 +138,7 @@ class TranslationAppAPIClient {
       if (kDebugMode) {
         print('Other Exception::: ${error.toString()}');
       }
-      return Result.failure(AppException('Something went wrong'));
+      return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
 

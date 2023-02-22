@@ -3,7 +3,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 class SocketIOClient extends GetxService {
   Socket? _socket;
-  RxBool isMicConnected = false.obs;
+  RxBool isMicConnected = false.obs, hasError = false.obs;
   RxString socketResponseText = ''.obs;
 
   void socketEmit(
@@ -19,6 +19,7 @@ class SocketIOClient extends GetxService {
     required String apiCallbackURL,
     required String languageCode,
   }) {
+    hasError.value = false;
     _socket = io(
         apiCallbackURL,
         OptionBuilder()
@@ -45,6 +46,7 @@ class SocketIOClient extends GetxService {
 
     _socket?.on('connect-success', (data) {
       isMicConnected.value = true;
+      hasError.value = false;
     });
 
     _socket?.on('response', (data) {
@@ -55,11 +57,21 @@ class SocketIOClient extends GetxService {
 
     _socket?.on('terminate', (data) {
       isMicConnected.value = false;
+      hasError.value = true;
+    });
+
+    _socket?.on('abort', (data) {
+      hasError.value = true;
+    });
+
+    _socket?.on('connect_error', (data) {
+      hasError.value = true;
     });
 
     _socket?.onDisconnect((data) {
       isMicConnected.value = false;
     });
+    _socket?.onAny((event, data) {});
   }
 
   bool isConnected() {
