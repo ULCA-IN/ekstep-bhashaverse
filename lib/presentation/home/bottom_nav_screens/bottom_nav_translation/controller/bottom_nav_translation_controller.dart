@@ -261,7 +261,8 @@ class BottomNavTranslationController extends GetxController {
 
   void stopVoiceRecordingAndGetResult() async {
     if (DateTime.now().difference(recordingStartTime ?? DateTime.now()) <
-        const Duration(milliseconds: 600)) {
+            tapAndHoldMinDuration &&
+        isMicPermissionGranted) {
       showDefaultSnackbar(message: tapAndHoldForRecording.tr);
       if (!_hiveDBInstance.get(isStreamingPreferred)) return;
     }
