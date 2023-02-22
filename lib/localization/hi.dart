@@ -68,4 +68,6 @@ final Map<String, String> hi = {
   errorNoTextInClipboard: 'क्लिपबोर्ड में कोई टेक्स्ट उपलब्ध नहीं है',
   s2sStreaming: 'S2S स्ट्रीमिंग',
   connecting: 'कनेक्ट हो रहा है...',
+  somethingWentWrong: 'कुछ गलत हुआ',
+  tapAndHoldForRecording: 'रिकॉर्डिंग के लिए कृपया माइक को टैप करके रखें',
 };

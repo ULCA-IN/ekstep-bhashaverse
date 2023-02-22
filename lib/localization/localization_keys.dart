@@ -71,3 +71,4 @@ const String errorNoTextInClipboard = 'errorNoTextInClipboard';
 const String s2sStreaming = 's2sStreaming';
 const String connecting = 'connecting';
 const String somethingWentWrong = 'somethingWentWrong';
+const String tapAndHoldForRecording = 'tapAndHoldForRecording';
