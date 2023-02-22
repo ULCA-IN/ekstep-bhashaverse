@@ -26,7 +26,7 @@ class VoiceRecorder {
   }
 
   Future<String?> stopRecordingVoiceAndGetOutput() async {
-    if (await _audioRec.isRecording()) {
+    if (await isVoiceRecording()) {
       await _audioRec.stop();
       _disposeRecorder();
     }
@@ -52,8 +52,12 @@ class VoiceRecorder {
   }
 
   void _disposeRecorder() async {
-    if (await _audioRec.isRecording()) {
+    if (await isVoiceRecording()) {
       _audioRec.dispose();
     }
+  }
+
+  Future<bool> isVoiceRecording() async {
+    return _audioRec.isRecording();
   }
 }
