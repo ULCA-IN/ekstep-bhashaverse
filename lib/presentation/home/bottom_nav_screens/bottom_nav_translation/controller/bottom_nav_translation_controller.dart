@@ -71,7 +71,7 @@ class BottomNavTranslationController extends GetxController {
 
   int silenceSize = 20;
 
-  late Worker streamingResponseListener, socketIOAbortListener;
+  late Worker streamingResponseListener, socketIOErrorListener;
 
   @override
   void onInit() {
@@ -121,7 +121,7 @@ class BottomNavTranslationController extends GetxController {
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
-    socketIOAbortListener = ever(_socketIOClient.isAborted, (isAborted) {
+    socketIOErrorListener = ever(_socketIOClient.hasError, (isAborted) {
       if (isAborted) {
         micButtonStatus.value = MicButtonStatus.released;
         showDefaultSnackbar(message: somethingWentWrong.tr);
@@ -132,7 +132,7 @@ class BottomNavTranslationController extends GetxController {
   @override
   void onClose() {
     streamingResponseListener.dispose();
-    socketIOAbortListener.dispose();
+    socketIOErrorListener.dispose();
     _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
