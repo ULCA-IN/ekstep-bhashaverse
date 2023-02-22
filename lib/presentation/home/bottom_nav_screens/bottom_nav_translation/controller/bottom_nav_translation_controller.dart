@@ -71,7 +71,7 @@ class BottomNavTranslationController extends GetxController {
 
   int silenceSize = 20;
 
-  late Worker worker;
+  late Worker streamingResponseListener, socketIOAbortListener;
 
   @override
   void onInit() {
@@ -110,18 +110,29 @@ class BottomNavTranslationController extends GetxController {
       isScrolledTransliterationHints.value = true;
     });
     super.onInit();
-    worker = ever(_socketIOClient.socketResponseText, (socketResponseText) {
+    // tried to use enum values instead of boolean for Socket IO status
+    // but that doesn't worked
+    streamingResponseListener =
+        ever(_socketIOClient.socketResponseText, (socketResponseText) {
       sourceLanTextController.text = socketResponseText;
       if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
       if (!_socketIOClient.isMicConnected.value) {
-        worker.dispose();
+        streamingResponseListener.dispose();
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
+
+    socketIOAbortListener = ever(_socketIOClient.isAborted, (isAborted) {
+      if (isAborted) {
+        micButtonStatus.value = MicButtonStatus.released;
+        showDefaultSnackbar(message: somethingWentWrong.tr);
+      }
+    }, condition: !_socketIOClient.isConnected());
   }
 
   @override
   void onClose() {
-    worker.dispose();
+    streamingResponseListener.dispose();
+    socketIOAbortListener.dispose();
     _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
