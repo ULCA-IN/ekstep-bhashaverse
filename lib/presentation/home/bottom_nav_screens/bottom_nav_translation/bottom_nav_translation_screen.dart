@@ -782,7 +782,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             MicButtonStatus.released;
         _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
       }
-    } else {
+    } else if (startMicRecording) {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
   }
