@@ -71,7 +71,6 @@ class SocketIOClient extends GetxService {
     _socket?.onDisconnect((data) {
       isMicConnected.value = false;
     });
-    _socket?.onAny((event, data) {});
   }
 
   bool isConnected() {
