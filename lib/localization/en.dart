@@ -71,4 +71,5 @@ final Map<String, String> en = {
   s2sStreaming: 'S2S Streaming',
   connecting: 'Connecting...',
   somethingWentWrong: 'Something went wrong',
+  tapAndHoldForRecording: 'Please tap and hold mic for recording',
 };
