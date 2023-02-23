@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
@@ -27,7 +28,10 @@ class AppLanguageController extends GetxController {
     _selectedLanguage.value = index;
   }
 
-  void setSelectedAppLocale(String selectedLocale) {
+  void setSelectedAppLocale() {
+    String selectedLocale =
+        getAppLanguageList()[getSelectedLanguageIndex() ?? 0]
+            [APIConstants.kLanguageCode];
     _hiveDBInstance.put(preferredAppLocale, selectedLocale);
     Get.updateLocale(Locale(selectedLocale));
   }
