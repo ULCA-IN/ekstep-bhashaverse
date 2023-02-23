@@ -223,12 +223,14 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
         children: [
           Row(
             children: [
-              Text(
-                title,
-                style: AppTextStyle().regular18DolphinGrey.copyWith(
-                      fontSize: 20.toFont,
-                      color: balticSea,
-                    ),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTextStyle().regular18DolphinGrey.copyWith(
+                        fontSize: 20.toFont,
+                        color: balticSea,
+                      ),
+                ),
               ),
               const Spacer(),
               action,
