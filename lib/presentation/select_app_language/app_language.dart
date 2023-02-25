@@ -213,14 +213,20 @@ class _AppLanguageState extends State<AppLanguage> {
     List<Map<String, dynamic>> tempList =
         _appLanguageController.getAppLanguageList();
     if (searchString.isNotEmpty) {
+      Map<String, String>? localeLanguageMap =
+          LanguageMapTranslated.langMap[Get.locale?.languageCode];
       List<Map<String, dynamic>> searchedLanguageList = tempList.where(
         (language) {
+          String? languageInLocale =
+              localeLanguageMap?[language[APIConstants.kLanguageCode]];
           return language[APIConstants.kEnglishName]
                   .toLowerCase()
                   .contains(searchString.toLowerCase()) ||
               language[APIConstants.kNativeName]
                   .toLowerCase()
-                  .contains(searchString.toLowerCase());
+                  .contains(searchString.toLowerCase()) ||
+              (languageInLocale != null &&
+                  languageInLocale.contains(searchString));
         },
       ).toList();
       _appLanguageController.setCustomLanguageList(searchedLanguageList);
