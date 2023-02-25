@@ -8,6 +8,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/constants/language_map_translated.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
@@ -89,13 +90,34 @@ class _AppLanguageState extends State<AppLanguage> {
                         itemBuilder: (context, index) {
                           return Obx(
                             () {
-                              return LanguageSelectionWidget(
-                                title: _appLanguageController
+                              String selectedLangCode = _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kLanguageCode];
+
+                              Map<String, String>? selectedLanguageMap =
+                                  LanguageMapTranslated
+                                      .langMap[Get.locale?.languageCode];
+
+                              String titleInSelectedLang = '';
+
+                              if (selectedLanguageMap != null &&
+                                  selectedLanguageMap[selectedLangCode] !=
+                                      null &&
+                                  selectedLanguageMap[selectedLangCode]!
+                                      .isNotEmpty) {
+                                titleInSelectedLang =
+                                    selectedLanguageMap[selectedLangCode]!;
+                              } else {
+                                titleInSelectedLang = _appLanguageController
                                         .getAppLanguageList()[index]
-                                    [APIConstants.kNativeName],
+                                    [APIConstants.kEnglishName];
+                              }
+
+                              return LanguageSelectionWidget(
+                                title: titleInSelectedLang,
                                 subTitle: _appLanguageController
                                         .getAppLanguageList()[index]
-                                    [APIConstants.kEnglishName],
+                                    [APIConstants.kNativeName],
                                 onItemTap: () {
                                   _appLanguageController
                                       .setSelectedLanguageIndex(index);
