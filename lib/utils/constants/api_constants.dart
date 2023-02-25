@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import '../../enums/language_enum.dart';
+import 'language_map_translated.dart';
 
 class APIConstants {
   static const String ASR_CALLBACK_AZURE_URL =
@@ -72,36 +73,136 @@ class APIConstants {
 
   static final LANGUAGE_CODE_MAP = {
     kLanguageCodeList: [
-      {kNativeName: 'English', kLanguageCode: 'en', kEnglishName: 'English'},
-      {kNativeName: 'हिन्दी', kLanguageCode: 'hi', kEnglishName: 'Hindi'},
-      {kNativeName: 'मराठी', kLanguageCode: 'mr', kEnglishName: 'Marathi'},
-      {kNativeName: 'বাংলা', kLanguageCode: 'bn', kEnglishName: 'Bangla'},
-      {kNativeName: 'ਪੰਜਾਬੀ', kLanguageCode: 'pa', kEnglishName: 'Punjabi'},
-      {kNativeName: 'ગુજરાતી', kLanguageCode: 'gu', kEnglishName: 'Gujarati'},
-      {kNativeName: 'ଓଡିଆ', kLanguageCode: 'or', kEnglishName: 'Oriya'},
-      {kNativeName: 'தமிழ்', kLanguageCode: 'ta', kEnglishName: 'Tamil'},
-      {kNativeName: 'తెలుగు', kLanguageCode: 'te', kEnglishName: 'Telugu'},
-      {kNativeName: 'ಕನ್ನಡ', kLanguageCode: 'kn', kEnglishName: 'Kannada'},
-      {kNativeName: 'اردو', kLanguageCode: 'ur', kEnglishName: 'Urdu'},
-      {kNativeName: 'डोगरी', kLanguageCode: 'doi', kEnglishName: 'Dogri'},
-      {kNativeName: 'नेपाली', kLanguageCode: 'ne', kEnglishName: 'Nepali'},
-      {kNativeName: 'සිංහල', kLanguageCode: 'si', kEnglishName: 'Sinhala'},
-      {kNativeName: 'संस्कृत', kLanguageCode: 'sa', kEnglishName: 'Sanskrit'},
-      {kNativeName: 'অসমীয়া', kLanguageCode: 'as', kEnglishName: 'Assamese'},
-      {kNativeName: 'मैथिली', kLanguageCode: 'mai', kEnglishName: 'Maithili'},
-      {kNativeName: 'भोजपुरी', kLanguageCode: 'bho', kEnglishName: 'Bhojpuri'},
-      {kNativeName: 'മലയാളം', kLanguageCode: 'ml', kEnglishName: 'Malayalam'},
+      {
+        kNativeName: 'English',
+        kLanguageCode: langCodeList[0],
+        kEnglishName: 'English'
+      },
+      {
+        kNativeName: 'हिन्दी',
+        kLanguageCode: langCodeList[1],
+        kEnglishName: 'Hindi'
+      },
+      {
+        kNativeName: 'मराठी',
+        kLanguageCode: langCodeList[2],
+        kEnglishName: 'Marathi'
+      },
+      {
+        kNativeName: 'বাংলা',
+        kLanguageCode: langCodeList[3],
+        kEnglishName: 'Bangla'
+      },
+      {
+        kNativeName: 'ਪੰਜਾਬੀ',
+        kLanguageCode: langCodeList[4],
+        kEnglishName: 'Punjabi'
+      },
+      {
+        kNativeName: 'ગુજરાતી',
+        kLanguageCode: langCodeList[5],
+        kEnglishName: 'Gujarati'
+      },
+      {
+        kNativeName: 'ଓଡିଆ',
+        kLanguageCode: langCodeList[6],
+        kEnglishName: 'Oriya'
+      },
+      {
+        kNativeName: 'தமிழ்',
+        kLanguageCode: langCodeList[7],
+        kEnglishName: 'Tamil'
+      },
+      {
+        kNativeName: 'తెలుగు',
+        kLanguageCode: langCodeList[8],
+        kEnglishName: 'Telugu'
+      },
+      {
+        kNativeName: 'ಕನ್ನಡ',
+        kLanguageCode: langCodeList[9],
+        kEnglishName: 'Kannada'
+      },
+      {
+        kNativeName: 'اردو',
+        kLanguageCode: langCodeList[10],
+        kEnglishName: 'Urdu'
+      },
+      {
+        kNativeName: 'डोगरी',
+        kLanguageCode: langCodeList[11],
+        kEnglishName: 'Dogri'
+      },
+      {
+        kNativeName: 'नेपाली',
+        kLanguageCode: langCodeList[12],
+        kEnglishName: 'Nepali'
+      },
+      {
+        kNativeName: 'සිංහල',
+        kLanguageCode: langCodeList[13],
+        kEnglishName: 'Sinhala'
+      },
+      {
+        kNativeName: 'संस्कृत',
+        kLanguageCode: langCodeList[14],
+        kEnglishName: 'Sanskrit'
+      },
+      {
+        kNativeName: 'অসমীয়া',
+        kLanguageCode: langCodeList[15],
+        kEnglishName: 'Assamese'
+      },
+      {
+        kNativeName: 'मैथिली',
+        kLanguageCode: langCodeList[16],
+        kEnglishName: 'Maithili'
+      },
+      {
+        kNativeName: 'भोजपुरी',
+        kLanguageCode: langCodeList[17],
+        kEnglishName: 'Bhojpuri'
+      },
+      {
+        kNativeName: 'മലയാളം',
+        kLanguageCode: langCodeList[18],
+        kEnglishName: 'Malayalam'
+      },
       {
         kNativeName: 'राजस्थानी',
-        kLanguageCode: 'raj',
+        kLanguageCode: langCodeList[19],
         kEnglishName: 'Rajasthani'
       },
-      {kNativeName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
-      {kNativeName: 'মানিপুরি', kLanguageCode: 'mni', kEnglishName: 'Manipuri'},
-      {kNativeName: 'كٲشُر', kLanguageCode: 'ks', kEnglishName: 'Kashmiri'},
-      {kNativeName: 'कोंकणी', kLanguageCode: 'kok', kEnglishName: 'Konkani'},
-      {kNativeName: 'सिंधी', kLanguageCode: 'sd', kEnglishName: 'Sindhi'},
-      {kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ', kLanguageCode: 'sat', kEnglishName: 'Santali'},
+      {
+        kNativeName: 'Bodo',
+        kLanguageCode: langCodeList[20],
+        kEnglishName: 'Bodo'
+      },
+      {
+        kNativeName: 'মানিপুরি',
+        kLanguageCode: langCodeList[21],
+        kEnglishName: 'Manipuri'
+      },
+      {
+        kNativeName: 'كٲشُر',
+        kLanguageCode: langCodeList[22],
+        kEnglishName: 'Kashmiri'
+      },
+      {
+        kNativeName: 'कोंकणी',
+        kLanguageCode: langCodeList[23],
+        kEnglishName: 'Konkani'
+      },
+      {
+        kNativeName: 'सिंधी',
+        kLanguageCode: langCodeList[24],
+        kEnglishName: 'Sindhi'
+      },
+      {
+        kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
+        kLanguageCode: langCodeList[25],
+        kEnglishName: 'Santali'
+      },
     ]
   };
 
