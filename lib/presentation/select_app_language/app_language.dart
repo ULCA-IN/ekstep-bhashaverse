@@ -121,29 +121,27 @@ class _AppLanguageState extends State<AppLanguage> {
                   backgroundColor: primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
-                    if (_focusNodeLanguageSearch.hasFocus) {
-                      _focusNodeLanguageSearch.unfocus();
-                    }
-                    _languageSearchController.clear();
-                    Future.delayed(keyboardHideDuration).then((_) {
-                      if (_appLanguageController.getSelectedLanguageIndex() !=
-                              null &&
-                          _appLanguageController
-                              .getAppLanguageList()
-                              .isNotEmpty) {
-                        _appLanguageController.setSelectedAppLocale();
-                        if (_hiveDBInstance.get(introShownAlreadyKey,
-                            defaultValue: false)) {
-                          Get.back();
-                        } else {
-                          Get.toNamed(AppRoutes.onboardingRoute);
-                        }
+                    if (_appLanguageController
+                            .getAppLanguageList()
+                            .isNotEmpty &&
+                        _appLanguageController.getSelectedLanguageIndex() !=
+                            null &&
+                        _appLanguageController.getSelectedLanguageIndex()! <
+                            _appLanguageController
+                                .getAppLanguageList()
+                                .length) {
+                      _languageSearchController.clear();
+                      _appLanguageController.setSelectedAppLocale();
+                      if (_hiveDBInstance.get(introShownAlreadyKey,
+                          defaultValue: false)) {
+                        Get.back();
                       } else {
-                        showDefaultSnackbar(
-                            message: errorPleaseSelectLanguage.tr);
-                        _appLanguageController.setAllLanguageList();
+                        Get.toNamed(AppRoutes.onboardingRoute);
                       }
-                    });
+                    } else {
+                      showDefaultSnackbar(
+                          message: errorPleaseSelectLanguage.tr);
+                    }
                   },
                 ),
                 SizedBox(height: 16.toHeight),
@@ -204,6 +202,13 @@ class _AppLanguageState extends State<AppLanguage> {
         },
       ).toList();
       _appLanguageController.setCustomLanguageList(searchedLanguageList);
+      _appLanguageController.setSelectedLanguageIndex(null);
+      for (var i = 0; i < searchedLanguageList.length; i++) {
+        if (searchedLanguageList[i][APIConstants.kLanguageCode] ==
+            Get.locale?.languageCode) {
+          _appLanguageController.setSelectedLanguageIndex(i);
+        }
+      }
     } else {
       _appLanguageController.setAllLanguageList();
     }

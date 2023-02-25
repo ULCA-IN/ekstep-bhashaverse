@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:bhashaverse/utils/snackbar_utils.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
@@ -24,7 +23,7 @@ class AppLanguageController extends GetxController {
     return _selectedLanguage.value;
   }
 
-  void setSelectedLanguageIndex(int index) {
+  void setSelectedLanguageIndex(int? index) {
     _selectedLanguage.value = index;
   }
 
@@ -38,9 +37,17 @@ class AppLanguageController extends GetxController {
 
   void _setAllLanguageList() {
     _languageList.clear();
-    for (var language
-        in APIConstants.LANGUAGE_CODE_MAP[APIConstants.kLanguageCodeList]!) {
+    for (var i = 0;
+        i <
+            APIConstants
+                .LANGUAGE_CODE_MAP[APIConstants.kLanguageCodeList]!.length;
+        i++) {
+      var language =
+          APIConstants.LANGUAGE_CODE_MAP[APIConstants.kLanguageCodeList]![i];
       _languageList.add(language);
+      if (language[APIConstants.kLanguageCode] == Get.locale?.languageCode) {
+        setSelectedLanguageIndex(i);
+      }
     }
   }
 
