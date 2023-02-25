@@ -34,7 +34,9 @@ class _AppLanguageState extends State<AppLanguage> {
     _appLanguageController = Get.find();
     _languageSearchController = TextEditingController();
     _hiveDBInstance = Hive.box(hiveDBName);
-    setSelectedLanguageFromName(Get.arguments[selectedLanguage]);
+    if (Get.arguments != null && Get.arguments[selectedLanguage] != null) {
+      setSelectedLanguageFromName(Get.arguments[selectedLanguage]);
+    }
     ScreenUtil().init();
     super.initState();
   }
