@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +15,7 @@ import '../../../../../common/controller/language_model_controller.dart';
 import '../../../../../enums/asr_details_enum.dart';
 import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
+import '../../../../../enums/mic_button_status.dart';
 import '../../../../../localization/localization_keys.dart';
 import '../../../../../services/socket_io_client.dart';
 import '../../../../../services/translation_app_api_client.dart';

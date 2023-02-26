@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,6 +9,7 @@ import 'package:lottie/lottie.dart';
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
+import '../../../../enums/mic_button_status.dart';
 import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../services/socket_io_client.dart';
