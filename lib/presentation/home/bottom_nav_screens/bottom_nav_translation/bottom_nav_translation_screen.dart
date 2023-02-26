@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -103,39 +102,116 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               child: Padding(
                 padding: AppEdgeInsets.instance.all(16),
                 child: Obx(
-                  () => Column(
-                    children: [
-                      Visibility(
-                        visible: !_bottomNavTranslationController
+                  () {
+                    String selectedSourceLanguage =
+                        _bottomNavTranslationController
+                            .selectedSourceLanguage.value;
+
+                    String selectedTargetLanguage =
+                        _bottomNavTranslationController
+                            .selectedTargetLanguage.value;
+                    return Column(
+                      children: [
+                        Visibility(
+                          visible: !_bottomNavTranslationController
+                                  .isTargetInputActive.value ||
+                              !_bottomNavTranslationController
+                                  .isKeyboardVisible.value,
+                          child: Flexible(
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    selectedSourceLanguage.isNotEmpty
+                                        ? selectedSourceLanguage
+                                        : 'Source Language not selected',
+                                    style: selectedSourceLanguage.isNotEmpty
+                                        ? AppTextStyle().regular16DolphinGrey
+                                        : AppTextStyle().grey14Arsenic,
+                                  ),
+                                ),
+                                SizedBox(height: 6.toHeight),
+                                Flexible(child: _buildSourceLanguageInput()),
+                                SizedBox(height: 6.toHeight),
+                                if (_bottomNavTranslationController
+                                    .isTranslateCompleted.value)
+                                  ASRAndTTSActions(
+                                    isEnabled: _bottomNavTranslationController
+                                            .isRecordedViaMic.value ||
+                                        (_hiveDBInstance
+                                                .get(isStreamingPreferred) &&
+                                            _bottomNavTranslationController
+                                                .isRecordedViaMic.value),
+                                    textToShare: _bottomNavTranslationController
+                                        .sourceLanTextController.text,
+                                    currentDuration: DateTImeUtils()
+                                        .getTimeFromMilliseconds(
+                                            timeInMillisecond:
+                                                _bottomNavTranslationController
+                                                    .currentDuration.value),
+                                    totalDuration: DateTImeUtils()
+                                        .getTimeFromMilliseconds(
+                                            timeInMillisecond:
+                                                _bottomNavTranslationController
+                                                    .maxDuration.value),
+                                    isRecordedAudio: !_hiveDBInstance
+                                        .get(isStreamingPreferred),
+                                    isPlayingAudio: shouldShowWaveforms(false),
+                                    onMusicPlayOrStop: () async {
+                                      shouldShowWaveforms(false)
+                                          ? await _bottomNavTranslationController
+                                              .stopPlayer()
+                                          : _bottomNavTranslationController
+                                              .playTTSOutput(false);
+                                    },
+                                    playerController:
+                                        _bottomNavTranslationController
+                                            .controller,
+                                  )
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 6.toHeight),
+                        if (!_bottomNavTranslationController
                                 .isTargetInputActive.value ||
                             !_bottomNavTranslationController
-                                .isKeyboardVisible.value,
-                        child: Flexible(
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  _bottomNavTranslationController
-                                          .getSelectedSourceLanguageName() ??
-                                      '',
-                                  style: AppTextStyle().regular16DolphinGrey,
+                                .isKeyboardVisible.value)
+                          _buildPastOrTranslateActions(),
+                        if (!_bottomNavTranslationController
+                            .isKeyboardVisible.value)
+                          const Divider(color: dolphinGray),
+                        Visibility(
+                          visible: !_bottomNavTranslationController
+                                  .isSourceInputActive.value ||
+                              !_bottomNavTranslationController
+                                  .isKeyboardVisible.value,
+                          child: Expanded(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 12.toHeight),
+                                Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    selectedTargetLanguage.isNotEmpty
+                                        ? selectedTargetLanguage
+                                        : 'Target language not selected',
+                                    style: selectedTargetLanguage.isNotEmpty
+                                        ? AppTextStyle().regular16DolphinGrey
+                                        : AppTextStyle().grey14Arsenic,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 6.toHeight),
-                              Flexible(child: _buildSourceLanguageInput()),
-                              SizedBox(height: 6.toHeight),
-                              if (_bottomNavTranslationController
-                                  .isTranslateCompleted.value)
+                                SizedBox(height: 6.toHeight),
+                                Flexible(
+                                  child: _buildTargetLanguageInput(),
+                                ),
+                                SizedBox(height: 6.toHeight),
                                 ASRAndTTSActions(
                                   isEnabled: _bottomNavTranslationController
-                                          .isRecordedViaMic.value ||
-                                      (_hiveDBInstance
-                                              .get(isStreamingPreferred) &&
-                                          _bottomNavTranslationController
-                                              .isRecordedViaMic.value),
+                                      .isTranslateCompleted.value,
                                   textToShare: _bottomNavTranslationController
-                                      .sourceLanTextController.text,
+                                      .targetLangTextController.text,
                                   currentDuration: DateTImeUtils()
                                       .getTimeFromMilliseconds(
                                           timeInMillisecond:
@@ -148,90 +224,27 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                   .maxDuration.value),
                                   isRecordedAudio: !_hiveDBInstance
                                       .get(isStreamingPreferred),
-                                  isPlayingAudio: shouldShowWaveforms(false),
+                                  isPlayingAudio: shouldShowWaveforms(true),
                                   onMusicPlayOrStop: () async {
-                                    shouldShowWaveforms(false)
+                                    shouldShowWaveforms(true)
                                         ? await _bottomNavTranslationController
                                             .stopPlayer()
                                         : _bottomNavTranslationController
-                                            .playTTSOutput(false);
+                                            .playTTSOutput(true);
                                   },
                                   playerController:
                                       _bottomNavTranslationController
                                           .controller,
                                 )
-                            ],
+                                // _buildShareCopyPlayActions(
+                                //     isForTargetSection: true),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 6.toHeight),
-                      if (!_bottomNavTranslationController
-                              .isTargetInputActive.value ||
-                          !_bottomNavTranslationController
-                              .isKeyboardVisible.value)
-                        _buildPastOrTranslateActions(),
-                      if (!_bottomNavTranslationController
-                          .isKeyboardVisible.value)
-                        const Divider(color: dolphinGray),
-                      Visibility(
-                        visible: !_bottomNavTranslationController
-                                .isSourceInputActive.value ||
-                            !_bottomNavTranslationController
-                                .isKeyboardVisible.value,
-                        child: Expanded(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 12.toHeight),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  _bottomNavTranslationController
-                                          .getSelectedTargetLanguageName() ??
-                                      '',
-                                  style: AppTextStyle().regular16DolphinGrey,
-                                ),
-                              ),
-                              SizedBox(height: 6.toHeight),
-                              Flexible(
-                                child: _buildTargetLanguageInput(),
-                              ),
-                              SizedBox(height: 6.toHeight),
-                              ASRAndTTSActions(
-                                isEnabled: _bottomNavTranslationController
-                                    .isTranslateCompleted.value,
-                                textToShare: _bottomNavTranslationController
-                                    .targetLangTextController.text,
-                                currentDuration: DateTImeUtils()
-                                    .getTimeFromMilliseconds(
-                                        timeInMillisecond:
-                                            _bottomNavTranslationController
-                                                .currentDuration.value),
-                                totalDuration: DateTImeUtils()
-                                    .getTimeFromMilliseconds(
-                                        timeInMillisecond:
-                                            _bottomNavTranslationController
-                                                .maxDuration.value),
-                                isRecordedAudio:
-                                    !_hiveDBInstance.get(isStreamingPreferred),
-                                isPlayingAudio: shouldShowWaveforms(true),
-                                onMusicPlayOrStop: () async {
-                                  shouldShowWaveforms(true)
-                                      ? await _bottomNavTranslationController
-                                          .stopPlayer()
-                                      : _bottomNavTranslationController
-                                          .playTTSOutput(true);
-                                },
-                                playerController:
-                                    _bottomNavTranslationController.controller,
-                              )
-                              // _buildShareCopyPlayActions(
-                              //     isForTargetSection: true),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -374,13 +387,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       // readOnly: _bottomNavTranslationController.isTranslateCompleted.value,
       textInputAction: TextInputAction.done,
 
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         border: InputBorder.none,
         isDense: true,
         contentPadding: EdgeInsets.zero,
-        hintText: 'Translation will appear here',
-        hintStyle:
-            AppTextStyle().regular18balticSea.copyWith(color: mischkaGrey),
       ),
     );
   }
@@ -390,23 +400,23 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       () => Visibility(
         visible: !_bottomNavTranslationController.isTranslateCompleted.value,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            CustomOutlineButton(
-              icon: iconClipBoardText,
-              title: kPaste.tr,
-              onTap: () async {
-                ClipboardData? clipboardData =
-                    await Clipboard.getData(Clipboard.kTextPlain);
-                if (clipboardData != null &&
-                    (clipboardData.text ?? '').isNotEmpty) {
-                  _bottomNavTranslationController.sourceLanTextController.text =
-                      clipboardData.text ?? '';
-                } else {
-                  showDefaultSnackbar(message: errorNoTextInClipboard.tr);
-                }
-              },
-            ),
+            // CustomOutlineButton(
+            //   icon: iconClipBoardText,
+            //   title: kPaste.tr,
+            //   onTap: () async {
+            //     ClipboardData? clipboardData =
+            //         await Clipboard.getData(Clipboard.kTextPlain);
+            //     if (clipboardData != null &&
+            //         (clipboardData.text ?? '').isNotEmpty) {
+            //       _bottomNavTranslationController.sourceLanTextController.text =
+            //           clipboardData.text ?? '';
+            //     } else {
+            //       showDefaultSnackbar(message: errorNoTextInClipboard.tr);
+            //     }
+            //   },
+            // ),
             CustomOutlineButton(
               title: kTranslate.tr,
               isHighlighted: true,
