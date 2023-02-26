@@ -62,7 +62,9 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconShare,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: brightGrey,
+                    color: textToShare.isNotEmpty
+                        ? brightGrey
+                        : balticSea.withOpacity(0.2),
                   ),
                 ),
               ),
@@ -83,7 +85,9 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconCopy,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: brightGrey,
+                    color: textToShare.isNotEmpty
+                        ? brightGrey
+                        : balticSea.withOpacity(0.2),
                   ),
                 ),
               ),
@@ -91,10 +95,7 @@ class ASRAndTTSActions extends StatelessWidget {
           ),
         ),
         Expanded(
-          child:
-              //  Obx(
-              //   () =>
-              Visibility(
+          child: Visibility(
             visible: _isPlayingAudio,
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -131,31 +132,32 @@ class ASRAndTTSActions extends StatelessWidget {
               ],
             ),
           ),
-          // ),
         ),
         SizedBox(width: 12.toWidth),
         Visibility(
           // visible: showSoundButton,
           child: InkWell(
             onTap: () {
-              _onAudioPlayOrStop();
+              if (isEnabled) {
+                _onAudioPlayOrStop();
+              } else {
+                showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+              }
             },
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: flushOrangeColor,
+                color: isEnabled
+                    ? flushOrangeColor
+                    : flushOrangeColor.withOpacity(0.2),
               ),
               padding: AppEdgeInsets.instance.all(8),
-              child:
-                  //  Obx(
-                  //   () =>
-                  SvgPicture.asset(
+              child: SvgPicture.asset(
                 _isPlayingAudio ? iconStopPlayback : iconSound,
                 height: 24.toWidth,
                 width: 24.toWidth,
-                color: balticSea,
+                color: isEnabled ? balticSea : balticSea.withOpacity(0.2),
               ),
-              // ),
             ),
           ),
         ),
