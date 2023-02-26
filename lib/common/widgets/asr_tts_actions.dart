@@ -104,7 +104,6 @@ class ASRAndTTSActions extends StatelessWidget {
                   size: Size(WaveformStyle.getDefaultWidth,
                       WaveformStyle.getDefaultHeight),
                   playerController: _playerController,
-                  // _bottomNavTranslationController.controller,
                   waveformType: WaveformType.fitWidth,
                   playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
                     isRecordedAudio: _isRecordedAudio,
@@ -134,30 +133,27 @@ class ASRAndTTSActions extends StatelessWidget {
           ),
         ),
         SizedBox(width: 12.toWidth),
-        Visibility(
-          // visible: showSoundButton,
-          child: InkWell(
-            onTap: () {
-              if (isEnabled) {
-                _onAudioPlayOrStop();
-              } else {
-                showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
-              }
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isEnabled
-                    ? flushOrangeColor
-                    : flushOrangeColor.withOpacity(0.2),
-              ),
-              padding: AppEdgeInsets.instance.all(8),
-              child: SvgPicture.asset(
-                _isPlayingAudio ? iconStopPlayback : iconSound,
-                height: 24.toWidth,
-                width: 24.toWidth,
-                color: isEnabled ? balticSea : balticSea.withOpacity(0.2),
-              ),
+        InkWell(
+          onTap: () {
+            if (isEnabled) {
+              _onAudioPlayOrStop();
+            } else {
+              showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isEnabled
+                  ? flushOrangeColor
+                  : flushOrangeColor.withOpacity(0.2),
+            ),
+            padding: AppEdgeInsets.instance.all(8),
+            child: SvgPicture.asset(
+              _isPlayingAudio ? iconStopPlayback : iconSound,
+              height: 24.toWidth,
+              width: 24.toWidth,
+              color: isEnabled ? balticSea : balticSea.withOpacity(0.2),
             ),
           ),
         ),
