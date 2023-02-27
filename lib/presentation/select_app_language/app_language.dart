@@ -35,7 +35,7 @@ class _AppLanguageState extends State<AppLanguage> {
     _languageSearchController = TextEditingController();
     _hiveDBInstance = Hive.box(hiveDBName);
     if (Get.arguments != null && Get.arguments[selectedLanguage] != null) {
-      setSelectedLanguageFromName(Get.arguments[selectedLanguage]);
+      setSelectedLanguageFromArg(Get.arguments[selectedLanguage]);
     }
     ScreenUtil().init();
     super.initState();
@@ -123,7 +123,8 @@ class _AppLanguageState extends State<AppLanguage> {
                                 onItemTap: () {
                                   _appLanguageController
                                       .setSelectedLanguageIndex(index);
-                                  _appLanguageController.setSelectedAppLocale();
+                                  Get.updateLocale(Locale(_appLanguageController
+                                      .getSelectedLanguageCode()));
                                 },
                                 index: index,
                                 selectedIndex: _appLanguageController
@@ -155,7 +156,7 @@ class _AppLanguageState extends State<AppLanguage> {
                                 .getAppLanguageList()
                                 .length) {
                       _languageSearchController.clear();
-                      _appLanguageController.setSelectedAppLocale();
+                      _appLanguageController.saveSelectedLocaleInDB();
                       if (_hiveDBInstance.get(introShownAlreadyKey,
                           defaultValue: false)) {
                         Get.back();
@@ -244,7 +245,7 @@ class _AppLanguageState extends State<AppLanguage> {
     }
   }
 
-  void setSelectedLanguageFromName(String name) {
+  void setSelectedLanguageFromArg(String name) {
     _appLanguageController.setSelectedLanguageIndex(_appLanguageController
         .getAppLanguageList()
         .indexWhere((element) => element[APIConstants.kNativeName] == name));
@@ -256,6 +257,9 @@ class _AppLanguageState extends State<AppLanguage> {
       _languageSearchController.clear();
       _appLanguageController.setAllLanguageList();
     } else {
+      Get.updateLocale(
+        Locale(_hiveDBInstance.get(preferredAppLocale)),
+      );
       Get.back();
     }
     return Future.value(false);
