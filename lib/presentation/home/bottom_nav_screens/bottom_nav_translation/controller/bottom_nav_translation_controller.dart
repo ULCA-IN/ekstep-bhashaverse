@@ -178,6 +178,10 @@ class BottomNavTranslationController extends GetxController {
       isMicPermissionGranted = isPermissionGranted;
     });
     if (isMicPermissionGranted) {
+      // clear previous recording files and
+      // update state
+      resetAllValues();
+
       // / if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
@@ -237,9 +241,6 @@ class BottomNavTranslationController extends GetxController {
             });
           });
         } else {
-          // clear previous recording files and
-          // update state
-          resetAllValues();
           await _voiceRecorder.startRecordingVoice();
         }
       }
@@ -299,7 +300,8 @@ class BottomNavTranslationController extends GetxController {
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
-    var response = await _translationAppAPIClient.sendTransliterationRequest(
+    var response = await _translationAppAclear
+    PIClient.sendTransliterationRequest(
         transliterationPayload: transliterationPayloadToSend);
 
     response?.when(
