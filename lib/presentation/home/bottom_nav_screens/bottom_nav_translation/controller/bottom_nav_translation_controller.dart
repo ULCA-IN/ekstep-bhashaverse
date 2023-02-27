@@ -182,7 +182,7 @@ class BottomNavTranslationController extends GetxController {
       // update state
       resetAllValues();
 
-      // / if user quickly released tap than Socket continue emit the data
+      //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
         recordingStartTime = DateTime.now();
@@ -300,8 +300,7 @@ class BottomNavTranslationController extends GetxController {
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
-    var response = await _translationAppAclear
-    PIClient.sendTransliterationRequest(
+    var response = await _translationAppAPIClient.sendTransliterationRequest(
         transliterationPayload: transliterationPayloadToSend);
 
     response?.when(

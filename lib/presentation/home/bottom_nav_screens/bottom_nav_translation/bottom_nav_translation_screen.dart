@@ -236,8 +236,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       _bottomNavTranslationController
                                           .controller,
                                 )
-                                // _buildShareCopyPlayActions(
-                                //     isForTargetSection: true),
                               ],
                             ),
                           ),
@@ -298,7 +296,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     constraints: BoxConstraints(
                                       minWidth:
                                           (ScreenUtil.screenWidth / 6).toWidth,
-                                      // maxWidth: 300,
                                     ),
                                     child: Text(
                                       hintText,
@@ -343,7 +340,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     return TextField(
       controller: _bottomNavTranslationController.sourceLanTextController,
       focusNode: _sourceLangFocusNode,
-      // readOnly: _bottomNavTranslationController.isTranslateCompleted.value,
       style: AppTextStyle().regular18balticSea,
       expands: true,
       maxLines: null,
@@ -384,9 +380,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       expands: true,
       maxLines: null,
       style: AppTextStyle().regular18balticSea,
-      // readOnly: _bottomNavTranslationController.isTranslateCompleted.value,
+      readOnly: !_bottomNavTranslationController.isTranslateCompleted.value,
       textInputAction: TextInputAction.done,
-
       decoration: const InputDecoration(
         border: InputBorder.none,
         isDense: true,
@@ -402,21 +397,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // CustomOutlineButton(
-            //   icon: iconClipBoardText,
-            //   title: kPaste.tr,
-            //   onTap: () async {
-            //     ClipboardData? clipboardData =
-            //         await Clipboard.getData(Clipboard.kTextPlain);
-            //     if (clipboardData != null &&
-            //         (clipboardData.text ?? '').isNotEmpty) {
-            //       _bottomNavTranslationController.sourceLanTextController.text =
-            //           clipboardData.text ?? '';
-            //     } else {
-            //       showDefaultSnackbar(message: errorNoTextInClipboard.tr);
-            //     }
-            //   },
-            // ),
             CustomOutlineButton(
               title: kTranslate.tr,
               isHighlighted: true,
