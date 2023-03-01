@@ -47,13 +47,19 @@ class AppTextStyle {
     color: balticSea,
   );
 
+  final regular22BalticSea = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 24.toFont,
+    color: balticSea,
+  );
+
   final semibold22BalticSea = TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 22.toFont,
     color: balticSea,
   );
 
-  final regular28balticSea = TextStyle(
+  final regular28BalticSea = TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 28.toFont,
     color: balticSea,
