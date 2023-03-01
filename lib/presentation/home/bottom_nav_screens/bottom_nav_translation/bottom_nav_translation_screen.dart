@@ -354,10 +354,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                     ? connecting.tr
                     : kTranslationHintText.tr,
         hintStyle:
-            AppTextStyle().regular28balticSea.copyWith(color: mischkaGrey),
-        hintMaxLines: _bottomNavTranslationController.isTranslateCompleted.value
-            ? null
-            : 2,
+            AppTextStyle().regular22BalticSea.copyWith(color: mischkaGrey),
+        hintMaxLines: 4,
         border: InputBorder.none,
         isDense: true,
         contentPadding: EdgeInsets.zero,
