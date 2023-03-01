@@ -62,9 +62,7 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconShare,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: textToShare.isNotEmpty
-                        ? brightGrey
-                        : balticSea.withOpacity(0.2),
+                    color: textToShare.isNotEmpty ? brightGrey : americanSilver,
                   ),
                 ),
               ),
@@ -85,9 +83,7 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconCopy,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: textToShare.isNotEmpty
-                        ? brightGrey
-                        : balticSea.withOpacity(0.2),
+                    color: textToShare.isNotEmpty ? brightGrey : americanSilver,
                   ),
                 ),
               ),
@@ -144,16 +140,14 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isEnabled
-                  ? flushOrangeColor
-                  : flushOrangeColor.withOpacity(0.2),
+              color: isEnabled ? flushOrangeColor : goastWhite,
             ),
             padding: AppEdgeInsets.instance.all(8),
             child: SvgPicture.asset(
               _isPlayingAudio ? iconStopPlayback : iconSound,
               height: 24.toWidth,
               width: 24.toWidth,
-              color: isEnabled ? balticSea : balticSea.withOpacity(0.2),
+              color: isEnabled ? balticSea : americanSilver,
             ),
           ),
         ),
