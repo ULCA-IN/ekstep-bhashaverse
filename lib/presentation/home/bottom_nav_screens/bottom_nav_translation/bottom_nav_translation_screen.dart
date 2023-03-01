@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -139,7 +140,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                 style: _bottomNavTranslationController
                                         .isTranslateCompleted.value
                                     ? AppTextStyle().regular18balticSea
-                                    : AppTextStyle().regular28balticSea,
+                                    : AppTextStyle().regular28BalticSea,
                                 expands: true,
                                 maxLines: null,
                                 textInputAction: TextInputAction.done,
@@ -155,12 +156,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                               ? connecting.tr
                                               : kTranslationHintText.tr,
                                   hintStyle: AppTextStyle()
-                                      .regular28balticSea
+                                      .regular22BalticSea
                                       .copyWith(color: mischkaGrey),
-                                  hintMaxLines: _bottomNavTranslationController
-                                          .isTranslateCompleted.value
-                                      ? null
-                                      : 2,
+                                  hintMaxLines: 4,
                                   border: InputBorder.none,
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
@@ -447,10 +445,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             ),
             child: Obx(
               () {
-                return Text(
+                return AutoSizeText(
                   _bottomNavTranslationController
                       .getSelectedSourceLanguageName(),
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                   style: AppTextStyle()
                       .regular18DolphinGrey
                       .copyWith(fontSize: 16.toFont),
@@ -505,11 +503,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
-              () => Text(
+              () => AutoSizeText(
                 _bottomNavTranslationController.getSelectedTargetLanguageName(),
                 style: AppTextStyle()
                     .regular18DolphinGrey
                     .copyWith(fontSize: 16.toFont),
+                maxLines: 2,
               ),
             ),
           ),

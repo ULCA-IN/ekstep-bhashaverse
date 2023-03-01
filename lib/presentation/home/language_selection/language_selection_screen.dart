@@ -177,7 +177,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   .contains(searchString.toLowerCase());
         },
       ).toList();
-      // _appLanguageController.setCustomLanguageList(searchedLanguageList);
       _languageSelectionController.setLanguageList(searchedLanguageList);
     } else {
       setLanguageListFromArgument();

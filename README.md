@@ -43,6 +43,7 @@ name: bhashaverse
   socket_io_client: ^2.0.1
   mic_stream: ^0.6.4
   record: ^4.4.4
+  auto_size_text: ^3.0.0
 ```
 
 * Dev Dependencies:

@@ -75,30 +75,35 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                   subtitle: appInterfaceWillChange.tr,
                 ),
                 SizedBox(height: 24.toHeight),
-                InkWell(
-                  onTap: () {
-                    Get.toNamed(AppRoutes.appLanguageRoute)?.then(
-                        (_) => _settingsController.getPreferredLanguage());
-                  },
-                  borderRadius: BorderRadius.circular(10),
-                  child: _settingHeading(
-                    action: Row(
-                      children: [
-                        Text(
-                          _settingsController.preferredLanguage.value,
-                          style: AppTextStyle()
-                              .light16BalticSea
-                              .copyWith(color: arsenicColor),
-                        ),
-                        SizedBox(width: 8.toWidth),
-                        RotatedBox(
-                          quarterTurns: 3,
-                          child: SvgPicture.asset(iconArrowDown),
-                        ),
-                      ],
+                Obx(
+                  () => InkWell(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.appLanguageRoute, arguments: {
+                        selectedLanguage:
+                            _settingsController.preferredLanguage.value,
+                      })?.then(
+                          (_) => _settingsController.getPreferredLanguage());
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: _settingHeading(
+                      action: Row(
+                        children: [
+                          Text(
+                            _settingsController.preferredLanguage.value,
+                            style: AppTextStyle()
+                                .light16BalticSea
+                                .copyWith(color: arsenicColor),
+                          ),
+                          SizedBox(width: 8.toWidth),
+                          RotatedBox(
+                            quarterTurns: 3,
+                            child: SvgPicture.asset(iconArrowDown),
+                          ),
+                        ],
+                      ),
+                      title: appLanguage.tr,
+                      subtitle: appInterfaceWillChangeInSelected.tr,
                     ),
-                    title: appLanguage.tr,
-                    subtitle: appInterfaceWillChangeInSelected.tr,
                   ),
                 ),
                 SizedBox(height: 24.toHeight),
@@ -218,12 +223,14 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
         children: [
           Row(
             children: [
-              Text(
-                title,
-                style: AppTextStyle().regular18DolphinGrey.copyWith(
-                      fontSize: 20.toFont,
-                      color: balticSea,
-                    ),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTextStyle().regular18DolphinGrey.copyWith(
+                        fontSize: 20.toFont,
+                        color: balticSea,
+                      ),
+                ),
               ),
               const Spacer(),
               action,

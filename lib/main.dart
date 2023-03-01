@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
     final Box hiveDBInstance = Hive.box(hiveDBName);
 
     // Localization preference
-    String appLocale =
-        hiveDBInstance.get(preferredAppLocale, defaultValue: 'en');
+    String appLocale = hiveDBInstance.get(preferredAppLocale,
+        defaultValue: Get.deviceLocale?.languageCode);
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
     }
