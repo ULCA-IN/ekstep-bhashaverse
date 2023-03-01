@@ -97,8 +97,8 @@ class _AppLanguageState extends State<AppLanguage> {
                                   [APIConstants.kLanguageCode];
 
                               Map<String, String>? selectedLanguageMap =
-                                  LanguageMapTranslated
-                                      .langMap[Get.locale?.languageCode];
+                                  TranslatedLanguagesMap
+                                      .language[Get.locale?.languageCode];
 
                               String titleInSelectedLang = '';
 
@@ -217,7 +217,7 @@ class _AppLanguageState extends State<AppLanguage> {
         _appLanguageController.getAppLanguageList();
     if (searchString.isNotEmpty) {
       Map<String, String>? localeLanguageMap =
-          LanguageMapTranslated.langMap[Get.locale?.languageCode];
+          TranslatedLanguagesMap.language[Get.locale?.languageCode];
       List<Map<String, dynamic>> searchedLanguageList = tempList.where(
         (language) {
           String? languageInLocale =

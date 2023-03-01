@@ -75,132 +75,132 @@ class APIConstants {
     kLanguageCodeList: [
       {
         kNativeName: 'English',
-        kLanguageCode: langCodeList[0],
+        kLanguageCode: languagesCodeList[0],
         kEnglishName: 'English'
       },
       {
         kNativeName: 'हिन्दी',
-        kLanguageCode: langCodeList[1],
+        kLanguageCode: languagesCodeList[1],
         kEnglishName: 'Hindi'
       },
       {
         kNativeName: 'मराठी',
-        kLanguageCode: langCodeList[2],
+        kLanguageCode: languagesCodeList[2],
         kEnglishName: 'Marathi'
       },
       {
         kNativeName: 'বাংলা',
-        kLanguageCode: langCodeList[3],
+        kLanguageCode: languagesCodeList[3],
         kEnglishName: 'Bangla'
       },
       {
         kNativeName: 'ਪੰਜਾਬੀ',
-        kLanguageCode: langCodeList[4],
+        kLanguageCode: languagesCodeList[4],
         kEnglishName: 'Punjabi'
       },
       {
         kNativeName: 'ગુજરાતી',
-        kLanguageCode: langCodeList[5],
+        kLanguageCode: languagesCodeList[5],
         kEnglishName: 'Gujarati'
       },
       {
         kNativeName: 'ଓଡିଆ',
-        kLanguageCode: langCodeList[6],
+        kLanguageCode: languagesCodeList[6],
         kEnglishName: 'Oriya'
       },
       {
         kNativeName: 'தமிழ்',
-        kLanguageCode: langCodeList[7],
+        kLanguageCode: languagesCodeList[7],
         kEnglishName: 'Tamil'
       },
       {
         kNativeName: 'తెలుగు',
-        kLanguageCode: langCodeList[8],
+        kLanguageCode: languagesCodeList[8],
         kEnglishName: 'Telugu'
       },
       {
         kNativeName: 'ಕನ್ನಡ',
-        kLanguageCode: langCodeList[9],
+        kLanguageCode: languagesCodeList[9],
         kEnglishName: 'Kannada'
       },
       {
         kNativeName: 'اردو',
-        kLanguageCode: langCodeList[10],
+        kLanguageCode: languagesCodeList[10],
         kEnglishName: 'Urdu'
       },
       {
         kNativeName: 'डोगरी',
-        kLanguageCode: langCodeList[11],
+        kLanguageCode: languagesCodeList[11],
         kEnglishName: 'Dogri'
       },
       {
         kNativeName: 'नेपाली',
-        kLanguageCode: langCodeList[12],
+        kLanguageCode: languagesCodeList[12],
         kEnglishName: 'Nepali'
       },
       {
         kNativeName: 'සිංහල',
-        kLanguageCode: langCodeList[13],
+        kLanguageCode: languagesCodeList[13],
         kEnglishName: 'Sinhala'
       },
       {
         kNativeName: 'संस्कृत',
-        kLanguageCode: langCodeList[14],
+        kLanguageCode: languagesCodeList[14],
         kEnglishName: 'Sanskrit'
       },
       {
         kNativeName: 'অসমীয়া',
-        kLanguageCode: langCodeList[15],
+        kLanguageCode: languagesCodeList[15],
         kEnglishName: 'Assamese'
       },
       {
         kNativeName: 'मैथिली',
-        kLanguageCode: langCodeList[16],
+        kLanguageCode: languagesCodeList[16],
         kEnglishName: 'Maithili'
       },
       {
         kNativeName: 'भोजपुरी',
-        kLanguageCode: langCodeList[17],
+        kLanguageCode: languagesCodeList[17],
         kEnglishName: 'Bhojpuri'
       },
       {
         kNativeName: 'മലയാളം',
-        kLanguageCode: langCodeList[18],
+        kLanguageCode: languagesCodeList[18],
         kEnglishName: 'Malayalam'
       },
       {
         kNativeName: 'राजस्थानी',
-        kLanguageCode: langCodeList[19],
+        kLanguageCode: languagesCodeList[19],
         kEnglishName: 'Rajasthani'
       },
       {
         kNativeName: 'Bodo',
-        kLanguageCode: langCodeList[20],
+        kLanguageCode: languagesCodeList[20],
         kEnglishName: 'Bodo'
       },
       {
         kNativeName: 'মানিপুরি',
-        kLanguageCode: langCodeList[21],
+        kLanguageCode: languagesCodeList[21],
         kEnglishName: 'Manipuri'
       },
       {
         kNativeName: 'كٲشُر',
-        kLanguageCode: langCodeList[22],
+        kLanguageCode: languagesCodeList[22],
         kEnglishName: 'Kashmiri'
       },
       {
         kNativeName: 'कोंकणी',
-        kLanguageCode: langCodeList[23],
+        kLanguageCode: languagesCodeList[23],
         kEnglishName: 'Konkani'
       },
       {
         kNativeName: 'सिंधी',
-        kLanguageCode: langCodeList[24],
+        kLanguageCode: languagesCodeList[24],
         kEnglishName: 'Sindhi'
       },
       {
         kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
-        kLanguageCode: langCodeList[25],
+        kLanguageCode: languagesCodeList[25],
         kEnglishName: 'Santali'
       },
     ]
