@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:get/get.dart';
 
 import '../../enums/asr_details_enum.dart';
-import '../../enums/language_enum.dart';
 import '../../models/search_model.dart';
 import '../../utils/constants/api_constants.dart';
 
@@ -112,14 +111,8 @@ class LanguageModelController extends GetxController {
         .intersection(availableTransModelLangCombinationsSet);
 
     for (String eachUseableLangPair in canUseSourceAndTargetLangSet) {
-      _allAvailableSourceLanguages.add(APIConstants.getLanguageCodeOrName(
-          value: eachUseableLangPair.split('-')[0],
-          returnWhat: LanguageMap.nativeName,
-          lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
-      _allAvailableTargetLanguages.add(APIConstants.getLanguageCodeOrName(
-          value: eachUseableLangPair.split('-')[1],
-          returnWhat: LanguageMap.nativeName,
-          lang_code_map: APIConstants.LANGUAGE_CODE_MAP));
+      _allAvailableSourceLanguages.add(eachUseableLangPair.split('-')[0]);
+      _allAvailableTargetLanguages.add(eachUseableLangPair.split('-')[1]);
     }
   }
 

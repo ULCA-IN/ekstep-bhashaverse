@@ -1,5 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
+import 'package:get/get.dart';
+
 import '../../enums/language_enum.dart';
 import 'language_map_translated.dart';
 
@@ -223,7 +225,7 @@ class APIConstants {
         case LanguageMap.englishName:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
-                  eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
+                  eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
           return returningLangPair[kEnglishName] ?? 'No Language Name Found';
 
@@ -233,6 +235,22 @@ class APIConstants {
                   eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
                   value.toLowerCase());
           return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
+        case LanguageMap.languageNameInAppLanguage:
+          String languageNameInAppLanguage = '';
+
+          Map<String, String>? selectedLanguageMap =
+              TranslatedLanguagesMap.language[Get.locale?.languageCode];
+
+          if (selectedLanguageMap != null &&
+              selectedLanguageMap[value] != null) {
+            languageNameInAppLanguage = selectedLanguageMap[value]!;
+          } else {
+            languageNameInAppLanguage = APIConstants.getLanguageCodeOrName(
+                value: value,
+                returnWhat: LanguageMap.englishName,
+                lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+          }
+          return languageNameInAppLanguage;
       }
     } catch (e) {
       return 'No Language Found';

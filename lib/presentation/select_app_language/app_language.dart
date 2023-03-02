@@ -4,11 +4,11 @@ import 'package:hive/hive.dart';
 
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
+import '../../enums/language_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/constants/language_map_translated.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
@@ -92,31 +92,11 @@ class _AppLanguageState extends State<AppLanguage> {
                         itemBuilder: (context, index) {
                           return Obx(
                             () {
-                              String selectedLangCode = _appLanguageController
-                                      .getAppLanguageList()[index]
-                                  [APIConstants.kLanguageCode];
-
-                              Map<String, String>? selectedLanguageMap =
-                                  TranslatedLanguagesMap
-                                      .language[Get.locale?.languageCode];
-
-                              String titleInSelectedLang = '';
-
-                              if (selectedLanguageMap != null &&
-                                  selectedLanguageMap[selectedLangCode] !=
-                                      null &&
-                                  selectedLanguageMap[selectedLangCode]!
-                                      .isNotEmpty) {
-                                titleInSelectedLang =
-                                    selectedLanguageMap[selectedLangCode]!;
-                              } else {
-                                titleInSelectedLang = _appLanguageController
-                                        .getAppLanguageList()[index]
-                                    [APIConstants.kEnglishName];
-                              }
-
                               return LanguageSelectionWidget(
-                                title: titleInSelectedLang,
+                                title: getLangNameInAppLanguage(
+                                    _appLanguageController
+                                            .getAppLanguageList()[index]
+                                        [APIConstants.kLanguageCode]),
                                 subTitle: _appLanguageController
                                         .getAppLanguageList()[index]
                                     [APIConstants.kNativeName],
@@ -216,20 +196,16 @@ class _AppLanguageState extends State<AppLanguage> {
     List<Map<String, dynamic>> tempList =
         _appLanguageController.getAppLanguageList();
     if (searchString.isNotEmpty) {
-      Map<String, String>? localeLanguageMap =
-          TranslatedLanguagesMap.language[Get.locale?.languageCode];
       List<Map<String, dynamic>> searchedLanguageList = tempList.where(
         (language) {
-          String? languageInLocale =
-              localeLanguageMap?[language[APIConstants.kLanguageCode]];
           return language[APIConstants.kEnglishName]
                   .toLowerCase()
                   .contains(searchString.toLowerCase()) ||
               language[APIConstants.kNativeName]
                   .toLowerCase()
                   .contains(searchString.toLowerCase()) ||
-              (languageInLocale != null &&
-                  languageInLocale.contains(searchString));
+              getLangNameInAppLanguage(language[APIConstants.kLanguageCode])
+                  .contains(searchString);
         },
       ).toList();
       _appLanguageController.setCustomLanguageList(searchedLanguageList);
@@ -243,6 +219,13 @@ class _AppLanguageState extends State<AppLanguage> {
     } else {
       _appLanguageController.setAllLanguageList();
     }
+  }
+
+  String getLangNameInAppLanguage(String languageCode) {
+    return APIConstants.getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 
   void setSelectedLanguageFromArg(String name) {
