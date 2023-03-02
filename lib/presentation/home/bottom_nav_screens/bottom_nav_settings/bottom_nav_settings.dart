@@ -12,6 +12,7 @@ import '../../../../utils/screen_util/screen_util.dart';
 import '../../../../utils/snackbar_utils.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
+import '../../home_screen/controller/home_controller.dart';
 import 'controller/settings_controller.dart';
 
 class BottomNavSettings extends StatefulWidget {
@@ -52,146 +53,171 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: honeydew,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 16.toHeight),
-                Text(
-                  kSettings.tr,
-                  style: AppTextStyle()
-                      .semibold24BalticSea
-                      .copyWith(fontSize: 20.toFont),
-                ),
-                SizedBox(height: 48.toHeight),
-                _settingHeading(
-                  action: _popupMenuBuilder(),
-                  title: appTheme.tr,
-                  subtitle: appInterfaceWillChange.tr,
-                ),
-                SizedBox(height: 24.toHeight),
-                Obx(
-                  () => InkWell(
-                    onTap: () {
-                      Get.toNamed(AppRoutes.appLanguageRoute, arguments: {
-                        selectedLanguage:
-                            _settingsController.preferredLanguage.value,
-                      })?.then(
-                          (_) => _settingsController.getPreferredLanguage());
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: _settingHeading(
-                      action: Row(
-                        children: [
-                          Text(
-                            _settingsController.preferredLanguage.value,
-                            style: AppTextStyle()
-                                .light16BalticSea
-                                .copyWith(color: arsenicColor),
+    return WillPopScope(
+      onWillPop: () => _onWillPop(),
+      child: Scaffold(
+        backgroundColor: honeydew,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 16.toHeight),
+                  Row(
+                    children: [
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => _onWillPop(),
+                        child: Container(
+                          padding: AppEdgeInsets.instance.all(8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border:
+                                Border.all(width: 1.toWidth, color: goastWhite),
                           ),
-                          SizedBox(width: 8.toWidth),
-                          RotatedBox(
-                            quarterTurns: 3,
-                            child: SvgPicture.asset(iconArrowDown),
+                          child: SvgPicture.asset(
+                            iconPrevious,
                           ),
-                        ],
+                        ),
                       ),
-                      title: appLanguage.tr,
-                      subtitle: appInterfaceWillChangeInSelected.tr,
-                    ),
+                      SizedBox(width: 24.toWidth),
+                      Text(
+                        kSettings.tr,
+                        style: AppTextStyle()
+                            .semibold24BalticSea
+                            .copyWith(fontSize: 20.toFont),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 24.toHeight),
-                _voiceAssistantTileWidget(),
-                SizedBox(height: 24.toHeight),
-                _settingHeading(
-                  action: Obx(
-                    () => CupertinoSwitch(
-                      value: _settingsController.isTransLiterationEnabled.value,
-                      activeColor: japaneseLaurel,
-                      trackColor: americanSilver,
-                      onChanged: (value) =>
-                          _settingsController.changeTransliterationPref(value),
-                    ),
+                  SizedBox(height: 48.toHeight),
+                  _settingHeading(
+                    action: _popupMenuBuilder(),
+                    title: appTheme.tr,
+                    subtitle: appInterfaceWillChange.tr,
                   ),
-                  title: transLiteration.tr,
-                  subtitle: transLiterationWillInitiateWord.tr,
-                ),
-                SizedBox(height: 24.toHeight),
-                Obx(
-                  () => _expandableSettingHeading(
-                    height: _settingsController.isAdvanceMenuOpened.value
-                        ? 130.toHeight
-                        : 60.toHeight,
-                    icon: AnimatedBuilder(
-                        animation: _controller,
-                        builder: (context, child) {
-                          return Transform(
-                            alignment: Alignment.center,
-                            transform: Matrix4.identity()
-                              ..rotateZ(
-                                _animation.value,
-                              ),
-                            child: SvgPicture.asset(iconArrowDown),
-                          );
-                        }),
-                    title: advanceSettings.tr,
-                    onTitleClick: () {
-                      _settingsController.isAdvanceMenuOpened.value =
-                          !_settingsController.isAdvanceMenuOpened.value;
-                      _settingsController.isAdvanceMenuOpened.value
-                          ? _controller.forward()
-                          : _controller.reverse();
-                    },
-                    child: AnimatedOpacity(
-                      opacity:
-                          _settingsController.isAdvanceMenuOpened.value ? 1 : 0,
-                      duration: defaultAnimationTime,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(child: SizedBox(height: 8.toHeight)),
-                          const Flexible(child: Divider()),
-                          Flexible(child: SizedBox(height: 14.toHeight)),
-                          Flexible(
-                            child: Row(
-                              children: [
-                                Text(
-                                  s2sStreaming.tr,
-                                  style: AppTextStyle()
-                                      .regular18DolphinGrey
-                                      .copyWith(
-                                        fontSize: 18.toFont,
-                                        color: balticSea,
-                                      ),
-                                ),
-                                const Spacer(),
-                                Obx(
-                                  () => CupertinoSwitch(
-                                    value: _settingsController
-                                        .isStreamingEnabled.value,
-                                    activeColor: japaneseLaurel,
-                                    trackColor: americanSilver,
-                                    onChanged: (value) {
-                                      _settingsController
-                                          .changeStreamingPref(value);
-                                    },
-                                  ),
-                                ),
-                              ],
+                  SizedBox(height: 24.toHeight),
+                  Obx(
+                    () => InkWell(
+                      onTap: () {
+                        Get.toNamed(AppRoutes.appLanguageRoute, arguments: {
+                          selectedLanguage:
+                              _settingsController.preferredLanguage.value,
+                        })?.then(
+                            (_) => _settingsController.getPreferredLanguage());
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: _settingHeading(
+                        action: Row(
+                          children: [
+                            Text(
+                              _settingsController.preferredLanguage.value,
+                              style: AppTextStyle()
+                                  .light16BalticSea
+                                  .copyWith(color: arsenicColor),
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 8.toWidth),
+                            RotatedBox(
+                              quarterTurns: 3,
+                              child: SvgPicture.asset(iconArrowDown),
+                            ),
+                          ],
+                        ),
+                        title: appLanguage.tr,
+                        subtitle: appInterfaceWillChangeInSelected.tr,
                       ),
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(height: 24.toHeight),
+                  _voiceAssistantTileWidget(),
+                  SizedBox(height: 24.toHeight),
+                  _settingHeading(
+                    action: Obx(
+                      () => CupertinoSwitch(
+                        value:
+                            _settingsController.isTransLiterationEnabled.value,
+                        activeColor: japaneseLaurel,
+                        trackColor: americanSilver,
+                        onChanged: (value) => _settingsController
+                            .changeTransliterationPref(value),
+                      ),
+                    ),
+                    title: transLiteration.tr,
+                    subtitle: transLiterationWillInitiateWord.tr,
+                  ),
+                  SizedBox(height: 24.toHeight),
+                  Obx(
+                    () => _expandableSettingHeading(
+                      height: _settingsController.isAdvanceMenuOpened.value
+                          ? 130.toHeight
+                          : 60.toHeight,
+                      icon: AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..rotateZ(
+                                  _animation.value,
+                                ),
+                              child: SvgPicture.asset(iconArrowDown),
+                            );
+                          }),
+                      title: advanceSettings.tr,
+                      onTitleClick: () {
+                        _settingsController.isAdvanceMenuOpened.value =
+                            !_settingsController.isAdvanceMenuOpened.value;
+                        _settingsController.isAdvanceMenuOpened.value
+                            ? _controller.forward()
+                            : _controller.reverse();
+                      },
+                      child: AnimatedOpacity(
+                        opacity: _settingsController.isAdvanceMenuOpened.value
+                            ? 1
+                            : 0,
+                        duration: defaultAnimationTime,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(child: SizedBox(height: 8.toHeight)),
+                            const Flexible(child: Divider()),
+                            Flexible(child: SizedBox(height: 14.toHeight)),
+                            Flexible(
+                              child: Row(
+                                children: [
+                                  Text(
+                                    s2sStreaming.tr,
+                                    style: AppTextStyle()
+                                        .regular18DolphinGrey
+                                        .copyWith(
+                                          fontSize: 18.toFont,
+                                          color: balticSea,
+                                        ),
+                                  ),
+                                  const Spacer(),
+                                  Obx(
+                                    () => CupertinoSwitch(
+                                      value: _settingsController
+                                          .isStreamingEnabled.value,
+                                      activeColor: japaneseLaurel,
+                                      trackColor: americanSilver,
+                                      onChanged: (value) {
+                                        _settingsController
+                                            .changeStreamingPref(value);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -428,5 +454,11 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
       case ThemeMode.dark:
         return dark.tr;
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    HomeController homeController = Get.find();
+    homeController.bottomBarIndex.value = 0;
+    return Future.value(false);
   }
 }
