@@ -39,8 +39,8 @@ class BottomNavTranslationController extends GetxController {
   RxBool isTranslateCompleted = false.obs;
   bool isMicPermissionGranted = false;
   RxBool isLsLoading = false.obs;
-  RxString selectedSourceLanguage = ''.obs;
-  RxString selectedTargetLanguage = ''.obs;
+  RxString selectedSourceLanguageCode = ''.obs;
+  RxString selectedTargetLanguageCode = ''.obs;
   dynamic sourceTTSResponseMale,
       sourceTTSResponseFemale,
       targetTTSResponseMale,
@@ -144,9 +144,9 @@ class BottomNavTranslationController extends GetxController {
 
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
-      String tempSourceLanguage = selectedSourceLanguage.value;
-      selectedSourceLanguage.value = selectedTargetLanguage.value;
-      selectedTargetLanguage.value = tempSourceLanguage;
+      String tempSourceLanguage = selectedSourceLanguageCode.value;
+      selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
+      selectedTargetLanguageCode.value = tempSourceLanguage;
       resetAllValues();
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
@@ -154,35 +154,22 @@ class BottomNavTranslationController extends GetxController {
   }
 
   bool isSourceAndTargetLangSelected() =>
-      selectedSourceLanguage.value.isNotEmpty &&
-      selectedTargetLanguage.value.isNotEmpty;
+      selectedSourceLanguageCode.value.isNotEmpty &&
+      selectedTargetLanguageCode.value.isNotEmpty;
 
-  String getSelectedSourceLanguageName() {
-    if (selectedSourceLanguage.value.isEmpty) {
-      return kTranslateSourceTitle.tr;
-    } else {
-      return selectedSourceLanguage.value;
-    }
+  String? getSelectedSourceLanguageName() {
+    return APIConstants.getLanguageCodeOrName(
+        value: selectedSourceLanguageCode.value,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 
-  String getSelectedTargetLanguageName() {
-    if (selectedTargetLanguage.value.isEmpty) {
-      return kTranslateTargetTitle.tr;
-    } else {
-      return selectedTargetLanguage.value;
-    }
+  String? getSelectedTargetLanguageName() {
+    return APIConstants.getLanguageCodeOrName(
+        value: selectedTargetLanguageCode.value,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
-
-  String getSelectedSourceLangCode() => APIConstants.getLanguageCodeOrName(
-        value: selectedSourceLanguage.value,
-        returnWhat: LanguageMap.languageCode,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP,
-      );
-
-  String getSelectedTargetLangCode() => APIConstants.getLanguageCodeOrName(
-      value: selectedTargetLanguage.value,
-      returnWhat: LanguageMap.languageCode,
-      lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
 
   void startVoiceRecording() async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
@@ -214,7 +201,7 @@ class BottomNavTranslationController extends GetxController {
                   emittingStatus: 'mic_data',
                   emittingData: [
                     value.buffer.asInt32List(),
-                    getSelectedSourceLangCode(),
+                    selectedSourceLanguageCode.value,
                     true,
                     false
                   ],
@@ -237,7 +224,7 @@ class BottomNavTranslationController extends GetxController {
                       emittingStatus: 'mic_data',
                       emittingData: [
                         null,
-                        getSelectedSourceLangCode(),
+                        selectedSourceLanguageCode.value,
                         false,
                         false
                       ],
@@ -274,7 +261,7 @@ class BottomNavTranslationController extends GetxController {
       if (_socketIOClient.isMicConnected.value) {
         _socketIOClient.socketEmit(
             emittingStatus: 'mic_data',
-            emittingData: [null, getSelectedSourceLangCode(), false, true],
+            emittingData: [null, selectedSourceLanguageCode.value, false, true],
             isDataToSend: true);
         if (sourceLanTextController.text.isNotEmpty) translateSourceLanguage();
       }
@@ -336,11 +323,11 @@ class BottomNavTranslationController extends GetxController {
     var asrPayloadToSend = {};
     asrPayloadToSend['modelId'] =
         _languageModelController.getAvailableASRModelsForLanguage(
-            languageCode: getSelectedSourceLangCode(),
+            languageCode: selectedSourceLanguageCode.value,
             requiredASRDetails: ASRModelDetails.modelId);
     asrPayloadToSend['task'] = 'asr';
     asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
-    asrPayloadToSend['source'] = getSelectedSourceLangCode();
+    asrPayloadToSend['source'] = selectedSourceLanguageCode.value;
     asrPayloadToSend['userId'] = null;
 
     var response = await _translationAppAPIClient.sendASRRequest(
@@ -365,7 +352,7 @@ class BottomNavTranslationController extends GetxController {
     var transPayload = {};
     transPayload['modelId'] =
         _languageModelController.getAvailableTranslationModel(
-            getSelectedSourceLangCode(), getSelectedTargetLangCode());
+            selectedSourceLanguageCode.value, selectedTargetLanguageCode.value);
     transPayload['task'] = 'translation';
     List<Map<String, dynamic>> source = [
       {'source': sourceLanTextController.text}
@@ -398,7 +385,7 @@ class BottomNavTranslationController extends GetxController {
     ];
 
     targetTTSPayloadMale['modelId'] = _languageModelController
-        .getAvailableTTSModel(getSelectedTargetLangCode());
+        .getAvailableTTSModel(selectedTargetLanguageCode.value);
     targetTTSPayloadMale['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
     targetTTSPayloadMale['gender'] = 'male';
 
@@ -415,7 +402,7 @@ class BottomNavTranslationController extends GetxController {
       var sourceTTSPayloadForMale = {};
       sourceTTSPayloadForMale.addAll(targetTTSPayloadMale);
       sourceTTSPayloadForMale['modelId'] = _languageModelController
-          .getAvailableTTSModel(getSelectedSourceLangCode());
+          .getAvailableTTSModel(selectedSourceLanguageCode.value);
       sourceTTSPayloadForMale['input'] = [
         {'source': sourceLanTextController.text}
       ];
@@ -530,7 +517,7 @@ class BottomNavTranslationController extends GetxController {
   void setModelForTransliteration() {
     transliterationModelToUse =
         _languageModelController.getAvailableTransliterationModelsForLanguage(
-            getSelectedSourceLangCode());
+            selectedSourceLanguageCode.value);
   }
 
   void clearTransliterationHints() {
@@ -620,7 +607,7 @@ class BottomNavTranslationController extends GetxController {
       _socketIOClient.disconnect();
     }
 
-    String languageCode = getSelectedSourceLangCode();
+    String languageCode = selectedSourceLanguageCode.value;
     String callbackURL =
         _languageModelController.getAvailableASRModelsForLanguage(
             languageCode: languageCode,

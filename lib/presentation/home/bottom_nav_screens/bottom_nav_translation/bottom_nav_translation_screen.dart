@@ -109,7 +109,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                 children: [
                                   Text(
                                     _bottomNavTranslationController
-                                        .selectedSourceLanguage.value,
+                                            .getSelectedSourceLanguageName() ??
+                                        '',
                                     style: AppTextStyle().regular16DolphinGrey,
                                   ),
                                   GestureDetector(
@@ -211,7 +212,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       alignment: Alignment.topLeft,
                                       child: Text(
                                         _bottomNavTranslationController
-                                            .selectedTargetLanguage.value,
+                                                .getSelectedTargetLanguageName() ??
+                                            '',
                                         style:
                                             AppTextStyle().regular16DolphinGrey,
                                       ),
@@ -413,21 +415,21 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             List<dynamic> sourceLanguageList =
                 _languageModelController.allAvailableSourceLanguages.toList();
 
-            dynamic selectedSourceLangIndex =
+            dynamic selectedSourceLangCode =
                 await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
               kLanguageList: sourceLanguageList,
-              kIsSourceLanguage: true
+              kIsSourceLanguage: true,
+              selectedLanguage: _bottomNavTranslationController
+                  .selectedSourceLanguageCode.value,
             });
-            if (selectedSourceLangIndex != null) {
-              String selectedLanguage =
-                  sourceLanguageList[selectedSourceLangIndex];
-              _bottomNavTranslationController.selectedSourceLanguage.value =
-                  selectedLanguage;
-              if (selectedLanguage ==
+            if (selectedSourceLangCode != null) {
+              _bottomNavTranslationController.selectedSourceLanguageCode.value =
+                  selectedSourceLangCode;
+              if (selectedSourceLangCode ==
                   _bottomNavTranslationController
-                      .selectedTargetLanguage.value) {
-                _bottomNavTranslationController.selectedTargetLanguage.value =
-                    '';
+                      .selectedTargetLanguageCode.value) {
+                _bottomNavTranslationController
+                    .selectedTargetLanguageCode.value = '';
               }
 
               if (_bottomNavTranslationController.isTransliterationEnabled()) {
@@ -445,9 +447,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             ),
             child: Obx(
               () {
+                String selectedSourceLanguage = _bottomNavTranslationController
+                        .selectedSourceLanguageCode.value.isNotEmpty
+                    ? _bottomNavTranslationController
+                        .getSelectedSourceLanguageName()!
+                    : kTranslateSourceTitle.tr;
                 return AutoSizeText(
-                  _bottomNavTranslationController
-                      .getSelectedSourceLanguageName(),
+                  selectedSourceLanguage,
                   maxLines: 2,
                   style: AppTextStyle()
                       .regular18DolphinGrey
@@ -476,22 +482,24 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 _languageModelController.allAvailableTargetLanguages.toList();
 
             if (_bottomNavTranslationController
-                .selectedSourceLanguage.value.isNotEmpty) {
+                .selectedSourceLanguageCode.value.isNotEmpty) {
               targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
                 return eachAvailableTargetLanguage ==
                     _bottomNavTranslationController
-                        .selectedSourceLanguage.value;
+                        .selectedSourceLanguageCode.value;
               });
             }
 
-            dynamic selectedTargetLangIndex =
+            dynamic selectedTargetLangCode =
                 await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
               kLanguageList: targetLanguageList,
-              kIsSourceLanguage: false
+              kIsSourceLanguage: false,
+              selectedLanguage: _bottomNavTranslationController
+                  .selectedTargetLanguageCode.value,
             });
-            if (selectedTargetLangIndex != null) {
-              _bottomNavTranslationController.selectedTargetLanguage.value =
-                  targetLanguageList[selectedTargetLangIndex];
+            if (selectedTargetLangCode != null) {
+              _bottomNavTranslationController.selectedTargetLanguageCode.value =
+                  selectedTargetLangCode;
             }
           },
           child: Container(
@@ -503,13 +511,20 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
-              () => AutoSizeText(
-                _bottomNavTranslationController.getSelectedTargetLanguageName(),
-                style: AppTextStyle()
-                    .regular18DolphinGrey
-                    .copyWith(fontSize: 16.toFont),
-                maxLines: 2,
-              ),
+              () {
+                String selectedTargetLanguage = _bottomNavTranslationController
+                        .selectedTargetLanguageCode.value.isNotEmpty
+                    ? _bottomNavTranslationController
+                        .getSelectedTargetLanguageName()!
+                    : kTranslateTargetTitle.tr;
+                return AutoSizeText(
+                  selectedTargetLanguage,
+                  style: AppTextStyle()
+                      .regular18DolphinGrey
+                      .copyWith(fontSize: 16.toFont),
+                  maxLines: 2,
+                );
+              },
             ),
           ),
         ),
@@ -725,7 +740,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
       if (_bottomNavTranslationController
-          .selectedSourceLanguage.value.isNotEmpty) {
+          .selectedSourceLanguageCode.value.isNotEmpty) {
         _bottomNavTranslationController.getTransliterationOutput(wordToSend);
       }
     } else {
