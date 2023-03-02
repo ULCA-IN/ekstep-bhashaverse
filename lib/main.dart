@@ -1,3 +1,4 @@
+import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,11 @@ class MyApp extends StatelessWidget {
         defaultValue: Get.deviceLocale?.languageCode);
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
+    }
+
+    // Voice assistant preference
+    if (hiveDBInstance.get(preferredVoiceAssistantGender) == null) {
+      hiveDBInstance.put(preferredVoiceAssistantGender, GenderEnum.female.name);
     }
 
     // Transliteration preference
