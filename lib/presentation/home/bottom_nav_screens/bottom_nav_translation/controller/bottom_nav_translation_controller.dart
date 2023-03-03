@@ -49,8 +49,6 @@ class BottomNavTranslationController extends GetxController {
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
   RxBool isKeyboardVisible = false.obs;
-  RxBool isSourceInputActive = false.obs;
-  RxBool isTargetInputActive = false.obs;
   String sourcePath = '';
   String targetPath = '';
   RxInt maxDuration = 0.obs;
@@ -159,14 +157,14 @@ class BottomNavTranslationController extends GetxController {
       selectedSourceLanguageCode.value.isNotEmpty &&
       selectedTargetLanguageCode.value.isNotEmpty;
 
-  String? getSelectedSourceLanguageName() {
+  String getSelectedSourceLanguageName() {
     return APIConstants.getLanguageCodeOrName(
         value: selectedSourceLanguageCode.value,
         returnWhat: LanguageMap.languageNameInAppLanguage,
         lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 
-  String? getSelectedTargetLanguageName() {
+  String getSelectedTargetLanguageName() {
     return APIConstants.getLanguageCodeOrName(
         value: selectedTargetLanguageCode.value,
         returnWhat: LanguageMap.languageNameInAppLanguage,
