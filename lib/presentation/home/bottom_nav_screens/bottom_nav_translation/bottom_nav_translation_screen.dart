@@ -105,11 +105,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   () {
                     String selectedSourceLanguage =
                         _bottomNavTranslationController
-                            .selectedSourceLanguage.value;
+                                .getSelectedSourceLanguageName() ??
+                            '';
 
                     String selectedTargetLanguage =
                         _bottomNavTranslationController
-                            .selectedTargetLanguage.value;
+                                .getSelectedTargetLanguageName() ??
+                            '';
                     return Column(
                       children: [
                         Visibility(
