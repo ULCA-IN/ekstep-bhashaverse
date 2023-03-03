@@ -1,4 +1,6 @@
 //common
+import 'package:flutter/material.dart';
+
 const hiveDBName = 'db_bhashaverse';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
@@ -51,6 +53,7 @@ const iconChat = 'assets/images/bottom_bar_icons/icon_chat.svg';
 const iconSettings = 'assets/images/bottom_bar_icons/icon_settings.svg';
 
 // Bottom Nav Translation
+const textFieldRadius = Radius.circular(16);
 const iconArrowSwapHorizontal =
     'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
 const iconMicroPhone = 'assets/images/common_icon/icon_microphone.svg';
@@ -67,7 +70,6 @@ const animationLoadingLine =
     'assets/animation/lottie_animation/loading_line_animation.json';
 const animationTranslationLoading =
     'assets/animation/lottie_animation/animation_translation_loading.json';
-
 const animationStaticWaveForRecording =
     'assets/animation/lottie_animation/voice-line-wave-animation.json';
 const kLanguageList = 'language_list';
