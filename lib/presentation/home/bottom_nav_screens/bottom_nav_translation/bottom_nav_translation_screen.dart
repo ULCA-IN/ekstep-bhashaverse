@@ -45,16 +45,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     _hiveDBInstance = Hive.box(hiveDBName);
     WidgetsBinding.instance.addObserver(this);
 
-    _sourceLangFocusNode.addListener(() {
-      _bottomNavTranslationController.isSourceInputActive.value =
-          _sourceLangFocusNode.hasFocus;
-    });
-
-    _transLangFocusNode.addListener(() {
-      _bottomNavTranslationController.isTargetInputActive.value =
-          _transLangFocusNode.hasFocus;
-    });
-
     ScreenUtil().init();
     super.initState();
   }
@@ -90,55 +80,33 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           SizedBox(
             height: 18.toHeight,
           ),
-          Flexible(
-            child: AnimatedContainer(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.all(Radius.circular(16)),
-                  border: Border.all(
-                    color: americanSilver,
-                  )),
-              duration: const Duration(milliseconds: 500),
-              child: Padding(
-                padding: AppEdgeInsets.instance.all(16),
-                child: Obx(
-                  () {
-                    String selectedSourceLanguage =
-                        _bottomNavTranslationController
-                                .getSelectedSourceLanguageName() ??
-                            '';
-
-                    String selectedTargetLanguage =
-                        _bottomNavTranslationController
-                                .getSelectedTargetLanguageName() ??
-                            '';
-                    return Column(
-                      children: [
-                        Visibility(
-                          visible: !_bottomNavTranslationController
-                                  .isTargetInputActive.value ||
-                              !_bottomNavTranslationController
-                                  .isKeyboardVisible.value,
-                          child: Flexible(
-                            child: Column(
-                              children: [
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    selectedSourceLanguage.isNotEmpty
-                                        ? selectedSourceLanguage
-                                        : 'Source Language not selected',
-                                    style: selectedSourceLanguage.isNotEmpty
-                                        ? AppTextStyle().regular16DolphinGrey
-                                        : AppTextStyle().grey14Arsenic,
-                                  ),
-                                ),
-                                SizedBox(height: 6.toHeight),
-                                Flexible(child: _buildSourceLanguageInput()),
-                                SizedBox(height: 6.toHeight),
-                                if (_bottomNavTranslationController
-                                    .isTranslateCompleted.value)
-                                  ASRAndTTSActions(
+          Expanded(
+            child: Column(
+              children: [
+                Flexible(
+                  child: AnimatedContainer(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: textFieldRadius,
+                          topRight: textFieldRadius,
+                        ),
+                        border: Border.all(
+                          color: americanSilver,
+                        )),
+                    duration: const Duration(milliseconds: 500),
+                    child: Padding(
+                      padding: AppEdgeInsets.instance.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(child: _buildSourceLanguageInput()),
+                          SizedBox(height: 6.toHeight),
+                          Obx(
+                            () => _bottomNavTranslationController
+                                        .isTranslateCompleted.value ||
+                                    _hiveDBInstance.get(isStreamingPreferred)
+                                ? ASRAndTTSActions(
                                     isEnabled: _bottomNavTranslationController
                                             .isRecordedViaMic.value ||
                                         (_hiveDBInstance
@@ -171,45 +139,34 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         _bottomNavTranslationController
                                             .controller,
                                   )
-                              ],
-                            ),
+                                : _buildTranslateButton(),
                           ),
-                        ),
-                        SizedBox(height: 6.toHeight),
-                        if (!_bottomNavTranslationController
-                                .isTargetInputActive.value ||
-                            !_bottomNavTranslationController
-                                .isKeyboardVisible.value)
-                          _buildPastOrTranslateActions(),
-                        if (!_bottomNavTranslationController
-                            .isKeyboardVisible.value)
-                          const Divider(color: dolphinGray),
-                        Visibility(
-                          visible: !_bottomNavTranslationController
-                                  .isSourceInputActive.value ||
-                              !_bottomNavTranslationController
-                                  .isKeyboardVisible.value,
-                          child: Expanded(
-                            child: Column(
-                              children: [
-                                SizedBox(height: 12.toHeight),
-                                Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    selectedTargetLanguage.isNotEmpty
-                                        ? selectedTargetLanguage
-                                        : 'Target language not selected',
-                                    style: selectedTargetLanguage.isNotEmpty
-                                        ? AppTextStyle().regular16DolphinGrey
-                                        : AppTextStyle().grey14Arsenic,
-                                  ),
-                                ),
-                                SizedBox(height: 6.toHeight),
-                                Flexible(
-                                  child: _buildTargetLanguageInput(),
-                                ),
-                                SizedBox(height: 6.toHeight),
-                                ASRAndTTSActions(
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                    child: AnimatedContainer(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: textFieldRadius,
+                              bottomRight: textFieldRadius,
+                            ),
+                            border: Border.all(
+                              color: americanSilver,
+                            )),
+                        duration: const Duration(milliseconds: 500),
+                        child: Padding(
+                          padding: AppEdgeInsets.instance.all(16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(child: _buildTargetLanguageInput()),
+                              SizedBox(height: 6.toHeight),
+                              Obx(
+                                () => ASRAndTTSActions(
                                   isEnabled: _bottomNavTranslationController
                                       .isTranslateCompleted.value,
                                   textToShare: _bottomNavTranslationController
@@ -237,20 +194,16 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   playerController:
                                       _bottomNavTranslationController
                                           .controller,
-                                )
-                              ],
-                            ),
+                                ),
+                              )
+                            ],
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
+                        ))),
+              ],
             ),
           ),
-          _buildTransliterationHints(),
           SizedBox(height: 20.toHeight),
+          _buildTransliterationHints(),
           Obx(
             () => _bottomNavTranslationController.isKeyboardVisible.value
                 ? const SizedBox.shrink()
@@ -271,13 +224,28 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         ? SizedBox(
             height: 85.toHeight,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                Visibility(
+                  visible: !_bottomNavTranslationController
+                          .isScrolledTransliterationHints.value &&
+                      _bottomNavTranslationController
+                          .transliterationWordHints.isNotEmpty,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.arrow_forward_outlined,
+                      color: Colors.grey.shade400,
+                      size: 22.toHeight,
+                    ),
+                  ),
+                ),
                 SingleChildScrollView(
                   controller: _bottomNavTranslationController
                       .transliterationHintsScrollController,
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       ..._bottomNavTranslationController
                           .transliterationWordHints
@@ -316,20 +284,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                     ],
                   ),
                 ),
-                Visibility(
-                  visible: !_bottomNavTranslationController
-                          .isScrolledTransliterationHints.value &&
-                      _bottomNavTranslationController
-                          .transliterationWordHints.isNotEmpty,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.arrow_forward_outlined,
-                      color: Colors.grey.shade400,
-                      size: 22.toHeight,
-                    ),
-                  ),
-                )
               ],
             ),
           )
@@ -343,8 +297,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       controller: _bottomNavTranslationController.sourceLanTextController,
       focusNode: _sourceLangFocusNode,
       style: AppTextStyle().regular18balticSea,
-      expands: true,
       maxLines: null,
+      minLines: 4,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _bottomNavTranslationController.isTranslateCompleted.value
@@ -377,8 +331,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     return TextField(
       controller: _bottomNavTranslationController.targetLangTextController,
       focusNode: _transLangFocusNode,
-      expands: true,
       maxLines: null,
+      minLines: 4,
       style: AppTextStyle().regular18balticSea,
       readOnly: !_bottomNavTranslationController.isTranslateCompleted.value,
       textInputAction: TextInputAction.done,
@@ -390,33 +344,28 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     );
   }
 
-  Widget _buildPastOrTranslateActions() {
-    return Obx(
-      () => Visibility(
-        visible: !_bottomNavTranslationController.isTranslateCompleted.value,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            CustomOutlineButton(
-              title: kTranslate.tr,
-              isHighlighted: true,
-              onTap: () {
-                unFocusTextFields();
-                if (_bottomNavTranslationController
-                    .sourceLanTextController.text.isEmpty) {
-                  showDefaultSnackbar(message: kErrorNoSourceText.tr);
-                } else if (_bottomNavTranslationController
-                    .isSourceAndTargetLangSelected()) {
-                  _bottomNavTranslationController.translateSourceLanguage();
-                } else {
-                  showDefaultSnackbar(
-                      message: kErrorSelectSourceAndTargetScreen.tr);
-                }
-              },
-            ),
-          ],
+  Widget _buildTranslateButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        CustomOutlineButton(
+          title: kTranslate.tr,
+          isHighlighted: true,
+          onTap: () {
+            unFocusTextFields();
+            if (_bottomNavTranslationController
+                .sourceLanTextController.text.isEmpty) {
+              showDefaultSnackbar(message: kErrorNoSourceText.tr);
+            } else if (_bottomNavTranslationController
+                .isSourceAndTargetLangSelected()) {
+              _bottomNavTranslationController.translateSourceLanguage();
+            } else {
+              showDefaultSnackbar(
+                  message: kErrorSelectSourceAndTargetScreen.tr);
+            }
+          },
         ),
-      ),
+      ],
     );
   }
 
