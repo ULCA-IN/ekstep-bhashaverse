@@ -220,21 +220,21 @@ class APIConstants {
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kNativeName] ?? 'No Language Name Found';
+          return returningLangPair[kNativeName] ?? '';
 
         case LanguageMap.englishName:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kEnglishName] ?? 'No Language Name Found';
+          return returningLangPair[kEnglishName] ?? '';
 
         case LanguageMap.languageCode:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
+          return returningLangPair[kLanguageCode] ?? '';
         case LanguageMap.languageNameInAppLanguage:
           String languageNameInAppLanguage = '';
 
@@ -253,7 +253,7 @@ class APIConstants {
           return languageNameInAppLanguage;
       }
     } catch (e) {
-      return 'No Language Found';
+      return '';
     }
   }
 }
