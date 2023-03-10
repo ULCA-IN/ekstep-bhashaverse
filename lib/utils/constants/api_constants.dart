@@ -348,7 +348,8 @@ class APIConstants {
               TranslatedLanguagesMap.language[Get.locale?.languageCode];
 
           if (selectedLanguageMap != null &&
-              selectedLanguageMap[value] != null) {
+              selectedLanguageMap[value] != null &&
+              selectedLanguageMap[value]!.isNotEmpty) {
             languageNameInAppLanguage = selectedLanguageMap[value]!;
           } else {
             languageNameInAppLanguage = APIConstants.getLanguageCodeOrName(
