@@ -6,6 +6,10 @@ import '../../enums/language_enum.dart';
 import 'language_map_translated.dart';
 
 class APIConstants {
+  static const String DHRUVA_DEV_API_URL =
+      'https://dev-auth.ulcacontrib.org/ulca/apis/v0';
+  static const String DHRUVA_API_STREAMING_URL =
+      'wss://api.dhruva.ai4bharat.org';
   static const String ASR_CALLBACK_AZURE_URL =
       'https://meity-dev-asr.ulcacontrib.org/asr/v1/recognize';
   static const String ASR_CALLBACK_CDAC_URL =
@@ -13,6 +17,7 @@ class APIConstants {
   static const String STS_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
+  static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
   static const String TRANSLITERATION_REQ_URL = '/v0/model/compute';
   static const String ASR_REQ_URL = '/asr/v1/model/compute';
@@ -28,6 +33,9 @@ class APIConstants {
   static const int kApiUnAuthorizedExceptionErrorCode = 401;
   static const int kApiDataConflictCode = 409;
 
+  static const String kUserIdREST = 'userID';
+  static const String kULCAAPIKeyREST = 'ulcaApiKey';
+  static const String kAuthorizationKeyStreaming = 'authorization';
   static const String kApiUnknownError = 'UNKNOWN_ERROR';
   static const String kApiCanceled = 'API_CANCELED';
   static const String kApiConnectionTimeout = 'CONNECT_TIMEOUT';
@@ -46,6 +54,104 @@ class APIConstants {
   static const String kApiAuthExceptionError = 'AUTH_EXCEPTION';
   static const String kErrorMessageUnAuthorizedException =
       'UnAuthorized. Please login again';
+
+  // Payload for available Languages request
+  static var payloadForLanguageConfig = {
+    "pipelineTasks": [
+      {"taskType": "asr"},
+      {"taskType": "translation"},
+      {"taskType": "tts"}
+    ],
+    "pipelineRequestConfig": {"submitter": "AI4Bharat"}
+  };
+
+  // payload for Compute request
+  static Map<String, dynamic> createRESTComputePayload({
+    required String srcLanguage,
+    required String targetLanguage,
+    required String preferredGender,
+    required bool isRecorded,
+    required String inputData,
+    String audioFormat = 'wav',
+    String sampleRate = '44100',
+    String? asrServiceID,
+    String? translationServiceID,
+    String? ttsServiceID,
+  }) {
+    var computeRequestToSend = {
+      "pipelineTasks": [
+        if (isRecorded)
+          {
+            "serviceId": "",
+            "taskType": "asr",
+            "config": {
+              "language": {"sourceLanguage": srcLanguage},
+              "audioFormat": audioFormat,
+              "samplingRate": sampleRate,
+            }
+          },
+        {
+          "serviceId": "",
+          "taskType": "translation",
+          "config": {
+            "language": {
+              "sourceLanguage": srcLanguage,
+              "targetLanguage": targetLanguage
+            }
+          }
+        },
+        {
+          "serviceId": "",
+          "taskType": "tts",
+          "config": {
+            "language": {"sourceLanguage": targetLanguage},
+            "gender": preferredGender
+          }
+        }
+      ],
+      "inputData": {
+        isRecorded ? 'audio' : 'input': [
+          {
+            isRecorded ? 'audioContent' : 'source': inputData,
+          }
+        ]
+      }
+    };
+
+    return computeRequestToSend;
+  }
+
+  static List<Map<String, Map<String, dynamic>>> createSocketIOComputePayload({
+    required String srcLanguage,
+    required String targetLanguage,
+    required String preferredGender,
+  }) {
+    return [
+      {
+        "task": {"type": "asr"},
+        "config": {
+          "language": {"sourceLanguage": srcLanguage},
+          "samplingRate": 44100,
+        }
+      },
+      {
+        "task": {"type": "translation"},
+        "config": {
+          "language": {
+            "sourceLanguage": srcLanguage,
+            "targetLanguage": targetLanguage
+          }
+        }
+      },
+      {
+        "task": {"type": "tts"},
+        "config": {
+          "language": {"sourceLanguage": targetLanguage},
+          "gender": preferredGender
+        }
+      }
+    ];
+  }
 
 // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
   static final List<String> TYPES_OF_MODELS_LIST = [
