@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
 import '../../../../../models/task_sequence_response_model.dart';
@@ -72,6 +73,9 @@ class BottomNavTranslationController extends GetxController {
 
   late Worker streamingResponseListener, socketIOErrorListener;
 
+  // TODO: Remove in production
+  final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
+
   @override
   void onInit() {
     _dhruvaapiClient = Get.find();
@@ -130,7 +134,7 @@ class BottomNavTranslationController extends GetxController {
   }
 
   @override
-  void onClose() {
+  void onClose() async {
     streamingResponseListener.dispose();
     socketIOErrorListener.dispose();
     _socketIOClient.disconnect();
@@ -357,6 +361,8 @@ class BottomNavTranslationController extends GetxController {
     String? base64Value,
     String? sourceText,
   }) async {
+    stopWatchTimer.onResetTimer();
+    stopWatchTimer.onStartTimer();
     isLoading.value = true;
     String asrServiceId = '';
     String translationServiceId = '';
@@ -422,10 +428,11 @@ class BottomNavTranslationController extends GetxController {
         isRecordedViaMic.value = isRecorded;
         isTranslateCompleted.value = true;
         isLoading.value = false;
+        stopWatchTimer.onStopTimer();
       },
       failure: (error) {
         isLoading.value = false;
-
+        stopWatchTimer.onStopTimer();
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
       },
@@ -514,6 +521,7 @@ class BottomNavTranslationController extends GetxController {
     await stopPlayer();
     sourcePath = '';
     targetPath = '';
+    stopWatchTimer.onResetTimer();
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
       clearTransliterationHints();

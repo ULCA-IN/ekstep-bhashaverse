@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
@@ -73,9 +74,42 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           SizedBox(
             height: 18.toHeight,
           ),
-          Text(
-            appName.tr,
-            style: AppTextStyle().semibold22BalticSea,
+          Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  appName.tr,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyle().semibold22BalticSea,
+                ),
+              ),
+              // TODO: Remove in production
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: StreamBuilder<int>(
+                  stream:
+                      _bottomNavTranslationController.stopWatchTimer.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(
+                        value ?? 0,
+                        hours: false,
+                        minute: false,
+                        milliSecond: true);
+                    return Text(
+                      displayTime,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Helvetica',
+                          fontWeight: FontWeight.bold),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           SizedBox(
             height: 18.toHeight,
