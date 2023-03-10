@@ -42,7 +42,7 @@ final Map<String, String> en = {
   kTranslation: 'Translation',
   kChat: 'Chat',
   kSettings: 'Settings',
-  kHomeLoadingAnimationText: 'Hold up, we are setting up things for you...',
+  kHomeLoadingAnimationText: 'Hold on, we are setting up things for you...',
   kTranslateSourceTitle: 'Translate from',
   kTranslateTargetTitle: 'Translate to',
   kTranslationHintText: 'Start typing or press mic to begin',
