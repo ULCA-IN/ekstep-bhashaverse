@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../../../../common/controller/language_model_controller.dart';
 import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
 import '../../../../../utils/constants/api_constants.dart';
@@ -54,9 +53,6 @@ class SettingsController extends GetxController {
   void changeStreamingPref(bool isEnabled) {
     _hiveDBInstance.put(isStreamingPreferred, isEnabled);
     isStreamingEnabled.value = isEnabled;
-    LanguageModelController languageModelController = Get.find();
-    languageModelController.calcAvailableSourceAndTargetLanguages(
-        isStreamingPreferred: isEnabled);
     BottomNavTranslationController bottomNavTranslationController = Get.find();
     bottomNavTranslationController.resetAllValues();
   }
