@@ -355,6 +355,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         _bottomNavTranslationController.isTranslateCompleted.value = false;
         _bottomNavTranslationController.deleteAudioFiles();
         _bottomNavTranslationController.targetLangTextController.clear();
+        _bottomNavTranslationController.stopPlayer();
         if (_bottomNavTranslationController.isTransliterationEnabled()) {
           getTransliterationHints(newText);
         } else {
