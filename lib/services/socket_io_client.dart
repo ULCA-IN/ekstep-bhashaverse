@@ -1,6 +1,10 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
+import '../models/socket_io_compute_response_model.dart';
+import '../utils/constants/api_constants.dart';
+import '../utils/environment/streaming_api_key_env.dart';
+
 class SocketIOClient extends GetxService {
   Socket? _socket;
   RxBool isMicConnected = false.obs, hasError = false.obs;
@@ -15,20 +19,15 @@ class SocketIOClient extends GetxService {
         : _socket?.emit(emittingStatus);
   }
 
-  void socketConnect({
-    required String apiCallbackURL,
-    required String languageCode,
-  }) {
+  void socketConnect() {
     hasError.value = false;
     _socket = io(
-        apiCallbackURL,
+        APIConstants.DHRUVA_API_STREAMING_URL,
         OptionBuilder()
-            .setTransports(['websocket', 'polling']) // for Flutter or Dart VM
+            .setTransports(['websocket', 'polling'])
             .disableAutoConnect()
-            .setQuery({
-              'language': languageCode,
-              'EIO': 4,
-              'transport': 'websocket',
+            .setAuth({
+              APIConstants.kAuthorizationKeyStreaming: streamingAPIKey,
             })
             .build());
 
@@ -42,16 +41,18 @@ class SocketIOClient extends GetxService {
   }
 
   void setSocketMethods() {
-    _socket?.onConnect((receivedData) {});
-
-    _socket?.on('connect-success', (data) {
+    _socket?.onConnect((data) {
       isMicConnected.value = true;
       hasError.value = false;
     });
 
+    _socket?.on('ready', (data) {});
+
     _socket?.on('response', (data) {
-      if (data is List && data.isNotEmpty && data[0].isNotEmpty) {
-        socketResponseText.value = data[0];
+      if (data != null) {
+        SocketIOComputeResponseModel response =
+            SocketIOComputeResponseModel.fromJson(data);
+        socketResponseText.value = response.results?[0].output?[0].source ?? '';
       }
     });
 
