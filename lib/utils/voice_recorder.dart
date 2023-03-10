@@ -12,7 +12,7 @@ class VoiceRecorder {
 
   String appDocPath = "";
   String recordedAudioFileName =
-      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wave' : '.flac'}';
+      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
