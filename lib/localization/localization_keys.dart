@@ -73,3 +73,5 @@ const String connecting = 'connecting';
 const String somethingWentWrong = 'somethingWentWrong';
 const String tapAndHoldForRecording = 'tapAndHoldForRecording';
 const String cannotPlayAudioAtTheMoment = 'cannotPlayAudioAtTheMoment';
+const String responseNotReceived = 'responseNotReceived';
+const String translationNotPossible = 'translationNotPossible';

@@ -73,4 +73,6 @@ final Map<String, String> en = {
   somethingWentWrong: 'Something went wrong',
   tapAndHoldForRecording: 'Please tap and hold mic for recording',
   cannotPlayAudioAtTheMoment: 'Cannot play audio at the moment',
+  responseNotReceived: 'Response not received',
+  translationNotPossible: 'translation not possible at the moment',
 };
