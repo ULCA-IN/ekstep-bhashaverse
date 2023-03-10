@@ -79,7 +79,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  appName.tr,
+                  bhashiniTitle.tr,
                   textAlign: TextAlign.center,
                   style: AppTextStyle().semibold22BalticSea,
                 ),

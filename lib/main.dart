@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
     }
 
     return GetMaterialApp(
-      title: appName.tr,
+      onGenerateTitle: (context) => bhashiniTitle.tr,
       debugShowCheckedModeBanner: false,
       translations: AppLocalization(),
       locale: Locale(appLocale),
