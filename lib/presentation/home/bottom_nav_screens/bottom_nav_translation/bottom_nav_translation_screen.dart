@@ -100,7 +100,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Flexible(child: _buildSourceLanguageInput()),
+                          Obx(() =>
+                              Flexible(child: _buildSourceLanguageInput())),
                           SizedBox(height: 6.toHeight),
                           Obx(
                             () => _bottomNavTranslationController
@@ -298,7 +299,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       focusNode: _sourceLangFocusNode,
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
-      minLines: 4,
+      minLines: 5,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _bottomNavTranslationController.isTranslateCompleted.value
@@ -318,6 +319,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       ),
       onChanged: (newText) {
         _bottomNavTranslationController.isTranslateCompleted.value = false;
+        _bottomNavTranslationController.deleteAudioFiles();
+        _bottomNavTranslationController.targetLangTextController.clear();
         if (_bottomNavTranslationController.isTransliterationEnabled()) {
           getTransliterationHints(newText);
         } else {
@@ -332,7 +335,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       controller: _bottomNavTranslationController.targetLangTextController,
       focusNode: _transLangFocusNode,
       maxLines: null,
-      minLines: 4,
+      minLines: 5,
       style: AppTextStyle().regular18balticSea,
       readOnly: !_bottomNavTranslationController.isTranslateCompleted.value,
       textInputAction: TextInputAction.done,
@@ -358,7 +361,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               showDefaultSnackbar(message: kErrorNoSourceText.tr);
             } else if (_bottomNavTranslationController
                 .isSourceAndTargetLangSelected()) {
-              _bottomNavTranslationController.translateSourceLanguage();
+              _bottomNavTranslationController.getComputeResponse(
+                  isRecorded: false,
+                  sourceText: _bottomNavTranslationController
+                      .sourceLanTextController.text);
             } else {
               showDefaultSnackbar(
                   message: kErrorSelectSourceAndTargetScreen.tr);
@@ -379,7 +385,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             _transLangFocusNode.unfocus();
 
             List<dynamic> sourceLanguageList =
-                _languageModelController.allAvailableSourceLanguages.toList();
+                _languageModelController.sourceTargetLanguageMap.keys.toList();
 
             dynamic selectedSourceLangCode =
                 await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
@@ -391,11 +397,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             if (selectedSourceLangCode != null) {
               _bottomNavTranslationController.selectedSourceLanguageCode.value =
                   selectedSourceLangCode;
-              if (selectedSourceLangCode ==
+              String selectedTargetLangCode = _bottomNavTranslationController
+                  .selectedTargetLanguageCode.value;
+              if (selectedTargetLangCode.isNotEmpty) {
+                if (!_languageModelController
+                    .sourceTargetLanguageMap[selectedSourceLangCode]!
+                    .contains(selectedTargetLangCode)) {
                   _bottomNavTranslationController
-                      .selectedTargetLanguageCode.value) {
-                _bottomNavTranslationController
-                    .selectedTargetLanguageCode.value = '';
+                      .selectedTargetLanguageCode.value = '';
+                }
               }
 
               if (_bottomNavTranslationController.isTransliterationEnabled()) {
@@ -416,7 +426,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 String selectedSourceLanguage = _bottomNavTranslationController
                         .selectedSourceLanguageCode.value.isNotEmpty
                     ? _bottomNavTranslationController
-                        .getSelectedSourceLanguageName()!
+                        .getSelectedSourceLanguageName()
                     : kTranslateSourceTitle.tr;
                 return AutoSizeText(
                   selectedSourceLanguage,
@@ -443,18 +453,17 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           onTap: () async {
             _sourceLangFocusNode.unfocus();
             _transLangFocusNode.unfocus();
-
-            List<dynamic> targetLanguageList =
-                _languageModelController.allAvailableTargetLanguages.toList();
-
             if (_bottomNavTranslationController
-                .selectedSourceLanguageCode.value.isNotEmpty) {
-              targetLanguageList.removeWhere((eachAvailableTargetLanguage) {
-                return eachAvailableTargetLanguage ==
-                    _bottomNavTranslationController
-                        .selectedSourceLanguageCode.value;
-              });
+                .selectedSourceLanguageCode.value.isEmpty) {
+              showDefaultSnackbar(
+                  message: 'Please select source language first');
+              return;
             }
+
+            List<dynamic> targetLanguageList = _languageModelController
+                .sourceTargetLanguageMap[_bottomNavTranslationController
+                    .selectedSourceLanguageCode.value]!
+                .toList();
 
             dynamic selectedTargetLangCode =
                 await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
@@ -481,7 +490,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                 String selectedTargetLanguage = _bottomNavTranslationController
                         .selectedTargetLanguageCode.value.isNotEmpty
                     ? _bottomNavTranslationController
-                        .getSelectedTargetLanguageName()!
+                        .getSelectedTargetLanguageName()
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
