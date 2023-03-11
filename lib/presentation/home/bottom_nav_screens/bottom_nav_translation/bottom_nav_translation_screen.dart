@@ -537,12 +537,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               shape: BoxShape.circle,
               elevation: 6,
               child: Container(
-                decoration: const BoxDecoration(
-                  color: flushOrangeColor,
+                decoration: BoxDecoration(
+                  color: isRecordingStarted()
+                      ? tangerineOrangeColor
+                      : flushOrangeColor,
                   shape: BoxShape.circle,
                 ),
                 child: Padding(
-                  padding: AppEdgeInsets.instance.all(20.0),
+                  padding: AppEdgeInsets.instance
+                      .all(isRecordingStarted() ? 28 : 20.0),
                   child: SvgPicture.asset(
                     _bottomNavTranslationController.micButtonStatus.value ==
                             MicButtonStatus.pressed
