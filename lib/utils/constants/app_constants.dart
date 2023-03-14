@@ -1,7 +1,7 @@
 //common
 import 'package:flutter/material.dart';
 
-const hiveDBName = 'db_bhashaverse';
+const hiveDBName = 'db_bhashini';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
 const preferredAppLocale = 'preferred_app_locale';

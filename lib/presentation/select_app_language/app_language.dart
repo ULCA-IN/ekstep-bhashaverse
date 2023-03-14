@@ -80,40 +80,38 @@ class _AppLanguageState extends State<AppLanguage> {
                 Expanded(
                   child: ScrollConfiguration(
                     behavior: RemoveScrollingGlowEffect(),
-                    child: Obx(
-                      () => GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisSpacing: 8.toHeight,
-                          crossAxisCount: 2,
-                          childAspectRatio: 2,
-                        ),
-                        itemCount:
-                            _appLanguageController.getAppLanguageList().length,
-                        itemBuilder: (context, index) {
-                          return Obx(
-                            () {
-                              return LanguageSelectionWidget(
-                                title: getLangNameInAppLanguage(
-                                    _appLanguageController
-                                            .getAppLanguageList()[index]
-                                        [APIConstants.kLanguageCode]),
-                                subTitle: _appLanguageController
-                                        .getAppLanguageList()[index]
-                                    [APIConstants.kNativeName],
-                                onItemTap: () {
-                                  _appLanguageController
-                                      .setSelectedLanguageIndex(index);
-                                  Get.updateLocale(Locale(_appLanguageController
-                                      .getSelectedLanguageCode()));
-                                },
-                                index: index,
-                                selectedIndex: _appLanguageController
-                                    .getSelectedLanguageIndex(),
-                              );
-                            },
-                          );
-                        },
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        mainAxisSpacing: 8.toHeight,
+                        crossAxisCount: 2,
+                        childAspectRatio: 2,
                       ),
+                      itemCount:
+                          _appLanguageController.getAppLanguageList().length,
+                      itemBuilder: (context, index) {
+                        return Obx(
+                          () {
+                            return LanguageSelectionWidget(
+                              title: getLangNameInAppLanguage(
+                                  _appLanguageController
+                                          .getAppLanguageList()[index]
+                                      [APIConstants.kLanguageCode],
+                                  _appLanguageController
+                                      .getSelectedLanguageCode()),
+                              subTitle: _appLanguageController
+                                      .getAppLanguageList()[index]
+                                  [APIConstants.kNativeName],
+                              onItemTap: () {
+                                _appLanguageController
+                                    .setSelectedLanguageIndex(index);
+                              },
+                              index: index,
+                              selectedIndex: _appLanguageController
+                                  .getSelectedLanguageIndex(),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -137,6 +135,8 @@ class _AppLanguageState extends State<AppLanguage> {
                                 .length) {
                       _languageSearchController.clear();
                       _appLanguageController.saveSelectedLocaleInDB();
+                      Get.updateLocale(Locale(
+                          _appLanguageController.getSelectedLanguageCode()));
                       if (_hiveDBInstance.get(introShownAlreadyKey,
                           defaultValue: false)) {
                         Get.back();
@@ -204,7 +204,8 @@ class _AppLanguageState extends State<AppLanguage> {
               language[APIConstants.kNativeName]
                   .toLowerCase()
                   .contains(searchString.toLowerCase()) ||
-              getLangNameInAppLanguage(language[APIConstants.kLanguageCode])
+              getLangNameInAppLanguage(language[APIConstants.kLanguageCode],
+                      _appLanguageController.getSelectedLanguageCode())
                   .contains(searchString);
         },
       ).toList();
@@ -221,11 +222,13 @@ class _AppLanguageState extends State<AppLanguage> {
     }
   }
 
-  String getLangNameInAppLanguage(String languageCode) {
+  String getLangNameInAppLanguage(
+      String languageCode, String selectedLangCode) {
     return APIConstants.getLanguageCodeOrName(
         value: languageCode,
         returnWhat: LanguageMap.languageNameInAppLanguage,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP,
+        langCode: selectedLangCode);
   }
 
   void setSelectedLanguageFromArg(String name) {

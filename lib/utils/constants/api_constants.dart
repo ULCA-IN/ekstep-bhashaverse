@@ -314,10 +314,12 @@ class APIConstants {
     ]
   };
 
-  static String getLanguageCodeOrName(
-      {required String value,
-      required LanguageMap returnWhat,
-      required Map<String, List<Map<String, String>>> lang_code_map}) {
+  static String getLanguageCodeOrName({
+    required String value,
+    required LanguageMap returnWhat,
+    required Map<String, List<Map<String, String>>> lang_code_map,
+    String? langCode,
+  }) {
     // If Language Code is to be returned that means the value received is a language name
     try {
       switch (returnWhat) {
@@ -345,7 +347,7 @@ class APIConstants {
           String languageNameInAppLanguage = '';
 
           Map<String, String>? selectedLanguageMap =
-              TranslatedLanguagesMap.language[Get.locale?.languageCode];
+              TranslatedLanguagesMap.language[langCode];
 
           if (selectedLanguageMap != null &&
               selectedLanguageMap[value] != null &&

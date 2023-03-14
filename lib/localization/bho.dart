@@ -66,4 +66,12 @@ final Map<String, String> bho = {
   maleVoiceAssistantNotAvailable:
       'मरद के ध्वनि सहायक नइखे,मेहरारू के ध्वनि सहायक चल रहल बा',
   errorNoTextInClipboard: 'क्लिपबोर्ड में कवनो पाठ उपलब्ध नइखे',
+  s2sStreaming: 'एस टु एस स्ट्रीमिंग ',
+  connecting: 'जुड़ रहल बा ',
+  somethingWentWrong: 'कोनो दिक्कत हो गइल ',
+  tapAndHoldForRecording: 'रिकॉर्डिंग करेके खातिर माइक के पकड़ के धइले रहीं। ',
+  cannotPlayAudioAtTheMoment: 'अभी ऑडियो ना चल सकता ',
+  responseNotReceived: 'गलती :प्रतिक्रिया नइखे मिलल। ',
+  translationNotPossible: 'अभी अनुवाद सम्भव नइखे। ',
+  bhashiniTitle: 'भाषिणी ',
 };

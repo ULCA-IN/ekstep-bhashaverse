@@ -68,4 +68,12 @@ final Map<String, String> ur = {
   maleVoiceAssistantNotAvailable:
       'مردانہ صوتی معاون دستیاب نہیں ہے، زنانہ صوتی معاون سے چلایا جا رہا ہے',
   errorNoTextInClipboard: 'کلپ بورڈ میں کوئی متن دستیاب نہیں ہے',
+  s2sStreaming: 'ایس ٹو ایس اسٹریمنگ ہو رہی ہے',
+  connecting: 'کنیکٹ کیا جا رہا ہے',
+  somethingWentWrong: 'کچھ غلط ہو گیا',
+  tapAndHoldForRecording: 'ریکارڈ کرنے کے لیے مائک کو ٹیپ کریں اور ہولڈ کریں',
+  cannotPlayAudioAtTheMoment: 'اس وقت آڈیو نہیں چل سکتا',
+  responseNotReceived: 'خرابی: جواب موصول نہیں ہوا',
+  translationNotPossible: 'اس وقت ترجمہ ممکن نہیں',
+  bhashiniTitle: 'بھاشنی',
 };

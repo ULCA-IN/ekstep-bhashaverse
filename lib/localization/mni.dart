@@ -66,4 +66,12 @@ final Map<String, String> mni = {
   maleVoiceAssistantNotAvailable:
       'ꯅꯨꯄꯥꯒꯤ ꯚꯣꯏꯁ ꯑꯦꯁꯤꯁꯇꯦꯟꯠ ꯂꯩꯇꯦ, ꯅꯨꯄꯤꯒꯤ ꯚꯣꯏꯁ ꯑꯦꯁꯤꯁꯇꯦꯟꯠꯇꯒꯤ ꯊꯥꯖꯔꯤ',
   errorNoTextInClipboard: 'ꯀ꯭ꯂꯤꯞꯕꯣꯔꯗꯇ ꯇꯦꯛꯁꯠ ꯑꯃꯠꯇ ꯌꯥꯎꯗꯦ',
+  s2sStreaming: 'ꯑꯦꯁ ꯇꯨ ꯑꯦꯁ ꯁ꯭ꯇ꯭ꯔꯤꯃꯤꯡ',
+  connecting: 'ꯀꯅꯦꯛ ꯇꯩꯔꯤ...',
+  somethingWentWrong: 'ꯀꯔꯤꯒꯨꯝꯕ ꯑꯁꯣꯏꯕ ꯑꯃ ꯂꯩꯔꯦ',
+  tapAndHoldForRecording: 'ꯆꯥꯟꯕꯤꯗꯨꯅ ꯔꯦꯀꯣꯔꯗꯤꯡ ꯇꯩꯅꯕꯒꯤꯗꯃꯛ ꯃꯥꯏꯛ ꯑꯗꯨ ꯅꯝꯗꯨꯅ ꯊꯝꯕꯤꯌꯨ',
+  cannotPlayAudioAtTheMoment: 'ꯃꯤꯀꯨꯞ ꯑꯁꯤꯗ ꯑꯣꯗꯤꯑꯣ ꯊꯥꯕ ꯌꯥꯗ꯭ꯔꯦ',
+  responseNotReceived: 'ꯑꯦꯔꯔ: ꯔꯦꯁꯄꯣꯟꯁ ꯐꯪꯗ꯭ꯔꯦ',
+  translationNotPossible: 'ꯃꯤꯀꯨꯞ ꯑꯁꯤꯗ ꯂꯣꯟ ꯍꯟꯗꯣꯛꯄ ꯌꯥꯗ꯭ꯔꯦ',
+  bhashiniTitle: 'ꯚꯥꯁꯤꯅꯤ',
 };

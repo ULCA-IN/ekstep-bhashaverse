@@ -66,4 +66,12 @@ final Map<String, String> mai = {
   maleVoiceAssistantNotAvailable:
       'पुरुष ध्वनि सहायक उपलब्ध नहि अछि, महिला ध्वनि सहायकक ध्वनि चलि रहल अछि ',
   errorNoTextInClipboard: 'क्लिपबोर्डमे कोनो टेक्स्ट उपलब्ध नहि अछि',
+  s2sStreaming: 'एस २ एस स्ट्रिमिंग',
+  connecting: 'कनेक्ट भऽ रहल अछि...',
+  somethingWentWrong: 'किछु दिक्कत भऽ गेल',
+  tapAndHoldForRecording: 'रिकॉर्डिंग करबा लेल माइककेँ छूबि धेने रहू ',
+  cannotPlayAudioAtTheMoment: 'अखन ऑडिओ नहि चलि सकैत अछि',
+  responseNotReceived: 'त्रुटि : प्रतिक्रिया नहि भेटल',
+  translationNotPossible: 'अखन अनुवाद सम्भव नहि',
+  bhashiniTitle: 'भाषिणी',
 };

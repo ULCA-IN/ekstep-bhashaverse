@@ -67,4 +67,13 @@ final Map<String, String> pa = {
   maleVoiceAssistantNotAvailable:
       ' ਮਰਦ ਆਵਾਜ਼ ਸਹਾਇਕ ਉਪਲਬਧ ਨਹੀਂ ਹੈ, ਔਰਤ ਆਵਾਜ਼ ਸਹਾਇਕ ਤੋਂ ਚਲਾਇਆ ਜਾ ਰਿਹਾ ਹੈ',
   errorNoTextInClipboard: 'ਕਲਿਪਬੋਰਡ ਤੇ ਕੋਈ ਟੈਕਸਟ ਉਪਲਬਧ ਨਹੀਂ ਹੈ ',
+  s2sStreaming: 'ਐਸ 2 ਐਸ ਸਟ੍ਰੀਮਿੰਗ ',
+  connecting: 'ਜੁੜ ਰਿਹਾ ਹੈ.. ',
+  somethingWentWrong: 'ਕੁਝ ਗਲਤ ਹੋ ਗਿਆ',
+  tapAndHoldForRecording:
+      'ਕਿਰਪਾ ਕਰਕੇ ਰਿਕਾਰਡਿੰਗ ਲਈ ਮਾਈਕ ਨੂੰ ਟੈਪ ਕਰੋ ਅਤੇ ਹੋਲਡ ਕਰੋ',
+  cannotPlayAudioAtTheMoment: 'ਇਸ ਸਮੇਂ ਔਡੀਓ ਨਹੀਂ ਚਲਾਇਆ ਜਾ ਸਕਦਾ',
+  responseNotReceived: 'ਤਰੁੱਟੀ: ਜਵਾਬ ਨਹੀਂ ਮਿਲਿਆ ',
+  translationNotPossible: 'ਇਸ ਸਮੇਂ ਅਨੁਵਾਦ ਸੰਭਵ ਨਹੀਂ ਹੈ',
+  bhashiniTitle: 'ਭਾਸ਼ਿਨੀ',
 };

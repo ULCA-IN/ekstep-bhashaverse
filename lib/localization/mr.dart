@@ -69,4 +69,13 @@ final Map<String, String> mr = {
   maleVoiceAssistantNotAvailable:
       'पुरुष ध्वनी सहाय्यक उपलब्ध नाही, स्त्री व्हॉईस सहाय्यक कार्यरत आहे',
   errorNoTextInClipboard: 'क्लिपबोर्डवर टेक्स्ट उपलब्ध नाही',
+  s2sStreaming: 'एस २ एस स्ट्रीमिंग',
+  connecting: 'कनेक्ट होत आहे ',
+  somethingWentWrong: 'काहीतरी गडबड झाली ',
+  tapAndHoldForRecording:
+      'रेकॉर्डिंग करण्यासाठी एमआयसीवर टिचकी मारा आणि धरून ठेवा  ',
+  cannotPlayAudioAtTheMoment: 'याक्षणी ऑडिओ चालवल्या जाऊ शकत नाही ',
+  responseNotReceived: 'चूक : प्रतिक्रिया मिळाली नाही ',
+  translationNotPossible: 'याक्षणी भाषांतर शक्य नाही ',
+  bhashiniTitle: 'भाषिणी ',
 };

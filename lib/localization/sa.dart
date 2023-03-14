@@ -68,4 +68,12 @@ final Map<String, String> sa = {
   maleVoiceAssistantNotAvailable:
       'पुरुषरूपः ध्वनिसहायकः नोपलभ्यते, स्त्रीरूपात् ध्वनिसहायकात् चाल्यते',
   errorNoTextInClipboard: 'क्लिप्बोर्ड् इत्यस्मिन् टेक्स्ट् किमपि नोपलोभ्यते',
+  s2sStreaming: 'एस् २ एस् स्ट्रीमिङ्ग्',
+  connecting: 'सन्दधाति...',
+  somethingWentWrong: 'किमपि अयुक्तम् सञ्जातम्',
+  tapAndHoldForRecording: 'कृपया, मुद्राङ्कनं कर्तुं मैक् नुत्वा धीयताम् ',
+  cannotPlayAudioAtTheMoment: 'सद्यः ध्वनिं विधातुं न शक्नुमः',
+  responseNotReceived: 'दोषः - प्रतिस्पन्दनं न लभ्यते',
+  translationNotPossible: 'सद्यः अनुवादः न साध्यः',
+  bhashiniTitle: 'भाषिणी',
 };

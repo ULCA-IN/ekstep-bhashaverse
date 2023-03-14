@@ -68,8 +68,12 @@ final Map<String, String> hi = {
   maleVoiceAssistantNotAvailable:
       'पुरुष ध्वनि सहायक उपलब्ध नहीं है, स्त्री ध्वनि सहायक से ध्वनि चल रही है',
   errorNoTextInClipboard: 'क्लिपबोर्ड में कोई टेक्स्ट उपलब्ध नहीं है',
-  s2sStreaming: 'S2S स्ट्रीमिंग',
-  connecting: 'कनेक्ट हो रहा है...',
-  somethingWentWrong: 'कुछ गलत हुआ',
-  tapAndHoldForRecording: 'रिकॉर्डिंग के लिए कृपया माइक को टैप करके रखें',
+  s2sStreaming: 'एस2एस स्ट्रीमिंग',
+  connecting: 'कनेक्ट किया जा रहा है...',
+  somethingWentWrong: 'कुछ गड़बड़ हो गया',
+  tapAndHoldForRecording: 'रिकॉर्ड करने के लिए माइक को टैप करके पकड़े रहें',
+  cannotPlayAudioAtTheMoment: 'इस समय ऑडियो नहीं चलाया जा सकता',
+  responseNotReceived: 'त्रुटि - कोई प्रतिक्रिया नहीं मिली',
+  translationNotPossible: 'इस समय अनुवाद संभव नहीं',
+  bhashiniTitle: 'भाषिणी',
 };
