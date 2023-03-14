@@ -1,4 +1,3 @@
-import 'package:bhashaverse/enums/gender_enum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 
+import 'enums/gender_enum.dart';
 import 'localization/app_localization.dart';
 import 'localization/localization_keys.dart';
 import 'presentation/splash_screen/binding/splash_binding.dart';
@@ -55,11 +55,11 @@ class MyApp extends StatelessWidget {
 
     // Streaming vs Batch model preference
     if (hiveDBInstance.get(isStreamingPreferred) == null) {
-      hiveDBInstance.put(isStreamingPreferred, true);
+      hiveDBInstance.put(isStreamingPreferred, false);
     }
 
     return GetMaterialApp(
-      title: appName.tr,
+      onGenerateTitle: (context) => bhashiniTitle.tr,
       debugShowCheckedModeBanner: false,
       translations: AppLocalization(),
       locale: Locale(appLocale),

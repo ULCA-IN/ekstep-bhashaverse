@@ -42,7 +42,7 @@ final Map<String, String> en = {
   kTranslation: 'Translation',
   kChat: 'Chat',
   kSettings: 'Settings',
-  kHomeLoadingAnimationText: 'Hold up, we are setting up things for you...',
+  kHomeLoadingAnimationText: 'Hold on, we are setting up things for you...',
   kTranslateSourceTitle: 'Translate from',
   kTranslateTargetTitle: 'Translate to',
   kTranslationHintText: 'Start typing or press mic to begin',
@@ -72,4 +72,8 @@ final Map<String, String> en = {
   connecting: 'Connecting...',
   somethingWentWrong: 'Something went wrong',
   tapAndHoldForRecording: 'Please tap and hold mic for recording',
+  cannotPlayAudioAtTheMoment: 'Cannot play audio at the moment',
+  responseNotReceived: 'Error: Response not received',
+  translationNotPossible: 'translation not possible at the moment',
+  bhashiniTitle: 'Bhashini',
 };

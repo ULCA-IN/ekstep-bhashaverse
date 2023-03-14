@@ -72,3 +72,7 @@ const String s2sStreaming = 's2sStreaming';
 const String connecting = 'connecting';
 const String somethingWentWrong = 'somethingWentWrong';
 const String tapAndHoldForRecording = 'tapAndHoldForRecording';
+const String cannotPlayAudioAtTheMoment = 'cannotPlayAudioAtTheMoment';
+const String responseNotReceived = 'responseNotReceived';
+const String translationNotPossible = 'translationNotPossible';
+const String bhashiniTitle = 'bhashiniTitle';

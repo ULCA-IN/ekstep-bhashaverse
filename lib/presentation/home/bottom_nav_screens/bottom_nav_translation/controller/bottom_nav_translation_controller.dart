@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/enums/mic_button_status.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,10 +12,11 @@ import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
-import '../../../../../enums/asr_details_enum.dart';
-import '../../../../../enums/gender_enum.dart';
+import '../../../../../models/task_sequence_response_model.dart';
 import '../../../../../enums/language_enum.dart';
+import '../../../../../enums/mic_button_status.dart';
 import '../../../../../localization/localization_keys.dart';
+import '../../../../../services/dhruva_api_client.dart';
 import '../../../../../services/socket_io_client.dart';
 import '../../../../../services/translation_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
@@ -27,6 +27,7 @@ import '../../../../../utils/voice_recorder.dart';
 import '../../../../../utils/waveform_style.dart';
 
 class BottomNavTranslationController extends GetxController {
+  late DHRUVAAPIClient _dhruvaapiClient;
   late TranslationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
 
@@ -38,13 +39,10 @@ class BottomNavTranslationController extends GetxController {
 
   RxBool isTranslateCompleted = false.obs;
   bool isMicPermissionGranted = false;
-  RxBool isLsLoading = false.obs;
+  RxBool isLoading = false.obs;
   RxString selectedSourceLanguageCode = ''.obs;
   RxString selectedTargetLanguageCode = ''.obs;
-  dynamic sourceTTSResponseMale,
-      sourceTTSResponseFemale,
-      targetTTSResponseMale,
-      targetTTSResponseFemale;
+  dynamic ttsResponse;
   RxBool isRecordedViaMic = false.obs;
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
@@ -76,6 +74,7 @@ class BottomNavTranslationController extends GetxController {
 
   @override
   void onInit() {
+    _dhruvaapiClient = Get.find();
     _socketIOClient = Get.find();
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
@@ -131,7 +130,7 @@ class BottomNavTranslationController extends GetxController {
   }
 
   @override
-  void onClose() {
+  void onClose() async {
     streamingResponseListener.dispose();
     socketIOErrorListener.dispose();
     _socketIOClient.disconnect();
@@ -144,10 +143,23 @@ class BottomNavTranslationController extends GetxController {
 
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
-      String tempSourceLanguage = selectedSourceLanguageCode.value;
-      selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
-      selectedTargetLanguageCode.value = tempSourceLanguage;
-      resetAllValues();
+      if (_languageModelController.sourceTargetLanguageMap.keys
+              .contains(selectedTargetLanguageCode.value) &&
+          _languageModelController
+                  .sourceTargetLanguageMap[selectedTargetLanguageCode.value] !=
+              null &&
+          _languageModelController
+              .sourceTargetLanguageMap[selectedTargetLanguageCode.value]!
+              .contains(selectedSourceLanguageCode.value)) {
+        String tempSourceLanguage = selectedSourceLanguageCode.value;
+        selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
+        selectedTargetLanguageCode.value = tempSourceLanguage;
+        resetAllValues();
+      } else {
+        showDefaultSnackbar(
+            message:
+                '${getSelectedTargetLanguageName()} - ${getSelectedSourceLanguageName()} ${translationNotPossible.tr}');
+      }
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
@@ -157,14 +169,14 @@ class BottomNavTranslationController extends GetxController {
       selectedSourceLanguageCode.value.isNotEmpty &&
       selectedTargetLanguageCode.value.isNotEmpty;
 
-  String? getSelectedSourceLanguageName() {
+  String getSelectedSourceLanguageName() {
     return APIConstants.getLanguageCodeOrName(
         value: selectedSourceLanguageCode.value,
         returnWhat: LanguageMap.languageNameInAppLanguage,
         lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 
-  String? getSelectedTargetLanguageName() {
+  String getSelectedTargetLanguageName() {
     return APIConstants.getLanguageCodeOrName(
         value: selectedTargetLanguageCode.value,
         returnWhat: LanguageMap.languageNameInAppLanguage,
@@ -176,7 +188,11 @@ class BottomNavTranslationController extends GetxController {
       isMicPermissionGranted = isPermissionGranted;
     });
     if (isMicPermissionGranted) {
-      // / if user quickly released tap than Socket continue emit the data
+      // clear previous recording files and
+      // update state
+      resetAllValues();
+
+      //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
         recordingStartTime = DateTime.now();
@@ -184,9 +200,16 @@ class BottomNavTranslationController extends GetxController {
           connectToSocket();
 
           _socketIOClient.socketEmit(
-              emittingStatus: 'connect_mic_stream',
-              emittingData: [],
-              isDataToSend: false);
+            emittingStatus: 'start',
+            emittingData: [
+              APIConstants.createSocketIOComputePayload(
+                  srcLanguage: selectedSourceLanguageCode.value,
+                  targetLanguage: selectedTargetLanguageCode.value,
+                  preferredGender:
+                      _hiveDBInstance.get(preferredVoiceAssistantGender))
+            ],
+            isDataToSend: true,
+          );
 
           MicStream.microphone(
                   audioSource: AudioSource.DEFAULT,
@@ -198,11 +221,15 @@ class BottomNavTranslationController extends GetxController {
             micStreamSubscription = stream?.listen((value) {
               double meanSquared = meanSquare(value.buffer.asInt8List());
               _socketIOClient.socketEmit(
-                  emittingStatus: 'mic_data',
+                  emittingStatus: 'data',
                   emittingData: [
-                    value.buffer.asInt32List(),
-                    selectedSourceLanguageCode.value,
-                    true,
+                    {
+                      "audio": [
+                        {"audioContent": value}
+                      ]
+                    },
+                    {"response_depth": 1},
+                    false,
                     false
                   ],
                   isDataToSend: true);
@@ -221,11 +248,15 @@ class BottomNavTranslationController extends GetxController {
                     .reduce((value, element) => value + element);
                 if (sumValue == silenceSize) {
                   _socketIOClient.socketEmit(
-                      emittingStatus: 'mic_data',
+                      emittingStatus: 'data',
                       emittingData: [
-                        null,
-                        selectedSourceLanguageCode.value,
-                        false,
+                        {
+                          "audio": [
+                            {"audioContent": value}
+                          ]
+                        },
+                        {"response_depth": 2},
+                        true,
                         false
                       ],
                       isDataToSend: true);
@@ -235,9 +266,6 @@ class BottomNavTranslationController extends GetxController {
             });
           });
         } else {
-          // clear previous recording files and
-          // update state
-          resetAllValues();
           await _voiceRecorder.startRecordingVoice();
         }
       }
@@ -260,10 +288,15 @@ class BottomNavTranslationController extends GetxController {
       micStreamSubscription?.cancel();
       if (_socketIOClient.isMicConnected.value) {
         _socketIOClient.socketEmit(
-            emittingStatus: 'mic_data',
-            emittingData: [null, selectedSourceLanguageCode.value, false, true],
+            emittingStatus: 'data',
+            emittingData: [
+              null,
+              {"response_depth": 2},
+              true,
+              true
+            ],
             isDataToSend: true);
-        if (sourceLanTextController.text.isNotEmpty) translateSourceLanguage();
+        await Future.delayed(const Duration(seconds: 5));
       }
       _socketIOClient.disconnect();
     } else {
@@ -275,7 +308,8 @@ class BottomNavTranslationController extends GetxController {
           showDefaultSnackbar(message: errorInRecording.tr);
           return;
         } else {
-          await getASROutput(base64EncodedAudioContent);
+          await getComputeResponse(
+              isRecorded: true, base64Value: base64EncodedAudioContent);
         }
       }
     }
@@ -318,175 +352,112 @@ class BottomNavTranslationController extends GetxController {
     );
   }
 
-  Future<void> getASROutput(String base64EncodedAudioContent) async {
-    isLsLoading.value = true;
-    var asrPayloadToSend = {};
-    asrPayloadToSend['modelId'] =
-        _languageModelController.getAvailableASRModelsForLanguage(
-            languageCode: selectedSourceLanguageCode.value,
-            requiredASRDetails: ASRModelDetails.modelId);
-    asrPayloadToSend['task'] = 'asr';
-    asrPayloadToSend['audioContent'] = base64EncodedAudioContent;
-    asrPayloadToSend['source'] = selectedSourceLanguageCode.value;
-    asrPayloadToSend['userId'] = null;
+  Future<void> getComputeResponse({
+    required bool isRecorded,
+    String? base64Value,
+    String? sourceText,
+  }) async {
+    isLoading.value = true;
+    String asrServiceId = '';
+    String translationServiceId = '';
+    String ttsServiceId = '';
+    asrServiceId = getTaskTypeServiceID(
+            _languageModelController.taskSequenceResponse,
+            'asr',
+            selectedSourceLanguageCode.value) ??
+        '';
+    translationServiceId = getTaskTypeServiceID(
+            _languageModelController.taskSequenceResponse,
+            'asr',
+            selectedSourceLanguageCode.value) ??
+        '';
+    ttsServiceId = getTaskTypeServiceID(
+            _languageModelController.taskSequenceResponse,
+            'asr',
+            selectedSourceLanguageCode.value) ??
+        '';
 
-    var response = await _translationAppAPIClient.sendASRRequest(
-        asrPayload: asrPayloadToSend);
+    var asrPayloadToSend = APIConstants.createRESTComputePayload(
+        srcLanguage: selectedSourceLanguageCode.value,
+        targetLanguage: selectedTargetLanguageCode.value,
+        isRecorded: isRecorded,
+        inputData: isRecorded ? base64Value! : sourceLanTextController.text,
+        audioFormat: Platform.isIOS ? 'flac' : 'wav',
+        asrServiceID: asrServiceId,
+        translationServiceID: translationServiceId,
+        ttsServiceID: ttsServiceId,
+        preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
+
+    var response = await _dhruvaapiClient.sendComputeRequest(
+        baseUrl: _languageModelController
+            .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
+        authorizationKey: _languageModelController.taskSequenceResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+        authorizationValue: _languageModelController.taskSequenceResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
+        computePayload: asrPayloadToSend);
 
     response.when(
-      success: (data) async {
-        sourceLanTextController.text = data['source'];
-        isRecordedViaMic.value = true;
-        await translateSourceLanguage();
-      },
-      failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isLsLoading.value = false;
-      },
-    );
-  }
-
-  Future<void> translateSourceLanguage() async {
-    isLsLoading.value = true;
-    var transPayload = {};
-    transPayload['modelId'] =
-        _languageModelController.getAvailableTranslationModel(
-            selectedSourceLanguageCode.value, selectedTargetLanguageCode.value);
-    transPayload['task'] = 'translation';
-    List<Map<String, dynamic>> source = [
-      {'source': sourceLanTextController.text}
-    ];
-    transPayload['input'] = source;
-
-    transPayload['userId'] = null;
-
-    var transResponse = await _translationAppAPIClient.sendTranslationRequest(
-        transPayload: transPayload);
-
-    transResponse.when(
-      success: (data) async {
-        targetLangTextController.text = data['target'];
-        await getTTSOutput();
-      },
-      failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isLsLoading.value = false;
-      },
-    );
-  }
-
-  Future<void> getTTSOutput() async {
-    var targetTTSPayloadMale = {};
-
-    targetTTSPayloadMale['input'] = [
-      {'source': targetLangTextController.text}
-    ];
-
-    targetTTSPayloadMale['modelId'] = _languageModelController
-        .getAvailableTTSModel(selectedTargetLanguageCode.value);
-    targetTTSPayloadMale['task'] = APIConstants.TYPES_OF_MODELS_LIST[2];
-    targetTTSPayloadMale['gender'] = 'male';
-
-    var targetTTSPayloadForFemale = {};
-    targetTTSPayloadForFemale.addAll(targetTTSPayloadMale);
-    targetTTSPayloadForFemale['gender'] = 'female';
-
-    List<dynamic> ttsPayloadList = [];
-    // ordering of list matters in TTS Payload
-    // first target then source
-    ttsPayloadList.addAll([targetTTSPayloadMale, targetTTSPayloadForFemale]);
-
-    if (_hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
-      var sourceTTSPayloadForMale = {};
-      sourceTTSPayloadForMale.addAll(targetTTSPayloadMale);
-      sourceTTSPayloadForMale['modelId'] = _languageModelController
-          .getAvailableTTSModel(selectedSourceLanguageCode.value);
-      sourceTTSPayloadForMale['input'] = [
-        {'source': sourceLanTextController.text}
-      ];
-
-      var sourceTTSPayloadForFemale = {};
-      sourceTTSPayloadForFemale.addAll(sourceTTSPayloadForMale);
-      sourceTTSPayloadForFemale['gender'] = 'female';
-      ttsPayloadList
-          .addAll([sourceTTSPayloadForMale, sourceTTSPayloadForFemale]);
-    }
-
-    var responseList = await _translationAppAPIClient.sendTTSReqTranslation(
-        ttsPayloadList: ttsPayloadList);
-
-    responseList.when(
-      success: (data) async {
-        await deleteAudioFiles(deleteRecordedFile: false);
-        if (data != null && data.isNotEmpty) {
-          targetTTSResponseMale =
-              data[0]['output']['audio'][0]['audioContent'] ?? '';
-          if (data.length > 1) {
-            targetTTSResponseFemale =
-                data[1]['output']['audio'][0]['audioContent'] ?? '';
-          }
-
-          if (_hiveDBInstance.get(isStreamingPreferred) &&
-              isRecordedViaMic.value &&
-              data.length > 2) {
-            sourceTTSResponseMale =
-                data[2]['output']['audio'][0]['audioContent'] ?? '';
-            if (data.length > 3) {
-              sourceTTSResponseFemale =
-                  data[3]['output']['audio'][0]['audioContent'] ?? '';
-            }
-          }
+      success: (taskResponse) async {
+        sourceLanTextController.text = taskResponse.pipelineResponse
+                ?.firstWhere((element) => element.taskType == 'translation')
+                .output
+                ?.first
+                .source ??
+            '';
+        if (sourceLanTextController.text.isEmpty) {
+          isLoading.value = false;
+          showDefaultSnackbar(message: responseNotReceived.tr);
+          return;
         }
+        targetLangTextController.text = taskResponse.pipelineResponse
+                ?.firstWhere((element) => element.taskType == 'translation')
+                .output
+                ?.first
+                .target ??
+            '';
+        ttsResponse = taskResponse.pipelineResponse
+            ?.firstWhere((element) => element.taskType == 'tts')
+            .audio[0]['audioContent'];
+        isRecordedViaMic.value = isRecorded;
         isTranslateCompleted.value = true;
-        isLsLoading.value = false;
+        isLoading.value = false;
       },
       failure: (error) {
+        isLoading.value = false;
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
-        isLsLoading.value = false;
       },
     );
+  }
+
+  String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
+      String taskType, String sourceLanguageCode,
+      [String? targetLanguageCode]) {
+    List<Config>? configs = sequenceResponse.pipelineResponseConfig
+        ?.firstWhere((element) => element.taskType == taskType)
+        .config;
+    for (var config in configs!) {
+      if (config.language?.sourceLanguage == sourceLanguageCode) {
+        // sends translation service id
+        if (targetLanguageCode != null) {
+          if (config.language?.targetLanguage == targetLanguageCode) {
+            return config.serviceId;
+          } else {
+            return '';
+          }
+        } else
+          return config.serviceId; // sends ASR, TTS service id
+      }
+    }
+    return '';
   }
 
   void playTTSOutput(bool isPlayingForTarget) async {
-    GenderEnum? preferredGender = GenderEnum.values
-        .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
     if (isPlayingForTarget ||
         _hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
-      bool isMaleTTSAvailable = isPlayingForTarget
-          ? targetTTSResponseMale != null && targetTTSResponseMale.isNotEmpty
-          : sourceTTSResponseMale != null && sourceTTSResponseMale.isNotEmpty;
-
-      bool isFemaleTTSAvailable = isPlayingForTarget
-          ? targetTTSResponseFemale != null &&
-              targetTTSResponseFemale.isNotEmpty
-          : sourceTTSResponseFemale != null &&
-              sourceTTSResponseFemale.isNotEmpty;
-
-      Uint8List? fileAsBytes;
-      if ((preferredGender == GenderEnum.male && isMaleTTSAvailable) ||
-          (!isFemaleTTSAvailable && isMaleTTSAvailable)) {
-        if (preferredGender == GenderEnum.female) {
-          showDefaultSnackbar(message: femaleVoiceAssistantNotAvailable.tr);
-        }
-        fileAsBytes = base64Decode(
-            isPlayingForTarget ? targetTTSResponseMale : sourceTTSResponseMale);
-      } else if ((preferredGender == GenderEnum.female &&
-              isFemaleTTSAvailable) ||
-          (!isMaleTTSAvailable && isFemaleTTSAvailable)) {
-        if (preferredGender == GenderEnum.male) {
-          showDefaultSnackbar(message: maleVoiceAssistantNotAvailable.tr);
-        }
-        fileAsBytes = base64Decode(isPlayingForTarget
-            ? targetTTSResponseFemale
-            : sourceTTSResponseFemale);
-      } else {
-        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
-      }
-
-      if (fileAsBytes != null) {
+      if (ttsResponse != null) {
+        Uint8List? fileAsBytes = base64Decode(ttsResponse);
         Directory appDocDir = await getApplicationDocumentsDirectory();
         targetPath =
             '${appDocDir.path}/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
@@ -496,12 +467,12 @@ class BottomNavTranslationController extends GetxController {
         }
 
         isPlayingTarget.value = isPlayingForTarget;
-        isPlayingSource.value = _hiveDBInstance.get(isStreamingPreferred) &&
-            !isPlayingForTarget; // playing from streaming
+        isPlayingSource.value =
+            _hiveDBInstance.get(isStreamingPreferred) && !isPlayingForTarget;
         await prepareWaveforms(targetPath,
-            isForTargeLanguage: isPlayingForTarget ||
-                (_hiveDBInstance.get(isStreamingPreferred) &&
-                    isRecordedViaMic.value));
+            isForTargeLanguage: isPlayingForTarget && isRecordedViaMic.value);
+      } else {
+        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
       }
     } else {
       String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
@@ -591,11 +562,7 @@ class BottomNavTranslationController extends GetxController {
     if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
       await ttsAudioFile?.delete();
     }
-
-    targetTTSResponseMale = null;
-    targetTTSResponseFemale = null;
-    sourceTTSResponseFemale = null;
-    sourceTTSResponseMale = null;
+    ttsResponse = null;
   }
 
   bool isTransliterationEnabled() {
@@ -606,14 +573,7 @@ class BottomNavTranslationController extends GetxController {
     if (_socketIOClient.isConnected()) {
       _socketIOClient.disconnect();
     }
-
-    String languageCode = selectedSourceLanguageCode.value;
-    String callbackURL =
-        _languageModelController.getAvailableASRModelsForLanguage(
-            languageCode: languageCode,
-            requiredASRDetails: ASRModelDetails.streamingCallbackURL);
-    _socketIOClient.socketConnect(
-        apiCallbackURL: callbackURL, languageCode: languageCode);
+    _socketIOClient.socketConnect();
   }
 
   double meanSquare(Int8List value) {

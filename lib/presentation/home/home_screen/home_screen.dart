@@ -28,7 +28,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _bottomNavTranslationController = Get.find();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
-    _homeController.calcAvailableSourceAndTargetLanguages();
+    _homeController.getAvailableLanguagesInTask();
+    _homeController.getTransliterationModels();
   }
 
   @override
@@ -69,12 +70,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         )
                 ],
               ),
-              if (_homeController.isModelsLoading.value ||
-                  _bottomNavTranslationController.isLsLoading.value)
+              if (_homeController.isLoading.value ||
+                  _bottomNavTranslationController.isLoading.value)
                 LottieAnimation(
                     context: context,
                     lottieAsset: animationLoadingLine,
-                    footerText: _homeController.isModelsLoading.value
+                    footerText: _homeController.isLoading.value
                         ? kHomeLoadingAnimationText.tr
                         : kTranslationLoadingAnimationText.tr),
             ],
