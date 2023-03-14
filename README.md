@@ -44,7 +44,6 @@ name: bhashaverse
   mic_stream: ^0.6.4
   record: ^4.4.4
   auto_size_text: ^3.0.0
-  stop_watch_timer: ^2.0.0
 ```
 
 * Dev Dependencies:
