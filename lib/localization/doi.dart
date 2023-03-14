@@ -66,4 +66,12 @@ final Map<String, String> doi = {
   maleVoiceAssistantNotAvailable:
       'पुरश वाइस असिस्टैंट उपलब्ध नेईं ऐ, महिला वाइस असिस्टैंट थमां चलाऽ करने',
   errorNoTextInClipboard: 'क्लिप बोर्ड उप्पर कोई अबारत उपलब्ध नेई',
+  s2sStreaming: 'एस2 एस स्ट्रीमिंग',
+  connecting: 'कनेक्ट कीता जा’रदा ऐ . . . ',
+  somethingWentWrong: 'किश गड़बड़ होई ऐ',
+  tapAndHoldForRecording: 'रिकार्ड करने आस्तै टैप करो ते माइक गी फड़ियै रक्खो',
+  cannotPlayAudioAtTheMoment: ' इस बेल्लै ऑडियो नेईं चलाया जाई सकदा',
+  responseNotReceived: 'गलती - कोई जवाबी-कारवाई नेईं मिली',
+  translationNotPossible: ' इस बेल्लै तरजमा मुमकन नेईं ऐ',
+  bhashiniTitle: 'भाशिणी ',
 };

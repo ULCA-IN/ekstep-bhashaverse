@@ -66,4 +66,12 @@ final Map<String, String> bn = {
   maleVoiceAssistantNotAvailable:
       'পুরুষ স্বর সহায়ক উপলব্ধ নেই, মহিলা স্বর সহায়ক ব্যবহার করা হচ্ছে',
   errorNoTextInClipboard: 'ক্লিপবোর্ডে কোনও টেক্সট নেই',
+  s2sStreaming: 'এস-টু-এস স্ট্রিমিং',
+  connecting: 'সংযোগ হচ্ছে...',
+  somethingWentWrong: 'কিছু ভুলভ্রান্তি ঘটেছে',
+  tapAndHoldForRecording: 'রেকর্ড করার জন্য মাইকে ট্যাপ করুন এবং ধরে থাকুন',
+  cannotPlayAudioAtTheMoment: 'এই মুহূর্তে অডিওটি চালানো সম্ভব নয়',
+  responseNotReceived: 'ভ্রান্তি: জবাব পাওয়া যায়নি',
+  translationNotPossible: 'এই মুহূর্তে ভাষান্তর সম্ভব নয়',
+  bhashiniTitle: 'ভাষিণী',
 };

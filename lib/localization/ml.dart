@@ -73,4 +73,12 @@ final Map<String, String> ml = {
   maleVoiceAssistantNotAvailable:
       'പുരുഷശബ്ദസഹായി ലഭ്യമല്ല, വനിതാശബ്ദസഹായിയുടെ ശബ്ദം കേള്‍പ്പിക്കുന്നു',
   errorNoTextInClipboard: 'ക്ലിപ്പ്ബോര്‍ഡില്‍ ടെക്സ്റ്റ് ഒന്നും ലഭ്യമല്ല',
+  s2sStreaming: 'എസ് റ്റു എസ് സ്ട്രീമിങ്ങ്',
+  connecting: 'കണക്ട് ചെയ്യുന്നു',
+  somethingWentWrong: 'എന്തോ തെറ്റിപ്പോയി',
+  tapAndHoldForRecording: 'റെക്കോഡ് ചെയ്യാൻ മൈക്കിൽ ടാപ്പ് ചെയ്ത് പിടിക്കുക',
+  cannotPlayAudioAtTheMoment: 'ഇപ്പോൾ ഓഡിയോ കേൾപ്പിക്കാൻ ആവില്ല',
+  responseNotReceived: 'തെറ്റ്: പ്രതികരണം കിട്ടിയിട്ടില്ല',
+  translationNotPossible: 'വിവർത്തനം ഇപ്പോൾ സാധ്യമല്ല',
+  bhashiniTitle: 'ഭാഷിണി',
 };

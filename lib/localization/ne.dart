@@ -69,4 +69,13 @@ final Map<String, String> ne = {
   maleVoiceAssistantNotAvailable:
       'पुरुष ध्वनि सहायक उपलब्ध छैन, महिला ध्वनि सहायकबाट चलाइँदैछ',
   errorNoTextInClipboard: 'क्लिपबोर्डमा कुनै टेक्स्ट उपलब्ध छैन',
+  s2sStreaming: 'S2S स्ट्रिम हुँदैछ',
+  connecting: 'जोडिँदैछ...',
+  somethingWentWrong: 'केहि गलत भयो',
+  tapAndHoldForRecording:
+      'रेकर्ड गर्नका लागि कृपया माइक ट्याप गरेर समात्नुहोस्',
+  cannotPlayAudioAtTheMoment: 'अहिले अडियो चलाउन सकिँदैन',
+  responseNotReceived: 'त्रुटि: प्रतिक्रिया प्राप्त भएको छैन',
+  translationNotPossible: 'अहिले अनुवाद गर्न सम्भव छैन',
+  bhashiniTitle: 'भासिनी',
 };

@@ -70,4 +70,12 @@ final Map<String, String> ta = {
   maleVoiceAssistantNotAvailable:
       'ஆண் குரலில் வாய்ஸ் அசிஸ்டண்ட் இல்லை, பெண் குரலில் வாய்ஸ் அசிஸ்டண்ட் இயக்கப்படுகிறது',
   errorNoTextInClipboard: 'கிளிப்போர்டில் வாசகம் எதுவும் இல்லை',
+  s2sStreaming: 'S2S ஸ்ட்ரீமிங் ஆகிறது',
+  connecting: 'இணைக்கிறது...',
+  somethingWentWrong: 'ஏதோ பிழை ஏற்பட்டுவிட்டது',
+  tapAndHoldForRecording: 'பதிவுசெய்ய மைக்கை தட்டி அப்படியே பிடிக்கவும்',
+  cannotPlayAudioAtTheMoment: 'தற்போது ஒலி இயக்க இயலாது',
+  responseNotReceived: 'பிழை: பதில் பெறவில்லை',
+  translationNotPossible: 'தற்போது மொழிபெயர்ப்பு செய்ய இயலாது',
+  bhashiniTitle: 'பாஷினி',
 };

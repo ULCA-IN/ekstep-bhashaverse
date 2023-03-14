@@ -70,4 +70,13 @@ final Map<String, String> or = {
   maleVoiceAssistantNotAvailable:
       'ପୁରୁଷ ଧ୍ୱନି ସହାୟକ ଉପଲବ୍‌ଧ ନାହିଁ, ମହିଳା ଧ୍ୱନି ସହାୟକରୁ ଚାଲୁଛି',
   errorNoTextInClipboard: 'କ୍ଲିପ୍‌ବୋର୍ଡରେ କୌଣସି ଟେକ୍ସଟ ଉପଲବ୍‌ଧ ନାହିଁ',
+  s2sStreaming: 'ଏସ୍‌2ଏସ୍‌ ଷ୍ଟ୍ରିମିଙ୍ଗ ',
+  connecting: 'କନେକ୍ଟ କରୁଛି',
+  somethingWentWrong: 'କିଛି ଗୋଟେ ଅସୁବିଧା ହୋଇଗଲା',
+  tapAndHoldForRecording:
+      'ରେକର୍ଡିଂ କରିବା ପାଇଁ ଦୟାକରି ଟ୍ୟାପ୍‌ କରି ମାଇକ୍‌କୁ ହୋଲ୍‌ଡ କରନ୍ତୁ ',
+  cannotPlayAudioAtTheMoment: 'ଏବେ ଅଡ଼ିଓ ଚଲାଯାଇ ପାରିବ ନାହିଁ ',
+  responseNotReceived: 'ତ୍ରୁଟି: ପ୍ରତିକ୍ରିୟା ମିଳିନାହିଁ',
+  translationNotPossible: 'ଏବେ ଅନୁବାଦ ସମ୍ଭବ ନୁହେଁ',
+  bhashiniTitle: 'ଭାଷିନୀ',
 };

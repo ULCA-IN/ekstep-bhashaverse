@@ -67,4 +67,12 @@ final Map<String, String> sat = {
   maleVoiceAssistantNotAvailable:
       'ᱠᱚᱲᱟ ᱟᱲᱟᱝ ᱥᱚᱦᱮᱫ ᱫᱚ ᱵᱟᱹᱱᱩᱜᱼᱟ,ᱛᱤᱨᱞᱟᱹ ᱟᱲᱟᱝ ᱥᱚᱦᱚᱫ ᱛᱮ ᱪᱟᱞᱟᱜ ᱠᱟᱱᱟ',
   errorNoTextInClipboard: 'ᱠᱞᱤᱯᱵᱳᱰ ᱨᱮ ᱴᱮᱠᱥᱴ ᱵᱟᱝ ᱧᱟᱢᱚᱜᱼᱟ',
+  s2sStreaming: 'ᱮᱥ ᱴᱩ ᱮᱥ ᱥᱴᱨᱤᱢᱤᱝ',
+  connecting: 'ᱡᱚᱯᱚᱲᱟᱜ ᱠᱟᱱᱟᱹᱹᱹ',
+  somethingWentWrong: 'ᱠᱤᱪᱷᱩ ᱜᱟᱹᱞᱛᱤ ᱦᱩᱭᱩᱜ ᱠᱟᱱᱟ ',
+  tapAndHoldForRecording: 'ᱫᱟᱭᱟᱠᱟᱛᱮ ᱨᱮᱠᱚᱰᱤᱝ ᱞᱟᱹᱜᱤᱫ ᱢᱟᱭᱤᱠ ᱥᱟᱵᱽ ᱟᱨ  ᱴᱮᱯᱢᱮ ',
+  cannotPlayAudioAtTheMoment: 'ᱱᱤᱭᱟᱹ ᱚᱠᱛᱚ ᱳᱰᱤᱭᱳ ᱪᱟᱞᱟᱣ ᱵᱟᱝ ᱜᱟᱱᱚᱜ ᱠᱟᱱᱟ ',
+  responseNotReceived: 'ᱦᱤᱲᱤᱡᱺ ᱛᱮᱞᱟ ᱵᱟᱝ ᱧᱟᱢᱟᱠᱟᱱᱟ',
+  translationNotPossible: 'ᱱᱤᱭᱟᱹ ᱚᱠᱛᱚ ᱛᱚᱨᱡᱚᱢᱟᱭ ᱵᱟᱝ ᱜᱟᱱᱚᱜ ᱠᱟᱱᱟ ',
+  bhashiniTitle: 'ᱵᱷᱟᱥᱤᱱᱤ ',
 };

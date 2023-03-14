@@ -17,6 +17,7 @@ const String languageTranslation = 'languageTranslation';
 const String translateSentencesFromOneIndianLanguageToAnother =
     'translateSentencesFromOneIndianLanguageToAnother';
 const String bhashaverseChatBot = 'bhashaverseChatBot';
+const String bhashiniChatBot = 'bhashiniChatBot';
 
 const String selectVoiceAssistant = 'selectVoiceAssistant';
 const String youWillHearTheTranslationText = 'youWillHearTheTranslationText';

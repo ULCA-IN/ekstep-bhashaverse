@@ -19,6 +19,7 @@ final Map<String, String> en = {
   translateSentencesFromOneIndianLanguageToAnother:
       'Translate sentences from one Indian language to another',
   bhashaverseChatBot: 'Bhashaverse Chat bot',
+  bhashiniChatBot: 'Bhashini Chat bot',
   selectVoiceAssistant: 'Select Voice Assistant Avatar',
   youWillHearTheTranslationText:
       'You will hear the translation in the voice of the avatar you selected. You can always change avatar from settings.',

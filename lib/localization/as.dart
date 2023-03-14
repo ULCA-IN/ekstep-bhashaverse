@@ -70,4 +70,13 @@ final Map<String, String> as = {
   maleVoiceAssistantNotAvailable:
       'পুৰুষ ধ্বনি সহায়ক উপলব্ধ নাই, মহিলা ধ্বনি সহায়ক ব্যৱহাৰ কৰা হৈছে',
   errorNoTextInClipboard: 'ক্লিপব\'ৰ্ডত কোনো পাঠ উপলব্ধ নাই',
+  s2sStreaming: 'এছটুএছ ষ্ট্ৰিমিং',
+  connecting: 'সংযোগ হৈ আছে',
+  somethingWentWrong: 'কিবা ভুল হৈ গ\'ল',
+  tapAndHoldForRecording:
+      'অনুগ্ৰহ কৰি ৰেকৰ্ডিংৰ বাবে মাইকটো টে\'প কৰক আৰু ধৰি ৰাখক',
+  cannotPlayAudioAtTheMoment: 'বৰ্তমান অডিঅ\'টো বজাব পৰা নাযাব',
+  responseNotReceived: 'ত্ৰুটি: সঁহাৰি পোৱা নাই',
+  translationNotPossible: 'এই মুহূৰ্তত অনুবাদ সম্ভৱ নহয়',
+  bhashiniTitle: 'ভাষিণী',
 };

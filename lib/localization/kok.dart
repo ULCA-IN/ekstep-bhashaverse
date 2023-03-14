@@ -64,4 +64,12 @@ final Map<String, String> kok = {
   maleVoiceAssistantNotAvailable:
       'दादलो आवाज सहाय्यक उपलब्ध ना, बायल आवाज सहाय्यकाच्या आवाजांतल्यान आयकात',
   errorNoTextInClipboard: 'क्लिपबोर्डांत टेक्स्ट उपलब्ध ना',
+  s2sStreaming: 'एस टू एस स्ट्रिमींग',
+  connecting: 'कनेक्टींग',
+  somethingWentWrong: 'कितें तरी चुकलें',
+  tapAndHoldForRecording: 'रिकोर्डींगा खातीर टॅप करात आनी मायक होल्ड करात',
+  cannotPlayAudioAtTheMoment: 'सद्या ऑडियो वाजोवंक शकना',
+  responseNotReceived: 'एर्ररःजाप मेळूंक ना',
+  translationNotPossible: 'सद्या अणकार शक्य ना',
+  bhashiniTitle: 'भाशिणी',
 };

@@ -67,4 +67,12 @@ final Map<String, String> te = {
   maleVoiceAssistantNotAvailable:
       'మగ వాయిస్ అసిస్టెంట్ లభ్యముగా లేదు, ఆడ వాయిస్ అసిస్టెంట్ తో వినిపించబడుతోంది',
   errorNoTextInClipboard: 'క్లిప్ బోర్డ్ లో టెక్స్ట్ లభ్యముగా లేదు',
+  s2sStreaming: 'S2S స్ట్రీమింగ్',
+  connecting: 'అనుసంధానిస్తోంది...',
+  somethingWentWrong: 'ఎదో పొరపాటు జరిగింది',
+  tapAndHoldForRecording: 'రికార్డు చేయటానికి దయచేసి మైక్‌ను నొక్కి పట్టుకోండి',
+  cannotPlayAudioAtTheMoment: 'ప్రస్తుత సమయంలో ధ్వని వినిపించటం వీలుపడదు',
+  responseNotReceived: 'పొరపాటు: ప్రతిస్పందన లభించలేదు',
+  translationNotPossible: 'ప్రస్తుత సమయంలో  అనువాదం వీలు పడదు ',
+  bhashiniTitle: 'భాషిణి',
 };

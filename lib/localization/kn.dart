@@ -73,4 +73,12 @@ final Map<String, String> kn = {
   maleVoiceAssistantNotAvailable:
       'ಪುರುಷ ವಾಯ್ಸ್‌ ಅಸಿಸ್ಟಂಟ್‌ ಲಭ್ಯವಿಲ್ಲ, ಮಹಿಳಾ ವಾಯ್ಸ್‌ ಅಸಿಸ್ಟಂಟ್‌ಅನ್ನು ಕಾರ್ಯಗತಗೊಳಿಸಲಾಗಿದೆ',
   errorNoTextInClipboard: 'ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ ಯಾವುದೇ ಟೆಕ್ಸ್ಟ್ ಲಭ್ಯವಿಲ್ಲ',
+  s2sStreaming: 's2s ಸ್ಟ್ರೀಮಿಂಗ್',
+  connecting: 'ಸಂಪರ್ಕಿಸಲಾಗುತ್ತಿದೆ',
+  somethingWentWrong: 'ಏನೋ ಸಮಸ್ಯೆ ಆಗಿದೆ',
+  tapAndHoldForRecording: 'ರೆಕಾರ್ಡ್ ಮಾಡಲು ಒತ್ತಿ ಹಿಡಿಯಿರಿ',
+  cannotPlayAudioAtTheMoment: 'ಈ ಸಮಯದಲ್ಲಿ ಧ್ವನಿಯನ್ನು ಪ್ರಸಾರ ಮಾಡಲು ಆಗುತ್ತಿಲ್ಲ',
+  responseNotReceived: 'ಪ್ರತಿಸ್ಪಂದನೆ ಲಭಿಸಿಲ್ಲ',
+  translationNotPossible: 'ಅನುವಾದ ಸಾಧ್ಯವಿಲ್ಲ',
+  bhashiniTitle: 'ಭಾಷಿಣಿ',
 };
