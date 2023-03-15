@@ -1,7 +1,5 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
-import 'package:get/get.dart';
-
 import '../../enums/language_enum.dart';
 import 'language_map_translated.dart';
 
@@ -246,11 +244,11 @@ class APIConstants {
         kLanguageCode: languagesCodeList[12],
         kEnglishName: 'Nepali'
       },
-      {
-        kNativeName: 'සිංහල',
-        kLanguageCode: languagesCodeList[13],
-        kEnglishName: 'Sinhala'
-      },
+      // {
+      //   kNativeName: 'සිංහල',
+      //   kLanguageCode: languagesCodeList[13],
+      //   kEnglishName: 'Sinhala'
+      // },
       {
         kNativeName: 'संस्कृत',
         kLanguageCode: languagesCodeList[14],
@@ -276,36 +274,36 @@ class APIConstants {
         kLanguageCode: languagesCodeList[18],
         kEnglishName: 'Malayalam'
       },
-      {
-        kNativeName: 'राजस्थानी',
-        kLanguageCode: languagesCodeList[19],
-        kEnglishName: 'Rajasthani'
-      },
-      {
-        kNativeName: 'Bodo',
-        kLanguageCode: languagesCodeList[20],
-        kEnglishName: 'Bodo'
-      },
+      // {
+      //   kNativeName: 'राजस्थानी',
+      //   kLanguageCode: languagesCodeList[19],
+      //   kEnglishName: 'Rajasthani'
+      // },
+      // {
+      //   kNativeName: 'Bodo',
+      //   kLanguageCode: languagesCodeList[20],
+      //   kEnglishName: 'Bodo'
+      // },
       {
         kNativeName: 'মানিপুরি',
         kLanguageCode: languagesCodeList[21],
         kEnglishName: 'Manipuri'
       },
-      {
-        kNativeName: 'كٲشُر',
-        kLanguageCode: languagesCodeList[22],
-        kEnglishName: 'Kashmiri'
-      },
+      // {
+      //   kNativeName: 'كٲشُر',
+      //   kLanguageCode: languagesCodeList[22],
+      //   kEnglishName: 'Kashmiri'
+      // },
       {
         kNativeName: 'कोंकणी',
         kLanguageCode: languagesCodeList[23],
         kEnglishName: 'Konkani'
       },
-      {
-        kNativeName: 'सिंधी',
-        kLanguageCode: languagesCodeList[24],
-        kEnglishName: 'Sindhi'
-      },
+      // {
+      //   kNativeName: 'सिंधी',
+      //   kLanguageCode: languagesCodeList[24],
+      //   kEnglishName: 'Sindhi'
+      // },
       {
         kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
         kLanguageCode: languagesCodeList[25],
