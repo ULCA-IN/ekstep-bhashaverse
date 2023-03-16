@@ -4,14 +4,10 @@ import '../../enums/language_enum.dart';
 import 'language_map_translated.dart';
 
 class APIConstants {
-  static const String DHRUVA_DEV_API_URL =
-      'https://dev-auth.ulcacontrib.org/ulca/apis/v0';
-  static const String DHRUVA_API_STREAMING_URL =
+  static const String ULCA_CONFIG_API_URL =
+      'https://meity-auth.ulcacontrib.org/ulca/apis/v0';
+  static const String ULCA_CONFIG_API_STREAMING_URL =
       'wss://api.dhruva.ai4bharat.org';
-  static const String ASR_CALLBACK_AZURE_URL =
-      'https://meity-dev-asr.ulcacontrib.org/asr/v1/recognize';
-  static const String ASR_CALLBACK_CDAC_URL =
-      'https://cdac.ulcacontrib.org/asr/v1/recognize';
   static const String STS_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 

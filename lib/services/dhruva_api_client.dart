@@ -23,7 +23,7 @@ class DHRUVAAPIClient {
 
   static DHRUVAAPIClient getAPIClientInstance() {
     var options = BaseOptions(
-      baseUrl: APIConstants.DHRUVA_DEV_API_URL,
+      baseUrl: APIConstants.ULCA_CONFIG_API_URL,
       connectTimeout: 80000,
       receiveTimeout: 50000,
     );
