@@ -147,7 +147,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                     subtitle: transLiterationWillInitiateWord.tr,
                   ),
                   SizedBox(height: 24.toHeight),
-                  Obx(
+                  // TODO: uncomment when Streaming service work
+                  /*   Obx(
                     () => _expandableSettingHeading(
                       height: _settingsController.isAdvanceMenuOpened.value
                           ? 130.toHeight
@@ -214,8 +215,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                           ],
                         ),
                       ),
-                    ),
-                  ),
+                    ), 
+                  ),*/
                 ],
               ),
             ),
