@@ -399,23 +399,26 @@ class BottomNavTranslationController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
-        sourceLanTextController.text = taskResponse.pipelineResponse
-                ?.firstWhere((element) => element.taskType == 'translation')
-                .output
-                ?.first
-                .source ??
-            '';
-        if (sourceLanTextController.text.isEmpty) {
-          isLoading.value = false;
-          showDefaultSnackbar(message: responseNotReceived.tr);
-          return;
+        if (isRecorded) {
+          sourceLanTextController.text = taskResponse.pipelineResponse
+                  ?.firstWhere((element) => element.taskType == 'asr')
+                  .output
+                  ?.first
+                  .source ??
+              '';
         }
-        targetLangTextController.text = taskResponse.pipelineResponse
+        String outputTargetText = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
                 ?.first
                 .target ??
             '';
+        if (outputTargetText.isEmpty) {
+          isLoading.value = false;
+          showDefaultSnackbar(message: responseNotReceived.tr);
+          return;
+        }
+        targetLangTextController.text = outputTargetText;
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio[0]['audioContent'];

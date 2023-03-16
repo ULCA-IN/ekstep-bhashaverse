@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../localization/localization_keys.dart';
@@ -27,17 +26,8 @@ class TranslationAppAPIClient {
       receiveTimeout: 50000,
     );
 
-    translationAppAPIClient = translationAppAPIClient ??
-        TranslationAppAPIClient(Dio(options)
-          ..interceptors.addAll(
-            [
-              if (kDebugMode)
-                LogInterceptor(
-                  responseBody: true,
-                  requestBody: true,
-                ),
-            ],
-          ));
+    translationAppAPIClient =
+        translationAppAPIClient ?? TranslationAppAPIClient(Dio(options));
     return translationAppAPIClient!;
   }
 
@@ -51,10 +41,7 @@ class TranslationAppAPIClient {
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
-    } on Exception catch (error) {
-      if (kDebugMode) {
-        print('Other Exception::: ${error.toString()}');
-      }
+    } on Exception catch (_) {
       return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
@@ -76,10 +63,7 @@ class TranslationAppAPIClient {
       } else {
         return null;
       }
-    } on Exception catch (error) {
-      if (kDebugMode) {
-        print('Other Exception::: ${error.toString()}');
-      }
+    } on Exception catch (_) {
       return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
