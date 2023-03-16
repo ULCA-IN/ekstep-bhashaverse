@@ -22,7 +22,7 @@ class SocketIOClient extends GetxService {
   void socketConnect() {
     hasError.value = false;
     _socket = io(
-        APIConstants.DHRUVA_API_STREAMING_URL,
+        APIConstants.ULCA_CONFIG_API_STREAMING_URL,
         OptionBuilder()
             .setTransports(['websocket', 'polling'])
             .disableAutoConnect()
