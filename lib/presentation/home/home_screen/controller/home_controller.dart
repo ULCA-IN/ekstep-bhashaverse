@@ -23,7 +23,22 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  void getTransliterationModels() async {
+  Future<void> getAvailableLanguagesInTask() async {
+    var languageRequestResponse = await _dhruvaapiClient.getTaskSequence(
+        requestPayload: APIConstants.payloadForLanguageConfig);
+    languageRequestResponse.when(
+      success: ((taskSequenceResponse) {
+        _languageModelController.setTaskSequenceResponse(taskSequenceResponse);
+        _languageModelController.populateLanguagePairs();
+      }),
+      failure: (error) {
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+      },
+    );
+  }
+
+  Future<void> getTransliterationModels() async {
     Map<String, dynamic> taskPayloads = {
       "task": APIConstants.TYPES_OF_MODELS_LIST[3],
       "sourceLanguage": "",
@@ -39,28 +54,8 @@ class HomeController extends GetxController {
       success: ((data) {
         _languageModelController.calcAvailableTransliterationModels(
             transliterationModel: data);
-        isLoading.value = false;
       }),
       failure: (error) {
-        isLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
-      },
-    );
-  }
-
-  void getAvailableLanguagesInTask() async {
-    isLoading.value = true;
-    var languageRequestResponse = await _dhruvaapiClient.getTaskSequence(
-        requestPayload: APIConstants.payloadForLanguageConfig);
-    languageRequestResponse.when(
-      success: ((taskSequenceResponse) {
-        _languageModelController.setTaskSequenceResponse(taskSequenceResponse);
-        _languageModelController.populateLanguagePairs();
-        isLoading.value = false;
-      }),
-      failure: (error) {
-        isLoading.value = false;
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
       },
