@@ -91,12 +91,13 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                       ),
                     ],
                   ),
-                  SizedBox(height: 48.toHeight),
+                  // TODO: uncoment when dark theme added
+                  /*  SizedBox(height: 48.toHeight),
                   _settingHeading(
                     action: _popupMenuBuilder(),
                     title: appTheme.tr,
                     subtitle: appInterfaceWillChange.tr,
-                  ),
+                  ), */
                   SizedBox(height: 24.toHeight),
                   Obx(
                     () => InkWell(
@@ -147,7 +148,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                     subtitle: transLiterationWillInitiateWord.tr,
                   ),
                   SizedBox(height: 24.toHeight),
-                  Obx(
+                  // TODO: uncomment when Streaming service work
+                  /*   Obx(
                     () => _expandableSettingHeading(
                       height: _settingsController.isAdvanceMenuOpened.value
                           ? 130.toHeight
@@ -214,8 +216,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                           ],
                         ),
                       ),
-                    ),
-                  ),
+                    ), 
+                  ),*/
                 ],
               ),
             ),
