@@ -15,6 +15,7 @@ const keyboardHideDuration = Duration(milliseconds: 200);
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
+const micBeepSound = 'assets/audio/mic_tap_sound.wav';
 
 // Select App Language Screen
 const imgEnglish = 'assets/images/app_language_img/img_english.png';
