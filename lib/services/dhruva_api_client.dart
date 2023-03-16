@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../localization/localization_keys.dart';
@@ -30,18 +27,10 @@ class DHRUVAAPIClient {
       connectTimeout: 80000,
       receiveTimeout: 50000,
     );
-
     translationAppAPIClient = translationAppAPIClient ??
         DHRUVAAPIClient(Dio(options)
           ..interceptors.addAll(
-            [
-              AuthKeyHeaderInterceptor(),
-              if (kDebugMode)
-                LogInterceptor(
-                  responseBody: true,
-                  requestBody: true,
-                ),
-            ],
+            [AuthKeyHeaderInterceptor()],
           ));
     return translationAppAPIClient!;
   }
@@ -60,10 +49,7 @@ class DHRUVAAPIClient {
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
-    } on Exception catch (error) {
-      if (kDebugMode) {
-        print('Other Exception::: ${error.toString()}');
-      }
+    } on Exception catch (_) {
       return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
@@ -90,13 +76,9 @@ class DHRUVAAPIClient {
       }
       return Result.success(RESTComputeResponseModel.fromJson(response.data));
     } on DioError catch (error) {
-      print(json.encode(error.requestOptions.data));
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
-    } on Exception catch (error) {
-      if (kDebugMode) {
-        print('Other Exception::: ${error.toString()}');
-      }
+    } on Exception catch (_) {
       return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
