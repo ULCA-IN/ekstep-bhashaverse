@@ -91,12 +91,13 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                       ),
                     ],
                   ),
-                  SizedBox(height: 48.toHeight),
-                  _settingHeading(
-                    action: _popupMenuBuilder(),
-                    title: appTheme.tr,
-                    subtitle: appInterfaceWillChange.tr,
-                  ),
+                  // TODO: uncoment when
+                  // SizedBox(height: 48.toHeight),
+                  // _settingHeading(
+                  //   action: _popupMenuBuilder(),
+                  //   title: appTheme.tr,
+                  //   subtitle: appInterfaceWillChange.tr,
+                  // ),
                   SizedBox(height: 24.toHeight),
                   Obx(
                     () => InkWell(
