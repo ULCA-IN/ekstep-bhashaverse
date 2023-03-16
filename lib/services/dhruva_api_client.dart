@@ -61,6 +61,8 @@ class DHRUVAAPIClient {
     required computePayload,
   }) async {
     try {
+      // using new instance of Dio as both baseUrl and
+      // header wil dynamic in this API call
       var response = await Dio(
           BaseOptions(connectTimeout: 80000, receiveTimeout: 50000, headers: {
         'Content-Type': 'application/json',
