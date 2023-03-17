@@ -51,8 +51,9 @@ class BottomNavTranslationController extends GetxController {
   RxBool isKeyboardVisible = false.obs;
   String sourcePath = '';
   String targetPath = '';
-  RxInt maxDuration = 0.obs;
-  RxInt currentDuration = 0.obs;
+  RxInt maxDuration = 0.obs,
+      currentDuration = 0.obs,
+      sourceTextCharLimit = 0.obs;
   File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
   String? transliterationModelToUse = '';
