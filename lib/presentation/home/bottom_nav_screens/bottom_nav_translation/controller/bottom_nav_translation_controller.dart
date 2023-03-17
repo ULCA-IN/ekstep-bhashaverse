@@ -212,8 +212,8 @@ class BottomNavTranslationController extends GetxController {
       //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
-        vibrateDevice();
         await playBeepSound();
+        await vibrateDevice();
         // wait until beep sound finished
         await Future.delayed(const Duration(milliseconds: 600));
 
@@ -297,8 +297,8 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    playBeepSound();
-    vibrateDevice();
+    await playBeepSound();
+    await vibrateDevice();
 
     if (DateTime.now().difference(recordingStartTime ?? DateTime.now()) <
             tapAndHoldMinDuration &&
@@ -614,12 +614,11 @@ class BottomNavTranslationController extends GetxController {
 
   Future<void> vibrateDevice() async {
     await Vibration.cancel();
-
     if (await Vibration.hasVibrator() ?? false) {
       if (await Vibration.hasCustomVibrationsSupport() ?? false) {
-        Vibration.vibrate(duration: 300);
+        await Vibration.vibrate(duration: 130);
       } else {
-        Vibration.vibrate();
+        await Vibration.vibrate();
       }
     }
   }
