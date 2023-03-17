@@ -147,7 +147,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         _bottomNavTranslationController
                                             .controller,
                                   )
-                                : _buildTranslateButton(),
+                                : _buildCharCountAndTranslateButton(),
                           ),
                         ],
                       ),
@@ -303,6 +303,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
       expands: true,
+      maxLength: asrTextCharMaxLength,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _bottomNavTranslationController.isTranslateCompleted.value
@@ -319,8 +320,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         border: InputBorder.none,
         isDense: true,
         contentPadding: EdgeInsets.zero,
+        counterText: '',
       ),
       onChanged: (newText) {
+        _bottomNavTranslationController.sourceTextCharLimit.value =
+            newText.length;
         _bottomNavTranslationController.isTranslateCompleted.value = false;
         _bottomNavTranslationController.deleteAudioFiles();
         _bottomNavTranslationController.targetLangTextController.clear();
@@ -351,10 +355,21 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     );
   }
 
-  Widget _buildTranslateButton() {
+  Widget _buildCharCountAndTranslateButton() {
+    int sourceCharLength =
+        _bottomNavTranslationController.sourceTextCharLimit.value;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Text(
+          '$sourceCharLength/$asrTextCharMaxLength',
+          style: AppTextStyle().grey14Arsenic.copyWith(
+              color: sourceCharLength >= asrTextCharMaxLength
+                  ? flushOrangeColor
+                  : sourceCharLength >= asrTextCharMaxLength - 20
+                      ? flushOrangeColor.withOpacity(0.4)
+                      : manateeGray),
+        ),
         CustomOutlineButton(
           title: kTranslate.tr,
           isHighlighted: true,
