@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:vibration/vibration.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
@@ -71,6 +72,8 @@ class BottomNavTranslationController extends GetxController {
 
   late final Box _hiveDBInstance;
 
+  final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
+
   late PlayerController controller;
 
   StreamSubscription<Uint8List>? micStreamSubscription;
@@ -114,6 +117,15 @@ class BottomNavTranslationController extends GetxController {
         default:
       }
     });
+
+    stopWatchTimer.rawTime.listen((event) {
+      if (micButtonStatus.value == MicButtonStatus.pressed &&
+          event >= recordingMaxTimeLimit) {
+        micButtonStatus.value = MicButtonStatus.released;
+        stopVoiceRecordingAndGetResult();
+      }
+    });
+
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
     });
@@ -144,6 +156,7 @@ class BottomNavTranslationController extends GetxController {
     _socketIOClient.disconnect();
     sourceLanTextController.dispose();
     targetLangTextController.dispose();
+    await stopWatchTimer.dispose();
     disposePlayer();
     deleteAudioFiles();
     super.onClose();
@@ -317,6 +330,7 @@ class BottomNavTranslationController extends GetxController {
             });
           });
         } else {
+          stopWatchTimer.onStartTimer();
           await _voiceRecorder.startRecordingVoice();
         }
       }
@@ -329,11 +343,16 @@ class BottomNavTranslationController extends GetxController {
     await playBeepSound();
     await vibrateDevice();
 
-    if (DateTime.now().difference(recordingStartTime ?? DateTime.now()) <
-            tapAndHoldMinDuration &&
+    stopWatchTimer.onStopTimer();
+    int timeTakenForLastRecording = stopWatchTimer.rawTime.value;
+    stopWatchTimer.onResetTimer();
+
+    if (timeTakenForLastRecording < tapAndHoldMinDuration &&
         isMicPermissionGranted) {
       showDefaultSnackbar(message: tapAndHoldForRecording.tr);
-      if (!_hiveDBInstance.get(isStreamingPreferred)) return;
+      if (!_hiveDBInstance.get(isStreamingPreferred)) {
+        return;
+      }
     }
 
     recordingStartTime = null;

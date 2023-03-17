@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
@@ -226,74 +227,100 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   }
 
   Widget _buildTransliterationHints() {
-    return Obx(() => _bottomNavTranslationController.isKeyboardVisible.value
-        ? SizedBox(
-            height: 85.toHeight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Visibility(
-                  visible: !_bottomNavTranslationController
-                          .isScrolledTransliterationHints.value &&
-                      _bottomNavTranslationController
-                          .transliterationWordHints.isNotEmpty,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.arrow_forward_outlined,
-                      color: Colors.grey.shade400,
-                      size: 22.toHeight,
+    return Obx(
+      () => _bottomNavTranslationController.isKeyboardVisible.value
+          ? SizedBox(
+              height: 85.toHeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Visibility(
+                    visible: !_bottomNavTranslationController
+                            .isScrolledTransliterationHints.value &&
+                        _bottomNavTranslationController
+                            .transliterationWordHints.isNotEmpty,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Icon(
+                        Icons.arrow_forward_outlined,
+                        color: Colors.grey.shade400,
+                        size: 22.toHeight,
+                      ),
                     ),
                   ),
-                ),
-                SingleChildScrollView(
-                  controller: _bottomNavTranslationController
-                      .transliterationHintsScrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      ..._bottomNavTranslationController
-                          .transliterationWordHints
-                          .map((hintText) => GestureDetector(
-                                onTap: () {
-                                  replaceTextWithTransliterationHint(hintText);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: lilyWhite,
-                                  ),
-                                  margin: AppEdgeInsets.instance.all(4),
-                                  padding: AppEdgeInsets.instance
-                                      .symmetric(vertical: 4, horizontal: 6),
-                                  alignment: Alignment.center,
+                  SingleChildScrollView(
+                    controller: _bottomNavTranslationController
+                        .transliterationHintsScrollController,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        ..._bottomNavTranslationController
+                            .transliterationWordHints
+                            .map((hintText) => GestureDetector(
+                                  onTap: () {
+                                    replaceTextWithTransliterationHint(
+                                        hintText);
+                                  },
                                   child: Container(
-                                    constraints: BoxConstraints(
-                                      minWidth:
-                                          (ScreenUtil.screenWidth / 6).toWidth,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: lilyWhite,
                                     ),
-                                    child: Text(
-                                      hintText,
-                                      style: AppTextStyle()
-                                          .regular18DolphinGrey
-                                          .copyWith(
-                                            color: Colors.black,
-                                          ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
+                                    margin: AppEdgeInsets.instance.all(4),
+                                    padding: AppEdgeInsets.instance
+                                        .symmetric(vertical: 4, horizontal: 6),
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      constraints: BoxConstraints(
+                                        minWidth: (ScreenUtil.screenWidth / 6)
+                                            .toWidth,
+                                      ),
+                                      child: Text(
+                                        hintText,
+                                        style: AppTextStyle()
+                                            .regular18DolphinGrey
+                                            .copyWith(
+                                              color: Colors.black,
+                                            ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )),
-                    ],
+                                )),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          )
-        : SizedBox.shrink());
+                ],
+              ),
+            )
+          //  TODO: Update below UI as per discussion
+          : _bottomNavTranslationController.micButtonStatus.value ==
+                  MicButtonStatus.pressed
+              ? Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 20),
+                  child: StreamBuilder<int>(
+                    stream:
+                        _bottomNavTranslationController.stopWatchTimer.rawTime,
+                    initialData: 0,
+                    builder: (context, snap) {
+                      final value = snap.data;
+                      final displayTime = StopWatchTimer.getDisplayTime(
+                          recordingMaxTimeLimit - (value ?? 0),
+                          hours: false,
+                          minute: false,
+                          milliSecond: true);
+                      return Text(
+                        '-$displayTime',
+                        style: AppTextStyle().regular18balticSea,
+                      );
+                    },
+                  ),
+                )
+              : SizedBox(height: 8.toHeight),
+    );
   }
 
   Widget _buildSourceLanguageInput() {
@@ -641,9 +668,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        _bottomNavTranslationController.micButtonStatus.value =
-            MicButtonStatus.released;
-        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        // can be false if recording limit reached
+        if (_bottomNavTranslationController.micButtonStatus.value ==
+            MicButtonStatus.pressed) {
+          _bottomNavTranslationController.micButtonStatus.value =
+              MicButtonStatus.released;
+          _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        }
       }
     } else if (startMicRecording) {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
