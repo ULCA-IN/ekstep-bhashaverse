@@ -14,6 +14,7 @@ const defaultAudioRecordingName = 'ASRAudio';
 const defaultTTSPlayName = 'TTSAudio';
 const tapAndHoldMinDuration = Duration(milliseconds: 600);
 const keyboardHideDuration = Duration(milliseconds: 200);
+const asrTextCharMaxLength = 500;
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
