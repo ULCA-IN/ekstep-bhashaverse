@@ -84,7 +84,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           Expanded(
             child: Column(
               children: [
-                Flexible(
+                Obx(
+                  () => _bottomNavTranslationController.isKeyboardVisible.value
+                      ? const SizedBox.shrink()
+                      : _buildSourceTargetLangButtons(),
+                ),
+                SizedBox(height: 20.toHeight),
+                Expanded(
                   child: AnimatedContainer(
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -148,7 +154,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                     ),
                   ),
                 ),
-                Flexible(
+                Expanded(
                     child: AnimatedContainer(
                         decoration: BoxDecoration(
                             color: Colors.white,
@@ -204,13 +210,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               ],
             ),
           ),
-          SizedBox(height: 20.toHeight),
+          SizedBox(
+              height: _bottomNavTranslationController.isKeyboardVisible.value
+                  ? 0
+                  : 8.toHeight),
           _buildTransliterationHints(),
-          Obx(
-            () => _bottomNavTranslationController.isKeyboardVisible.value
-                ? const SizedBox.shrink()
-                : _buildSourceTargetLangButtons(),
-          ),
           Obx(
             () => _bottomNavTranslationController.isKeyboardVisible.value
                 ? const SizedBox.shrink()
@@ -289,9 +293,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
               ],
             ),
           )
-        : SizedBox(
-            height: 8.toHeight,
-          ));
+        : SizedBox.shrink());
   }
 
   Widget _buildSourceLanguageInput() {
@@ -300,7 +302,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       focusNode: _sourceLangFocusNode,
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
-      minLines: 5,
+      expands: true,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _bottomNavTranslationController.isTranslateCompleted.value
@@ -337,9 +339,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       controller: _bottomNavTranslationController.targetLangTextController,
       focusNode: _transLangFocusNode,
       maxLines: null,
-      minLines: 5,
+      expands: true,
       style: AppTextStyle().regular18balticSea,
-      readOnly: !_bottomNavTranslationController.isTranslateCompleted.value,
+      readOnly: true,
       textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
         border: InputBorder.none,
