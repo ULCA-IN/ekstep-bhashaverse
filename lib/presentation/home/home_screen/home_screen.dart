@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _homeController.getAvailableLanguagesInTask().then((_) {
       _homeController.getTransliterationModels().then((_) {
         _homeController.isLoading.value = false;
+        BottomNavTranslationController translationController = Get.find();
+        translationController.getSourceTargetLangFromDB();
       });
     });
   }
