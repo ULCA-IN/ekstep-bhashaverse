@@ -1,3 +1,4 @@
+import 'package:bhashaverse/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -5,7 +6,6 @@ import 'package:hive/hive.dart';
 import '../../common/elevated_button.dart';
 import '../../common/language_selection_widget.dart';
 import '../../enums/language_enum.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
@@ -64,12 +64,12 @@ class _AppLanguageState extends State<AppLanguage> {
               children: [
                 SizedBox(height: 16.toHeight),
                 Text(
-                  selectAppLanguage.tr,
+                  localization(context).selectAppLanguage,
                   style: AppTextStyle().semibold24BalticSea,
                 ),
                 SizedBox(height: 8.toHeight),
                 Text(
-                  youCanAlwaysChange.tr,
+                  localization(context).youCanAlwaysChange,
                   style: AppTextStyle()
                       .light16BalticSea
                       .copyWith(color: dolphinGray),
@@ -104,6 +104,12 @@ class _AppLanguageState extends State<AppLanguage> {
                               onItemTap: () {
                                 _appLanguageController
                                     .setSelectedLanguageIndex(index);
+                                MyApp.setLocale(
+                                    context,
+                                    Locale(
+                                        _appLanguageController
+                                            .getSelectedLanguageCode(),
+                                        'IN'));
                               },
                               index: index,
                               selectedIndex: _appLanguageController
@@ -117,7 +123,7 @@ class _AppLanguageState extends State<AppLanguage> {
                 ),
                 SizedBox(height: 16.toHeight),
                 elevatedButton(
-                  buttonText: continueText.tr,
+                  buttonText: localization(context).continueText,
                   textStyle: AppTextStyle()
                       .semibold24BalticSea
                       .copyWith(fontSize: 18.toFont),
@@ -135,8 +141,11 @@ class _AppLanguageState extends State<AppLanguage> {
                                 .length) {
                       _languageSearchController.clear();
                       _appLanguageController.saveSelectedLocaleInDB();
-                      Get.updateLocale(Locale(
-                          _appLanguageController.getSelectedLanguageCode()));
+                      MyApp.setLocale(
+                          context,
+                          Locale(
+                              _appLanguageController.getSelectedLanguageCode(),
+                              'IN'));
                       if (_hiveDBInstance.get(introShownAlreadyKey,
                           defaultValue: false)) {
                         Get.back();
@@ -145,7 +154,8 @@ class _AppLanguageState extends State<AppLanguage> {
                       }
                     } else {
                       showDefaultSnackbar(
-                          message: errorPleaseSelectLanguage.tr);
+                          message:
+                              localization(context).errorPleaseSelectLanguage);
                     }
                   },
                 ),
@@ -176,7 +186,7 @@ class _AppLanguageState extends State<AppLanguage> {
             Icons.search,
             color: dolphinGray,
           ),
-          hintText: searchLanguage.tr,
+          hintText: localization(context).searchLanguage,
           hintStyle: AppTextStyle()
               .light16BalticSea
               .copyWith(fontSize: 18.toFont, color: manateeGray),
