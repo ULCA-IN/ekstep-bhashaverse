@@ -401,6 +401,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             if (selectedSourceLangCode != null) {
               _bottomNavTranslationController.selectedSourceLanguageCode.value =
                   selectedSourceLangCode;
+              _hiveDBInstance.put(
+                  preferredSourceLanguage, selectedSourceLangCode);
               String selectedTargetLangCode = _bottomNavTranslationController
                   .selectedTargetLanguageCode.value;
               if (selectedTargetLangCode.isNotEmpty) {
@@ -479,6 +481,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             if (selectedTargetLangCode != null) {
               _bottomNavTranslationController.selectedTargetLanguageCode.value =
                   selectedTargetLangCode;
+              _hiveDBInstance.put(
+                  preferredTargetLanguage, selectedTargetLangCode);
             }
           },
           child: Container(
