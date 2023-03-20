@@ -5,10 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'enums/gender_enum.dart';
-import 'localization/app_localization.dart';
-import 'localization/localization_keys.dart';
 import 'presentation/splash_screen/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants/app_constants.dart';
@@ -29,8 +28,26 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  static void setLocale(BuildContext context, Locale newLocale) {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state?.setLocale(newLocale);
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  Locale? _locale;
+
+  setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +58,9 @@ class MyApp extends StatelessWidget {
         defaultValue: Get.deviceLocale?.languageCode);
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
+      // handle when first time app launch
+    } else {
+      MyApp.setLocale(context, Locale(appLocale, 'IN'));
     }
 
     // Voice assistant preference
@@ -59,11 +79,11 @@ class MyApp extends StatelessWidget {
     }
 
     return GetMaterialApp(
-      onGenerateTitle: (context) => bhashiniTitle.tr,
+      onGenerateTitle: (context) => 'Bhashini',
       debugShowCheckedModeBanner: false,
-      translations: AppLocalization(),
-      locale: Locale(appLocale),
-      fallbackLocale: const Locale('en', 'US'),
+      locale: _locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(
         primaryColor: primaryColor,
         textTheme: GoogleFonts.latoTextTheme(),
