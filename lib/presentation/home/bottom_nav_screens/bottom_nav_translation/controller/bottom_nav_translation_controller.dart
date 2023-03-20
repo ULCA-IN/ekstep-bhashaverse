@@ -148,6 +148,31 @@ class BottomNavTranslationController extends GetxController {
     super.onClose();
   }
 
+  void getSourceTargetLangFromDB() {
+    String? _selectedSourceLanguage =
+        _hiveDBInstance.get(preferredSourceLanguage);
+
+    if (_selectedSourceLanguage == null || _selectedSourceLanguage.isEmpty) {
+      _selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
+    }
+
+    if (_languageModelController.sourceTargetLanguageMap.keys
+        .toList()
+        .contains(_selectedSourceLanguage)) {
+      selectedSourceLanguageCode.value = _selectedSourceLanguage ?? '';
+    }
+
+    String? _selectedTargetLanguage =
+        _hiveDBInstance.get(preferredTargetLanguage);
+    if (_selectedTargetLanguage != null &&
+        _selectedTargetLanguage.isNotEmpty &&
+        _languageModelController.sourceTargetLanguageMap.keys
+            .toList()
+            .contains(_selectedTargetLanguage)) {
+      selectedTargetLanguageCode.value = _selectedTargetLanguage;
+    }
+  }
+
   setBeepSoundFile() async {
     appDirectory = await getTemporaryDirectory();
     beepSoundPath = "${appDirectory.path}/mic_tap_sound.wav";
