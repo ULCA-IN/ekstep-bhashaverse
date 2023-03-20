@@ -46,6 +46,9 @@ name: bhashaverse
   auto_size_text: ^3.0.0
   vibration: ^1.7.6
   stop_watch_timer: ^2.0.0
+  flutter_localizations:
+    sdk: flutter
+  intl: any
 ```
 
 * Dev Dependencies:
