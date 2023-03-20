@@ -341,7 +341,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       maxLines: null,
       expands: true,
       style: AppTextStyle().regular18balticSea,
-      readOnly: false,
+      readOnly: true,
       textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
         border: InputBorder.none,
