@@ -1,5 +1,6 @@
 //common
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const hiveDBName = 'db_bhashini';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
@@ -81,3 +82,7 @@ const animationStaticWaveForRecording =
 const kLanguageList = 'language_list';
 const kIsSourceLanguage = 'is_source_language';
 const selectedLanguage = 'selectedLanguage';
+
+AppLocalizations localization(BuildContext context) {
+  return AppLocalizations.of(context)!;
+}
