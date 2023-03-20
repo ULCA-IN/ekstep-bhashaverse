@@ -6,10 +6,12 @@ import 'dart:typed_data';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vibration/vibration.dart';
 
 import '../../../../../common/controller/language_model_controller.dart';
 import '../../../../../models/task_sequence_response_model.dart';
@@ -59,6 +61,10 @@ class BottomNavTranslationController extends GetxController {
   late SocketIOClient _socketIOClient;
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
   DateTime? recordingStartTime;
+  String beepSoundPath = '';
+  late File beepSoundFile;
+  PlayerController _controller = PlayerController();
+  late Directory appDirectory;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -80,6 +86,7 @@ class BottomNavTranslationController extends GetxController {
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     controller = PlayerController();
+    setBeepSoundFile();
 
     controller.onCompletion.listen((event) {
       isPlayingSource.value = false;
@@ -141,6 +148,16 @@ class BottomNavTranslationController extends GetxController {
     super.onClose();
   }
 
+  setBeepSoundFile() async {
+    appDirectory = await getTemporaryDirectory();
+    beepSoundPath = "${appDirectory.path}/mic_tap_sound.wav";
+    beepSoundFile = File(beepSoundPath);
+    if (!await beepSoundFile.exists()) {
+      await beepSoundFile.writeAsBytes(
+          (await rootBundle.load(micBeepSound)).buffer.asUint8List());
+    }
+  }
+
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
       if (_languageModelController.sourceTargetLanguageMap.keys
@@ -195,6 +212,11 @@ class BottomNavTranslationController extends GetxController {
       //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
+        await playBeepSound();
+        await vibrateDevice();
+        // wait until beep sound finished
+        await Future.delayed(const Duration(milliseconds: 600));
+
         recordingStartTime = DateTime.now();
         if (_hiveDBInstance.get(isStreamingPreferred)) {
           connectToSocket();
@@ -275,6 +297,9 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
+    await playBeepSound();
+    await vibrateDevice();
+
     if (DateTime.now().difference(recordingStartTime ?? DateTime.now()) <
             tapAndHoldMinDuration &&
         isMicPermissionGranted) {
@@ -585,5 +610,28 @@ class BottomNavTranslationController extends GetxController {
       sqrValue = indValue * indValue;
     }
     return (sqrValue / value.length) * 1000;
+  }
+
+  Future<void> vibrateDevice() async {
+    await Vibration.cancel();
+    if (await Vibration.hasVibrator() ?? false) {
+      if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+        await Vibration.vibrate(duration: 130);
+      } else {
+        await Vibration.vibrate();
+      }
+    }
+  }
+
+  Future<void> playBeepSound() async {
+    if (_controller.playerState == PlayerState.playing ||
+        _controller.playerState == PlayerState.paused) {
+      await _controller.stopPlayer();
+    }
+    await _controller.preparePlayer(
+      path: beepSoundFile.path,
+      shouldExtractWaveform: false,
+    );
+    await _controller.startPlayer(finishMode: FinishMode.pause);
   }
 }

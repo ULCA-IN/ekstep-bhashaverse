@@ -44,6 +44,7 @@ name: bhashaverse
   mic_stream: ^0.6.4
   record: ^4.4.4
   auto_size_text: ^3.0.0
+  vibration: ^1.7.6
 ```
 
 * Dev Dependencies:
@@ -81,6 +82,7 @@ flutter_icons:
     - assets/images/onboarding_image/
     - assets/images/bottom_bar_icons/
     - assets/animation/lottie_animation/
+    - assets/audio/
 ```
 
 - Enter the terminal and execute following commands:
