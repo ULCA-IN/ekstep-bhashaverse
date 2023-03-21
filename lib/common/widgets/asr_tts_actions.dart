@@ -47,26 +47,27 @@ class ASRAndTTSActions extends StatelessWidget {
           visible: !_isPlayingAudio,
           child: Row(
             children: [
-              InkWell(
-                onTap: () {
-                  if (textToShare.isEmpty) {
-                    showDefaultSnackbar(message: noTextForShare.tr);
-                    return;
-                  } else {
-                    Share.share(textToShare);
-                  }
-                },
-                child: Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: SvgPicture.asset(
-                    iconShare,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
-                    color: textToShare.isNotEmpty ? brightGrey : americanSilver,
-                  ),
-                ),
-              ),
-              SizedBox(width: 12.toWidth),
+              // TODO: uncomment when sharing recording files enabled
+              // InkWell(
+              //   onTap: () {
+              //     if (textToShare.isEmpty) {
+              //       showDefaultSnackbar(message: noTextForShare.tr);
+              //       return;
+              //     } else {
+              //       Share.share(textToShare);
+              //     }
+              //   },
+              //   child: Padding(
+              //     padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+              //     child: SvgPicture.asset(
+              //       iconShare,
+              //       height: 24.toWidth,
+              //       width: 24.toWidth,
+              //       color: textToShare.isNotEmpty ? brightGrey : americanSilver,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(width: 12.toWidth),
               InkWell(
                 onTap: () async {
                   if (textToShare.isEmpty) {
