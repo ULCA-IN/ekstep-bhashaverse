@@ -271,9 +271,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       .symmetric(vertical: 4, horizontal: 6),
                                   alignment: Alignment.center,
                                   child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(4),
-                                      color: lilyWhite,
+                                    constraints: BoxConstraints(
+                                      minWidth:
+                                          (ScreenUtil.screenWidth / 6).toWidth,
                                     ),
                                     child: Text(
                                       hintText,
