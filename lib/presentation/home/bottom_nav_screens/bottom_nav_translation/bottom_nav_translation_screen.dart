@@ -149,7 +149,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         _bottomNavTranslationController
                                             .controller,
                                   )
-                                : _buildCharCountAndTranslateButton(),
+                                : _buildLimitCountAndTranslateButton(),
                           ),
                         ],
                       ),
@@ -357,9 +357,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     );
   }
 
-  Widget _buildCharCountAndTranslateButton() {
-    int sourceCharLength =
-        _bottomNavTranslationController.sourceTextCharLimit.value;
+  Widget _buildLimitCountAndTranslateButton() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -370,14 +368,14 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   AvatarGlow(
                     animate: true,
                     repeat: true,
-                    glowColor: Colors.red.shade700,
+                    glowColor: brickRed,
                     endRadius: 16,
                     shape: BoxShape.circle,
                     showTwoGlows: true,
                     curve: Curves.easeInOut,
                     child: Icon(
                       Icons.mic_none,
-                      color: Colors.red.shade400,
+                      color: frolyRed,
                     ),
                   ),
                   SizedBox(width: 4.toWidth),
@@ -402,22 +400,28 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   ? manateeGray
                                   : (recordingMaxTimeLimit - (value ?? 0)) >=
                                           2000
-                                      ? flushOrangeColor
-                                      : Colors.red.shade400),
+                                      ? frolyRed
+                                      : brickRed),
                         );
                       },
                     ),
                   ),
                 ],
               )
-            : Text(
-                '$sourceCharLength/$asrTextCharMaxLength',
-                style: AppTextStyle().grey14Arsenic.copyWith(
-                    color: sourceCharLength >= asrTextCharMaxLength
-                        ? Colors.red.shade400
-                        : sourceCharLength >= asrTextCharMaxLength - 20
-                            ? flushOrangeColor.withOpacity(0.4)
-                            : manateeGray),
+            : Obx(
+                () {
+                  int sourceCharLength =
+                      _bottomNavTranslationController.sourceTextCharLimit.value;
+                  return Text(
+                    '$sourceCharLength/$asrTextCharMaxLength',
+                    style: AppTextStyle().grey14Arsenic.copyWith(
+                        color: sourceCharLength >= asrTextCharMaxLength
+                            ? brickRed
+                            : sourceCharLength >= asrTextCharMaxLength - 20
+                                ? frolyRed
+                                : manateeGray),
+                  );
+                },
               ),
         CustomOutlineButton(
           title: kTranslate.tr,
