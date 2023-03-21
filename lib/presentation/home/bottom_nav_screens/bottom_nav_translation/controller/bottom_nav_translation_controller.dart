@@ -160,6 +160,9 @@ class BottomNavTranslationController extends GetxController {
         .toList()
         .contains(_selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = _selectedSourceLanguage ?? '';
+      if (isTransliterationEnabled()) {
+        setModelForTransliteration();
+      }
     }
 
     String? _selectedTargetLanguage =
