@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
@@ -147,7 +149,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         _bottomNavTranslationController
                                             .controller,
                                   )
-                                : _buildTranslateButton(),
+                                : _buildLimitCountAndTranslateButton(),
                           ),
                         ],
                       ),
@@ -303,6 +305,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
       expands: true,
+      maxLength: asrTextCharMaxLength,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _bottomNavTranslationController.isTranslateCompleted.value
@@ -319,8 +322,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         border: InputBorder.none,
         isDense: true,
         contentPadding: EdgeInsets.zero,
+        counterText: '',
       ),
       onChanged: (newText) {
+        _bottomNavTranslationController.sourceTextCharLimit.value =
+            newText.length;
         _bottomNavTranslationController.isTranslateCompleted.value = false;
         _bottomNavTranslationController.deleteAudioFiles();
         _bottomNavTranslationController.targetLangTextController.clear();
@@ -351,10 +357,72 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     );
   }
 
-  Widget _buildTranslateButton() {
+  Widget _buildLimitCountAndTranslateButton() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        _bottomNavTranslationController.micButtonStatus.value ==
+                MicButtonStatus.pressed
+            ? Row(
+                children: [
+                  AvatarGlow(
+                    animate: true,
+                    repeat: true,
+                    glowColor: brickRed,
+                    endRadius: 16,
+                    shape: BoxShape.circle,
+                    showTwoGlows: true,
+                    curve: Curves.easeInOut,
+                    child: Icon(
+                      Icons.mic_none,
+                      color: frolyRed,
+                    ),
+                  ),
+                  SizedBox(width: 4.toWidth),
+                  Padding(
+                    padding: AppEdgeInsets.instance.symmetric(vertical: 0),
+                    child: StreamBuilder<int>(
+                      stream: _bottomNavTranslationController
+                          .stopWatchTimer.rawTime,
+                      initialData: 0,
+                      builder: (context, snap) {
+                        final value = snap.data;
+                        final displayTime = StopWatchTimer.getDisplayTime(
+                            recordingMaxTimeLimit - (value ?? 0),
+                            hours: false,
+                            minute: false,
+                            milliSecond: true);
+                        return Text(
+                          '-$displayTime',
+                          style: AppTextStyle().grey14Arsenic.copyWith(
+                              color: (recordingMaxTimeLimit - (value ?? 0)) >=
+                                      5000
+                                  ? manateeGray
+                                  : (recordingMaxTimeLimit - (value ?? 0)) >=
+                                          2000
+                                      ? frolyRed
+                                      : brickRed),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              )
+            : Obx(
+                () {
+                  int sourceCharLength =
+                      _bottomNavTranslationController.sourceTextCharLimit.value;
+                  return Text(
+                    '$sourceCharLength/$asrTextCharMaxLength',
+                    style: AppTextStyle().grey14Arsenic.copyWith(
+                        color: sourceCharLength >= asrTextCharMaxLength
+                            ? brickRed
+                            : sourceCharLength >= asrTextCharMaxLength - 20
+                                ? frolyRed
+                                : manateeGray),
+                  );
+                },
+              ),
         CustomOutlineButton(
           title: kTranslate.tr,
           isHighlighted: true,
@@ -626,9 +694,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        _bottomNavTranslationController.micButtonStatus.value =
-            MicButtonStatus.released;
-        _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        // can be false if recording limit reached
+        if (_bottomNavTranslationController.micButtonStatus.value ==
+            MicButtonStatus.pressed) {
+          _bottomNavTranslationController.micButtonStatus.value =
+              MicButtonStatus.released;
+          _bottomNavTranslationController.stopVoiceRecordingAndGetResult();
+        }
       }
     } else if (startMicRecording) {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);

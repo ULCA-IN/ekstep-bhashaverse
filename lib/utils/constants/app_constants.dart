@@ -12,8 +12,10 @@ const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
 const defaultAudioRecordingName = 'ASRAudio';
 const defaultTTSPlayName = 'TTSAudio';
-const tapAndHoldMinDuration = Duration(milliseconds: 600);
+const tapAndHoldMinDuration = 600;
 const keyboardHideDuration = Duration(milliseconds: 200);
+const asrTextCharMaxLength = 500;
+const recordingMaxTimeLimit = 30000;
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';

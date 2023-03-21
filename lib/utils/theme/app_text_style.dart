@@ -19,7 +19,7 @@ class AppTextStyle {
 
   final grey14Arsenic = TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 12.toFont,
+    fontSize: 14.toFont,
     color: manateeGray,
   );
 

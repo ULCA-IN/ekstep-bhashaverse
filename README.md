@@ -45,6 +45,7 @@ name: bhashaverse
   record: ^4.4.4
   auto_size_text: ^3.0.0
   vibration: ^1.7.6
+  stop_watch_timer: ^2.0.0
 ```
 
 * Dev Dependencies:
