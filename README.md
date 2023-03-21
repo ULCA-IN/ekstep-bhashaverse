@@ -108,6 +108,7 @@ flutter_icons:
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+     <uses-permission android:name="android.permission.VIBRATE"/>
 ```
 
 ### Steps for iOS
@@ -123,16 +124,58 @@ flutter_icons:
 
 ```ruby
    post_install do |installer|
-     installer.pods_project.targets.each do |target|
-       flutter_additional_ios_build_settings(target)
-          target.build_configurations.each do |config|
-             config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [          '$(inherited)',
-            ## dart: PermissionGroup.microphone
-            'PERMISSION_MICROPHONE=1',
-          ]
-          end
-     end
-   end
+    installer.pods_project.targets.each do |target|
+      flutter_additional_ios_build_settings(target)
+      target.build_configurations.each do |config|
+              config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+          '$(inherited)',
+
+          ## dart: PermissionGroup.calendar
+          'PERMISSION_EVENTS=0',
+
+          ## dart: PermissionGroup.reminders
+          'PERMISSION_REMINDERS=0',
+
+          ## dart: PermissionGroup.contacts
+          'PERMISSION_CONTACTS=0',
+
+          ## dart: PermissionGroup.camera
+          'PERMISSION_CAMERA=0',
+            
+          ## dart: PermissionGroup.microphone
+          'PERMISSION_MICROPHONE=1',
+          
+          ## dart: PermissionGroup.speech
+          'PERMISSION_SPEECH_RECOGNIZER=0',
+
+          ## dart: PermissionGroup.photos
+          'PERMISSION_PHOTOS=0',
+
+          ## dart: [PermissionGroup.location, PermissionGroup.locationAlways, PermissionGroup.locationWhenInUse]
+          'PERMISSION_LOCATION=0',
+        
+          ## dart: PermissionGroup.notification
+          'PERMISSION_NOTIFICATIONS=0',
+
+          ## dart: PermissionGroup.mediaLibrary
+          'PERMISSION_MEDIA_LIBRARY=0',
+
+          ## dart: PermissionGroup.sensors
+          'PERMISSION_SENSORS=0',
+
+          ## dart: PermissionGroup.bluetooth
+          'PERMISSION_BLUETOOTH=0',
+
+          ## dart: PermissionGroup.appTrackingTransparency
+          'PERMISSION_APP_TRACKING_TRANSPARENCY=0',
+
+          ## dart: PermissionGroup.criticalAlerts
+          'PERMISSION_CRITICAL_ALERTS=0',
+
+            ]
+        end
+    end
+end
 ```
 
 - Enter the following commands in terminal:
@@ -142,4 +185,70 @@ flutter_icons:
 
 ------------
 
-- Run the project on emulator/device/web etc.
+- Run the project on emulator or physical device with following command (replace placeholders with appropriate values) :
+
+```shell-script
+flutter run --debug --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY> --dart-define authorization=<ADD_AUTHORIZATION_KEY>
+```
+
+- You can also build apk/appbundle/ipa file with following command:
+
+```shell-script
+flutter build apk/appbundle/ipa --release --obfuscate --split-debug-info=<PATH_WHERE_DEBUG_INFO_CAN_BE_SAVED> --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY> --dart-define authorization=<ADD_AUTHORIZATION_KEY>
+```
+
+------------
+
+### launch.json file for VS Code (Optional)
+
+If you don't want to supply dart-define parameters every time when building the project, Add launch.json file.
+To do that, create .vscode folder inside root directory of the project. Then create launch.json file and paste below details inside it. Please replace userID and other required keys which you have obtained for authorization.
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "bhashaverse",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define",
+                "userID=<ADD_USER_ID>",
+                "--dart-define",
+                "ulcaApiKey=<ADD_ULCA_API_KEY>",
+                "--dart-define",
+                "authorization=<ADD_AUTHORIZATION_KEY>",
+            ]
+        },
+        {
+            "name": "bhashaverse (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define",
+                "userID=<ADD_USER_ID>",
+                "--dart-define",
+                "ulcaApiKey=<ADD_ULCA_API_KEY>",
+                "--dart-define",
+                "authorization=<ADD_AUTHORIZATION_KEY>",
+            ]
+        },
+        {
+            "name": "bhashaverse (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--dart-define",
+                "userID=<ADD_USER_ID>",
+                "--dart-define",
+                "ulcaApiKey=<ADD_ULCA_API_KEY>",
+                "--dart-define",
+                "authorization=<ADD_AUTHORIZATION_KEY>",
+            ]
+        }
+    ]
+}
+```
