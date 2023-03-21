@@ -582,6 +582,7 @@ class BottomNavTranslationController extends GetxController {
     targetLangTextController.clear();
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
+    sourceTextCharLimit.value = 0;
     await deleteAudioFiles();
     maxDuration.value = 0;
     currentDuration.value = 0;
