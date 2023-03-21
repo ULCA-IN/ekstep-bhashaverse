@@ -120,7 +120,8 @@ class BottomNavTranslationController extends GetxController {
 
     stopWatchTimer.rawTime.listen((event) {
       if (micButtonStatus.value == MicButtonStatus.pressed &&
-          event >= recordingMaxTimeLimit) {
+          (event + 1) >= recordingMaxTimeLimit) {
+        stopWatchTimer.onStopTimer();
         micButtonStatus.value = MicButtonStatus.released;
         stopVoiceRecordingAndGetResult();
       }
@@ -343,7 +344,6 @@ class BottomNavTranslationController extends GetxController {
     await playBeepSound();
     await vibrateDevice();
 
-    stopWatchTimer.onStopTimer();
     int timeTakenForLastRecording = stopWatchTimer.rawTime.value;
     stopWatchTimer.onResetTimer();
 
