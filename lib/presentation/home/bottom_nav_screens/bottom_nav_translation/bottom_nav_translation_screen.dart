@@ -1,4 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -227,100 +228,74 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
   }
 
   Widget _buildTransliterationHints() {
-    return Obx(
-      () => _bottomNavTranslationController.isKeyboardVisible.value
-          ? SizedBox(
-              height: 85.toHeight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Visibility(
-                    visible: !_bottomNavTranslationController
-                            .isScrolledTransliterationHints.value &&
-                        _bottomNavTranslationController
-                            .transliterationWordHints.isNotEmpty,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        Icons.arrow_forward_outlined,
-                        color: Colors.grey.shade400,
-                        size: 22.toHeight,
-                      ),
+    return Obx(() => _bottomNavTranslationController.isKeyboardVisible.value
+        ? SizedBox(
+            height: 85.toHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Visibility(
+                  visible: !_bottomNavTranslationController
+                          .isScrolledTransliterationHints.value &&
+                      _bottomNavTranslationController
+                          .transliterationWordHints.isNotEmpty,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.arrow_forward_outlined,
+                      color: Colors.grey.shade400,
+                      size: 22.toHeight,
                     ),
                   ),
-                  SingleChildScrollView(
-                    controller: _bottomNavTranslationController
-                        .transliterationHintsScrollController,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        ..._bottomNavTranslationController
-                            .transliterationWordHints
-                            .map((hintText) => GestureDetector(
-                                  onTap: () {
-                                    replaceTextWithTransliterationHint(
-                                        hintText);
-                                  },
+                ),
+                SingleChildScrollView(
+                  controller: _bottomNavTranslationController
+                      .transliterationHintsScrollController,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ..._bottomNavTranslationController
+                          .transliterationWordHints
+                          .map((hintText) => GestureDetector(
+                                onTap: () {
+                                  replaceTextWithTransliterationHint(hintText);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: lilyWhite,
+                                  ),
+                                  margin: AppEdgeInsets.instance.all(4),
+                                  padding: AppEdgeInsets.instance
+                                      .symmetric(vertical: 4, horizontal: 6),
+                                  alignment: Alignment.center,
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(4),
                                       color: lilyWhite,
                                     ),
-                                    margin: AppEdgeInsets.instance.all(4),
-                                    padding: AppEdgeInsets.instance
-                                        .symmetric(vertical: 4, horizontal: 6),
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      constraints: BoxConstraints(
-                                        minWidth: (ScreenUtil.screenWidth / 6)
-                                            .toWidth,
-                                      ),
-                                      child: Text(
-                                        hintText,
-                                        style: AppTextStyle()
-                                            .regular18DolphinGrey
-                                            .copyWith(
-                                              color: Colors.black,
-                                            ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                    child: Text(
+                                      hintText,
+                                      style: AppTextStyle()
+                                          .regular18DolphinGrey
+                                          .copyWith(
+                                            color: Colors.black,
+                                          ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                )),
-                      ],
-                    ),
+                                ),
+                              )),
+                    ],
                   ),
-                ],
-              ),
-            )
-          //  TODO: Update below UI as per discussion
-          : _bottomNavTranslationController.micButtonStatus.value ==
-                  MicButtonStatus.pressed
-              ? Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 20),
-                  child: StreamBuilder<int>(
-                    stream:
-                        _bottomNavTranslationController.stopWatchTimer.rawTime,
-                    initialData: 0,
-                    builder: (context, snap) {
-                      final value = snap.data;
-                      final displayTime = StopWatchTimer.getDisplayTime(
-                          recordingMaxTimeLimit - (value ?? 0),
-                          hours: false,
-                          minute: false,
-                          milliSecond: true);
-                      return Text(
-                        '-$displayTime',
-                        style: AppTextStyle().regular18balticSea,
-                      );
-                    },
-                  ),
-                )
-              : SizedBox(height: 8.toHeight),
-    );
+                ),
+              ],
+            ),
+          )
+        : SizedBox.shrink());
   }
 
   Widget _buildSourceLanguageInput() {
@@ -388,15 +363,62 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          '$sourceCharLength/$asrTextCharMaxLength',
-          style: AppTextStyle().grey14Arsenic.copyWith(
-              color: sourceCharLength >= asrTextCharMaxLength
-                  ? flushOrangeColor
-                  : sourceCharLength >= asrTextCharMaxLength - 20
-                      ? flushOrangeColor.withOpacity(0.4)
-                      : manateeGray),
-        ),
+        _bottomNavTranslationController.micButtonStatus.value ==
+                MicButtonStatus.pressed
+            ? Row(
+                children: [
+                  AvatarGlow(
+                    animate: true,
+                    repeat: true,
+                    glowColor: Colors.red.shade700,
+                    endRadius: 16,
+                    shape: BoxShape.circle,
+                    showTwoGlows: true,
+                    curve: Curves.easeInOut,
+                    child: Icon(
+                      Icons.mic_none,
+                      color: Colors.red.shade400,
+                    ),
+                  ),
+                  SizedBox(width: 4.toWidth),
+                  Padding(
+                    padding: AppEdgeInsets.instance.symmetric(vertical: 0),
+                    child: StreamBuilder<int>(
+                      stream: _bottomNavTranslationController
+                          .stopWatchTimer.rawTime,
+                      initialData: 0,
+                      builder: (context, snap) {
+                        final value = snap.data;
+                        final displayTime = StopWatchTimer.getDisplayTime(
+                            recordingMaxTimeLimit - (value ?? 0),
+                            hours: false,
+                            minute: false,
+                            milliSecond: true);
+                        return Text(
+                          '-$displayTime',
+                          style: AppTextStyle().grey14Arsenic.copyWith(
+                              color: (recordingMaxTimeLimit - (value ?? 0)) >=
+                                      5000
+                                  ? manateeGray
+                                  : (recordingMaxTimeLimit - (value ?? 0)) >=
+                                          2000
+                                      ? flushOrangeColor
+                                      : Colors.red.shade400),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                '$sourceCharLength/$asrTextCharMaxLength',
+                style: AppTextStyle().grey14Arsenic.copyWith(
+                    color: sourceCharLength >= asrTextCharMaxLength
+                        ? Colors.red.shade400
+                        : sourceCharLength >= asrTextCharMaxLength - 20
+                            ? flushOrangeColor.withOpacity(0.4)
+                            : manateeGray),
+              ),
         CustomOutlineButton(
           title: kTranslate.tr,
           isHighlighted: true,
