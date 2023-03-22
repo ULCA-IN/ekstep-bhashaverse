@@ -75,10 +75,23 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           SizedBox(
             height: 18.toHeight,
           ),
-          Text(
-            bhashiniTitle.tr,
-            textAlign: TextAlign.center,
-            style: AppTextStyle().semibold22BalticSea,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                imgAppLogoSmall,
+                height: 30.toHeight,
+                width: 30.toWidth,
+              ),
+              SizedBox(
+                width: 8.toWidth,
+              ),
+              Text(
+                bhashiniTitle.tr,
+                textAlign: TextAlign.center,
+                style: AppTextStyle().bold24BalticSea,
+              ),
+            ],
           ),
           SizedBox(
             height: 18.toHeight,
