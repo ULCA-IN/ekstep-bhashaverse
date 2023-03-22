@@ -19,7 +19,7 @@ class VoiceRecorder {
   Future<void> startRecordingVoice() async {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
 
-    recordingPath = '${appDocDir.path}/recordings';
+    recordingPath = '${appDocDir.path}/$recordingFolderName';
     if (!await Directory(recordingPath).exists()) {
       Directory(recordingPath).create();
     }
