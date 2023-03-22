@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const Color primaryColor = Color(0XFFFF9933);
 const Color flushOrangeColor = Color(0xFFFF8000);
 const Color tangerineOrangeColor = Color(0xFFFB7D00);
+const Color bisqueOrangeColor = Color(0xFFFFE5CC);
 const Color frolyRed = Color(0xFFEA929D);
 const Color brickRed = Color(0xFFD1293D);
 const Color balticSea = Color(0xFF202330);
