@@ -74,4 +74,5 @@ final Map<String, String> mai = {
   responseNotReceived: 'त्रुटि : प्रतिक्रिया नहि भेटल',
   translationNotPossible: 'अखन अनुवाद सम्भव नहि',
   bhashiniTitle: 'भाषिणी',
+  bhashiniChatBot: 'भाषिणी चैट बॉट',
 };

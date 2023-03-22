@@ -285,21 +285,21 @@ class APIConstants {
         kLanguageCode: languagesCodeList[21],
         kEnglishName: 'Manipuri'
       },
-      // {
-      //   kNativeName: 'كٲشُر',
-      //   kLanguageCode: languagesCodeList[22],
-      //   kEnglishName: 'Kashmiri'
-      // },
+      {
+        kNativeName: 'كٲشُر',
+        kLanguageCode: languagesCodeList[22],
+        kEnglishName: 'Kashmiri'
+      },
       {
         kNativeName: 'कोंकणी',
         kLanguageCode: languagesCodeList[23],
         kEnglishName: 'Konkani'
       },
-      // {
-      //   kNativeName: 'सिंधी',
-      //   kLanguageCode: languagesCodeList[24],
-      //   kEnglishName: 'Sindhi'
-      // },
+      {
+        kNativeName: 'सिंधी',
+        kLanguageCode: languagesCodeList[24],
+        kEnglishName: 'Sindhi'
+      },
       {
         kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
         kLanguageCode: languagesCodeList[25],

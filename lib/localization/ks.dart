@@ -70,4 +70,14 @@ final Map<String, String> ks = {
   maleVoiceAssistantNotAvailable:
       'مرد آوٲزی معٲوِن چُھنہٕ دٔستِیاب، زَنانہٕ آوٲزی معٲوِن پٮ۪ٹھٕ چُھ یِوان چَلاونہٕ',
   errorNoTextInClipboard: 'کِلِپ بورڈس مَنٛز چُھنہٕ کٕہنۍ متن دٔستِیاب',
+  s2sStreaming: 'کیٛاتھام گوٚو غلط',
+  connecting:
+      'مہربٲنی کٔرتھ دِیِو مایکہِ زیٖر تہٕ تھٲیِو دبٲوتھ رکارڈنٛگ خٲطرٕ ',
+  somethingWentWrong: 'وٕنکٮ۪ن ہیٚکہِ نہٕ اوڈیو چٔلِتھ کٮ۪نٛہہ',
+  tapAndHoldForRecording: 'غلطی: جواب آو نہٕ رٹنہٕ ',
+  cannotPlayAudioAtTheMoment: 'وٕنکٮ۪ن چھُنہٕ ترجُمہٕ مُمکن کٮ۪نٛہہ',
+  responseNotReceived: 'بھاشِنی',
+  translationNotPossible: 'بھاشنی چیٹ بوٹ',
+  bhashiniTitle: 'انٛگلِش',
+  bhashiniChatBot: 'ہیٚندی',
 };

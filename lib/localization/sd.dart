@@ -68,4 +68,13 @@ final Map<String, String> sd = {
   maleVoiceAssistantNotAvailable:
       'मर्दानो आवाज़ी सहाइकु मौजूद नाहे, ज़नानो आवाज़ी सहाइकु सां हली रहियो आहे',
   errorNoTextInClipboard: 'क्लिपबोर्ड में टेक्स्ट मौजूद नाहे ',
+  s2sStreaming: 'एस2एस स्ट्रीमिंग थी रही आहे',
+  connecting: 'कनेक्ट थी रहियो आहे...',
+  somethingWentWrong: 'कुझु ग़लतु थियो',
+  tapAndHoldForRecording: 'रिकार्डींग लाइ महरबानी करे माइक खे टैप करे झले रखो ',
+  cannotPlayAudioAtTheMoment: 'हिन वक़्ति आवाज़ न हली सघंदो',
+  responseNotReceived: 'चूकः वरंदी हासिलु न थी',
+  translationNotPossible: 'तर्जुमो हिन वक़्त मुम्किन नाहे',
+  bhashiniTitle: 'भाशिणी',
+  bhashiniChatBot: 'भाशिणी चैट बोट',
 };

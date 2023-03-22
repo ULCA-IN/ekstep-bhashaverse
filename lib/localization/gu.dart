@@ -66,4 +66,14 @@ final Map<String, String> gu = {
   maleVoiceAssistantNotAvailable:
       'પુરુષ ધ્વનિ સહાયક ઉપલબ્ધ નથી, સ્ત્રી ધ્વનિ સહાયક કાર્યરત છે',
   errorNoTextInClipboard: 'કલીપબોર્ડમાં કોઈ ટેક્સ્ટ ઉપલબ્ધ નથી',
+  s2sStreaming: 'એસ2એસ સ્ટ્રીમિંગ થઇ રહ્યું છે.',
+  connecting: 'કનેક્ટ થઇ રહ્યું છે.',
+  somethingWentWrong: 'કશીક ભૂલ થઇ છે ',
+  tapAndHoldForRecording:
+      'રેકોર્ડ કરવા માટે માઈક સામે ચપટી વગાડો અને પકડી રાખો ',
+  cannotPlayAudioAtTheMoment: 'આ ક્ષણે ઓડિયો ચલાવી શકાશે નહીં ',
+  responseNotReceived: 'ત્રુટી: કોઈ પ્રતિભાવ નથી મળ્યો',
+  translationNotPossible: 'આ ક્ષણે અનુવાદ સંભવ નથી ',
+  bhashiniTitle: 'ભાષીણી',
+  bhashiniChatBot: 'ભાષીણી ચેટ બોટ ',
 };

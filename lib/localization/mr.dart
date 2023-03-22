@@ -78,4 +78,5 @@ final Map<String, String> mr = {
   responseNotReceived: 'चूक : प्रतिक्रिया मिळाली नाही ',
   translationNotPossible: 'याक्षणी भाषांतर शक्य नाही ',
   bhashiniTitle: 'भाषिणी ',
+  bhashiniChatBot: 'भाषिणी चॅट बॉट',
 };
