@@ -16,23 +16,28 @@ import '../../utils/waveform_style.dart';
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
-    required this.textToShare,
-    required this.isEnabled,
+    required String textToCopy,
+    String? audioPathToShare,
+    required bool isEnabled,
     required PlayerController playerController,
     required bool isRecordedAudio,
     required bool isPlayingAudio,
     required String currentDuration,
     required String totalDuration,
     required Function onMusicPlayOrStop,
-  })  : _playerController = playerController,
+  })  : _isEnabled = isEnabled,
+        _textToCopy = textToCopy,
+        _audioPathToShare = audioPathToShare,
+        _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
         _isPlayingAudio = isPlayingAudio,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _onAudioPlayOrStop = onMusicPlayOrStop;
 
-  final bool isEnabled, _isRecordedAudio, _isPlayingAudio;
-  final String textToShare;
+  final bool _isEnabled, _isRecordedAudio, _isPlayingAudio;
+  final String _textToCopy;
+  final String? _audioPathToShare;
   final Function _onAudioPlayOrStop;
   final PlayerController _playerController;
   final String _currentDuration;
@@ -48,33 +53,34 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Row(
             children: [
               // TODO: uncomment when sharing recording files enabled
-              // InkWell(
-              //   onTap: () {
-              //     if (textToShare.isEmpty) {
-              //       showDefaultSnackbar(message: noTextForShare.tr);
-              //       return;
-              //     } else {
-              //       Share.share(textToShare);
-              //     }
-              //   },
-              //   child: Padding(
-              //     padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-              //     child: SvgPicture.asset(
-              //       iconShare,
-              //       height: 24.toWidth,
-              //       width: 24.toWidth,
-              //       color: textToShare.isNotEmpty ? brightGrey : americanSilver,
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(width: 12.toWidth),
               InkWell(
                 onTap: () async {
-                  if (textToShare.isEmpty) {
+                  if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
+                    //TODO: localized below content
+                    showDefaultSnackbar(message: 'No audio found to share');
+                    return;
+                  } else {
+                    await Share.shareXFiles([XFile(_audioPathToShare!)]);
+                  }
+                },
+                child: Padding(
+                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  child: SvgPicture.asset(
+                    iconShare,
+                    height: 24.toWidth,
+                    width: 24.toWidth,
+                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.toWidth),
+              InkWell(
+                onTap: () async {
+                  if (_textToCopy.isEmpty) {
                     showDefaultSnackbar(message: noTextForCopy.tr);
                     return;
                   } else {
-                    await Clipboard.setData(ClipboardData(text: textToShare));
+                    await Clipboard.setData(ClipboardData(text: _textToCopy));
                     showDefaultSnackbar(message: textCopiedToClipboard.tr);
                   }
                 },
@@ -84,7 +90,7 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconCopy,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: textToShare.isNotEmpty ? brightGrey : americanSilver,
+                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
                   ),
                 ),
               ),
@@ -132,7 +138,7 @@ class ASRAndTTSActions extends StatelessWidget {
         SizedBox(width: 12.toWidth),
         InkWell(
           onTap: () {
-            if (isEnabled) {
+            if (_isEnabled) {
               _onAudioPlayOrStop();
             } else {
               showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
@@ -141,14 +147,14 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isEnabled ? flushOrangeColor : goastWhite,
+              color: _isEnabled ? flushOrangeColor : goastWhite,
             ),
             padding: AppEdgeInsets.instance.all(8),
             child: SvgPicture.asset(
               _isPlayingAudio ? iconStopPlayback : iconSound,
               height: 24.toWidth,
               width: 24.toWidth,
-              color: isEnabled ? balticSea : americanSilver,
+              color: _isEnabled ? balticSea : americanSilver,
             ),
           ),
         ),

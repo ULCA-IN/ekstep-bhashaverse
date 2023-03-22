@@ -136,8 +136,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                 .get(isStreamingPreferred) &&
                                             _bottomNavTranslationController
                                                 .isRecordedViaMic.value),
-                                    textToShare: _bottomNavTranslationController
+                                    textToCopy: _bottomNavTranslationController
                                         .sourceLanTextController.text,
+                                    audioPathToShare:
+                                        _bottomNavTranslationController
+                                            .sourceLangASRPath,
                                     currentDuration: DateTImeUtils()
                                         .getTimeFromMilliseconds(
                                             timeInMillisecond:
@@ -192,8 +195,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                 () => ASRAndTTSActions(
                                   isEnabled: _bottomNavTranslationController
                                       .isTranslateCompleted.value,
-                                  textToShare: _bottomNavTranslationController
+                                  textToCopy: _bottomNavTranslationController
                                       .targetLangTextController.text,
+                                  audioPathToShare:
+                                      _bottomNavTranslationController
+                                          .targetLangTTSPath,
                                   currentDuration: DateTImeUtils()
                                       .getTimeFromMilliseconds(
                                           timeInMillisecond:
@@ -341,7 +347,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         _bottomNavTranslationController.sourceTextCharLimit.value =
             newText.length;
         _bottomNavTranslationController.isTranslateCompleted.value = false;
-        _bottomNavTranslationController.deleteAudioFiles();
+        _bottomNavTranslationController.ttsResponse = null;
         _bottomNavTranslationController.targetLangTextController.clear();
         _bottomNavTranslationController.stopPlayer();
         if (_bottomNavTranslationController.isTransliterationEnabled()) {
