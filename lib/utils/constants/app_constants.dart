@@ -10,6 +10,7 @@ const preferredSourceLanguage = 'preferred_source_language';
 const preferredTargetLanguage = 'preferred_target_language';
 const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
+const recordingFolderName = 'recordings';
 const defaultAudioRecordingName = 'ASRAudio';
 const defaultTTSPlayName = 'TTSAudio';
 const tapAndHoldMinDuration = 600;
