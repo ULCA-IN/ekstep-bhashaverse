@@ -10,7 +10,7 @@ import 'snackbar_utils.dart';
 class VoiceRecorder {
   final Record _audioRec = Record();
 
-  String appDocPath = "";
+  String recordingPath = "";
   String recordedAudioFileName =
       '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
   File? audioWavInputFile;
@@ -18,10 +18,15 @@ class VoiceRecorder {
 
   Future<void> startRecordingVoice() async {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
-    appDocPath = appDocDir.path;
+
+    recordingPath = '${appDocDir.path}/$recordingFolderName';
+    if (!await Directory(recordingPath).exists()) {
+      Directory(recordingPath).create();
+    }
+
     await _audioRec.start(
       encoder: Platform.isAndroid ? AudioEncoder.wav : AudioEncoder.flac,
-      path: '$appDocPath/$recordedAudioFileName',
+      path: '$recordingPath/$recordedAudioFileName',
     );
   }
 
@@ -30,7 +35,7 @@ class VoiceRecorder {
       await _audioRec.stop();
       _disposeRecorder();
     }
-    audioWavInputFile = File('$appDocPath/$recordedAudioFileName');
+    audioWavInputFile = File('$recordingPath/$recordedAudioFileName');
     if (audioWavInputFile != null && !await audioWavInputFile!.exists()) {
       showDefaultSnackbar(message: errorRetrievingRecordingFile);
       return null;
@@ -43,12 +48,6 @@ class VoiceRecorder {
 
   String? getAudioFilePath() {
     return audioWavInputFile?.path;
-  }
-
-  void deleteRecordedFile() async {
-    if (audioWavInputFile != null && await audioWavInputFile!.exists()) {
-      await audioWavInputFile?.delete();
-    }
   }
 
   void _disposeRecorder() async {

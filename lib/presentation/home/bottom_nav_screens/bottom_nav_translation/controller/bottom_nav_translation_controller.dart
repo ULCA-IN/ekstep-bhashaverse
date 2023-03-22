@@ -50,8 +50,8 @@ class BottomNavTranslationController extends GetxController {
   RxBool isPlayingSource = false.obs;
   RxBool isPlayingTarget = false.obs;
   RxBool isKeyboardVisible = false.obs;
-  String sourcePath = '';
-  String targetPath = '';
+  String? sourceLangASRPath = '';
+  String targetLangTTSPath = '';
   RxInt maxDuration = 0.obs,
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
@@ -159,7 +159,6 @@ class BottomNavTranslationController extends GetxController {
     targetLangTextController.dispose();
     await stopWatchTimer.dispose();
     disposePlayer();
-    deleteAudioFiles();
     super.onClose();
   }
 
@@ -192,7 +191,7 @@ class BottomNavTranslationController extends GetxController {
   }
 
   setBeepSoundFile() async {
-    appDirectory = await getTemporaryDirectory();
+    appDirectory = await getApplicationDocumentsDirectory();
     beepSoundPath = "${appDirectory.path}/mic_tap_sound.wav";
     beepSoundFile = File(beepSoundPath);
     if (!await beepSoundFile.exists()) {
@@ -376,6 +375,7 @@ class BottomNavTranslationController extends GetxController {
       if (await _voiceRecorder.isVoiceRecording()) {
         String? base64EncodedAudioContent =
             await _voiceRecorder.stopRecordingVoiceAndGetOutput();
+        sourceLangASRPath = _voiceRecorder.getAudioFilePath()!;
         if (base64EncodedAudioContent == null ||
             base64EncodedAudioContent.isEmpty) {
           showDefaultSnackbar(message: errorInRecording.tr);
@@ -495,6 +495,25 @@ class BottomNavTranslationController extends GetxController {
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio[0]['audioContent'];
+
+        // Save TTS recording in file
+        if (ttsResponse != null) {
+          Uint8List? fileAsBytes = base64Decode(ttsResponse);
+          Directory appDocDir = await getApplicationDocumentsDirectory();
+          String recordingPath = '${appDocDir.path}/$recordingFolderName';
+          if (!await Directory(recordingPath).exists()) {
+            Directory(recordingPath).create();
+          }
+          targetLangTTSPath =
+              '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
+          ttsAudioFile = File(targetLangTTSPath);
+          if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+            await ttsAudioFile?.writeAsBytes(fileAsBytes);
+          }
+        } else {
+          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+        }
+
         isRecordedViaMic.value = isRecorded;
         isTranslateCompleted.value = true;
         isLoading.value = false;
@@ -532,30 +551,15 @@ class BottomNavTranslationController extends GetxController {
   void playTTSOutput(bool isPlayingForTarget) async {
     if (isPlayingForTarget ||
         _hiveDBInstance.get(isStreamingPreferred) && isRecordedViaMic.value) {
-      if (ttsResponse != null) {
-        Uint8List? fileAsBytes = base64Decode(ttsResponse);
-        Directory appDocDir = await getApplicationDocumentsDirectory();
-        targetPath =
-            '${appDocDir.path}/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
-        ttsAudioFile = File(targetPath);
-        if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-          await ttsAudioFile?.writeAsBytes(fileAsBytes);
-        }
-
-        isPlayingTarget.value = isPlayingForTarget;
-        isPlayingSource.value =
-            _hiveDBInstance.get(isStreamingPreferred) && !isPlayingForTarget;
-        await prepareWaveforms(targetPath,
-            isForTargeLanguage: isPlayingForTarget && isRecordedViaMic.value);
-      } else {
-        showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
-      }
+      isPlayingTarget.value = isPlayingForTarget;
+      isPlayingSource.value =
+          _hiveDBInstance.get(isStreamingPreferred) && !isPlayingForTarget;
+      await prepareWaveforms(targetLangTTSPath,
+          isForTargeLanguage: isPlayingForTarget && isRecordedViaMic.value);
     } else {
-      String? recordedAudioFilePath = _voiceRecorder.getAudioFilePath();
-      if (recordedAudioFilePath != null && recordedAudioFilePath.isNotEmpty) {
-        sourcePath = _voiceRecorder.getAudioFilePath()!;
+      if (sourceLangASRPath != null && sourceLangASRPath!.isNotEmpty) {
         isPlayingSource.value = true;
-        await prepareWaveforms(sourcePath, isForTargeLanguage: false);
+        await prepareWaveforms(sourceLangASRPath!, isForTargeLanguage: false);
         isPlayingTarget.value = false;
       }
     }
@@ -583,13 +587,13 @@ class BottomNavTranslationController extends GetxController {
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
     sourceTextCharLimit.value = 0;
-    await deleteAudioFiles();
+    ttsResponse = null;
     maxDuration.value = 0;
     currentDuration.value = 0;
-    sourcePath = '';
+    sourceLangASRPath = '';
     await stopPlayer();
-    sourcePath = '';
-    targetPath = '';
+    sourceLangASRPath = '';
+    targetLangTTSPath = '';
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
       clearTransliterationHints();
@@ -632,14 +636,6 @@ class BottomNavTranslationController extends GetxController {
     }
     isPlayingTarget.value = false;
     isPlayingSource.value = false;
-  }
-
-  Future<void> deleteAudioFiles({bool deleteRecordedFile = true}) async {
-    if (deleteRecordedFile) _voiceRecorder.deleteRecordedFile();
-    if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-      await ttsAudioFile?.delete();
-    }
-    ttsResponse = null;
   }
 
   bool isTransliterationEnabled() {
