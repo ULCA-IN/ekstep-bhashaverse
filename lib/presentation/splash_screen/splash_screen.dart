@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
@@ -31,6 +34,18 @@ class _SplashScreenState extends State<SplashScreen> {
       Get.offNamed(isIntroShownAlready
           ? AppRoutes.homeRoute
           : AppRoutes.appLanguageRoute);
+    });
+    clearOldRecordings();
+  }
+
+  void clearOldRecordings() async {
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
+    final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
+    Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
+    _stream.listen((event) async {
+      if (event is File) {
+        await event.delete();
+      }
     });
   }
 
