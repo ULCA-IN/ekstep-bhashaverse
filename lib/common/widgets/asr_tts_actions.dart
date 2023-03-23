@@ -55,7 +55,7 @@ class ASRAndTTSActions extends StatelessWidget {
               InkWell(
                 onTap: () async {
                   if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
-                    showDefaultSnackbar(message: noAudioFoundForShare.tr);
+                    showDefaultSnackbar(message: noAudioFoundToShare.tr);
                     return;
                   } else {
                     await Share.shareXFiles(
