@@ -60,7 +60,11 @@ class ASRAndTTSActions extends StatelessWidget {
                     showDefaultSnackbar(message: 'No audio found to share');
                     return;
                   } else {
-                    await Share.shareXFiles([XFile(_audioPathToShare!)]);
+                    await Share.shareXFiles(
+                      [XFile(_audioPathToShare!)],
+                      sharePositionOrigin: Rect.fromLTWH(0, 0,
+                          ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
+                    );
                   }
                 },
                 child: Padding(
