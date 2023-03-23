@@ -77,4 +77,5 @@ final Map<String, String> en = {
   responseNotReceived: 'Error: Response not received',
   translationNotPossible: 'translation not possible at the moment',
   bhashiniTitle: 'Bhashini',
+  noAudioFoundToShare: 'No audio found to share',
 };

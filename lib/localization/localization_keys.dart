@@ -77,3 +77,4 @@ const String cannotPlayAudioAtTheMoment = 'cannotPlayAudioAtTheMoment';
 const String responseNotReceived = 'responseNotReceived';
 const String translationNotPossible = 'translationNotPossible';
 const String bhashiniTitle = 'bhashiniTitle';
+const String noAudioFoundToShare = 'noAudioFoundToShare';
