@@ -213,6 +213,10 @@ class BottomNavTranslationController extends GetxController {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;
+        _hiveDBInstance.put(
+            preferredSourceLanguage, selectedSourceLanguageCode.value);
+        _hiveDBInstance.put(
+            preferredTargetLanguage, selectedTargetLanguageCode.value);
         resetAllValues();
       } else {
         showDefaultSnackbar(
