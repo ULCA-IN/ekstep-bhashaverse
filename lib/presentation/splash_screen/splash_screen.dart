@@ -41,12 +41,14 @@ class _SplashScreenState extends State<SplashScreen> {
   void clearOldRecordings() async {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
-    Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
-    _stream.listen((event) async {
-      if (event is File) {
-        await event.delete();
-      }
-    });
+    if (await rootDir.exists()) {
+      Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
+      _stream.listen((event) async {
+        if (event is File) {
+          await event.delete();
+        }
+      });
+    }
   }
 
   @override
