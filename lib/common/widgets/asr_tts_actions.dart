@@ -52,12 +52,10 @@ class ASRAndTTSActions extends StatelessWidget {
           visible: !_isPlayingAudio,
           child: Row(
             children: [
-              // TODO: uncomment when sharing recording files enabled
               InkWell(
                 onTap: () async {
                   if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
-                    //TODO: localized below content
-                    showDefaultSnackbar(message: 'No audio found to share');
+                    showDefaultSnackbar(message: noAudioFoundForShare.tr);
                     return;
                   } else {
                     await Share.shareXFiles(
