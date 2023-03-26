@@ -59,4 +59,17 @@ class VoiceRecorder {
   Future<bool> isVoiceRecording() async {
     return _audioRec.isRecording();
   }
+
+  Future<void> clearOldRecordings() async {
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
+    final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
+    if (await rootDir.exists()) {
+      Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
+      _stream.listen((event) async {
+        if (event is File) {
+          await event.delete();
+        }
+      });
+    }
+  }
 }
