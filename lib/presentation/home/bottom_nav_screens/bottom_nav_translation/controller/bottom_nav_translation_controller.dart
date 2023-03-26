@@ -585,7 +585,7 @@ class BottomNavTranslationController extends GetxController {
     _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
   }
 
-  void resetAllValues() async {
+  Future<void> resetAllValues() async {
     sourceLanTextController.clear();
     targetLangTextController.clear();
     isTranslateCompleted.value = false;

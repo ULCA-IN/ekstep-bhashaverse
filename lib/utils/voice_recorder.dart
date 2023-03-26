@@ -11,12 +11,14 @@ class VoiceRecorder {
   final Record _audioRec = Record();
 
   String recordingPath = "";
-  String recordedAudioFileName =
-      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
+  String recordedAudioFileName = '';
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
   Future<void> startRecordingVoice() async {
+    recordingPath = recordedAudioFileName =
+        '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
+
     Directory? appDocDir = await getApplicationDocumentsDirectory();
 
     recordingPath = '${appDocDir.path}/$recordingFolderName';
@@ -58,5 +60,18 @@ class VoiceRecorder {
 
   Future<bool> isVoiceRecording() async {
     return _audioRec.isRecording();
+  }
+
+  Future<void> clearOldRecordings() async {
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
+    final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
+    if (await rootDir.exists()) {
+      Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
+      _stream.listen((event) async {
+        if (event is File) {
+          await event.delete();
+        }
+      });
+    }
   }
 }

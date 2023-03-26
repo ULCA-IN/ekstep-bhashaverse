@@ -20,6 +20,7 @@ import '../../../../utils/snackbar_utils.dart';
 import '../../../../utils/theme/app_colors.dart';
 import '../../../../utils/theme/app_text_style.dart';
 import '../../../../utils/date_time_utils.dart';
+import '../../../../utils/voice_recorder.dart';
 import 'controller/bottom_nav_translation_controller.dart';
 
 class BottomNavTranslation extends StatefulWidget {
@@ -501,10 +502,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                       .selectedTargetLanguageCode.value = '';
                 }
               }
-
-              if (_bottomNavTranslationController.isTransliterationEnabled()) {
-                _bottomNavTranslationController.setModelForTransliteration();
-              }
+              await _bottomNavTranslationController.resetAllValues();
+              VoiceRecorder voiceRecorder = VoiceRecorder();
+              await voiceRecorder.clearOldRecordings();
             }
           },
           child: Container(
