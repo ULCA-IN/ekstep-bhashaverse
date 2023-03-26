@@ -456,6 +456,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   isRecorded: false,
                   sourceText: _bottomNavTranslationController
                       .sourceLanTextController.text);
+              _bottomNavTranslationController.isRecordedViaMic.value = false;
             } else {
               showDefaultSnackbar(
                   message: kErrorSelectSourceAndTargetScreen.tr);
@@ -570,6 +571,10 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   selectedTargetLangCode;
               _hiveDBInstance.put(
                   preferredTargetLanguage, selectedTargetLangCode);
+              if (_bottomNavTranslationController
+                  .sourceLanTextController.text.isNotEmpty)
+                _bottomNavTranslationController.getComputeResponse(
+                    isRecorded: false);
             }
           },
           child: Container(

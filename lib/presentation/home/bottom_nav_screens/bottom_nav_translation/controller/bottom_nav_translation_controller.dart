@@ -387,6 +387,7 @@ class BottomNavTranslationController extends GetxController {
         } else {
           await getComputeResponse(
               isRecorded: true, base64Value: base64EncodedAudioContent);
+          isRecordedViaMic.value = true;
         }
       }
     }
@@ -518,7 +519,6 @@ class BottomNavTranslationController extends GetxController {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
         }
 
-        isRecordedViaMic.value = isRecorded;
         isTranslateCompleted.value = true;
         isLoading.value = false;
       },
