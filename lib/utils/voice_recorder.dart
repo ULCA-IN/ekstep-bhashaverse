@@ -11,12 +11,14 @@ class VoiceRecorder {
   final Record _audioRec = Record();
 
   String recordingPath = "";
-  String recordedAudioFileName =
-      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
+  String recordedAudioFileName = '';
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
   Future<void> startRecordingVoice() async {
+    recordingPath = recordedAudioFileName =
+        '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
+
     Directory? appDocDir = await getApplicationDocumentsDirectory();
 
     recordingPath = '${appDocDir.path}/$recordingFolderName';
