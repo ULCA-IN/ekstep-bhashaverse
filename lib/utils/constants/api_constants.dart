@@ -60,7 +60,7 @@ class APIConstants {
   };
 
   // payload for Compute request
-  static Map<String, dynamic> createRESTComputePayload({
+  static Map<String, dynamic> createComputePayloadASRTrans({
     required String srcLanguage,
     required String targetLanguage,
     required String preferredGender,
@@ -70,13 +70,12 @@ class APIConstants {
     String sampleRate = '44100',
     String? asrServiceID,
     String? translationServiceID,
-    String? ttsServiceID,
   }) {
     var computeRequestToSend = {
       "pipelineTasks": [
         if (isRecorded)
           {
-            "serviceId": "",
+            "serviceId": asrServiceID ?? "",
             "taskType": "asr",
             "config": {
               "language": {"sourceLanguage": srcLanguage},
@@ -85,7 +84,7 @@ class APIConstants {
             }
           },
         {
-          "serviceId": "",
+          "serviceId": translationServiceID ?? "",
           "taskType": "translation",
           "config": {
             "language": {
@@ -94,20 +93,39 @@ class APIConstants {
             }
           }
         },
-        {
-          "serviceId": "",
-          "taskType": "tts",
-          "config": {
-            "language": {"sourceLanguage": targetLanguage},
-            "gender": preferredGender
-          }
-        }
       ],
       "inputData": {
         isRecorded ? 'audio' : 'input': [
           {
             isRecorded ? 'audioContent' : 'source': inputData,
           }
+        ]
+      }
+    };
+
+    return computeRequestToSend;
+  }
+
+  static Map<String, dynamic> createComputePayloadTTS({
+    required String srcLanguage,
+    required String preferredGender,
+    required String inputData,
+    String? ttsServiceID,
+  }) {
+    var computeRequestToSend = {
+      "pipelineTasks": [
+        {
+          "serviceId": ttsServiceID ?? "",
+          "taskType": "tts",
+          "config": {
+            "language": {"sourceLanguage": srcLanguage},
+            "gender": preferredGender
+          }
+        }
+      ],
+      "inputData": {
+        'input': [
+          {'source': inputData}
         ]
       }
     };
