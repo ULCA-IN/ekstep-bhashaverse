@@ -132,11 +132,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     _hiveDBInstance.get(isStreamingPreferred)
                                 ? ASRAndTTSActions(
                                     isEnabled: _bottomNavTranslationController
-                                            .isRecordedViaMic.value ||
-                                        (_hiveDBInstance
-                                                .get(isStreamingPreferred) &&
-                                            _bottomNavTranslationController
-                                                .isRecordedViaMic.value),
+                                        .sourceLanTextController
+                                        .text
+                                        .isNotEmpty,
                                     textToCopy: _bottomNavTranslationController
                                         .sourceLanTextController.text,
                                     audioPathToShare:
@@ -156,15 +154,32 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         .get(isStreamingPreferred),
                                     isPlayingAudio: shouldShowWaveforms(false),
                                     onMusicPlayOrStop: () async {
-                                      shouldShowWaveforms(false)
-                                          ? await _bottomNavTranslationController
-                                              .stopPlayer()
-                                          : _bottomNavTranslationController
-                                              .playTTSOutput(false);
+                                      if (shouldShowWaveforms(false)) {
+                                        await _bottomNavTranslationController
+                                            .stopPlayer();
+                                      } else if (_bottomNavTranslationController
+                                          .isRecordedViaMic.value) {
+                                        _bottomNavTranslationController
+                                            .playTTSOutput();
+                                      } else {
+                                        _bottomNavTranslationController
+                                            .getComputeResTTS(
+                                          sourceText:
+                                              _bottomNavTranslationController
+                                                  .sourceLanTextController.text,
+                                          languageCode:
+                                              _bottomNavTranslationController
+                                                  .selectedSourceLanguageCode
+                                                  .value,
+                                          isTargetLanguage: false,
+                                        );
+                                      }
                                     },
                                     playerController:
                                         _bottomNavTranslationController
                                             .controller,
+                                    isLoading: _bottomNavTranslationController
+                                        .isSourceSpeakerLoading.value,
                                   )
                                 : _buildLimitCountAndTranslateButton(),
                           ),
@@ -195,7 +210,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                               Obx(
                                 () => ASRAndTTSActions(
                                   isEnabled: _bottomNavTranslationController
-                                      .isTranslateCompleted.value,
+                                          .isTranslateCompleted.value &&
+                                      _bottomNavTranslationController
+                                          .targetLangTextController
+                                          .text
+                                          .isNotEmpty,
                                   textToCopy: _bottomNavTranslationController
                                       .targetLangTextController.text,
                                   audioPathToShare:
@@ -215,15 +234,28 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                       .get(isStreamingPreferred),
                                   isPlayingAudio: shouldShowWaveforms(true),
                                   onMusicPlayOrStop: () async {
-                                    shouldShowWaveforms(true)
-                                        ? await _bottomNavTranslationController
-                                            .stopPlayer()
-                                        : _bottomNavTranslationController
-                                            .playTTSOutput(true);
+                                    if (shouldShowWaveforms(true)) {
+                                      await _bottomNavTranslationController
+                                          .stopPlayer();
+                                    } else {
+                                      _bottomNavTranslationController
+                                          .getComputeResTTS(
+                                        sourceText:
+                                            _bottomNavTranslationController
+                                                .targetLangTextController.text,
+                                        languageCode:
+                                            _bottomNavTranslationController
+                                                .selectedTargetLanguageCode
+                                                .value,
+                                        isTargetLanguage: true,
+                                      );
+                                    }
                                   },
                                   playerController:
                                       _bottomNavTranslationController
                                           .controller,
+                                  isLoading: _bottomNavTranslationController
+                                      .isTargetSpeakerLoading.value,
                                 ),
                               )
                             ],
@@ -448,12 +480,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           isHighlighted: true,
           onTap: () {
             unFocusTextFields();
+            _bottomNavTranslationController.sourceLangTTSPath = '';
+            _bottomNavTranslationController.targetLangTTSPath = '';
+
             if (_bottomNavTranslationController
                 .sourceLanTextController.text.isEmpty) {
               showDefaultSnackbar(message: kErrorNoSourceText.tr);
             } else if (_bottomNavTranslationController
                 .isSourceAndTargetLangSelected()) {
-              _bottomNavTranslationController.getComputeResponse(
+              _bottomNavTranslationController.getComputeResponseASRTrans(
                   isRecorded: false,
                   sourceText: _bottomNavTranslationController
                       .sourceLanTextController.text);
@@ -573,7 +608,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_bottomNavTranslationController
                   .sourceLanTextController.text.isNotEmpty)
-                _bottomNavTranslationController.getComputeResponse(
+                _bottomNavTranslationController.getComputeResponseASRTrans(
                     isRecorded: false);
             }
           },

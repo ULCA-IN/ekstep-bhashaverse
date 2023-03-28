@@ -25,6 +25,7 @@ class ASRAndTTSActions extends StatelessWidget {
     required String currentDuration,
     required String totalDuration,
     required Function onMusicPlayOrStop,
+    required bool isLoading,
   })  : _isEnabled = isEnabled,
         _textToCopy = textToCopy,
         _audioPathToShare = audioPathToShare,
@@ -33,7 +34,8 @@ class ASRAndTTSActions extends StatelessWidget {
         _isPlayingAudio = isPlayingAudio,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
-        _onAudioPlayOrStop = onMusicPlayOrStop;
+        _onAudioPlayOrStop = onMusicPlayOrStop,
+        _isLoading = isLoading;
 
   final bool _isEnabled, _isRecordedAudio, _isPlayingAudio;
   final String _textToCopy;
@@ -42,6 +44,7 @@ class ASRAndTTSActions extends StatelessWidget {
   final PlayerController _playerController;
   final String _currentDuration;
   final String _totalDuration;
+  final bool _isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -152,11 +155,18 @@ class ASRAndTTSActions extends StatelessWidget {
               color: _isEnabled ? flushOrangeColor : goastWhite,
             ),
             padding: AppEdgeInsets.instance.all(8),
-            child: SvgPicture.asset(
-              _isPlayingAudio ? iconStopPlayback : iconSound,
+            child: SizedBox(
               height: 24.toWidth,
               width: 24.toWidth,
-              color: _isEnabled ? balticSea : americanSilver,
+              child: _isLoading
+                  ? CircularProgressIndicator(
+                      color: balticSea,
+                      strokeWidth: 2,
+                    )
+                  : SvgPicture.asset(
+                      _isPlayingAudio ? iconStopPlayback : iconSound,
+                      color: _isEnabled ? balticSea : americanSilver,
+                    ),
             ),
           ),
         ),
