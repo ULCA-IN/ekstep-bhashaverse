@@ -64,7 +64,7 @@ class BottomNavTranslationController extends GetxController {
   DateTime? recordingStartTime;
   String beepSoundPath = '';
   late File beepSoundFile;
-  PlayerController _controller = PlayerController();
+  PlayerController _playerController = PlayerController();
   late Directory appDirectory;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled);
   Rx<SpeakerStatus> targetSpeakerStatus = Rx(SpeakerStatus.disabled);
@@ -726,14 +726,14 @@ class BottomNavTranslationController extends GetxController {
   }
 
   Future<void> playBeepSound() async {
-    if (_controller.playerState == PlayerState.playing ||
-        _controller.playerState == PlayerState.paused) {
-      await _controller.stopPlayer();
+    if (_playerController.playerState == PlayerState.playing ||
+        _playerController.playerState == PlayerState.paused) {
+      await _playerController.stopPlayer();
     }
-    await _controller.preparePlayer(
+    await _playerController.preparePlayer(
       path: beepSoundFile.path,
       shouldExtractWaveform: false,
     );
-    await _controller.startPlayer(finishMode: FinishMode.pause);
+    await _playerController.startPlayer(finishMode: FinishMode.pause);
   }
 }
