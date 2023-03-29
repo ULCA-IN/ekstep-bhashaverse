@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/enums/speaker_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -18,33 +19,29 @@ class ASRAndTTSActions extends StatelessWidget {
     super.key,
     required String textToCopy,
     String? audioPathToShare,
-    required bool isEnabled,
     required PlayerController playerController,
     required bool isRecordedAudio,
-    required bool isPlayingAudio,
     required String currentDuration,
     required String totalDuration,
     required Function onMusicPlayOrStop,
-    required bool isLoading,
-  })  : _isEnabled = isEnabled,
-        _textToCopy = textToCopy,
+    required SpeakerStatus speakerStatus,
+  })  : _textToCopy = textToCopy,
         _audioPathToShare = audioPathToShare,
         _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
-        _isPlayingAudio = isPlayingAudio,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _onAudioPlayOrStop = onMusicPlayOrStop,
-        _isLoading = isLoading;
+        _speakerStatus = speakerStatus;
 
-  final bool _isEnabled, _isRecordedAudio, _isPlayingAudio;
+  final bool _isRecordedAudio;
   final String _textToCopy;
   final String? _audioPathToShare;
   final Function _onAudioPlayOrStop;
   final PlayerController _playerController;
   final String _currentDuration;
   final String _totalDuration;
-  final bool _isLoading;
+  final SpeakerStatus _speakerStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +49,7 @@ class ASRAndTTSActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Visibility(
-          visible: !_isPlayingAudio,
+          visible: _speakerStatus != SpeakerStatus.playing,
           child: Row(
             children: [
               InkWell(
@@ -104,7 +101,7 @@ class ASRAndTTSActions extends StatelessWidget {
         ),
         Expanded(
           child: Visibility(
-            visible: _isPlayingAudio,
+            visible: _speakerStatus == SpeakerStatus.playing,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -143,7 +140,7 @@ class ASRAndTTSActions extends StatelessWidget {
         SizedBox(width: 12.toWidth),
         InkWell(
           onTap: () {
-            if (_isEnabled) {
+            if (_speakerStatus != SpeakerStatus.disabled) {
               _onAudioPlayOrStop();
             } else {
               showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
@@ -152,20 +149,26 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: _isEnabled ? flushOrangeColor : goastWhite,
+              color: _speakerStatus != SpeakerStatus.disabled
+                  ? flushOrangeColor
+                  : goastWhite,
             ),
             padding: AppEdgeInsets.instance.all(8),
             child: SizedBox(
               height: 24.toWidth,
               width: 24.toWidth,
-              child: _isLoading
+              child: _speakerStatus == SpeakerStatus.loading
                   ? CircularProgressIndicator(
                       color: balticSea,
                       strokeWidth: 2,
                     )
                   : SvgPicture.asset(
-                      _isPlayingAudio ? iconStopPlayback : iconSound,
-                      color: _isEnabled ? balticSea : americanSilver,
+                      _speakerStatus == SpeakerStatus.playing
+                          ? iconStopPlayback
+                          : iconSound,
+                      color: _speakerStatus != SpeakerStatus.disabled
+                          ? balticSea
+                          : americanSilver,
                     ),
             ),
           ),
