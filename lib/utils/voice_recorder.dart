@@ -15,7 +15,7 @@ class VoiceRecorder {
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
-  Future<void> startRecordingVoice() async {
+  Future<void> startRecordingVoice(int samplingRate) async {
     recordingPath = recordedAudioFileName =
         '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
 
@@ -28,6 +28,7 @@ class VoiceRecorder {
 
     await _audioRec.start(
       encoder: Platform.isAndroid ? AudioEncoder.wav : AudioEncoder.flac,
+      samplingRate: samplingRate,
       path: '$recordingPath/$recordedAudioFileName',
     );
   }

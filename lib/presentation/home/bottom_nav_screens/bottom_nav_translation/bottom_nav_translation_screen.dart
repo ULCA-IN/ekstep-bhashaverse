@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
 import '../../../../enums/mic_button_status.dart';
+import '../../../../enums/speaker_status.dart';
 import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../services/socket_io_client.dart';
@@ -131,14 +133,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         .isTranslateCompleted.value ||
                                     _hiveDBInstance.get(isStreamingPreferred)
                                 ? ASRAndTTSActions(
-                                    isEnabled: _bottomNavTranslationController
-                                            .isRecordedViaMic.value ||
-                                        (_hiveDBInstance
-                                                .get(isStreamingPreferred) &&
-                                            _bottomNavTranslationController
-                                                .isRecordedViaMic.value),
                                     textToCopy: _bottomNavTranslationController
-                                        .sourceLanTextController.text,
+                                        .sourceLanTextController.text
+                                        .trim(),
                                     audioPathToShare:
                                         _bottomNavTranslationController
                                             .sourceLangASRPath,
@@ -154,17 +151,35 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                     .maxDuration.value),
                                     isRecordedAudio: !_hiveDBInstance
                                         .get(isStreamingPreferred),
-                                    isPlayingAudio: shouldShowWaveforms(false),
                                     onMusicPlayOrStop: () async {
-                                      shouldShowWaveforms(false)
-                                          ? await _bottomNavTranslationController
-                                              .stopPlayer()
-                                          : _bottomNavTranslationController
-                                              .playTTSOutput(false);
+                                      if (isAudioPlaying(
+                                          isForTargetSection: false)) {
+                                        await _bottomNavTranslationController
+                                            .stopPlayer();
+                                      } else if (_bottomNavTranslationController
+                                          .isRecordedViaMic.value) {
+                                        _bottomNavTranslationController
+                                            .playTTSOutput();
+                                      } else {
+                                        _bottomNavTranslationController
+                                            .getComputeResTTS(
+                                          sourceText:
+                                              _bottomNavTranslationController
+                                                  .sourceLanTextController.text,
+                                          languageCode:
+                                              _bottomNavTranslationController
+                                                  .selectedSourceLanguageCode
+                                                  .value,
+                                          isTargetLanguage: false,
+                                        );
+                                      }
                                     },
                                     playerController:
                                         _bottomNavTranslationController
                                             .controller,
+                                    speakerStatus:
+                                        _bottomNavTranslationController
+                                            .sourceSpeakerStatus.value,
                                   )
                                 : _buildLimitCountAndTranslateButton(),
                           ),
@@ -194,10 +209,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                               SizedBox(height: 6.toHeight),
                               Obx(
                                 () => ASRAndTTSActions(
-                                  isEnabled: _bottomNavTranslationController
-                                      .isTranslateCompleted.value,
                                   textToCopy: _bottomNavTranslationController
-                                      .targetLangTextController.text,
+                                      .targetLangTextController.text
+                                      .trim(),
                                   audioPathToShare:
                                       _bottomNavTranslationController
                                           .targetLangTTSPath,
@@ -213,17 +227,30 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                   .maxDuration.value),
                                   isRecordedAudio: !_hiveDBInstance
                                       .get(isStreamingPreferred),
-                                  isPlayingAudio: shouldShowWaveforms(true),
                                   onMusicPlayOrStop: () async {
-                                    shouldShowWaveforms(true)
-                                        ? await _bottomNavTranslationController
-                                            .stopPlayer()
-                                        : _bottomNavTranslationController
-                                            .playTTSOutput(true);
+                                    if (isAudioPlaying(
+                                        isForTargetSection: true)) {
+                                      await _bottomNavTranslationController
+                                          .stopPlayer();
+                                    } else {
+                                      _bottomNavTranslationController
+                                          .getComputeResTTS(
+                                        sourceText:
+                                            _bottomNavTranslationController
+                                                .targetLangTextController.text,
+                                        languageCode:
+                                            _bottomNavTranslationController
+                                                .selectedTargetLanguageCode
+                                                .value,
+                                        isTargetLanguage: true,
+                                      );
+                                    }
                                   },
                                   playerController:
                                       _bottomNavTranslationController
                                           .controller,
+                                  speakerStatus: _bottomNavTranslationController
+                                      .targetSpeakerStatus.value,
                                 ),
                               )
                             ],
@@ -350,7 +377,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         _bottomNavTranslationController.isTranslateCompleted.value = false;
         _bottomNavTranslationController.ttsResponse = null;
         _bottomNavTranslationController.targetLangTextController.clear();
-        _bottomNavTranslationController.stopPlayer();
+        if (_bottomNavTranslationController.controller.playerState ==
+            PlayerState.playing) _bottomNavTranslationController.stopPlayer();
+        if (_bottomNavTranslationController.targetSpeakerStatus.value !=
+            SpeakerStatus.disabled)
+          _bottomNavTranslationController.targetSpeakerStatus.value =
+              SpeakerStatus.disabled;
         if (_bottomNavTranslationController.isTransliterationEnabled()) {
           getTransliterationHints(newText);
         } else {
@@ -448,12 +480,15 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           isHighlighted: true,
           onTap: () {
             unFocusTextFields();
+            _bottomNavTranslationController.sourceLangTTSPath = '';
+            _bottomNavTranslationController.targetLangTTSPath = '';
+
             if (_bottomNavTranslationController
                 .sourceLanTextController.text.isEmpty) {
               showDefaultSnackbar(message: kErrorNoSourceText.tr);
             } else if (_bottomNavTranslationController
                 .isSourceAndTargetLangSelected()) {
-              _bottomNavTranslationController.getComputeResponse(
+              _bottomNavTranslationController.getComputeResponseASRTrans(
                   isRecorded: false,
                   sourceText: _bottomNavTranslationController
                       .sourceLanTextController.text);
@@ -573,7 +608,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_bottomNavTranslationController
                   .sourceLanTextController.text.isNotEmpty)
-                _bottomNavTranslationController.getComputeResponse(
+                _bottomNavTranslationController.getComputeResponseASRTrans(
                     isRecorded: false);
             }
           },
@@ -690,11 +725,13 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     _bottomNavTranslationController.clearTransliterationHints();
   }
 
-  bool shouldShowWaveforms(bool isForTargetSection) {
+  bool isAudioPlaying({required bool isForTargetSection}) {
     return ((isForTargetSection &&
-            _bottomNavTranslationController.isPlayingTarget.value) ||
+            _bottomNavTranslationController.targetSpeakerStatus.value ==
+                SpeakerStatus.playing) ||
         (!isForTargetSection &&
-            _bottomNavTranslationController.isPlayingSource.value));
+            _bottomNavTranslationController.sourceSpeakerStatus.value ==
+                SpeakerStatus.playing));
   }
 
   void unFocusTextFields() {
@@ -718,7 +755,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        // can be false if recording limit reached
         if (_bottomNavTranslationController.micButtonStatus.value ==
             MicButtonStatus.pressed) {
           _bottomNavTranslationController.micButtonStatus.value =
