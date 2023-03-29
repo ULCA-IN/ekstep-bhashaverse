@@ -152,7 +152,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     isRecordedAudio: !_hiveDBInstance
                                         .get(isStreamingPreferred),
                                     onMusicPlayOrStop: () async {
-                                      if (shouldShowWaveforms(false)) {
+                                      if (isAudioPlaying(
+                                          isForTargetSection: false)) {
                                         await _bottomNavTranslationController
                                             .stopPlayer();
                                       } else if (_bottomNavTranslationController
@@ -227,7 +228,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   isRecordedAudio: !_hiveDBInstance
                                       .get(isStreamingPreferred),
                                   onMusicPlayOrStop: () async {
-                                    if (shouldShowWaveforms(true)) {
+                                    if (isAudioPlaying(
+                                        isForTargetSection: true)) {
                                       await _bottomNavTranslationController
                                           .stopPlayer();
                                     } else {
@@ -723,7 +725,7 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
     _bottomNavTranslationController.clearTransliterationHints();
   }
 
-  bool shouldShowWaveforms(bool isForTargetSection) {
+  bool isAudioPlaying({required bool isForTargetSection}) {
     return ((isForTargetSection &&
             _bottomNavTranslationController.targetSpeakerStatus.value ==
                 SpeakerStatus.playing) ||
