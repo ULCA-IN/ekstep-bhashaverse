@@ -1,3 +1,4 @@
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import '../../../../common/controller/language_model_controller.dart';
 import '../../../../common/widgets/asr_tts_actions.dart';
 import '../../../../common/widgets/custom_outline_button.dart';
 import '../../../../enums/mic_button_status.dart';
+import '../../../../enums/speaker_status.dart';
 import '../../../../localization/localization_keys.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../services/socket_io_client.dart';
@@ -131,12 +133,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         .isTranslateCompleted.value ||
                                     _hiveDBInstance.get(isStreamingPreferred)
                                 ? ASRAndTTSActions(
-                                    isEnabled: _bottomNavTranslationController
-                                        .sourceLanTextController
-                                        .text
-                                        .isNotEmpty,
                                     textToCopy: _bottomNavTranslationController
-                                        .sourceLanTextController.text,
+                                        .sourceLanTextController.text
+                                        .trim(),
                                     audioPathToShare:
                                         _bottomNavTranslationController
                                             .sourceLangASRPath,
@@ -152,7 +151,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                     .maxDuration.value),
                                     isRecordedAudio: !_hiveDBInstance
                                         .get(isStreamingPreferred),
-                                    isPlayingAudio: shouldShowWaveforms(false),
                                     onMusicPlayOrStop: () async {
                                       if (shouldShowWaveforms(false)) {
                                         await _bottomNavTranslationController
@@ -178,8 +176,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                     playerController:
                                         _bottomNavTranslationController
                                             .controller,
-                                    isLoading: _bottomNavTranslationController
-                                        .isSourceSpeakerLoading.value,
+                                    speakerStatus:
+                                        _bottomNavTranslationController
+                                            .sourceSpeakerStatus.value,
                                   )
                                 : _buildLimitCountAndTranslateButton(),
                           ),
@@ -209,14 +208,9 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                               SizedBox(height: 6.toHeight),
                               Obx(
                                 () => ASRAndTTSActions(
-                                  isEnabled: _bottomNavTranslationController
-                                          .isTranslateCompleted.value &&
-                                      _bottomNavTranslationController
-                                          .targetLangTextController
-                                          .text
-                                          .isNotEmpty,
                                   textToCopy: _bottomNavTranslationController
-                                      .targetLangTextController.text,
+                                      .targetLangTextController.text
+                                      .trim(),
                                   audioPathToShare:
                                       _bottomNavTranslationController
                                           .targetLangTTSPath,
@@ -232,7 +226,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                                   .maxDuration.value),
                                   isRecordedAudio: !_hiveDBInstance
                                       .get(isStreamingPreferred),
-                                  isPlayingAudio: shouldShowWaveforms(true),
                                   onMusicPlayOrStop: () async {
                                     if (shouldShowWaveforms(true)) {
                                       await _bottomNavTranslationController
@@ -254,8 +247,8 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                   playerController:
                                       _bottomNavTranslationController
                                           .controller,
-                                  isLoading: _bottomNavTranslationController
-                                      .isTargetSpeakerLoading.value,
+                                  speakerStatus: _bottomNavTranslationController
+                                      .targetSpeakerStatus.value,
                                 ),
                               )
                             ],
@@ -382,7 +375,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
         _bottomNavTranslationController.isTranslateCompleted.value = false;
         _bottomNavTranslationController.ttsResponse = null;
         _bottomNavTranslationController.targetLangTextController.clear();
-        _bottomNavTranslationController.stopPlayer();
+        if (_bottomNavTranslationController.controller.playerState ==
+            PlayerState.playing) _bottomNavTranslationController.stopPlayer();
+        if (_bottomNavTranslationController.targetSpeakerStatus.value !=
+            SpeakerStatus.disabled)
+          _bottomNavTranslationController.targetSpeakerStatus.value =
+              SpeakerStatus.disabled;
         if (_bottomNavTranslationController.isTransliterationEnabled()) {
           getTransliterationHints(newText);
         } else {
@@ -727,9 +725,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
 
   bool shouldShowWaveforms(bool isForTargetSection) {
     return ((isForTargetSection &&
-            _bottomNavTranslationController.isPlayingTarget.value) ||
+            _bottomNavTranslationController.targetSpeakerStatus.value ==
+                SpeakerStatus.playing) ||
         (!isForTargetSection &&
-            _bottomNavTranslationController.isPlayingSource.value));
+            _bottomNavTranslationController.sourceSpeakerStatus.value ==
+                SpeakerStatus.playing));
   }
 
   void unFocusTextFields() {
@@ -753,7 +753,6 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
             MicButtonStatus.pressed;
         _bottomNavTranslationController.startVoiceRecording();
       } else {
-        // can be false if recording limit reached
         if (_bottomNavTranslationController.micButtonStatus.value ==
             MicButtonStatus.pressed) {
           _bottomNavTranslationController.micButtonStatus.value =
