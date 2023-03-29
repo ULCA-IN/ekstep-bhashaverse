@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,6 +69,7 @@ class BottomNavTranslationController extends GetxController {
   late Directory appDirectory;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled);
   Rx<SpeakerStatus> targetSpeakerStatus = Rx(SpeakerStatus.disabled);
+  int samplingRate = 16000;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -91,6 +93,9 @@ class BottomNavTranslationController extends GetxController {
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     controller = PlayerController();
+    Connectivity().onConnectivityChanged.listen(
+          (newConnectivity) => updateSamplingRate(newConnectivity),
+        );
     setBeepSoundFile();
     controller.onCompletion.listen((event) {
       sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -333,7 +338,7 @@ class BottomNavTranslationController extends GetxController {
           });
         } else {
           stopWatchTimer.onStartTimer();
-          await _voiceRecorder.startRecordingVoice();
+          await _voiceRecorder.startRecordingVoice(samplingRate);
         }
       }
     } else {
@@ -456,7 +461,8 @@ class BottomNavTranslationController extends GetxController {
         audioFormat: Platform.isIOS ? 'flac' : 'wav',
         asrServiceID: asrServiceId,
         translationServiceID: translationServiceId,
-        preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
+        preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
+        samplingRate: samplingRate);
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
@@ -736,5 +742,13 @@ class BottomNavTranslationController extends GetxController {
       shouldExtractWaveform: false,
     );
     await _playerController.startPlayer(finishMode: FinishMode.pause);
+  }
+
+  void updateSamplingRate(ConnectivityResult newConnectivity) {
+    if (newConnectivity == ConnectivityResult.mobile) {
+      samplingRate = 8000;
+    } else {
+      samplingRate = 16000;
+    }
   }
 }
