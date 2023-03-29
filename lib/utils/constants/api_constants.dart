@@ -67,7 +67,7 @@ class APIConstants {
     required bool isRecorded,
     required String inputData,
     String audioFormat = 'wav',
-    String sampleRate = '44100',
+    int samplingRate = 16000, // default
     String? asrServiceID,
     String? translationServiceID,
   }) {
@@ -80,7 +80,7 @@ class APIConstants {
             "config": {
               "language": {"sourceLanguage": srcLanguage},
               "audioFormat": audioFormat,
-              "samplingRate": sampleRate,
+              "samplingRate": samplingRate,
             }
           },
         {
