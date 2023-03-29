@@ -688,7 +688,8 @@ class BottomNavTranslationController extends GetxController {
   }
 
   Future<void> stopPlayer() async {
-    if (controller.playerState.isPlaying) {
+    if (controller.playerState.isPlaying ||
+        controller.playerState == PlayerState.paused) {
       await controller.stopPlayer();
     }
     targetSpeakerStatus.value = SpeakerStatus.stopped;
