@@ -1,11 +1,11 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/enums/speaker_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
