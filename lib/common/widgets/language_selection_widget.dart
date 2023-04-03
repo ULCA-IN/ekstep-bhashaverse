@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../utils/screen_util/screen_util.dart';
-import '../utils/theme/app_colors.dart';
-import '../utils/theme/app_text_style.dart';
+import '../../utils/screen_util/screen_util.dart';
+import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_text_style.dart';
 
 class LanguageSelectionWidget extends StatelessWidget {
   const LanguageSelectionWidget({
