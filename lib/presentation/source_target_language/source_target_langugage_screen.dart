@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import '../../../common/language_selection_widget.dart';
-import '../../../enums/language_enum.dart';
-import '../../../localization/localization_keys.dart';
-import '../../../utils/constants/api_constants.dart';
-import '../../../utils/constants/app_constants.dart';
-import '../../../utils/remove_glow_effect.dart';
-import '../../../utils/screen_util/screen_util.dart';
-import '../../../utils/theme/app_colors.dart';
-import '../../../utils/theme/app_text_style.dart';
-import 'controller/language_selection_controller.dart';
+import '../../common/widgets/language_selection_widget.dart';
+import '../../enums/language_enum.dart';
+import '../../localization/localization_keys.dart';
+import '../../utils/constants/api_constants.dart';
+import '../../utils/constants/app_constants.dart';
+import '../../utils/remove_glow_effect.dart';
+import '../../utils/screen_util/screen_util.dart';
+import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_text_style.dart';
+import 'controller/source_target_langugage_controller.dart';
 
-class LanguageSelectionScreen extends StatefulWidget {
-  const LanguageSelectionScreen({super.key});
+class SourceTargetLanguageScreen extends StatefulWidget {
+  const SourceTargetLanguageScreen({super.key});
 
   @override
-  State<LanguageSelectionScreen> createState() =>
-      _LanguageSelectionScreenState();
+  State<SourceTargetLanguageScreen> createState() =>
+      _SourceTargetLanguageScreenState();
 }
 
-class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  late LanguageSelectionController _languageSelectionController;
+class _SourceTargetLanguageScreenState
+    extends State<SourceTargetLanguageScreen> {
+  late SourceTargetLanguageController _languageSelectionController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
   bool isUserSelectedFromSearchResult = false;

@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
-import '../../../../utils/constants/language_map_translated.dart';
+import '../../../utils/constants/language_map_translated.dart';
 
-class LanguageSelectionController extends GetxController {
+class SourceTargetLanguageController extends GetxController {
   final RxList<dynamic> _languagesList = [].obs;
   final _selectedLanguageIndex = Rxn<int>();
 
