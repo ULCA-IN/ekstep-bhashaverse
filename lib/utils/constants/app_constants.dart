@@ -40,11 +40,20 @@ const imgOnboarding3 =
     'assets/images/onboarding_image/img_illustration_onboarding_3.webp';
 const imgOnboarding4 =
     'assets/images/onboarding_image/img_illustration_onboarding_4.webp';
-const iconPrevious = 'assets/images/common_icon/icon_arrow_previous.svg';
+const iconPrevious = 'assets/images/common_icon/icon_arrow_left.svg';
 
 // Voice Assistant Screen
 const imgMaleAvatar = 'assets/images/img_male_avatar.webp';
 const imgFemaleAvatar = 'assets/images/img_female_avatar.webp';
+
+//Home Screen
+const imgVoiceSpeaking = 'assets/images/menu_images/img_voice_speaking.webp';
+const imgVideo = 'assets/images/menu_images/img_video.webp';
+const imgText = 'assets/images/menu_images/img_text.webp';
+const imgImages = 'assets/images/menu_images/img_images.webp';
+const imgDocuments = 'assets/images/menu_images/img_documents.webp';
+const imgMic = 'assets/images/menu_images/img_mic.webp';
+const iconSettings = 'assets/images/common_icon/icon_settings.svg';
 
 // Setting Screen
 const iconArrowDown = 'assets/images/common_icon/icon_arrow_down.svg';
@@ -53,12 +62,7 @@ const iconSelectedRadio =
 const iconUnSelectedRadio =
     'assets/images/common_icon/icon_unselected_radio_button.svg';
 
-// Bottom Bar Icons
-const iconTranslation = 'assets/images/bottom_bar_icons/icon_translation.svg';
-const iconChat = 'assets/images/bottom_bar_icons/icon_chat.svg';
-const iconSettings = 'assets/images/bottom_bar_icons/icon_settings.svg';
-
-// Bottom Nav Translation
+// Translation Screen
 const textFieldRadius = Radius.circular(16);
 const iconArrowSwapHorizontal =
     'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
