@@ -11,7 +11,7 @@ import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
 import 'controller/home_controller.dart';
-import 'widgets/menu_widgets.dart';
+import 'widgets/menu_item_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
