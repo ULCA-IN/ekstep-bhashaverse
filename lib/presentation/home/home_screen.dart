@@ -136,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   _handleMenuTap(int index) {
     switch (index) {
       case 1:
-        Get.toNamed(AppRoutes.translationRoute);
+        Get.toNamed(AppRoutes.textTranslationRoute);
         break;
       default:
         showDefaultSnackbar(

@@ -10,7 +10,7 @@ import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
-import 'controller/source_target_langugage_controller.dart';
+import 'controller/source_target_language_controller.dart';
 
 class SourceTargetLanguageScreen extends StatefulWidget {
   const SourceTargetLanguageScreen({super.key});
