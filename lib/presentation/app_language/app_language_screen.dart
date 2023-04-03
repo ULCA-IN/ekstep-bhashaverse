@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../common/elevated_button.dart';
-import '../../common/language_selection_widget.dart';
+import '../../common/widgets/elevated_button.dart';
+import '../../common/widgets/language_selection_widget.dart';
 import '../../enums/language_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
@@ -16,14 +16,14 @@ import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/app_language_controller.dart';
 
-class AppLanguage extends StatefulWidget {
-  const AppLanguage({super.key});
+class AppLanguageScreen extends StatefulWidget {
+  const AppLanguageScreen({super.key});
 
   @override
-  State<AppLanguage> createState() => _AppLanguageState();
+  State<AppLanguageScreen> createState() => _AppLanguageScreenState();
 }
 
-class _AppLanguageState extends State<AppLanguage> {
+class _AppLanguageScreenState extends State<AppLanguageScreen> {
   late AppLanguageController _appLanguageController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
