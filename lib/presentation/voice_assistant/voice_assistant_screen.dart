@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../common/elevated_button.dart';
+import '../../common/widgets/elevated_button.dart';
 import '../../enums/gender_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
