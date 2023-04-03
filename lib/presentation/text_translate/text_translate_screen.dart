@@ -1,7 +1,6 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:bhashaverse/common/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/asr_tts_actions.dart';
+import '../../common/widgets/common_app_bar.dart';
 import '../../common/widgets/custom_outline_button.dart';
 import '../../enums/mic_button_status.dart';
 import '../../enums/speaker_status.dart';
@@ -25,18 +25,18 @@ import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/date_time_utils.dart';
 import '../../utils/voice_recorder.dart';
-import 'controller/translation_controller.dart';
+import 'controller/text_translate_controller.dart';
 
-class TranslationScreen extends StatefulWidget {
-  const TranslationScreen({super.key});
+class TextTranslateScreen extends StatefulWidget {
+  const TextTranslateScreen({super.key});
 
   @override
-  State<TranslationScreen> createState() => _TranslationScreenState();
+  State<TextTranslateScreen> createState() => _TextTranslateScreenState();
 }
 
-class _TranslationScreenState extends State<TranslationScreen>
+class _TextTranslateScreenState extends State<TextTranslateScreen>
     with WidgetsBindingObserver {
-  late TranslationController _translationController;
+  late TextTranslateController _translationController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
