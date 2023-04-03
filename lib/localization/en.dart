@@ -78,4 +78,10 @@ final Map<String, String> en = {
   translationNotPossible: 'translation not possible at the moment',
   bhashiniTitle: 'Bhashini',
   noAudioFoundToShare: 'No audio found to share',
+  converge: 'Converge',
+  video: 'Video',
+  text: 'Text',
+  images: 'Images',
+  documents: 'Documents',
+  voice: 'Voice',
 };
