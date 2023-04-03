@@ -6,7 +6,6 @@ import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
-import '../../bottom_nav_translation/controller/bottom_nav_translation_controller.dart';
 
 class SettingsController extends GetxController {
   RxBool isTransLiterationEnabled = true.obs;
@@ -53,7 +52,5 @@ class SettingsController extends GetxController {
   void changeStreamingPref(bool isEnabled) {
     _hiveDBInstance.put(isStreamingPreferred, isEnabled);
     isStreamingEnabled.value = isEnabled;
-    BottomNavTranslationController bottomNavTranslationController = Get.find();
-    bottomNavTranslationController.resetAllValues();
   }
 }

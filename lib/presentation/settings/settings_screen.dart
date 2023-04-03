@@ -4,25 +4,25 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'dart:math' show pi;
 
-import '../../../../enums/gender_enum.dart';
-import '../../../../localization/localization_keys.dart';
-import '../../../../routes/app_routes.dart';
-import '../../../../utils/constants/app_constants.dart';
-import '../../../../utils/screen_util/screen_util.dart';
-import '../../../../utils/snackbar_utils.dart';
-import '../../../../utils/theme/app_colors.dart';
-import '../../../../utils/theme/app_text_style.dart';
-import '../../home_screen/controller/home_controller.dart';
+import '../../common/widgets/common_app_bar.dart';
+import '../../enums/gender_enum.dart';
+import '../../localization/localization_keys.dart';
+import '../../routes/app_routes.dart';
+import '../../utils/constants/app_constants.dart';
+import '../../utils/screen_util/screen_util.dart';
+import '../../utils/snackbar_utils.dart';
+import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
 
-class BottomNavSettings extends StatefulWidget {
-  const BottomNavSettings({super.key});
+class SettingsScreen extends StatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<BottomNavSettings> createState() => _BottomNavSettingsState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _BottomNavSettingsState extends State<BottomNavSettings>
+class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
   late AnimationController _controller;
@@ -65,32 +65,9 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(height: 16.toHeight),
-                  Row(
-                    children: [
-                      InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => _onWillPop(),
-                        child: Container(
-                          padding: AppEdgeInsets.instance.all(8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(width: 1.toWidth, color: goastWhite),
-                          ),
-                          child: SvgPicture.asset(
-                            iconPrevious,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 24.toWidth),
-                      Text(
-                        kSettings.tr,
-                        style: AppTextStyle()
-                            .semibold24BalticSea
-                            .copyWith(fontSize: 20.toFont),
-                      ),
-                    ],
-                  ),
+                  CommonAppBar(
+                      title: kSettings.tr,
+                      onBackPress: () async => _onWillPop()),
                   // TODO: uncoment when dark theme added
                   /*  SizedBox(height: 48.toHeight),
                   _settingHeading(
@@ -284,7 +261,8 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
     );
   }
 
-  Widget _expandableSettingHeading({
+  // TODO: uncomment when Streaming service work
+  /*  Widget _expandableSettingHeading({
     required String title,
     required Widget icon,
     Widget? child,
@@ -326,7 +304,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
         ],
       ),
     );
-  }
+  }*/
 
   Widget _voiceAssistantTileWidget() {
     return Container(
@@ -459,8 +437,7 @@ class _BottomNavSettingsState extends State<BottomNavSettings>
   }
 
   Future<bool> _onWillPop() async {
-    HomeController homeController = Get.find();
-    homeController.bottomBarIndex.value = 0;
+    Get.back();
     return Future.value(false);
   }
 }
