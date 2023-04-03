@@ -9,7 +9,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'enums/gender_enum.dart';
 import 'localization/app_localization.dart';
 import 'localization/localization_keys.dart';
-import 'presentation/splash_screen/binding/splash_binding.dart';
+import 'presentation/splash/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants/app_constants.dart';
 import 'utils/theme/app_colors.dart';
