@@ -1,58 +1,44 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:audio_session/audio_session.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 import 'constants/app_constants.dart';
 import 'snackbar_utils.dart';
 
 class VoiceRecorder {
-  final FlutterSoundRecorder _audioRec = FlutterSoundRecorder();
-  String appDocPath = "";
-  String recordedAudioFileName =
-      '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}.wav';
+  final Record _audioRec = Record();
+
+  String recordingPath = "";
+  String recordedAudioFileName = '';
   File? audioWavInputFile;
   String _speechToBase64 = '';
 
-  Future<void> startRecordingVoice() async {
-    await _audioRec.openRecorder();
-    final session = await AudioSession.instance;
-
-    if (Platform.isIOS) {
-      await session.configure(AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-        avAudioSessionCategoryOptions:
-            AVAudioSessionCategoryOptions.allowBluetooth |
-                AVAudioSessionCategoryOptions.defaultToSpeaker,
-        avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-        avAudioSessionRouteSharingPolicy:
-            AVAudioSessionRouteSharingPolicy.defaultPolicy,
-        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-        androidAudioAttributes: const AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.speech,
-          flags: AndroidAudioFlags.none,
-          usage: AndroidAudioUsage.voiceCommunication,
-        ),
-        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-        androidWillPauseWhenDucked: true,
-      ));
-    }
+  Future<void> startRecordingVoice(int samplingRate) async {
+    recordingPath = recordedAudioFileName =
+        '$defaultAudioRecordingName${DateTime.now().millisecondsSinceEpoch}${Platform.isAndroid ? '.wav' : '.flac'}';
 
     Directory? appDocDir = await getApplicationDocumentsDirectory();
-    appDocPath = appDocDir.path;
-    await _audioRec.startRecorder(
-      toFile: '$appDocPath/$recordedAudioFileName',
+
+    recordingPath = '${appDocDir.path}/$recordingFolderName';
+    if (!await Directory(recordingPath).exists()) {
+      Directory(recordingPath).create();
+    }
+
+    await _audioRec.start(
+      encoder: Platform.isAndroid ? AudioEncoder.wav : AudioEncoder.flac,
+      samplingRate: samplingRate,
+      path: '$recordingPath/$recordedAudioFileName',
     );
   }
 
   Future<String?> stopRecordingVoiceAndGetOutput() async {
-    if (_audioRec.isRecording) {
-      await _audioRec.stopRecorder();
+    if (await isVoiceRecording()) {
+      await _audioRec.stop();
       _disposeRecorder();
     }
-    audioWavInputFile = File('$appDocPath/$recordedAudioFileName');
+    audioWavInputFile = File('$recordingPath/$recordedAudioFileName');
     if (audioWavInputFile != null && !await audioWavInputFile!.exists()) {
       showDefaultSnackbar(message: errorRetrievingRecordingFile);
       return null;
@@ -67,13 +53,26 @@ class VoiceRecorder {
     return audioWavInputFile?.path;
   }
 
-  void deleteRecordedFile() async {
-    if (audioWavInputFile != null && await audioWavInputFile!.exists()) {
-      await audioWavInputFile?.delete();
+  void _disposeRecorder() async {
+    if (await isVoiceRecording()) {
+      _audioRec.dispose();
     }
   }
 
-  void _disposeRecorder() {
-    _audioRec.isRecording ? _audioRec.closeRecorder() : null;
+  Future<bool> isVoiceRecording() async {
+    return _audioRec.isRecording();
+  }
+
+  Future<void> clearOldRecordings() async {
+    Directory? appDocDir = await getApplicationDocumentsDirectory();
+    final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
+    if (await rootDir.exists()) {
+      Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
+      _stream.listen((event) async {
+        if (event is File) {
+          await event.delete();
+        }
+      });
+    }
   }
 }

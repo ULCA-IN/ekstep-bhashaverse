@@ -8,7 +8,6 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/voice_assistant_controller.dart';
@@ -22,18 +21,12 @@ class VoiceAssistantScreen extends StatefulWidget {
 
 class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   late VoiceAssistantController _voiceAssistantController;
-  Box hiveDBInstance = Hive.box(hiveDBName);
 
   @override
   void initState() {
-    super.initState();
+    _voiceAssistantController = Get.find();
     ScreenUtil().init();
-    _voiceAssistantController = Get.put(VoiceAssistantController());
-    var selectedGender = hiveDBInstance.get(preferredVoiceAssistantGender);
-    if (selectedGender != null && selectedGender.isNotEmpty) {
-      _voiceAssistantController
-          .setSelectedGender(GenderEnum.values.byName(selectedGender));
-    }
+    super.initState();
   }
 
   @override
@@ -82,10 +75,6 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 backgroundColor: primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
-                  if (_voiceAssistantController.getSelectedGender() == null) {
-                    showDefaultSnackbar(message: errorSelectVoiceAssistant.tr);
-                    return;
-                  }
                   Box hiveDBInstance = Hive.box(hiveDBName);
                   hiveDBInstance.put(introShownAlreadyKey, true);
                   Get.offAllNamed(AppRoutes.homeRoute);
@@ -108,22 +97,17 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
       child: Obx(
         () => InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: () {
-            _voiceAssistantController.setSelectedGender(gender);
-            hiveDBInstance.put(preferredVoiceAssistantGender, gender.name);
-          },
+          onTap: () => _voiceAssistantController.setSelectedGender(gender),
           child: Container(
             padding: AppEdgeInsets.instance.all(22),
             decoration: BoxDecoration(
-              color: (_voiceAssistantController.getSelectedGender() != null &&
-                      _voiceAssistantController.getSelectedGender() == gender)
+              color: (_voiceAssistantController.getSelectedGender() == gender)
                   ? sassyGreen
                   : Colors.white,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 width: 1.toWidth,
-                color: (_voiceAssistantController.getSelectedGender() != null &&
-                        _voiceAssistantController.getSelectedGender() == gender)
+                color: (_voiceAssistantController.getSelectedGender() == gender)
                     ? japaneseLaurel
                     : americanSilver,
               ),

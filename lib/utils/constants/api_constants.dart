@@ -1,15 +1,17 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import '../../enums/language_enum.dart';
+import 'language_map_translated.dart';
 
 class APIConstants {
-  static const String ASR_CALLBACK_AZURE_URL =
-      'https://meity-dev-asr.ulcacontrib.org/asr/v1/recognize';
-  static const String ASR_CALLBACK_CDAC_URL =
-      'https://cdac.ulcacontrib.org/asr/v1/recognize';
+  static const String ULCA_CONFIG_API_URL =
+      'https://meity-auth.ulcacontrib.org/ulca/apis/v0';
+  static const String ULCA_CONFIG_API_STREAMING_URL =
+      'wss://api.dhruva.ai4bharat.org';
   static const String STS_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
+  static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
   static const String TRANSLITERATION_REQ_URL = '/v0/model/compute';
   static const String ASR_REQ_URL = '/asr/v1/model/compute';
@@ -25,6 +27,9 @@ class APIConstants {
   static const int kApiUnAuthorizedExceptionErrorCode = 401;
   static const int kApiDataConflictCode = 409;
 
+  static const String kUserIdREST = 'userID';
+  static const String kULCAAPIKeyREST = 'ulcaApiKey';
+  static const String kAuthorizationKeyStreaming = 'authorization';
   static const String kApiUnknownError = 'UNKNOWN_ERROR';
   static const String kApiCanceled = 'API_CANCELED';
   static const String kApiConnectionTimeout = 'CONNECT_TIMEOUT';
@@ -44,6 +49,122 @@ class APIConstants {
   static const String kErrorMessageUnAuthorizedException =
       'UnAuthorized. Please login again';
 
+  // Payload for available Languages request
+  static var payloadForLanguageConfig = {
+    "pipelineTasks": [
+      {"taskType": "asr"},
+      {"taskType": "translation"},
+      {"taskType": "tts"}
+    ],
+    "pipelineRequestConfig": {"submitter": "AI4Bharat"}
+  };
+
+  // payload for Compute request
+  static Map<String, dynamic> createComputePayloadASRTrans({
+    required String srcLanguage,
+    required String targetLanguage,
+    required String preferredGender,
+    required bool isRecorded,
+    required String inputData,
+    String audioFormat = 'wav',
+    int samplingRate = 16000, // default
+    String? asrServiceID,
+    String? translationServiceID,
+  }) {
+    var computeRequestToSend = {
+      "pipelineTasks": [
+        if (isRecorded)
+          {
+            "serviceId": asrServiceID ?? "",
+            "taskType": "asr",
+            "config": {
+              "language": {"sourceLanguage": srcLanguage},
+              "audioFormat": audioFormat,
+              "samplingRate": samplingRate,
+            }
+          },
+        {
+          "serviceId": translationServiceID ?? "",
+          "taskType": "translation",
+          "config": {
+            "language": {
+              "sourceLanguage": srcLanguage,
+              "targetLanguage": targetLanguage
+            }
+          }
+        },
+      ],
+      "inputData": {
+        isRecorded ? 'audio' : 'input': [
+          {
+            isRecorded ? 'audioContent' : 'source': inputData,
+          }
+        ]
+      }
+    };
+
+    return computeRequestToSend;
+  }
+
+  static Map<String, dynamic> createComputePayloadTTS({
+    required String srcLanguage,
+    required String preferredGender,
+    required String inputData,
+    String? ttsServiceID,
+  }) {
+    var computeRequestToSend = {
+      "pipelineTasks": [
+        {
+          "serviceId": ttsServiceID ?? "",
+          "taskType": "tts",
+          "config": {
+            "language": {"sourceLanguage": srcLanguage},
+            "gender": preferredGender
+          }
+        }
+      ],
+      "inputData": {
+        'input': [
+          {'source': inputData}
+        ]
+      }
+    };
+
+    return computeRequestToSend;
+  }
+
+  static List<Map<String, Map<String, dynamic>>> createSocketIOComputePayload({
+    required String srcLanguage,
+    required String targetLanguage,
+    required String preferredGender,
+  }) {
+    return [
+      {
+        "task": {"type": "asr"},
+        "config": {
+          "language": {"sourceLanguage": srcLanguage},
+          "samplingRate": 44100,
+        }
+      },
+      {
+        "task": {"type": "translation"},
+        "config": {
+          "language": {
+            "sourceLanguage": srcLanguage,
+            "targetLanguage": targetLanguage
+          }
+        }
+      },
+      {
+        "task": {"type": "tts"},
+        "config": {
+          "language": {"sourceLanguage": targetLanguage},
+          "gender": preferredGender
+        }
+      }
+    ];
+  }
+
 // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
   static final List<String> TYPES_OF_MODELS_LIST = [
     'asr',
@@ -60,6 +181,11 @@ class APIConstants {
     TYPES_OF_MODELS_LIST[3]: 'AI4Bharat,',
   };
 
+  static final ASR_MODEL_TYPES = [
+    'streaming',
+    'batch',
+  ];
+
   static const kNativeName = 'native_name';
   static const kEnglishName = 'english_name';
   static const kLanguageCode = 'language_code';
@@ -67,39 +193,145 @@ class APIConstants {
 
   static final LANGUAGE_CODE_MAP = {
     kLanguageCodeList: [
-      {kNativeName: 'English', kLanguageCode: 'en', kEnglishName: 'English'},
-      {kNativeName: 'हिन्दी', kLanguageCode: 'hi', kEnglishName: 'Hindi'},
-      {kNativeName: 'मराठी', kLanguageCode: 'mr', kEnglishName: 'Marathi'},
-      {kNativeName: 'বাংলা', kLanguageCode: 'bn', kEnglishName: 'Bangla'},
-      {kNativeName: 'ਪੰਜਾਬੀ', kLanguageCode: 'pa', kEnglishName: 'Punjabi'},
-      {kNativeName: 'ગુજરાતી', kLanguageCode: 'gu', kEnglishName: 'Gujarati'},
-      {kNativeName: 'ଓଡିଆ', kLanguageCode: 'or', kEnglishName: 'Oriya'},
-      {kNativeName: 'தமிழ்', kLanguageCode: 'ta', kEnglishName: 'Tamil'},
-      {kNativeName: 'తెలుగు', kLanguageCode: 'te', kEnglishName: 'Telugu'},
-      {kNativeName: 'ಕನ್ನಡ', kLanguageCode: 'kn', kEnglishName: 'Kannada'},
-      {kNativeName: 'اردو', kLanguageCode: 'ur', kEnglishName: 'Urdu'},
-      {kNativeName: 'डोगरी', kLanguageCode: 'doi', kEnglishName: 'Dogri'},
-      {kNativeName: 'नेपाली', kLanguageCode: 'ne', kEnglishName: 'Nepali'},
-      {kNativeName: 'සිංහල', kLanguageCode: 'si', kEnglishName: 'Sinhala'},
-      {kNativeName: 'संस्कृत', kLanguageCode: 'sa', kEnglishName: 'Sanskrit'},
-      {kNativeName: 'অসমীয়া', kLanguageCode: 'as', kEnglishName: 'Assamese'},
-      {kNativeName: 'मैथिली', kLanguageCode: 'mai', kEnglishName: 'Maithili'},
-      {kNativeName: 'भोजपुरी', kLanguageCode: 'bho', kEnglishName: 'Bhojpuri'},
-      {kNativeName: 'മലയാളം', kLanguageCode: 'ml', kEnglishName: 'Malayalam'},
       {
-        kNativeName: 'राजस्थानी',
-        kLanguageCode: 'raj',
-        kEnglishName: 'Rajasthani'
+        kNativeName: 'English',
+        kLanguageCode: languagesCodeList[0],
+        kEnglishName: 'English'
       },
-      {kNativeName: 'Bodo', kLanguageCode: 'brx', kEnglishName: 'Bodo'},
-      {kNativeName: 'মানিপুরি', kLanguageCode: 'mni', kEnglishName: 'Manipuri'},
+      {
+        kNativeName: 'हिन्दी',
+        kLanguageCode: languagesCodeList[1],
+        kEnglishName: 'Hindi'
+      },
+      {
+        kNativeName: 'मराठी',
+        kLanguageCode: languagesCodeList[2],
+        kEnglishName: 'Marathi'
+      },
+      {
+        kNativeName: 'বাংলা',
+        kLanguageCode: languagesCodeList[3],
+        kEnglishName: 'Bangla'
+      },
+      {
+        kNativeName: 'ਪੰਜਾਬੀ',
+        kLanguageCode: languagesCodeList[4],
+        kEnglishName: 'Punjabi'
+      },
+      {
+        kNativeName: 'ગુજરાતી',
+        kLanguageCode: languagesCodeList[5],
+        kEnglishName: 'Gujarati'
+      },
+      {
+        kNativeName: 'ଓଡିଆ',
+        kLanguageCode: languagesCodeList[6],
+        kEnglishName: 'Oriya'
+      },
+      {
+        kNativeName: 'தமிழ்',
+        kLanguageCode: languagesCodeList[7],
+        kEnglishName: 'Tamil'
+      },
+      {
+        kNativeName: 'తెలుగు',
+        kLanguageCode: languagesCodeList[8],
+        kEnglishName: 'Telugu'
+      },
+      {
+        kNativeName: 'ಕನ್ನಡ',
+        kLanguageCode: languagesCodeList[9],
+        kEnglishName: 'Kannada'
+      },
+      {
+        kNativeName: 'اردو',
+        kLanguageCode: languagesCodeList[10],
+        kEnglishName: 'Urdu'
+      },
+      {
+        kNativeName: 'डोगरी',
+        kLanguageCode: languagesCodeList[11],
+        kEnglishName: 'Dogri'
+      },
+      {
+        kNativeName: 'नेपाली',
+        kLanguageCode: languagesCodeList[12],
+        kEnglishName: 'Nepali'
+      },
+      // {
+      //   kNativeName: 'සිංහල',
+      //   kLanguageCode: languagesCodeList[13],
+      //   kEnglishName: 'Sinhala'
+      // },
+      {
+        kNativeName: 'संस्कृत',
+        kLanguageCode: languagesCodeList[14],
+        kEnglishName: 'Sanskrit'
+      },
+      {
+        kNativeName: 'অসমীয়া',
+        kLanguageCode: languagesCodeList[15],
+        kEnglishName: 'Assamese'
+      },
+      {
+        kNativeName: 'मैथिली',
+        kLanguageCode: languagesCodeList[16],
+        kEnglishName: 'Maithili'
+      },
+      {
+        kNativeName: 'भोजपुरी',
+        kLanguageCode: languagesCodeList[17],
+        kEnglishName: 'Bhojpuri'
+      },
+      {
+        kNativeName: 'മലയാളം',
+        kLanguageCode: languagesCodeList[18],
+        kEnglishName: 'Malayalam'
+      },
+      // {
+      //   kNativeName: 'राजस्थानी',
+      //   kLanguageCode: languagesCodeList[19],
+      //   kEnglishName: 'Rajasthani'
+      // },
+      // {
+      //   kNativeName: 'Bodo',
+      //   kLanguageCode: languagesCodeList[20],
+      //   kEnglishName: 'Bodo'
+      // },
+      {
+        kNativeName: 'মানিপুরি',
+        kLanguageCode: languagesCodeList[21],
+        kEnglishName: 'Manipuri'
+      },
+      {
+        kNativeName: 'كٲشُر',
+        kLanguageCode: languagesCodeList[22],
+        kEnglishName: 'Kashmiri'
+      },
+      {
+        kNativeName: 'कोंकणी',
+        kLanguageCode: languagesCodeList[23],
+        kEnglishName: 'Konkani'
+      },
+      {
+        kNativeName: 'सिंधी',
+        kLanguageCode: languagesCodeList[24],
+        kEnglishName: 'Sindhi'
+      },
+      {
+        kNativeName: 'ᱥᱟᱱᱛᱟᱲᱤ',
+        kLanguageCode: languagesCodeList[25],
+        kEnglishName: 'Santali'
+      },
     ]
   };
 
-  static String getLanguageCodeOrName(
-      {required String value,
-      required LanguageMap returnWhat,
-      required Map<String, List<Map<String, String>>> lang_code_map}) {
+  static String getLanguageCodeOrName({
+    required String value,
+    required LanguageMap returnWhat,
+    required Map<String, List<Map<String, String>>> lang_code_map,
+    String? langCode,
+  }) {
     // If Language Code is to be returned that means the value received is a language name
     try {
       switch (returnWhat) {
@@ -108,24 +340,41 @@ class APIConstants {
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kNativeName] ?? 'No Language Name Found';
+          return returningLangPair[kNativeName] ?? '';
 
         case LanguageMap.englishName:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
-                  eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
+                  eachLanguageCodeNamePair[kLanguageCode]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kEnglishName] ?? 'No Language Name Found';
+          return returningLangPair[kEnglishName] ?? '';
 
         case LanguageMap.languageCode:
           var returningLangPair = lang_code_map[kLanguageCodeList]!.firstWhere(
               (eachLanguageCodeNamePair) =>
                   eachLanguageCodeNamePair[kNativeName]!.toLowerCase() ==
                   value.toLowerCase());
-          return returningLangPair[kLanguageCode] ?? 'No Language Code Found';
+          return returningLangPair[kLanguageCode] ?? '';
+        case LanguageMap.languageNameInAppLanguage:
+          String languageNameInAppLanguage = '';
+
+          Map<String, String>? selectedLanguageMap =
+              TranslatedLanguagesMap.language[langCode];
+
+          if (selectedLanguageMap != null &&
+              selectedLanguageMap[value] != null &&
+              selectedLanguageMap[value]!.isNotEmpty) {
+            languageNameInAppLanguage = selectedLanguageMap[value]!;
+          } else {
+            languageNameInAppLanguage = APIConstants.getLanguageCodeOrName(
+                value: value,
+                returnWhat: LanguageMap.englishName,
+                lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+          }
+          return languageNameInAppLanguage;
       }
     } catch (e) {
-      return 'No Language Found';
+      return '';
     }
   }
 }

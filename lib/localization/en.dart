@@ -19,6 +19,7 @@ final Map<String, String> en = {
   translateSentencesFromOneIndianLanguageToAnother:
       'Translate sentences from one Indian language to another',
   bhashaverseChatBot: 'Bhashaverse Chat bot',
+  bhashiniChatBot: 'Bhashini Chat bot',
   selectVoiceAssistant: 'Select Voice Assistant Avatar',
   youWillHearTheTranslationText:
       'You will hear the translation in the voice of the avatar you selected. You can always change avatar from settings.',
@@ -42,7 +43,7 @@ final Map<String, String> en = {
   kTranslation: 'Translation',
   kChat: 'Chat',
   kSettings: 'Settings',
-  kHomeLoadingAnimationText: 'Hold up, we are setting up things for you...',
+  kHomeLoadingAnimationText: 'Hold on, we are setting up things for you...',
   kTranslateSourceTitle: 'Translate from',
   kTranslateTargetTitle: 'Translate to',
   kTranslationHintText: 'Start typing or press mic to begin',
@@ -68,4 +69,13 @@ final Map<String, String> en = {
   maleVoiceAssistantNotAvailable:
       'Male Voice assistant is not available, Playing from female voice assistant',
   errorNoTextInClipboard: 'No text available in clipboard',
+  s2sStreaming: 'S2S Streaming',
+  connecting: 'Connecting...',
+  somethingWentWrong: 'Something went wrong',
+  tapAndHoldForRecording: 'Please tap and hold mic for recording',
+  cannotPlayAudioAtTheMoment: 'Cannot play audio at the moment',
+  responseNotReceived: 'Error: Response not received',
+  translationNotPossible: 'translation not possible at the moment',
+  bhashiniTitle: 'Bhashini',
+  noAudioFoundToShare: 'No audio found to share',
 };

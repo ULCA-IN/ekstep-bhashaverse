@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 
+import 'enums/gender_enum.dart';
 import 'localization/app_localization.dart';
 import 'localization/localization_keys.dart';
 import 'presentation/splash_screen/binding/splash_binding.dart';
@@ -34,14 +35,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Box hiveDBInstance = Hive.box(hiveDBName);
-    String appLocale =
-        hiveDBInstance.get(preferredAppLocale, defaultValue: 'en');
+
+    // Localization preference
+    String appLocale = hiveDBInstance.get(preferredAppLocale,
+        defaultValue: Get.deviceLocale?.languageCode);
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
     }
-    hiveDBInstance.put(enableTransliteration, true);
+
+    // Voice assistant preference
+    if (hiveDBInstance.get(preferredVoiceAssistantGender) == null) {
+      hiveDBInstance.put(preferredVoiceAssistantGender, GenderEnum.female.name);
+    }
+
+    // Transliteration preference
+    if (hiveDBInstance.get(enableTransliteration) == null) {
+      hiveDBInstance.put(enableTransliteration, true);
+    }
+
+    // Streaming vs Batch model preference
+    if (hiveDBInstance.get(isStreamingPreferred) == null) {
+      hiveDBInstance.put(isStreamingPreferred, false);
+    }
+
     return GetMaterialApp(
-      title: appName.tr,
+      onGenerateTitle: (context) => bhashiniTitle.tr,
       debugShowCheckedModeBanner: false,
       translations: AppLocalization(),
       locale: Locale(appLocale),

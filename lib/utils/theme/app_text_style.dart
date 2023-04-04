@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/screen_util/screen_util.dart';
+import '../screen_util/screen_util.dart';
 
 import 'app_colors.dart';
 
 class AppTextStyle {
+  final regular12Arsenic = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 12.toFont,
+    color: arsenicColor,
+  );
+
+  final regular14Arsenic = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14.toFont,
+    color: arsenicColor,
+  );
+
+  final grey14Arsenic = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontSize: 14.toFont,
+    color: manateeGray,
+  );
+
   final light16BalticSea = TextStyle(
     fontWeight: FontWeight.w400,
     fontSize: 16.toFont,
@@ -29,16 +47,16 @@ class AppTextStyle {
     color: balticSea,
   );
 
-  final regular12Arsenic = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 12.toFont,
-    color: arsenicColor,
+  final semibold22BalticSea = TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 22.toFont,
+    color: balticSea,
   );
 
-  final regular14Arsenic = TextStyle(
+  final regular22BalticSea = TextStyle(
     fontWeight: FontWeight.w500,
-    fontSize: 14.toFont,
-    color: arsenicColor,
+    fontSize: 24.toFont,
+    color: balticSea,
   );
 
   final semibold24BalticSea = TextStyle(
@@ -47,13 +65,13 @@ class AppTextStyle {
     color: balticSea,
   );
 
-  final semibold22BalticSea = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 22.toFont,
+  final bold24BalticSea = TextStyle(
+    fontWeight: FontWeight.w800,
+    fontSize: 24.toFont,
     color: balticSea,
   );
 
-  final regular28balticSea = TextStyle(
+  final regular28BalticSea = TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 28.toFont,
     color: balticSea,

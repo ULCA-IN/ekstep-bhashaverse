@@ -31,11 +31,12 @@ class OnboardingController extends GetxController {
       headerText: languageTranslation.tr,
       bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
     ));
-    pages.add(OnboardingModel(
-      imagePath: imgOnboarding4,
-      headerText: bhashaverseChatBot.tr,
-      bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
-    ));
+    // TODO: uncomment after chat feature added
+    // pages.add(OnboardingModel(
+    //   imagePath: imgOnboarding4,
+    //   headerText: bhashaverseChatBot.tr,
+    //   bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
+    // ));
 
     return pages;
   }

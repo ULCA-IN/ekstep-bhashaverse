@@ -65,8 +65,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         return Obx(
                           () {
                             return LanguageSelectionWidget(
-                              title: _languageSelectionController
-                                  .getLanguageList()[index],
+                              title: getLangNameInAppLanguage(
+                                  _languageSelectionController
+                                      .getLanguageList()[index]),
                               subTitle: getNativeNameOfLanguage(
                                   _languageSelectionController
                                       .getLanguageList()[index]),
@@ -83,7 +84,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                                           (element) =>
                                               element == selectedLanguageName));
                                 } else {
-                                  Get.back(result: index);
+                                  Get.back(
+                                      result: _languageSelectionController
+                                          .getLanguageList()[index]);
                                 }
                               },
                               index: index,
@@ -166,18 +169,29 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   }
 
   void performLanguageSearch(String searchString) {
+    if (_languageSelectionController.getLanguageList().isEmpty) {
+      _languageSelectionController
+          .setLanguageList(Get.arguments[kLanguageList]);
+    }
     if (searchString.isNotEmpty) {
       isUserSelectedFromSearchResult = true;
       List<dynamic> tempList = _languageSelectionController.getLanguageList();
       List<dynamic> searchedLanguageList = tempList.where(
-        (language) {
-          return language.toLowerCase().contains(searchString.toLowerCase()) ||
-              getNativeNameOfLanguage(language)
+        (languageCode) {
+          String languageNameInEnglish = APIConstants.getLanguageCodeOrName(
+              value: languageCode,
+              returnWhat: LanguageMap.englishName,
+              lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+
+          return languageNameInEnglish
                   .toLowerCase()
-                  .contains(searchString.toLowerCase());
+                  .contains(searchString.toLowerCase()) ||
+              getNativeNameOfLanguage(languageCode)
+                  .toLowerCase()
+                  .contains(searchString.toLowerCase()) ||
+              getLangNameInAppLanguage(languageCode).contains(searchString);
         },
       ).toList();
-      // _appLanguageController.setCustomLanguageList(searchedLanguageList);
       _languageSelectionController.setLanguageList(searchedLanguageList);
     } else {
       setLanguageListFromArgument();
@@ -189,13 +203,23 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     var langListArgument = Get.arguments[kLanguageList];
     if (langListArgument != null && langListArgument.isNotEmpty) {
       _languageSelectionController.setLanguageList(langListArgument);
+      _languageSelectionController.setSelectedLanguageIndex(
+          _languageSelectionController.getLanguageList().indexWhere(
+              (element) => element == Get.arguments[selectedLanguage]));
     }
   }
 
-  String getNativeNameOfLanguage(String languageName) {
+  String getLangNameInAppLanguage(String languageCode) {
     return APIConstants.getLanguageCodeOrName(
-        value: languageName,
-        returnWhat: LanguageMap.englishName,
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+  }
+
+  String getNativeNameOfLanguage(String languageCode) {
+    return APIConstants.getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.nativeName,
         lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 }

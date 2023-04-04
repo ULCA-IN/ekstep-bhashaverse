@@ -17,6 +17,7 @@ const String languageTranslation = 'languageTranslation';
 const String translateSentencesFromOneIndianLanguageToAnother =
     'translateSentencesFromOneIndianLanguageToAnother';
 const String bhashaverseChatBot = 'bhashaverseChatBot';
+const String bhashiniChatBot = 'bhashiniChatBot';
 
 const String selectVoiceAssistant = 'selectVoiceAssistant';
 const String youWillHearTheTranslationText = 'youWillHearTheTranslationText';
@@ -68,3 +69,12 @@ const String femaleVoiceAssistantNotAvailable =
     'femaleVoiceAssistantNotAvailable';
 const String maleVoiceAssistantNotAvailable = 'maleVoiceAssistantNotAvailable';
 const String errorNoTextInClipboard = 'errorNoTextInClipboard';
+const String s2sStreaming = 's2sStreaming';
+const String connecting = 'connecting';
+const String somethingWentWrong = 'somethingWentWrong';
+const String tapAndHoldForRecording = 'tapAndHoldForRecording';
+const String cannotPlayAudioAtTheMoment = 'cannotPlayAudioAtTheMoment';
+const String responseNotReceived = 'responseNotReceived';
+const String translationNotPossible = 'translationNotPossible';
+const String bhashiniTitle = 'bhashiniTitle';
+const String noAudioFoundToShare = 'noAudioFoundToShare';

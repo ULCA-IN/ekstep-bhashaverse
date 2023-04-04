@@ -1,15 +1,26 @@
 //common
-const hiveDBName = 'db_bhashaverse';
+import 'package:flutter/material.dart';
+
+const hiveDBName = 'db_bhashini';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
 const preferredAppLocale = 'preferred_app_locale';
+const isStreamingPreferred = 'is_streaming_preferred';
+const preferredSourceLanguage = 'preferred_source_language';
+const preferredTargetLanguage = 'preferred_target_language';
 const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
+const recordingFolderName = 'recordings';
 const defaultAudioRecordingName = 'ASRAudio';
 const defaultTTSPlayName = 'TTSAudio';
+const tapAndHoldMinDuration = 600;
+const keyboardHideDuration = Duration(milliseconds: 200);
+const asrTextCharMaxLength = 500;
+const recordingMaxTimeLimit = 30000;
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
+const micBeepSound = 'assets/audio/mic_tap_sound.wav';
 
 // Select App Language Screen
 const imgEnglish = 'assets/images/app_language_img/img_english.png';
@@ -48,6 +59,7 @@ const iconChat = 'assets/images/bottom_bar_icons/icon_chat.svg';
 const iconSettings = 'assets/images/bottom_bar_icons/icon_settings.svg';
 
 // Bottom Nav Translation
+const textFieldRadius = Radius.circular(16);
 const iconArrowSwapHorizontal =
     'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
 const iconMicroPhone = 'assets/images/common_icon/icon_microphone.svg';
@@ -64,8 +76,8 @@ const animationLoadingLine =
     'assets/animation/lottie_animation/loading_line_animation.json';
 const animationTranslationLoading =
     'assets/animation/lottie_animation/animation_translation_loading.json';
-
 const animationStaticWaveForRecording =
     'assets/animation/lottie_animation/voice-line-wave-animation.json';
 const kLanguageList = 'language_list';
 const kIsSourceLanguage = 'is_source_language';
+const selectedLanguage = 'selectedLanguage';

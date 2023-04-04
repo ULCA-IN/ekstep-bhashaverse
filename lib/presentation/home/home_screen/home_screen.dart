@@ -28,7 +28,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _bottomNavTranslationController = Get.find();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
-    _homeController.calcAvailableSourceAndTargetLanguages();
+
+    _homeController.isLoading.value = true;
+    _homeController.getAvailableLanguagesInTask().then((_) {
+      _homeController.getTransliterationModels().then((_) {
+        _homeController.isLoading.value = false;
+        BottomNavTranslationController translationController = Get.find();
+        translationController.getSourceTargetLangFromDB();
+      });
+    });
   }
 
   @override
@@ -69,12 +77,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         )
                 ],
               ),
-              if (_homeController.isModelsLoading.value ||
-                  _bottomNavTranslationController.isLsLoading.value)
+              if (_homeController.isLoading.value ||
+                  _bottomNavTranslationController.isLoading.value)
                 LottieAnimation(
                     context: context,
                     lottieAsset: animationLoadingLine,
-                    footerText: _homeController.isModelsLoading.value
+                    footerText: _homeController.isLoading.value
                         ? kHomeLoadingAnimationText.tr
                         : kTranslationLoadingAnimationText.tr),
             ],
