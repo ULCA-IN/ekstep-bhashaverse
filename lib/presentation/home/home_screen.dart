@@ -1,3 +1,4 @@
+import 'package:bhashaverse/models/home_menu_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -23,13 +24,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final HomeController _homeController;
 
-  final List<Map<String, String>> menuItems = [
-    {text.tr: imgText},
-    {converge.tr: imgVoiceSpeaking},
-    {voice.tr: imgMic},
-    {video.tr: imgVideo},
-    {documents.tr: imgDocuments},
-    {images.tr: imgImages},
+  final List<HomeMenuModel> menuItems = [
+    HomeMenuModel(name: text.tr, imagePath: imgText, isDisabled: false),
+    HomeMenuModel(
+        name: converse.tr, imagePath: imgVoiceSpeaking, isDisabled: false),
+    HomeMenuModel(name: voice.tr, imagePath: imgMic, isDisabled: false),
+    HomeMenuModel(name: video.tr, imagePath: imgVideo, isDisabled: true),
+    HomeMenuModel(
+        name: documents.tr, imagePath: imgDocuments, isDisabled: true),
+    HomeMenuModel(name: images.tr, imagePath: imgImages, isDisabled: true),
   ];
 
   @override
@@ -105,9 +108,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       shrinkWrap: true,
                       children: List.generate(menuItems.length, (index) {
                         return MenuItem(
-                          title: menuItems[index].keys.first,
-                          image: menuItems[index].values.first,
-                          isDisabled: index != 1,
+                          title: menuItems[index].name,
+                          image: menuItems[index].imagePath,
+                          isDisabled: menuItems[index].isDisabled,
                           onTap: () => _handleMenuTap(index),
                         );
                       }),
@@ -135,12 +138,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   _handleMenuTap(int index) {
     switch (index) {
-      case 1:
+      case 0:
         Get.toNamed(AppRoutes.textTranslationRoute);
+        break;
+      case 1:
+        Get.toNamed(AppRoutes.conversationRoute);
+        break;
+      case 2:
+        Get.toNamed(AppRoutes.voiceTextTranslationRoute);
         break;
       default:
         showDefaultSnackbar(
-            message: '${menuItems[index].keys.first} not available currently');
+            message: '${menuItems[index].name} not available currently');
         break;
     }
   }
