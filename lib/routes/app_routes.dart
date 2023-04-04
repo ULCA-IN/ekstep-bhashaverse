@@ -18,6 +18,8 @@ import '../presentation/splash/binding/splash_binding.dart';
 import '../presentation/splash/splash_screen.dart';
 import '../presentation/text_translate/binding/text_translate_binding.dart';
 import '../presentation/text_translate/text_translate_screen.dart';
+import '../presentation/voice_text_translate/binding/voice_text_translate_binding.dart';
+import '../presentation/voice_text_translate/voice_text_translate_screen.dart';
 
 class AppRoutes {
   static String homeRoute = '/home_route';
@@ -27,6 +29,7 @@ class AppRoutes {
   static String onboardingRoute = '/onboarding_route';
   static String textTranslationRoute = '/text_translation_route';
   static String conversationRoute = '/conversation_route';
+  static String voiceTextTranslationRoute = '/voice_text_translation_route';
   static String languageSelectionRoute = '/language_selection_route';
   static String settingsRoute = '/settingsRoute';
 
@@ -65,6 +68,11 @@ class AppRoutes {
       name: conversationRoute,
       page: () => const ConversationScreen(),
       binding: ConversationBinding(),
+    ),
+    GetPage(
+      name: voiceTextTranslationRoute,
+      page: () => const VoiceTextTranslateScreen(),
+      binding: VoiceTextTranslateBinding(),
     ),
     GetPage(
       name: languageSelectionRoute,
