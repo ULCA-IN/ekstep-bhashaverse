@@ -87,7 +87,7 @@ class _ConversationScreenState extends State<ConversationScreen>
                     height: 18.toHeight,
                   ),
                   CommonAppBar(
-                      title: converge.tr, onBackPress: () => Get.back()),
+                      title: converse.tr, onBackPress: () => Get.back()),
                   SizedBox(
                     height: 24.toHeight,
                   ),
