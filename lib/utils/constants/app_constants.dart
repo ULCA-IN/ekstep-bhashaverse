@@ -15,7 +15,7 @@ const defaultAudioRecordingName = 'ASRAudio';
 const defaultTTSPlayName = 'TTSAudio';
 const tapAndHoldMinDuration = 600;
 const keyboardHideDuration = Duration(milliseconds: 200);
-const asrTextCharMaxLength = 500;
+const textCharMaxLength = 500;
 const recordingMaxTimeLimit = 30000;
 
 // App Assets
@@ -74,6 +74,7 @@ const iconShare = 'assets/images/common_icon/icon_share.svg';
 const iconSound = 'assets/images/common_icon/icon_sound.svg';
 const iconStopPlayback = 'assets/images/common_icon/icon_stop_playback.svg';
 const iconMicStop = 'assets/images/common_icon/icon_mic_stop.svg';
+const iconDownArrow = 'assets/images/common_icon/icon_down_arrow.svg';
 const animationHomeLoading =
     'assets/animation/lottie_animation/animation_home_loading.json';
 const animationLoadingLine =
