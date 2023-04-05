@@ -1,8 +1,8 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:bhashaverse/common/widgets/mic_button.dart';
+import 'package:bhashaverse/enums/current_mic.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
@@ -94,11 +94,6 @@ class _ConversationScreenState extends State<ConversationScreen>
                   Expanded(
                     child: Column(
                       children: [
-                        Obx(
-                          () => _translationController.isKeyboardVisible.value
-                              ? const SizedBox.shrink()
-                              : _buildSourceTargetLangButtons(),
-                        ),
                         SizedBox(height: 20.toHeight),
                         Expanded(
                           child: AnimatedContainer(
@@ -117,14 +112,10 @@ class _ConversationScreenState extends State<ConversationScreen>
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Obx(() => Flexible(
-                                      child: _buildSourceLanguageInput())),
+                                  Flexible(child: _buildSourceLanguageInput()),
                                   SizedBox(height: 6.toHeight),
                                   Obx(
-                                    () => _translationController
-                                                .isTranslateCompleted.value ||
-                                            _hiveDBInstance
-                                                .get(isStreamingPreferred)
+                                    () => !_sourceLangFocusNode.hasFocus
                                         ? ASRAndTTSActions(
                                             textToCopy: _translationController
                                                 .sourceLanTextController.text
@@ -151,7 +142,11 @@ class _ConversationScreenState extends State<ConversationScreen>
                                                 await _translationController
                                                     .stopPlayer();
                                               } else if (_translationController
-                                                  .isRecordedViaMic.value) {
+                                                      .isRecordedViaMic.value &&
+                                                  _translationController
+                                                          .currentMic.value ==
+                                                      CurrentlySelectedMic
+                                                          .source) {
                                                 _translationController
                                                     .playTTSOutput();
                                               } else {
@@ -176,7 +171,13 @@ class _ConversationScreenState extends State<ConversationScreen>
                                                 _translationController
                                                     .sourceSpeakerStatus.value,
                                           )
-                                        : _buildLimitCountAndTranslateButton(),
+                                        : _buildLimitCountAndTranslateButton(
+                                            showMicButton:
+                                                isRecordingStarted() &&
+                                                    _translationController
+                                                            .currentMic.value ==
+                                                        CurrentlySelectedMic
+                                                            .source),
                                   ),
                                 ],
                               ),
@@ -204,51 +205,82 @@ class _ConversationScreenState extends State<ConversationScreen>
                                           child: _buildTargetLanguageInput()),
                                       SizedBox(height: 6.toHeight),
                                       Obx(
-                                        () => ASRAndTTSActions(
-                                          textToCopy: _translationController
-                                              .targetLangTextController.text
-                                              .trim(),
-                                          audioPathToShare:
-                                              _translationController
-                                                  .targetLangTTSPath,
-                                          currentDuration: DateTImeUtils()
-                                              .getTimeFromMilliseconds(
-                                                  timeInMillisecond:
-                                                      _translationController
-                                                          .currentDuration
-                                                          .value),
-                                          totalDuration: DateTImeUtils()
-                                              .getTimeFromMilliseconds(
-                                                  timeInMillisecond:
-                                                      _translationController
-                                                          .maxDuration.value),
-                                          isRecordedAudio: !_hiveDBInstance
-                                              .get(isStreamingPreferred),
-                                          onMusicPlayOrStop: () async {
-                                            if (isAudioPlaying(
-                                                isForTargetSection: true)) {
-                                              await _translationController
-                                                  .stopPlayer();
-                                            } else {
-                                              _translationController
-                                                  .getComputeResTTS(
-                                                sourceText:
+                                        () => _translationController
+                                                    .isTranslateCompleted
+                                                    .value ||
+                                                _hiveDBInstance
+                                                    .get(isStreamingPreferred)
+                                            ? ASRAndTTSActions(
+                                                textToCopy:
                                                     _translationController
                                                         .targetLangTextController
-                                                        .text,
-                                                languageCode:
+                                                        .text
+                                                        .trim(),
+                                                audioPathToShare:
                                                     _translationController
-                                                        .selectedTargetLanguageCode
+                                                        .targetLangTTSPath,
+                                                currentDuration: DateTImeUtils()
+                                                    .getTimeFromMilliseconds(
+                                                        timeInMillisecond:
+                                                            _translationController
+                                                                .currentDuration
+                                                                .value),
+                                                totalDuration: DateTImeUtils()
+                                                    .getTimeFromMilliseconds(
+                                                        timeInMillisecond:
+                                                            _translationController
+                                                                .maxDuration
+                                                                .value),
+                                                isRecordedAudio:
+                                                    !_hiveDBInstance.get(
+                                                        isStreamingPreferred),
+                                                onMusicPlayOrStop: () async {
+                                                  if (isAudioPlaying(
+                                                      isForTargetSection:
+                                                          true)) {
+                                                    await _translationController
+                                                        .stopPlayer();
+                                                  } else if (_translationController
+                                                          .isRecordedViaMic
+                                                          .value &&
+                                                      _translationController
+                                                              .currentMic
+                                                              .value ==
+                                                          CurrentlySelectedMic
+                                                              .target) {
+                                                    _translationController
+                                                        .playTTSOutput();
+                                                  } else {
+                                                    _translationController
+                                                        .getComputeResTTS(
+                                                      sourceText:
+                                                          _translationController
+                                                              .targetLangTextController
+                                                              .text,
+                                                      languageCode:
+                                                          _translationController
+                                                              .selectedTargetLanguageCode
+                                                              .value,
+                                                      isTargetLanguage: true,
+                                                    );
+                                                  }
+                                                },
+                                                playerController:
+                                                    _translationController
+                                                        .controller,
+                                                speakerStatus:
+                                                    _translationController
+                                                        .targetSpeakerStatus
                                                         .value,
-                                                isTargetLanguage: true,
-                                              );
-                                            }
-                                          },
-                                          playerController:
-                                              _translationController.controller,
-                                          speakerStatus: _translationController
-                                              .targetSpeakerStatus.value,
-                                        ),
+                                              )
+                                            : _buildLimitCountAndTranslateButton(
+                                                showMicButton:
+                                                    isRecordingStarted() &&
+                                                        _translationController
+                                                                .currentMic
+                                                                .value ==
+                                                            CurrentlySelectedMic
+                                                                .target),
                                       )
                                     ],
                                   ),
@@ -259,13 +291,14 @@ class _ConversationScreenState extends State<ConversationScreen>
                   SizedBox(
                       height: _translationController.isKeyboardVisible.value
                           ? 0
-                          : 8.toHeight),
+                          : 30.toHeight),
                   _buildTransliterationHints(),
                   Obx(
                     () => _translationController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
+                  SizedBox(height: 30.toHeight),
                 ],
               ),
             ),
@@ -363,7 +396,7 @@ class _ConversationScreenState extends State<ConversationScreen>
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
       expands: true,
-      maxLength: asrTextCharMaxLength,
+      maxLength: textCharMaxLength,
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         hintText: _translationController.isTranslateCompleted.value
@@ -409,7 +442,6 @@ class _ConversationScreenState extends State<ConversationScreen>
       maxLines: null,
       expands: true,
       style: AppTextStyle().regular18balticSea,
-      readOnly: true,
       textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
         border: InputBorder.none,
@@ -419,11 +451,11 @@ class _ConversationScreenState extends State<ConversationScreen>
     );
   }
 
-  Widget _buildLimitCountAndTranslateButton() {
+  Widget _buildLimitCountAndTranslateButton({required bool showMicButton}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _translationController.micButtonStatus.value == MicButtonStatus.pressed
+        showMicButton
             ? Row(
                 children: [
                   AvatarGlow(
@@ -473,11 +505,11 @@ class _ConversationScreenState extends State<ConversationScreen>
                   int sourceCharLength =
                       _translationController.sourceTextCharLimit.value;
                   return Text(
-                    '$sourceCharLength/$asrTextCharMaxLength',
+                    '$sourceCharLength/$textCharMaxLength',
                     style: AppTextStyle().grey14Arsenic.copyWith(
-                        color: sourceCharLength >= asrTextCharMaxLength
+                        color: sourceCharLength >= textCharMaxLength
                             ? brickRed
-                            : sourceCharLength >= asrTextCharMaxLength - 20
+                            : sourceCharLength >= textCharMaxLength - 20
                                 ? frolyRed
                                 : manateeGray),
                   );
@@ -509,191 +541,136 @@ class _ConversationScreenState extends State<ConversationScreen>
     );
   }
 
-  Widget _buildSourceTargetLangButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
-
-            List<dynamic> sourceLanguageList =
-                _languageModelController.sourceTargetLanguageMap.keys.toList();
-
-            dynamic selectedSourceLangCode =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: sourceLanguageList,
-              kIsSourceLanguage: true,
-              selectedLanguage:
-                  _translationController.selectedSourceLanguageCode.value,
-            });
-            if (selectedSourceLangCode != null) {
-              _translationController.selectedSourceLanguageCode.value =
-                  selectedSourceLangCode;
-              _hiveDBInstance.put(
-                  preferredSourceLanguage, selectedSourceLangCode);
-              String selectedTargetLangCode =
-                  _translationController.selectedTargetLanguageCode.value;
-              if (selectedTargetLangCode.isNotEmpty) {
-                if (!_languageModelController
-                    .sourceTargetLanguageMap[selectedSourceLangCode]!
-                    .contains(selectedTargetLangCode)) {
-                  _translationController.selectedTargetLanguageCode.value = '';
-                }
-              }
-              await _translationController.resetAllValues();
-              VoiceRecorder voiceRecorder = VoiceRecorder();
-              await voiceRecorder.clearOldRecordings();
-            }
-          },
-          child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () {
-                String selectedSourceLanguage = _translationController
-                        .selectedSourceLanguageCode.value.isNotEmpty
-                    ? _translationController.getSelectedSourceLanguageName()
-                    : kTranslateSourceTitle.tr;
-                return AutoSizeText(
-                  selectedSourceLanguage,
-                  maxLines: 2,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
-                );
-              },
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            _translationController.swapSourceAndTargetLanguage();
-          },
-          child: SvgPicture.asset(
-            iconArrowSwapHorizontal,
-            height: 32.toHeight,
-            width: 32.toWidth,
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
-            if (_translationController
-                .selectedSourceLanguageCode.value.isEmpty) {
-              showDefaultSnackbar(
-                  message: 'Please select source language first');
-              return;
-            }
-
-            List<dynamic> targetLanguageList = _languageModelController
-                .sourceTargetLanguageMap[
-                    _translationController.selectedSourceLanguageCode.value]!
-                .toList();
-
-            dynamic selectedTargetLangCode =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: targetLanguageList,
-              kIsSourceLanguage: false,
-              selectedLanguage:
-                  _translationController.selectedTargetLanguageCode.value,
-            });
-            if (selectedTargetLangCode != null) {
-              _translationController.selectedTargetLanguageCode.value =
-                  selectedTargetLangCode;
-              _hiveDBInstance.put(
-                  preferredTargetLanguage, selectedTargetLangCode);
-              if (_translationController
-                  .sourceLanTextController.text.isNotEmpty)
-                _translationController.getComputeResponseASRTrans(
-                    isRecorded: false);
-            }
-          },
-          child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () {
-                String selectedTargetLanguage = _translationController
-                        .selectedTargetLanguageCode.value.isNotEmpty
-                    ? _translationController.getSelectedTargetLanguageName()
-                    : kTranslateTargetTitle.tr;
-                return AutoSizeText(
-                  selectedTargetLanguage,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
-                  maxLines: 2,
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildMicButton() {
-    return Obx(
-      () => Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
+    return Padding(
+      padding: AppEdgeInsets.instance.symmetric(horizontal: 18.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          AnimatedOpacity(
-            opacity: isRecordingStarted() ? 1 : 0,
-            duration: const Duration(milliseconds: 600),
-            child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
-              child: LottieBuilder.asset(
-                animationStaticWaveForRecording,
-                fit: BoxFit.cover,
-                animate: isRecordingStarted(),
+          Flexible(
+            child: Obx(() {
+              String selectedSourceLanguage = _translationController
+                      .selectedSourceLanguageCode.value.isNotEmpty
+                  ? _translationController.getSelectedSourceLanguageName()
+                  : kTranslateSourceTitle.tr;
+              return MicButton(
+                isRecordingStarted: isRecordingStarted() &&
+                    _translationController.currentMic.value ==
+                        CurrentlySelectedMic.source,
+                expandWhenRecording: false,
+                languageName: selectedSourceLanguage,
+                onMicButtonTap: (isPressed) {
+                  _translationController.currentMic.value =
+                      CurrentlySelectedMic.source;
+                  micButtonActions(startMicRecording: isPressed);
+                },
+                onLanguageTap: () async {
+                  _sourceLangFocusNode.unfocus();
+                  _transLangFocusNode.unfocus();
+
+                  List<dynamic> sourceLanguageList = _languageModelController
+                      .sourceTargetLanguageMap.keys
+                      .toList();
+
+                  dynamic selectedSourceLangCode = await Get.toNamed(
+                      AppRoutes.languageSelectionRoute,
+                      arguments: {
+                        kLanguageList: sourceLanguageList,
+                        kIsSourceLanguage: true,
+                        selectedLanguage: _translationController
+                            .selectedSourceLanguageCode.value,
+                      });
+                  if (selectedSourceLangCode != null) {
+                    _translationController.selectedSourceLanguageCode.value =
+                        selectedSourceLangCode;
+                    _hiveDBInstance.put(
+                        preferredSourceLanguage, selectedSourceLangCode);
+                    String selectedTargetLangCode =
+                        _translationController.selectedTargetLanguageCode.value;
+                    if (selectedTargetLangCode.isNotEmpty) {
+                      if (!_languageModelController
+                          .sourceTargetLanguageMap[selectedSourceLangCode]!
+                          .contains(selectedTargetLangCode)) {
+                        _translationController
+                            .selectedTargetLanguageCode.value = '';
+                      }
+                    }
+                    await _translationController.resetAllValues();
+                    VoiceRecorder voiceRecorder = VoiceRecorder();
+                    await voiceRecorder.clearOldRecordings();
+                  }
+                },
+              );
+            }),
+          ),
+          Flexible(
+            child: AnimatedOpacity(
+              opacity: isRecordingStarted() ? 1 : 0,
+              duration: const Duration(milliseconds: 600),
+              child: Padding(
+                padding: AppEdgeInsets.instance.symmetric(horizontal: 0),
+                child: LottieBuilder.asset(
+                  animationStaticWaveForRecording,
+                  fit: BoxFit.fitWidth,
+                  animate: isRecordingStarted(),
+                  repeat: true,
+                ),
               ),
             ),
           ),
-          GestureDetector(
-            onTapDown: (_) => micButtonActions(startMicRecording: true),
-            onTapUp: (_) => micButtonActions(startMicRecording: false),
-            onTapCancel: () => micButtonActions(startMicRecording: false),
-            onPanEnd: (_) => micButtonActions(startMicRecording: false),
-            child: PhysicalModel(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              elevation: 6,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isRecordingStarted()
-                      ? tangerineOrangeColor
-                      : flushOrangeColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: AppEdgeInsets.instance
-                      .all(isRecordingStarted() ? 28 : 20.0),
-                  child: SvgPicture.asset(
-                    _translationController.micButtonStatus.value ==
-                            MicButtonStatus.pressed
-                        ? iconMicStop
-                        : iconMicroPhone,
-                    height: 32.toHeight,
-                    width: 32.toWidth,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                ),
-              ),
-            ),
+          Flexible(
+            child: Obx(() {
+              String selectedTargetLanguage = _translationController
+                      .selectedTargetLanguageCode.value.isNotEmpty
+                  ? _translationController.getSelectedTargetLanguageName()
+                  : kTranslateTargetTitle.tr;
+              return MicButton(
+                isRecordingStarted: isRecordingStarted() &&
+                    _translationController.currentMic.value ==
+                        CurrentlySelectedMic.target,
+                expandWhenRecording: false,
+                languageName: selectedTargetLanguage,
+                onMicButtonTap: (isPressed) {
+                  _translationController.currentMic.value =
+                      CurrentlySelectedMic.target;
+                  micButtonActions(startMicRecording: isPressed);
+                },
+                onLanguageTap: () async {
+                  _sourceLangFocusNode.unfocus();
+                  _transLangFocusNode.unfocus();
+                  if (_translationController
+                      .selectedSourceLanguageCode.value.isEmpty) {
+                    showDefaultSnackbar(
+                        message: 'Please select source language first');
+                    return;
+                  }
+
+                  List<dynamic> targetLanguageList = _languageModelController
+                      .sourceTargetLanguageMap[_translationController
+                          .selectedSourceLanguageCode.value]!
+                      .toList();
+
+                  dynamic selectedTargetLangCode = await Get.toNamed(
+                      AppRoutes.languageSelectionRoute,
+                      arguments: {
+                        kLanguageList: targetLanguageList,
+                        kIsSourceLanguage: false,
+                        selectedLanguage: _translationController
+                            .selectedTargetLanguageCode.value,
+                      });
+                  if (selectedTargetLangCode != null) {
+                    _translationController.selectedTargetLanguageCode.value =
+                        selectedTargetLangCode;
+                    _hiveDBInstance.put(
+                        preferredTargetLanguage, selectedTargetLangCode);
+                    if (_translationController
+                        .sourceLanTextController.text.isNotEmpty)
+                      _translationController.getComputeResponseASRTrans(
+                          isRecorded: false);
+                  }
+                },
+              );
+            }),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/enums/current_mic.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,7 @@ class ConversationController extends GetxController {
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled);
   Rx<SpeakerStatus> targetSpeakerStatus = Rx(SpeakerStatus.disabled);
   int samplingRate = 16000;
+  Rx<CurrentlySelectedMic> currentMic = Rx(CurrentlySelectedMic.none);
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -442,20 +444,29 @@ class ConversationController extends GetxController {
     String asrServiceId = '';
     String translationServiceId = '';
 
-    asrServiceId = getTaskTypeServiceID(
+    asrServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'asr',
             selectedSourceLanguageCode.value) ??
         '';
-    translationServiceId = getTaskTypeServiceID(
+    translationServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'translation',
             selectedSourceLanguageCode.value) ??
         '';
 
+    String sourceLang = '', targetLang = '';
+    if (currentMic.value == CurrentlySelectedMic.target) {
+      sourceLang = selectedTargetLanguageCode.value;
+      targetLang = selectedSourceLanguageCode.value;
+    } else {
+      sourceLang = selectedSourceLanguageCode.value;
+      targetLang = selectedTargetLanguageCode.value;
+    }
+
     var asrPayloadToSend = APIConstants.createComputePayloadASRTrans(
-        srcLanguage: selectedSourceLanguageCode.value,
-        targetLanguage: selectedTargetLanguageCode.value,
+        srcLanguage: sourceLang,
+        targetLanguage: targetLang,
         isRecorded: isRecorded,
         inputData: isRecorded ? base64Value! : sourceLanTextController.text,
         audioFormat: Platform.isIOS ? 'flac' : 'wav',
@@ -476,13 +487,16 @@ class ConversationController extends GetxController {
     response.when(
       success: (taskResponse) async {
         if (isRecorded) {
-          sourceLanTextController.text = taskResponse.pipelineResponse
+          String sourceLangText = taskResponse.pipelineResponse
                   ?.firstWhere((element) => element.taskType == 'asr')
                   .output
                   ?.first
                   .source
                   ?.trim() ??
               '';
+          currentMic.value == CurrentlySelectedMic.source
+              ? sourceLanTextController.text = sourceLangText
+              : targetLangTextController.text = sourceLangText;
         }
         String outputTargetText = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
@@ -496,7 +510,9 @@ class ConversationController extends GetxController {
           showDefaultSnackbar(message: responseNotReceived.tr);
           return;
         }
-        targetLangTextController.text = outputTargetText;
+        currentMic.value == CurrentlySelectedMic.target
+            ? sourceLanTextController.text = outputTargetText
+            : targetLangTextController.text = outputTargetText;
         isTranslateCompleted.value = true;
         isLoading.value = false;
         sourceLangTTSPath = '';
@@ -523,7 +539,7 @@ class ConversationController extends GetxController {
           ? targetSpeakerStatus.value = SpeakerStatus.loading
           : sourceSpeakerStatus.value = SpeakerStatus.loading;
 
-      String ttsServiceId = getTaskTypeServiceID(
+      String ttsServiceId = APIConstants.getTaskTypeServiceID(
               _languageModelController.taskSequenceResponse,
               'tts',
               selectedSourceLanguageCode.value) ??
@@ -593,33 +609,12 @@ class ConversationController extends GetxController {
     }
   }
 
-  String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
-      String taskType, String sourceLanguageCode,
-      [String? targetLanguageCode]) {
-    List<Config>? configs = sequenceResponse.pipelineResponseConfig
-        ?.firstWhere((element) => element.taskType == taskType)
-        .config;
-    for (var config in configs!) {
-      if (config.language?.sourceLanguage == sourceLanguageCode) {
-        // sends translation service id
-        if (targetLanguageCode != null) {
-          if (config.language?.targetLanguage == targetLanguageCode) {
-            return config.serviceId;
-          } else {
-            return '';
-          }
-        } else
-          return config.serviceId; // sends ASR, TTS service id
-      }
-    }
-    return '';
-  }
-
   void playTTSOutput() async {
     if (sourceLangASRPath != null && sourceLangASRPath!.isNotEmpty) {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
       await prepareWaveforms(sourceLangASRPath!,
-          isRecordedAudio: true, isTargetLanguage: false);
+          isRecordedAudio: true,
+          isTargetLanguage: currentMic.value == CurrentlySelectedMic.target);
     }
   }
 
