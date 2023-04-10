@@ -78,21 +78,50 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           SizedBox(
             height: 18.toHeight,
           ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
+          Stack(
             children: [
-              Image.asset(
-                imgAppLogoSmall,
-                height: 30.toHeight,
-                width: 30.toWidth,
+              Align(
+                alignment: Alignment.center,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Image.asset(
+                    imgAppLogoSmall,
+                    height: 30.toHeight,
+                    width: 30.toWidth,
+                  ),
+                  SizedBox(
+                    width: 8.toWidth,
+                  ),
+                  Text(
+                    bhashiniTitle.tr,
+                    textAlign: TextAlign.center,
+                    style: AppTextStyle().bold24BalticSea,
+                  ),
+                ]),
               ),
-              SizedBox(
-                width: 8.toWidth,
-              ),
-              Text(
-                bhashiniTitle.tr,
-                textAlign: TextAlign.center,
-                style: AppTextStyle().bold24BalticSea,
+              Positioned(
+                // alignment: Alignment.centerRight,
+                right: 0,
+                bottom: 0,
+                child: StreamBuilder<int>(
+                  stream: _bottomNavTranslationController
+                      .stopWatchTimerForDemo.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(
+                        value ?? 0,
+                        hours: false,
+                        minute: false,
+                        milliSecond: true);
+                    return Text(
+                      displayTime,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Helvetica',
+                          fontWeight: FontWeight.bold),
+                    );
+                  },
+                ),
               ),
             ],
           ),

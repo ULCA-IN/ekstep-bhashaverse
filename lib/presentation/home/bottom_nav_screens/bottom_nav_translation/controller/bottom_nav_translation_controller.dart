@@ -39,6 +39,8 @@ class BottomNavTranslationController extends GetxController {
   TextEditingController sourceLanTextController = TextEditingController();
   TextEditingController targetLangTextController = TextEditingController();
 
+  final stopWatchTimerForDemo = StopWatchTimer(mode: StopWatchMode.countUp);
+
   final ScrollController transliterationHintsScrollController =
       ScrollController();
 
@@ -468,6 +470,10 @@ class BottomNavTranslationController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
         samplingRate: samplingRate);
 
+    // Start demo timer
+    stopWatchTimerForDemo.onResetTimer();
+    stopWatchTimerForDemo.onStartTimer();
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -479,6 +485,7 @@ class BottomNavTranslationController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
+        stopWatchTimerForDemo.onStopTimer();
         if (isRecorded) {
           sourceLanTextController.text = taskResponse.pipelineResponse
                   ?.firstWhere((element) => element.taskType == 'asr')
@@ -509,6 +516,7 @@ class BottomNavTranslationController extends GetxController {
         targetSpeakerStatus.value = SpeakerStatus.stopped;
       },
       failure: (error) {
+        stopWatchTimerForDemo.onStopTimer();
         isLoading.value = false;
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
@@ -539,6 +547,10 @@ class BottomNavTranslationController extends GetxController {
           ttsServiceID: ttsServiceId,
           preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
 
+      // Start demo timer
+      stopWatchTimerForDemo.onResetTimer();
+      stopWatchTimerForDemo.onStartTimer();
+
       var response = await _dhruvaapiClient.sendComputeRequest(
           baseUrl: _languageModelController
               .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -550,6 +562,8 @@ class BottomNavTranslationController extends GetxController {
 
       response.when(
         success: (taskResponse) async {
+          stopWatchTimerForDemo.onStopTimer();
+
           ttsResponse = taskResponse.pipelineResponse
               ?.firstWhere((element) => element.taskType == 'tts')
               .audio[0]['audioContent'];
@@ -581,6 +595,7 @@ class BottomNavTranslationController extends GetxController {
           }
         },
         failure: (error) {
+          stopWatchTimerForDemo.onStopTimer();
           isTargetLanguage
               ? targetSpeakerStatus.value = SpeakerStatus.stopped
               : sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -653,6 +668,7 @@ class BottomNavTranslationController extends GetxController {
     maxDuration.value = 0;
     currentDuration.value = 0;
     sourceLangASRPath = '';
+    stopWatchTimerForDemo.onResetTimer();
     await stopPlayer();
     sourceSpeakerStatus.value = SpeakerStatus.disabled;
     targetSpeakerStatus.value = SpeakerStatus.disabled;
