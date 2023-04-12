@@ -45,13 +45,15 @@ class BottomNavTranslationController extends GetxController {
   RxBool isTranslateCompleted = false.obs;
   bool isMicPermissionGranted = false;
   RxBool isLoading = false.obs;
-  RxString selectedSourceLanguageCode = ''.obs;
+  RxString selectedSourceLanguageCode = ''.obs,
+      targetOutputText = ''.obs,
+      targetLangTTSPath = ''.obs,
+      sourceLangTTSPath = ''.obs;
   RxString selectedTargetLanguageCode = ''.obs;
   dynamic ttsResponse;
   RxBool isRecordedViaMic = false.obs;
   RxBool isKeyboardVisible = false.obs;
   String? sourceLangASRPath = '';
-  String sourceLangTTSPath = '', targetLangTTSPath = '';
   RxInt maxDuration = 0.obs,
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
@@ -485,23 +487,23 @@ class BottomNavTranslationController extends GetxController {
                   ?.trim() ??
               '';
         }
-        String outputTargetText = taskResponse.pipelineResponse
+        targetOutputText.value = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
                 ?.first
                 .target
                 ?.trim() ??
             '';
-        if (outputTargetText.isEmpty) {
+        if (targetOutputText.value.isEmpty) {
           isLoading.value = false;
           showDefaultSnackbar(message: responseNotReceived.tr);
           return;
         }
-        targetLangTextController.text = outputTargetText;
+        targetLangTextController.text = targetOutputText.value;
         isTranslateCompleted.value = true;
         isLoading.value = false;
-        sourceLangTTSPath = '';
-        targetLangTTSPath = '';
+        sourceLangTTSPath.value = '';
+        targetLangTTSPath.value = '';
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
       },
@@ -518,8 +520,8 @@ class BottomNavTranslationController extends GetxController {
     required String languageCode,
     required bool isTargetLanguage,
   }) async {
-    if ((isTargetLanguage && targetLangTTSPath.isEmpty) ||
-        (!isTargetLanguage && sourceLangTTSPath.isEmpty)) {
+    if ((isTargetLanguage && targetLangTTSPath.value.isEmpty) ||
+        (!isTargetLanguage && sourceLangTTSPath.value.isEmpty)) {
       isTargetLanguage
           ? targetSpeakerStatus.value = SpeakerStatus.loading
           : sourceSpeakerStatus.value = SpeakerStatus.loading;
@@ -563,8 +565,8 @@ class BottomNavTranslationController extends GetxController {
             String ttsFilePath =
                 '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
             isTargetLanguage
-                ? targetLangTTSPath = ttsFilePath
-                : sourceLangTTSPath = ttsFilePath;
+                ? targetLangTTSPath.value = ttsFilePath
+                : sourceLangTTSPath.value = ttsFilePath;
             ttsAudioFile = File(ttsFilePath);
             if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
               await ttsAudioFile?.writeAsBytes(fileAsBytes);
@@ -588,7 +590,7 @@ class BottomNavTranslationController extends GetxController {
       );
     } else {
       await prepareWaveforms(
-          isTargetLanguage ? targetLangTTSPath : sourceLangTTSPath,
+          isTargetLanguage ? targetLangTTSPath.value : sourceLangTTSPath.value,
           isRecordedAudio: false,
           isTargetLanguage: isTargetLanguage);
     }
@@ -654,8 +656,8 @@ class BottomNavTranslationController extends GetxController {
     sourceSpeakerStatus.value = SpeakerStatus.disabled;
     targetSpeakerStatus.value = SpeakerStatus.disabled;
     sourceLangASRPath = '';
-    sourceLangTTSPath = '';
-    targetLangTTSPath = '';
+    sourceLangTTSPath.value = '';
+    targetLangTTSPath.value = '';
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
       clearTransliterationHints();
