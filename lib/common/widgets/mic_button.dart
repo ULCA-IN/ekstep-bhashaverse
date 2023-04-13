@@ -66,34 +66,29 @@ class MicButton extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 14.toHeight),
+          SizedBox(height: 10.toHeight),
           Container(
-            // color: flushOrangeColor,
-            // padding: AppEdgeInsets.instance.all(6),
             child: GestureDetector(
               onTap: () => _onLanguageTap(),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  AutoSizeText(
-                    _languageName,
-                    maxLines: 2,
-                    style: AppTextStyle()
-                        .regular18balticSea
-                        .copyWith(fontSize: 16.toFont),
+                  Flexible(
+                    child: AutoSizeText(
+                      _languageName,
+                      maxLines: 2,
+                      style: AppTextStyle()
+                          .regular18balticSea
+                          .copyWith(fontSize: 16.toFont),
+                    ),
                   ),
                   SizedBox(width: 6.toWidth),
-                  // Icon(
-                  //   Icons.arrow_drop_down,
-                  //   size: 40.toWidth,
-                  // )
                   SvgPicture.asset(
                     iconDownArrow,
                     width: 8.toWidth,
                     height: 8.toWidth,
                   )
-                  // Icon(Icons.arrow_drop_down_outlined),
                 ],
               ),
             ),
