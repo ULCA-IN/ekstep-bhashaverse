@@ -527,7 +527,7 @@ class BottomNavTranslationController extends GetxController {
       String ttsServiceId = getTaskTypeServiceID(
               _languageModelController.taskSequenceResponse,
               'tts',
-              selectedSourceLanguageCode.value) ??
+              languageCode) ??
           '';
 
       var asrPayloadToSend = APIConstants.createComputePayloadTTS(
