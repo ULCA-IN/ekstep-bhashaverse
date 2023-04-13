@@ -56,7 +56,7 @@ class APIConstants {
       {"taskType": "translation"},
       {"taskType": "tts"}
     ],
-    "pipelineRequestConfig": {"submitter": "AI4Bharat"}
+    "pipelineRequestConfig": {"pipelineId": "64258d51ae52c44b28e73683"}
   };
 
   // payload for Compute request
@@ -75,22 +75,22 @@ class APIConstants {
       "pipelineTasks": [
         if (isRecorded)
           {
-            "serviceId": asrServiceID ?? "",
             "taskType": "asr",
             "config": {
               "language": {"sourceLanguage": srcLanguage},
+              "serviceId": asrServiceID ?? "",
               "audioFormat": audioFormat,
               "samplingRate": samplingRate,
             }
           },
         {
-          "serviceId": translationServiceID ?? "",
           "taskType": "translation",
           "config": {
             "language": {
               "sourceLanguage": srcLanguage,
               "targetLanguage": targetLanguage
-            }
+            },
+            "serviceId": translationServiceID ?? ""
           }
         },
       ],
@@ -115,10 +115,10 @@ class APIConstants {
     var computeRequestToSend = {
       "pipelineTasks": [
         {
-          "serviceId": ttsServiceID ?? "",
           "taskType": "tts",
           "config": {
             "language": {"sourceLanguage": srcLanguage},
+            "serviceId": ttsServiceID ?? "",
             "gender": preferredGender
           }
         }
