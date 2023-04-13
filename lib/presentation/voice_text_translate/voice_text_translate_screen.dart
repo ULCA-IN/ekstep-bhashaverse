@@ -41,7 +41,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
-  final FocusNode _transLangFocusNode = FocusNode();
+  final FocusNode _targetLangFocusNode = FocusNode();
 
   late final Box _hiveDBInstance;
 
@@ -129,8 +129,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                                             textToCopy: _voiceController
                                                 .sourceLanTextController.text
                                                 .trim(),
-                                            audioPathToShare: _voiceController
-                                                .sourceLangASRPath,
+                                            //TODO: add audio share
                                             currentDuration: DateTImeUtils()
                                                 .getTimeFromMilliseconds(
                                                     timeInMillisecond:
@@ -166,6 +165,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                                                 );
                                               }
                                             },
+                                            onFileShare: () {},
                                             playerController:
                                                 _voiceController.controller,
                                             speakerStatus: _voiceController
@@ -203,8 +203,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                                           textToCopy: _voiceController
                                               .targetLangTextController.text
                                               .trim(),
-                                          audioPathToShare: _voiceController
-                                              .targetLangTTSPath,
+                                          //TODO: add audio share
                                           currentDuration: DateTImeUtils()
                                               .getTimeFromMilliseconds(
                                                   timeInMillisecond:
@@ -235,6 +234,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                                               );
                                             }
                                           },
+                                          onFileShare: () {},
                                           playerController:
                                               _voiceController.controller,
                                           speakerStatus: _voiceController
@@ -394,7 +394,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   Widget _buildTargetLanguageInput() {
     return TextField(
       controller: _voiceController.targetLangTextController,
-      focusNode: _transLangFocusNode,
+      focusNode: _targetLangFocusNode,
       maxLines: null,
       expands: true,
       style: AppTextStyle().regular18balticSea,
@@ -504,7 +504,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         InkWell(
           onTap: () async {
             _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
+            _targetLangFocusNode.unfocus();
 
             List<dynamic> sourceLanguageList =
                 _languageModelController.sourceTargetLanguageMap.keys.toList();
@@ -573,7 +573,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         InkWell(
           onTap: () async {
             _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
+            _targetLangFocusNode.unfocus();
             if (_voiceController.selectedSourceLanguageCode.value.isEmpty) {
               showDefaultSnackbar(
                   message: 'Please select source language first');
@@ -719,7 +719,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
   void unFocusTextFields() {
     _sourceLangFocusNode.unfocus();
-    _transLangFocusNode.unfocus();
+    _targetLangFocusNode.unfocus();
   }
 
   bool isRecordingStarted() {
