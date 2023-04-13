@@ -138,7 +138,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                                         .trim(),
                                     audioPathToShare:
                                         _bottomNavTranslationController
-                                            .sourceLangASRPath,
+                                                .isRecordedViaMic.value
+                                            ? _bottomNavTranslationController
+                                                .sourceLangASRPath
+                                            : _bottomNavTranslationController
+                                                .sourceLangTTSPath.value,
                                     currentDuration: DateTImeUtils()
                                         .getTimeFromMilliseconds(
                                             timeInMillisecond:
@@ -210,11 +214,11 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
                               Obx(
                                 () => ASRAndTTSActions(
                                   textToCopy: _bottomNavTranslationController
-                                      .targetLangTextController.text
+                                      .targetOutputText.value
                                       .trim(),
                                   audioPathToShare:
                                       _bottomNavTranslationController
-                                          .targetLangTTSPath,
+                                          .targetLangTTSPath.value,
                                   currentDuration: DateTImeUtils()
                                       .getTimeFromMilliseconds(
                                           timeInMillisecond:
@@ -480,8 +484,12 @@ class _BottomNavTranslationState extends State<BottomNavTranslation>
           isHighlighted: true,
           onTap: () {
             unFocusTextFields();
-            _bottomNavTranslationController.sourceLangTTSPath = '';
-            _bottomNavTranslationController.targetLangTTSPath = '';
+            _bottomNavTranslationController.sourceLangTTSPath.value = '';
+            _bottomNavTranslationController.targetLangTTSPath.value = '';
+            if (_bottomNavTranslationController.isRecordedViaMic.value) {
+              _bottomNavTranslationController.sourceLangASRPath = '';
+              _bottomNavTranslationController.isRecordedViaMic.value = false;
+            }
 
             if (_bottomNavTranslationController
                 .sourceLanTextController.text.isEmpty) {
