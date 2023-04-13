@@ -405,18 +405,6 @@ class ConversationController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
-        if (isRecorded) {
-          String sourceLangText = taskResponse.pipelineResponse
-                  ?.firstWhere((element) => element.taskType == 'asr')
-                  .output
-                  ?.first
-                  .source
-                  ?.trim() ??
-              '';
-          currentMic.value == CurrentlySelectedMic.source
-              ? sourceLangTextController.text = sourceLangText
-              : targetLangTextController.text = sourceLangText;
-        }
         String outputTargetText = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
@@ -425,23 +413,48 @@ class ConversationController extends GetxController {
                 ?.trim() ??
             '';
         if (outputTargetText.isEmpty) {
-          if (isRecorded) isLoading.value = false;
+          // something went wrong in API call
+          isLoading.value = false;
           showDefaultSnackbar(message: responseNotReceived.tr);
           return;
         }
-        currentMic.value == CurrentlySelectedMic.target
-            ? sourceLangTextController.text = outputTargetText
-            : targetLangTextController.text = outputTargetText;
-        isTranslateCompleted.value = true;
-        if (isRecorded) isLoading.value = false;
-        currentMic.value == CurrentlySelectedMic.source
-            ? targetLangTTSPath = ''
-            : sourceLangTTSPath = '';
+
+        String sourceLangText = taskResponse.pipelineResponse
+                ?.firstWhere((element) => element.taskType == 'asr')
+                .output
+                ?.first
+                .source
+                ?.trim() ??
+            '';
+
+        // if voice recorded from target mic, then add source response value in it
+
+        if (currentMic.value == CurrentlySelectedMic.source) {
+          sourceLangTextController.text = sourceLangText;
+          targetLangTextController.text = outputTargetText;
+          targetLangTTSPath = '';
+          getComputeResTTS(
+              sourceText: outputTargetText,
+              languageCode: selectedTargetLanguageCode.value,
+              isTargetLanguage: true,
+              shouldPlayAudio: true);
+        } else {
+          targetLangTextController.text = sourceLangText;
+          sourceLangTextController.text = outputTargetText;
+          sourceLangTTSPath = '';
+          getComputeResTTS(
+              sourceText: outputTargetText,
+              languageCode: selectedSourceLanguageCode.value,
+              isTargetLanguage: false,
+              shouldPlayAudio: true);
+        }
+
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
+        isTranslateCompleted.value = true;
       },
       failure: (error) {
-        if (isRecorded) isLoading.value = false;
+        isLoading.value = false;
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
       },
@@ -511,6 +524,7 @@ class ConversationController extends GetxController {
               } else
                 shareAudioFile(ttsFilePath);
             }
+            isLoading.value = false;
           } else {
             showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
             return;
