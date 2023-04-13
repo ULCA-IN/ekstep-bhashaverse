@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
@@ -18,30 +17,29 @@ class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
     required String textToCopy,
-    String? audioPathToShare,
     required PlayerController playerController,
     required bool isRecordedAudio,
     required String currentDuration,
     required String totalDuration,
-    required Function onMusicPlayOrStop,
     required SpeakerStatus speakerStatus,
+    required Function onMusicPlayOrStop,
+    required Function onFileShare,
   })  : _textToCopy = textToCopy,
-        _audioPathToShare = audioPathToShare,
         _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
+        _speakerStatus = speakerStatus,
         _onAudioPlayOrStop = onMusicPlayOrStop,
-        _speakerStatus = speakerStatus;
+        _onFileShare = onFileShare;
 
   final bool _isRecordedAudio;
   final String _textToCopy;
-  final String? _audioPathToShare;
-  final Function _onAudioPlayOrStop;
   final PlayerController _playerController;
   final String _currentDuration;
   final String _totalDuration;
   final SpeakerStatus _speakerStatus;
+  final Function _onAudioPlayOrStop, _onFileShare;
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +51,7 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Row(
             children: [
               InkWell(
-                onTap: () async {
-                  if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
-                    showDefaultSnackbar(message: noAudioFoundToShare.tr);
-                    return;
-                  } else {
-                    await Share.shareXFiles(
-                      [XFile(_audioPathToShare!)],
-                      sharePositionOrigin: Rect.fromLTWH(0, 0,
-                          ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
-                    );
-                  }
-                },
+                onTap: () async => _onFileShare(),
                 child: Padding(
                   padding: AppEdgeInsets.instance.symmetric(vertical: 8),
                   child: SvgPicture.asset(
