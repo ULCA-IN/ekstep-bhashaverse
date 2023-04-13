@@ -11,8 +11,6 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/speaker_status.dart';
-import '../../../models/task_sequence_response_model.dart';
-import '../../../enums/language_enum.dart';
 import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/translation_app_api_client.dart';
@@ -191,10 +189,7 @@ class TextTranslateController extends GetxController {
           }
         }
       },
-      failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
-      },
+      failure: (_) {},
     );
   }
 
@@ -203,11 +198,6 @@ class TextTranslateController extends GetxController {
     // String asrServiceId = '';
     String translationServiceId = '';
 
-    // asrServiceId = APIConstants.getTaskTypeServiceID(
-    //         _languageModelController.taskSequenceResponse,
-    //         'asr',
-    //         selectedSourceLanguageCode.value) ??
-    // '';
     translationServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'translation',
@@ -275,7 +265,7 @@ class TextTranslateController extends GetxController {
       String ttsServiceId = APIConstants.getTaskTypeServiceID(
               _languageModelController.taskSequenceResponse,
               'tts',
-              selectedSourceLanguageCode.value) ??
+              languageCode) ??
           '';
 
       var asrPayloadToSend = APIConstants.createComputePayloadTTS(
