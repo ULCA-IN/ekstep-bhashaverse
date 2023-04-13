@@ -23,7 +23,7 @@ import '../../../../../enums/mic_button_status.dart';
 import '../../../../../localization/localization_keys.dart';
 import '../../../../../services/dhruva_api_client.dart';
 import '../../../../../services/socket_io_client.dart';
-import '../../../../../services/translation_app_api_client.dart';
+import '../../../../../services/transliteration_app_api_client.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
 import '../../../../../utils/permission_handler.dart';
@@ -33,7 +33,7 @@ import '../../../../../utils/waveform_style.dart';
 
 class BottomNavTranslationController extends GetxController {
   late DHRUVAAPIClient _dhruvaapiClient;
-  late TranslationAppAPIClient _translationAppAPIClient;
+  late TransliterationAppAPIClient _transliterationAppAPIClient;
   late LanguageModelController _languageModelController;
 
   TextEditingController sourceLanTextController = TextEditingController();
@@ -89,7 +89,7 @@ class BottomNavTranslationController extends GetxController {
   void onInit() {
     _dhruvaapiClient = Get.find();
     _socketIOClient = Get.find();
-    _translationAppAPIClient = Get.find();
+    _transliterationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     controller = PlayerController();
@@ -412,8 +412,9 @@ class BottomNavTranslationController extends GetxController {
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
-    var response = await _translationAppAPIClient.sendTransliterationRequest(
-        transliterationPayload: transliterationPayloadToSend);
+    var response =
+        await _transliterationAppAPIClient.sendTransliterationRequest(
+            transliterationPayload: transliterationPayloadToSend);
 
     response?.when(
       success: (data) async {
@@ -635,8 +636,8 @@ class BottomNavTranslationController extends GetxController {
   }
 
   void cancelPreviousTransliterationRequest() {
-    _translationAppAPIClient.transliterationAPIcancelToken.cancel();
-    _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
+    _transliterationAppAPIClient.transliterationAPIcancelToken.cancel();
+    _transliterationAppAPIClient.transliterationAPIcancelToken = CancelToken();
   }
 
   Future<void> resetAllValues() async {

@@ -8,27 +8,27 @@ import 'data_source_manager/exception/app_exceptions.dart';
 import 'data_source_manager/models/api_result.dart';
 import 'network_error.dart';
 
-class TranslationAppAPIClient {
+class TransliterationAppAPIClient {
   late Dio _dio;
 
-  static TranslationAppAPIClient? translationAppAPIClient;
+  static TransliterationAppAPIClient? transliterationAppAPIClient;
 
-  TranslationAppAPIClient(dio) {
+  TransliterationAppAPIClient(dio) {
     _dio = dio;
   }
 
   CancelToken transliterationAPIcancelToken = CancelToken();
 
-  static TranslationAppAPIClient getAPIClientInstance() {
+  static TransliterationAppAPIClient getAPIClientInstance() {
     var options = BaseOptions(
-      baseUrl: APIConstants.STS_BASE_URL,
+      baseUrl: APIConstants.TRANSLITERATION_BASE_URL,
       connectTimeout: 80000,
       receiveTimeout: 50000,
     );
 
-    translationAppAPIClient =
-        translationAppAPIClient ?? TranslationAppAPIClient(Dio(options));
-    return translationAppAPIClient!;
+    transliterationAppAPIClient = transliterationAppAPIClient ??
+        TransliterationAppAPIClient(Dio(options));
+    return transliterationAppAPIClient!;
   }
 
   Future<Result<AppException, dynamic>> getTransliterationModels(
@@ -55,7 +55,6 @@ class TranslationAppAPIClient {
         options: Options(
             headers: {'Content-Type': 'application/json', 'Accept': '*/*'}),
       );
-      return Result.success(response.data);
     } on DioError catch (error) {
       if (error.type != DioErrorType.cancel) {
         return Result.failure(

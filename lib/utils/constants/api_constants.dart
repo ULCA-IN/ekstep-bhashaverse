@@ -8,7 +8,7 @@ class APIConstants {
       'https://meity-auth.ulcacontrib.org/ulca/apis/v0';
   static const String ULCA_CONFIG_API_STREAMING_URL =
       'wss://api.dhruva.ai4bharat.org';
-  static const String STS_BASE_URL =
+  static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
   static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
