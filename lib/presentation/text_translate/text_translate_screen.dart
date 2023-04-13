@@ -36,7 +36,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   late TextTranslateController _textTranslationController;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
-  final FocusNode _transLangFocusNode = FocusNode();
+  final FocusNode _targetLangFocusNode = FocusNode();
   late final Box _hiveDBInstance;
 
   @override
@@ -120,9 +120,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                       textToCopy: _textTranslationController
                                           .targetLangTextController.text
                                           .trim(),
-                                      audioPathToShare:
-                                          _textTranslationController
-                                              .targetLangTTSPath,
                                       currentDuration: DateTImeUtils()
                                           .getTimeFromMilliseconds(
                                               timeInMillisecond:
@@ -155,6 +152,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                           );
                                         }
                                       },
+                                      onFileShare: () {},
                                       playerController:
                                           _textTranslationController
                                               .playerController,
@@ -220,8 +218,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                     textToCopy: _textTranslationController
                                         .sourceLanTextController.text
                                         .trim(),
-                                    audioPathToShare: _textTranslationController
-                                        .sourceLangTTSPath,
                                     currentDuration: DateTImeUtils()
                                         .getTimeFromMilliseconds(
                                             timeInMillisecond:
@@ -252,6 +248,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                         );
                                       }
                                     },
+                                    onFileShare: () {},
                                     playerController: _textTranslationController
                                         .playerController,
                                     speakerStatus: _textTranslationController
@@ -284,7 +281,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   }
 
   Widget _buildTransliterationHints() {
-    return Obx(() => _textTranslationController.isKeyboardVisible.value || true
+    return Obx(() => _textTranslationController.isKeyboardVisible.value
         ? SingleChildScrollView(
             controller:
                 _textTranslationController.transliterationHintsScrollController,
@@ -373,7 +370,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   Widget _buildTargetLanguageInput() {
     return TextField(
       controller: _textTranslationController.targetLangTextController,
-      focusNode: _transLangFocusNode,
+      focusNode: _targetLangFocusNode,
       maxLines: null,
       expands: true,
       style: AppTextStyle().regular18balticSea,
@@ -437,7 +434,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         InkWell(
           onTap: () async {
             _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
+            _targetLangFocusNode.unfocus();
 
             List<dynamic> sourceLanguageList =
                 _languageModelController.sourceTargetLanguageMap.keys.toList();
@@ -507,7 +504,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         InkWell(
           onTap: () async {
             _sourceLangFocusNode.unfocus();
-            _transLangFocusNode.unfocus();
+            _targetLangFocusNode.unfocus();
             if (_textTranslationController
                 .selectedSourceLanguageCode.value.isEmpty) {
               showDefaultSnackbar(
@@ -607,6 +604,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
   void unFocusTextFields() {
     _sourceLangFocusNode.unfocus();
-    _transLangFocusNode.unfocus();
+    _targetLangFocusNode.unfocus();
   }
 }
