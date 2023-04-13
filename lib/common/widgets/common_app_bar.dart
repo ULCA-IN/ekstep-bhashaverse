@@ -34,10 +34,23 @@ class CommonAppBar extends StatelessWidget {
           ),
         ),
         Center(
-          child: Text(
-            _title,
-            style: AppTextStyle().regular24BalticSea,
-            textAlign: TextAlign.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                imgAppLogoSmall,
+                height: 30.toHeight,
+                width: 30.toWidth,
+              ),
+              SizedBox(
+                width: 8.toWidth,
+              ),
+              Text(
+                _title,
+                style: AppTextStyle().regular24BalticSea,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ],
