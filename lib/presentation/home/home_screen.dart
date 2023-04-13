@@ -1,4 +1,3 @@
-import 'package:bhashaverse/models/home_menu_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -6,6 +5,7 @@ import 'package:get/get.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/widgets/bhashini_title.dart';
 import '../../localization/localization_keys.dart';
+import '../../models/home_menu_model.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
