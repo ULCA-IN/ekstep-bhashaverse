@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 
 import '../../../common/controller/language_model_controller.dart';
 import '../../../services/dhruva_api_client.dart';
-import '../../../services/translation_app_api_client.dart';
+import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/snackbar_utils.dart';
 
@@ -10,7 +10,7 @@ class HomeController extends GetxController {
   RxBool isLoading = false.obs, isKeyboardVisible = false.obs;
 
   late DHRUVAAPIClient _dhruvaapiClient;
-  late TranslationAppAPIClient _translationAppAPIClient;
+  late TransliterationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
 
   @override
