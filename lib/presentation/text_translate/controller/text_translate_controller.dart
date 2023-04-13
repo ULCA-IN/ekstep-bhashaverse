@@ -13,7 +13,7 @@ import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/speaker_status.dart';
 import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
-import '../../../services/translation_app_api_client.dart';
+import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/snackbar_utils.dart';
@@ -24,7 +24,7 @@ class TextTranslateController extends GetxController {
       targetLangTextController = TextEditingController();
 
   late DHRUVAAPIClient _dhruvaapiClient;
-  late TranslationAppAPIClient _translationAppAPIClient;
+  late TransliterationAppAPIClient _transliterationAppAPIClient;
   late LanguageModelController _languageModelController;
 
   final ScrollController transliterationHintsScrollController =
@@ -55,7 +55,7 @@ class TextTranslateController extends GetxController {
   @override
   void onInit() {
     _dhruvaapiClient = Get.find();
-    _translationAppAPIClient = Get.find();
+    _transliterationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     playerController = PlayerController();
@@ -175,8 +175,9 @@ class TextTranslateController extends GetxController {
     transliterationPayloadToSend['task'] = 'transliteration';
     transliterationPayloadToSend['userId'] = null;
 
-    var response = await _translationAppAPIClient.sendTransliterationRequest(
-        transliterationPayload: transliterationPayloadToSend);
+    var response =
+        await _transliterationAppAPIClient.sendTransliterationRequest(
+            transliterationPayload: transliterationPayloadToSend);
 
     response?.when(
       success: (data) async {
