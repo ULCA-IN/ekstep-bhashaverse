@@ -1,18 +1,14 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:avatar_glow/avatar_glow.dart';
-import 'package:bhashaverse/common/widgets/mic_button.dart';
-import 'package:bhashaverse/enums/current_mic.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
-import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
-import '../../common/widgets/asr_tts_actions.dart';
 import '../../common/widgets/common_app_bar.dart';
-import '../../common/widgets/custom_outline_button.dart';
+import '../../common/widgets/mic_button.dart';
+import '../../common/widgets/text_field_with_actions.dart';
+import '../../enums/current_mic.dart';
 import '../../enums/mic_button_status.dart';
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
@@ -22,8 +18,6 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
-import '../../utils/theme/app_text_style.dart';
-import '../../utils/date_time_utils.dart';
 import '../../utils/voice_recorder.dart';
 import 'controller/conversation_controller.dart';
 
@@ -34,13 +28,10 @@ class ConversationScreen extends StatefulWidget {
   State<ConversationScreen> createState() => _ConversationScreenState();
 }
 
-class _ConversationScreenState extends State<ConversationScreen>
-    with WidgetsBindingObserver {
+class _ConversationScreenState extends State<ConversationScreen> {
   late ConversationController _translationController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
-  final FocusNode _sourceLangFocusNode = FocusNode();
-  final FocusNode _transLangFocusNode = FocusNode();
 
   late final Box _hiveDBInstance;
 
@@ -51,25 +42,8 @@ class _ConversationScreenState extends State<ConversationScreen>
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _translationController.getSourceTargetLangFromDB();
-    WidgetsBinding.instance.addObserver(this);
-
     ScreenUtil().init();
     super.initState();
-  }
-
-  @override
-  void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-    final newValue = bottomInset > 0.0;
-    if (newValue != _translationController.isKeyboardVisible.value) {
-      _translationController.isKeyboardVisible.value = newValue;
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   @override
@@ -95,210 +69,23 @@ class _ConversationScreenState extends State<ConversationScreen>
                     child: Column(
                       children: [
                         SizedBox(height: 20.toHeight),
-                        Expanded(
-                          child: AnimatedContainer(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: textFieldRadius,
-                                  topRight: textFieldRadius,
-                                ),
-                                border: Border.all(
-                                  color: americanSilver,
-                                )),
-                            duration: const Duration(milliseconds: 500),
-                            child: Padding(
-                              padding: AppEdgeInsets.instance.all(16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(child: _buildSourceLanguageInput()),
-                                  SizedBox(height: 6.toHeight),
-                                  Obx(
-                                    () => !_sourceLangFocusNode.hasFocus
-                                        ? ASRAndTTSActions(
-                                            textToCopy: _translationController
-                                                .sourceLanTextController.text
-                                                .trim(),
-                                            audioPathToShare:
-                                                _translationController
-                                                    .sourceLangASRPath,
-                                            currentDuration: DateTImeUtils()
-                                                .getTimeFromMilliseconds(
-                                                    timeInMillisecond:
-                                                        _translationController
-                                                            .currentDuration
-                                                            .value),
-                                            totalDuration: DateTImeUtils()
-                                                .getTimeFromMilliseconds(
-                                                    timeInMillisecond:
-                                                        _translationController
-                                                            .maxDuration.value),
-                                            isRecordedAudio: !_hiveDBInstance
-                                                .get(isStreamingPreferred),
-                                            onMusicPlayOrStop: () async {
-                                              if (isAudioPlaying(
-                                                  isForTargetSection: false)) {
-                                                await _translationController
-                                                    .stopPlayer();
-                                              } else if (_translationController
-                                                      .isRecordedViaMic.value &&
-                                                  _translationController
-                                                          .currentMic.value ==
-                                                      CurrentlySelectedMic
-                                                          .source) {
-                                                _translationController
-                                                    .playTTSOutput();
-                                              } else {
-                                                _translationController
-                                                    .getComputeResTTS(
-                                                  sourceText:
-                                                      _translationController
-                                                          .sourceLanTextController
-                                                          .text,
-                                                  languageCode:
-                                                      _translationController
-                                                          .selectedSourceLanguageCode
-                                                          .value,
-                                                  isTargetLanguage: false,
-                                                );
-                                              }
-                                            },
-                                            playerController:
-                                                _translationController
-                                                    .controller,
-                                            speakerStatus:
-                                                _translationController
-                                                    .sourceSpeakerStatus.value,
-                                          )
-                                        : _buildLimitCountAndTranslateButton(
-                                            showMicButton:
-                                                isRecordingStarted() &&
-                                                    _translationController
-                                                            .currentMic.value ==
-                                                        CurrentlySelectedMic
-                                                            .source),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                            child: AnimatedContainer(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: const BorderRadius.only(
-                                      bottomLeft: textFieldRadius,
-                                      bottomRight: textFieldRadius,
-                                    ),
-                                    border: Border.all(
-                                      color: americanSilver,
-                                    )),
-                                duration: const Duration(milliseconds: 500),
-                                child: Padding(
-                                  padding: AppEdgeInsets.instance.all(16),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Flexible(
-                                          child: _buildTargetLanguageInput()),
-                                      SizedBox(height: 6.toHeight),
-                                      Obx(
-                                        () => _translationController
-                                                    .isTranslateCompleted
-                                                    .value ||
-                                                _hiveDBInstance
-                                                    .get(isStreamingPreferred)
-                                            ? ASRAndTTSActions(
-                                                textToCopy:
-                                                    _translationController
-                                                        .targetLangTextController
-                                                        .text
-                                                        .trim(),
-                                                audioPathToShare:
-                                                    _translationController
-                                                        .targetLangTTSPath,
-                                                currentDuration: DateTImeUtils()
-                                                    .getTimeFromMilliseconds(
-                                                        timeInMillisecond:
-                                                            _translationController
-                                                                .currentDuration
-                                                                .value),
-                                                totalDuration: DateTImeUtils()
-                                                    .getTimeFromMilliseconds(
-                                                        timeInMillisecond:
-                                                            _translationController
-                                                                .maxDuration
-                                                                .value),
-                                                isRecordedAudio:
-                                                    !_hiveDBInstance.get(
-                                                        isStreamingPreferred),
-                                                onMusicPlayOrStop: () async {
-                                                  if (isAudioPlaying(
-                                                      isForTargetSection:
-                                                          true)) {
-                                                    await _translationController
-                                                        .stopPlayer();
-                                                  } else if (_translationController
-                                                          .isRecordedViaMic
-                                                          .value &&
-                                                      _translationController
-                                                              .currentMic
-                                                              .value ==
-                                                          CurrentlySelectedMic
-                                                              .target) {
-                                                    _translationController
-                                                        .playTTSOutput();
-                                                  } else {
-                                                    _translationController
-                                                        .getComputeResTTS(
-                                                      sourceText:
-                                                          _translationController
-                                                              .targetLangTextController
-                                                              .text,
-                                                      languageCode:
-                                                          _translationController
-                                                              .selectedTargetLanguageCode
-                                                              .value,
-                                                      isTargetLanguage: true,
-                                                    );
-                                                  }
-                                                },
-                                                playerController:
-                                                    _translationController
-                                                        .controller,
-                                                speakerStatus:
-                                                    _translationController
-                                                        .targetSpeakerStatus
-                                                        .value,
-                                              )
-                                            : _buildLimitCountAndTranslateButton(
-                                                showMicButton:
-                                                    isRecordingStarted() &&
-                                                        _translationController
-                                                                .currentMic
-                                                                .value ==
-                                                            CurrentlySelectedMic
-                                                                .target),
-                                      )
-                                    ],
-                                  ),
-                                ))),
+                        _buildSourceTextField(),
+                        _buildTargetTextField(),
                       ],
                     ),
                   ),
-                  SizedBox(
-                      height: _translationController.isKeyboardVisible.value
-                          ? 0
-                          : 30.toHeight),
-                  _buildTransliterationHints(),
+                  Obx(
+                    () => SizedBox(
+                        height: _translationController.isKeyboardVisible.value
+                            ? 12.toHeight
+                            : 30.toHeight),
+                  ),
                   Obx(
                     () => _translationController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
-                  SizedBox(height: 30.toHeight),
+                  SizedBox(height: 8.toHeight),
                 ],
               ),
             ),
@@ -319,235 +106,153 @@ class _ConversationScreenState extends State<ConversationScreen>
     );
   }
 
-  Widget _buildTransliterationHints() {
-    return Obx(() => _translationController.isKeyboardVisible.value
-        ? SizedBox(
-            height: 85.toHeight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Visibility(
-                  visible: !_translationController
-                          .isScrolledTransliterationHints.value &&
-                      _translationController
-                          .transliterationWordHints.isNotEmpty,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.arrow_forward_outlined,
-                      color: Colors.grey.shade400,
-                      size: 22.toHeight,
-                    ),
-                  ),
-                ),
-                SingleChildScrollView(
-                  controller: _translationController
-                      .transliterationHintsScrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      ..._translationController.transliterationWordHints
-                          .map((hintText) => GestureDetector(
-                                onTap: () {
-                                  replaceTextWithTransliterationHint(hintText);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: lilyWhite,
-                                  ),
-                                  margin: AppEdgeInsets.instance.all(4),
-                                  padding: AppEdgeInsets.instance
-                                      .symmetric(vertical: 4, horizontal: 6),
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                      minWidth:
-                                          (ScreenUtil.screenWidth / 6).toWidth,
-                                    ),
-                                    child: Text(
-                                      hintText,
-                                      style: AppTextStyle()
-                                          .regular18DolphinGrey
-                                          .copyWith(
-                                            color: Colors.black,
-                                          ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
-        : SizedBox.shrink());
-  }
-
-  Widget _buildSourceLanguageInput() {
-    return TextField(
-      controller: _translationController.sourceLanTextController,
-      focusNode: _sourceLangFocusNode,
-      style: AppTextStyle().regular18balticSea,
-      maxLines: null,
-      expands: true,
-      maxLength: textCharMaxLength,
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        hintText: _translationController.isTranslateCompleted.value
-            ? null
-            : isRecordingStarted()
-                ? kListeningHintText.tr
+  Widget _buildSourceTextField() {
+    return Expanded(
+      child: Obx(
+        () => TextFieldWithActions(
+            textController: _translationController.sourceLangTextController,
+            focusNode: FocusNode(),
+            hintText: isRecordingStarted()
+                ? _translationController.currentMic.value ==
+                        CurrentlySelectedMic.source
+                    ? kListeningHintText.tr
+                    : ''
                 : _translationController.micButtonStatus.value ==
                         MicButtonStatus.pressed
                     ? connecting.tr
-                    : kTranslationHintText.tr,
-        hintStyle:
-            AppTextStyle().regular24BalticSea.copyWith(color: mischkaGrey),
-        hintMaxLines: 4,
-        border: InputBorder.none,
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-        counterText: '',
+                    : converseHintText.tr,
+            translateButtonTitle: kTranslate.tr,
+            currentDuration: _translationController.currentDuration.value,
+            totalDuration: _translationController.maxDuration.value,
+            isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
+            topBorderRadius: 16, //TODO: change to conttand
+            bottomBorderRadius: 0,
+            showTranslateButton: false,
+            showASRTTSActionButtons: true,
+            isReadOnly: true,
+            onMusicPlayOrStop: () => _onAudioPlayStop(true),
+            onFileShare: () => _onFileShare(isSourceLang: true),
+            playerController: _translationController.controller,
+            speakerStatus: _translationController.sourceSpeakerStatus.value,
+            rawTimeStream: _translationController.stopWatchTimer.rawTime,
+            showMicButton: isRecordingStarted() &&
+                _translationController.currentMic.value ==
+                    CurrentlySelectedMic.source),
       ),
-      onChanged: (newText) {
-        _translationController.sourceTextCharLimit.value = newText.length;
-        _translationController.isTranslateCompleted.value = false;
-        _translationController.ttsResponse = null;
-        _translationController.targetLangTextController.clear();
-        if (_translationController.controller.playerState ==
-            PlayerState.playing) _translationController.stopPlayer();
-        if (_translationController.targetSpeakerStatus.value !=
-            SpeakerStatus.disabled)
-          _translationController.targetSpeakerStatus.value =
-              SpeakerStatus.disabled;
-        if (_translationController.isTransliterationEnabled()) {
-          getTransliterationHints(newText);
+    );
+  }
+
+  Widget _buildTargetTextField() {
+    return Expanded(
+      child: Obx(
+        () => TextFieldWithActions(
+            textController: _translationController.targetLangTextController,
+            focusNode: FocusNode(),
+            hintText: isRecordingStarted()
+                ? _translationController.currentMic.value ==
+                        CurrentlySelectedMic.target
+                    ? kListeningHintText.tr
+                    : ''
+                : _translationController.micButtonStatus.value ==
+                        MicButtonStatus.pressed
+                    ? connecting.tr
+                    : converseHintText.tr,
+            translateButtonTitle: kTranslate.tr,
+            currentDuration: _translationController.currentDuration.value,
+            totalDuration: _translationController.maxDuration.value,
+            isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
+            topBorderRadius: 0,
+            bottomBorderRadius: 16, //TODO: change to conttand
+            showTranslateButton: false,
+            showASRTTSActionButtons: true,
+            isReadOnly: true,
+            onFileShare: () => _onFileShare(isSourceLang: false),
+            onMusicPlayOrStop: () => _onAudioPlayStop(false),
+            playerController: _translationController.controller,
+            speakerStatus: _translationController.targetSpeakerStatus.value,
+            rawTimeStream: _translationController.stopWatchTimer.rawTime,
+            showMicButton: isRecordingStarted() &&
+                _translationController.currentMic.value ==
+                    CurrentlySelectedMic.target),
+      ),
+    );
+  }
+
+  Future<void> _onAudioPlayStop(bool isPlayingSource) async {
+    if (isAudioPlaying()) {
+      await _translationController.stopPlayer();
+    } else if (_translationController.isRecordedViaMic.value) {
+      _translationController.playTTSOutput(isPlayingSource);
+    } else {
+      String sourceText;
+      String languageCode;
+      if (isPlayingSource) {
+        sourceText = _translationController.sourceLangTextController.text;
+        languageCode = _translationController.selectedSourceLanguageCode.value;
+      } else {
+        sourceText = _translationController.targetLangTextController.text;
+        languageCode = _translationController.selectedTargetLanguageCode.value;
+      }
+
+      _translationController.getComputeResTTS(
+        sourceText: sourceText,
+        languageCode: languageCode,
+        isTargetLanguage: !isPlayingSource,
+        shouldPlayAudio: true,
+      );
+    }
+  }
+
+  void _onFileShare({required bool isSourceLang}) async {
+    if (_translationController.isTranslateCompleted.value) {
+      // first check if already compute call finished and TTS file generated
+      String? audioPathToShare = isSourceLang
+          ? _translationController.sourceLangTTSPath
+          : _translationController.targetLangTTSPath;
+      if (audioPathToShare != null && audioPathToShare.isNotEmpty) {
+        _translationController.shareAudioFile(audioPathToShare);
+      } else {
+        // else call TTS compute API
+        String sourceText = isSourceLang
+            ? _translationController.sourceLangTextController.text
+            : _translationController.targetLangTextController.text;
+        if (sourceText.isNotEmpty) {
+          await _translationController.getComputeResTTS(
+            sourceText: sourceText,
+            languageCode: isSourceLang
+                ? _translationController.selectedSourceLanguageCode.value
+                : _translationController.selectedTargetLanguageCode.value,
+            isTargetLanguage: !isSourceLang,
+            shouldPlayAudio: false,
+          );
         } else {
-          _translationController.transliterationWordHints.clear();
+          showDefaultSnackbar(message: noAudioFoundToShare.tr);
         }
-      },
-    );
-  }
-
-  Widget _buildTargetLanguageInput() {
-    return TextField(
-      controller: _translationController.targetLangTextController,
-      focusNode: _transLangFocusNode,
-      maxLines: null,
-      expands: true,
-      style: AppTextStyle().regular18balticSea,
-      textInputAction: TextInputAction.done,
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-      ),
-    );
-  }
-
-  Widget _buildLimitCountAndTranslateButton({required bool showMicButton}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        showMicButton
-            ? Row(
-                children: [
-                  AvatarGlow(
-                    animate: true,
-                    repeat: true,
-                    glowColor: brickRed,
-                    endRadius: 16,
-                    shape: BoxShape.circle,
-                    showTwoGlows: true,
-                    curve: Curves.easeInOut,
-                    child: Icon(
-                      Icons.mic_none,
-                      color: frolyRed,
-                    ),
-                  ),
-                  SizedBox(width: 4.toWidth),
-                  Padding(
-                    padding: AppEdgeInsets.instance.symmetric(vertical: 0),
-                    child: StreamBuilder<int>(
-                      stream: _translationController.stopWatchTimer.rawTime,
-                      initialData: 0,
-                      builder: (context, snap) {
-                        final value = snap.data;
-                        final displayTime = StopWatchTimer.getDisplayTime(
-                            recordingMaxTimeLimit - (value ?? 0),
-                            hours: false,
-                            minute: false,
-                            milliSecond: true);
-                        return Text(
-                          '-$displayTime',
-                          style: AppTextStyle().grey14Arsenic.copyWith(
-                              color: (recordingMaxTimeLimit - (value ?? 0)) >=
-                                      5000
-                                  ? manateeGray
-                                  : (recordingMaxTimeLimit - (value ?? 0)) >=
-                                          2000
-                                      ? frolyRed
-                                      : brickRed),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              )
-            : Obx(
-                () {
-                  int sourceCharLength =
-                      _translationController.sourceTextCharLimit.value;
-                  return Text(
-                    '$sourceCharLength/$textCharMaxLength',
-                    style: AppTextStyle().grey14Arsenic.copyWith(
-                        color: sourceCharLength >= textCharMaxLength
-                            ? brickRed
-                            : sourceCharLength >= textCharMaxLength - 20
-                                ? frolyRed
-                                : manateeGray),
-                  );
-                },
-              ),
-        CustomOutlineButton(
-          title: kTranslate.tr,
-          isHighlighted: true,
-          onTap: () {
-            unFocusTextFields();
-            _translationController.sourceLangTTSPath = '';
-            _translationController.targetLangTTSPath = '';
-
-            if (_translationController.sourceLanTextController.text.isEmpty) {
-              showDefaultSnackbar(message: kErrorNoSourceText.tr);
-            } else if (_translationController.isSourceAndTargetLangSelected()) {
-              _translationController.getComputeResponseASRTrans(
-                  isRecorded: false,
-                  sourceText:
-                      _translationController.sourceLanTextController.text);
-              _translationController.isRecordedViaMic.value = false;
-            } else {
-              showDefaultSnackbar(
-                  message: kErrorSelectSourceAndTargetScreen.tr);
-            }
-          },
-        ),
-      ],
-    );
+      }
+    } else {
+      showDefaultSnackbar(message: noAudioFoundToShare.tr);
+    }
   }
 
   Widget _buildMicButton() {
     return Padding(
-      padding: AppEdgeInsets.instance.symmetric(horizontal: 18.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      padding: AppEdgeInsets.instance.symmetric(horizontal: 14.0),
+      child: Stack(
+        // mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Flexible(
+          AnimatedOpacity(
+            opacity: isRecordingStarted() ? 1 : 0,
+            duration: const Duration(milliseconds: 600),
+            child: LottieBuilder.asset(
+              animationStaticWaveForRecording,
+              fit: BoxFit.fitWidth,
+              animate: isRecordingStarted(),
+              repeat: true,
+            ),
+          ),
+          Positioned(
+            // alignment: Alignment.centerLeft,
+            left: 30,
             child: Obx(() {
               String selectedSourceLanguage = _translationController
                       .selectedSourceLanguageCode.value.isNotEmpty
@@ -557,7 +262,7 @@ class _ConversationScreenState extends State<ConversationScreen>
                 isRecordingStarted: isRecordingStarted() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.source,
-                expandWhenRecording: false,
+                // expandWhenRecording: false,
                 languageName: selectedSourceLanguage,
                 onMicButtonTap: (isPressed) {
                   _translationController.currentMic.value =
@@ -565,9 +270,6 @@ class _ConversationScreenState extends State<ConversationScreen>
                   micButtonActions(startMicRecording: isPressed);
                 },
                 onLanguageTap: () async {
-                  _sourceLangFocusNode.unfocus();
-                  _transLangFocusNode.unfocus();
-
                   List<dynamic> sourceLanguageList = _languageModelController
                       .sourceTargetLanguageMap.keys
                       .toList();
@@ -593,6 +295,7 @@ class _ConversationScreenState extends State<ConversationScreen>
                           .contains(selectedTargetLangCode)) {
                         _translationController
                             .selectedTargetLanguageCode.value = '';
+                        _hiveDBInstance.put(preferredTargetLanguage, null);
                       }
                     }
                     await _translationController.resetAllValues();
@@ -603,22 +306,8 @@ class _ConversationScreenState extends State<ConversationScreen>
               );
             }),
           ),
-          Flexible(
-            child: AnimatedOpacity(
-              opacity: isRecordingStarted() ? 1 : 0,
-              duration: const Duration(milliseconds: 600),
-              child: Padding(
-                padding: AppEdgeInsets.instance.symmetric(horizontal: 0),
-                child: LottieBuilder.asset(
-                  animationStaticWaveForRecording,
-                  fit: BoxFit.fitWidth,
-                  animate: isRecordingStarted(),
-                  repeat: true,
-                ),
-              ),
-            ),
-          ),
-          Flexible(
+          Positioned(
+            right: 30,
             child: Obx(() {
               String selectedTargetLanguage = _translationController
                       .selectedTargetLanguageCode.value.isNotEmpty
@@ -628,7 +317,6 @@ class _ConversationScreenState extends State<ConversationScreen>
                 isRecordingStarted: isRecordingStarted() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.target,
-                expandWhenRecording: false,
                 languageName: selectedTargetLanguage,
                 onMicButtonTap: (isPressed) {
                   _translationController.currentMic.value =
@@ -636,8 +324,6 @@ class _ConversationScreenState extends State<ConversationScreen>
                   micButtonActions(startMicRecording: isPressed);
                 },
                 onLanguageTap: () async {
-                  _sourceLangFocusNode.unfocus();
-                  _transLangFocusNode.unfocus();
                   if (_translationController
                       .selectedSourceLanguageCode.value.isEmpty) {
                     showDefaultSnackbar(
@@ -663,8 +349,9 @@ class _ConversationScreenState extends State<ConversationScreen>
                         selectedTargetLangCode;
                     _hiveDBInstance.put(
                         preferredTargetLanguage, selectedTargetLangCode);
+                    await _translationController.resetAllValues();
                     if (_translationController
-                        .sourceLanTextController.text.isNotEmpty)
+                        .sourceLangTextController.text.isNotEmpty)
                       _translationController.getComputeResponseASRTrans(
                           isRecorded: false);
                   }
@@ -677,43 +364,11 @@ class _ConversationScreenState extends State<ConversationScreen>
     );
   }
 
-  void getTransliterationHints(String newText) {
-    String wordToSend = newText.split(" ").last;
-    if (wordToSend.isNotEmpty) {
-      if (_translationController.selectedSourceLanguageCode.value.isNotEmpty) {
-        _translationController.getTransliterationOutput(wordToSend);
-      }
-    } else {
-      _translationController.clearTransliterationHints();
-    }
-  }
-
-  void replaceTextWithTransliterationHint(String currentHintText) {
-    List<String> oldString =
-        _translationController.sourceLanTextController.text.trim().split(' ');
-    oldString.removeLast();
-    oldString.add(currentHintText);
-    _translationController.sourceLanTextController.text =
-        '${oldString.join(' ')} ';
-    _translationController.sourceLanTextController.selection =
-        TextSelection.fromPosition(TextPosition(
-            offset:
-                _translationController.sourceLanTextController.text.length));
-    _translationController.clearTransliterationHints();
-  }
-
-  bool isAudioPlaying({required bool isForTargetSection}) {
-    return ((isForTargetSection &&
-            _translationController.targetSpeakerStatus.value ==
-                SpeakerStatus.playing) ||
-        (!isForTargetSection &&
-            _translationController.sourceSpeakerStatus.value ==
-                SpeakerStatus.playing));
-  }
-
-  void unFocusTextFields() {
-    _sourceLangFocusNode.unfocus();
-    _transLangFocusNode.unfocus();
+  bool isAudioPlaying() {
+    return (_translationController.targetSpeakerStatus.value ==
+            SpeakerStatus.playing ||
+        _translationController.sourceSpeakerStatus.value ==
+            SpeakerStatus.playing);
   }
 
   bool isRecordingStarted() {
@@ -725,8 +380,6 @@ class _ConversationScreenState extends State<ConversationScreen>
 
   void micButtonActions({required bool startMicRecording}) {
     if (_translationController.isSourceAndTargetLangSelected()) {
-      unFocusTextFields();
-
       if (startMicRecording) {
         _translationController.micButtonStatus.value = MicButtonStatus.pressed;
         _translationController.startVoiceRecording();
