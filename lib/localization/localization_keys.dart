@@ -84,3 +84,4 @@ const String text = 'text';
 const String images = 'images';
 const String documents = 'documents';
 const String voice = 'voice';
+const String converseHintText = 'converseHintText';

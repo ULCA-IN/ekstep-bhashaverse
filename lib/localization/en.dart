@@ -84,4 +84,5 @@ final Map<String, String> en = {
   images: 'Images',
   documents: 'Documents',
   voice: 'Voice',
+  converseHintText: 'Press mic to begin conversation'
 };
