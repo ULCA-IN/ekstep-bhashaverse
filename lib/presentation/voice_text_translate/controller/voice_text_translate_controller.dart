@@ -23,7 +23,7 @@ import '../../../enums/mic_button_status.dart';
 import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
-import '../../../services/translation_app_api_client.dart';
+import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/permission_handler.dart';
@@ -33,7 +33,7 @@ import '../../../utils/waveform_style.dart';
 
 class VoiceTextTranslateController extends GetxController {
   late DHRUVAAPIClient _dhruvaapiClient;
-  late TranslationAppAPIClient _translationAppAPIClient;
+  late TransliterationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
 
   TextEditingController sourceLanTextController = TextEditingController();
@@ -426,10 +426,7 @@ class VoiceTextTranslateController extends GetxController {
           }
         }
       },
-      failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
-      },
+      failure: (_) {},
     );
   }
 
