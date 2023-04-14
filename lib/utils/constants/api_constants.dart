@@ -56,7 +56,7 @@ class APIConstants {
       {"taskType": "translation"},
       {"taskType": "tts"}
     ],
-    "pipelineRequestConfig": {"pipelineId": "64258d51ae52c44b28e73683"}
+    "pipelineRequestConfig": {"pipelineId": "64392f96daac500b55c543cd"}
   };
 
   // payload for Compute request
