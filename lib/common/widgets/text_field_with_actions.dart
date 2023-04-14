@@ -16,8 +16,9 @@ class TextFieldWithActions extends StatelessWidget {
     super.key,
     required TextEditingController textController,
     required FocusNode focusNode,
-    required String? hintText,
+    String? hintText,
     required String translateButtonTitle,
+    required String textToCopy,
     required int currentDuration,
     required int totalDuration,
     int sourceCharLength = 0,
@@ -40,6 +41,7 @@ class TextFieldWithActions extends StatelessWidget {
         _focusNode = focusNode,
         _hintText = hintText,
         _translateButtonTitle = translateButtonTitle,
+        _textToCopy = textToCopy,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _sourceCharLength = sourceCharLength,
@@ -61,7 +63,7 @@ class TextFieldWithActions extends StatelessWidget {
 
   final TextEditingController _textController;
   final FocusNode _focusNode;
-  final String _translateButtonTitle;
+  final String _translateButtonTitle, _textToCopy;
   final String? _hintText;
   final int _currentDuration, _totalDuration, _sourceCharLength;
   final bool _isRecordedAudio,
@@ -128,7 +130,7 @@ class TextFieldWithActions extends StatelessWidget {
             SizedBox(height: 6.toHeight),
             _showASRTTSActionButtons && !_showMicButton
                 ? ASRAndTTSActions(
-                    textToCopy: _textController.text.trim(),
+                    textToCopy: _textToCopy,
                     currentDuration: DateTImeUtils().getTimeFromMilliseconds(
                         timeInMillisecond: _currentDuration),
                     totalDuration: DateTImeUtils().getTimeFromMilliseconds(
