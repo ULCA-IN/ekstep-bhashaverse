@@ -130,6 +130,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
+            textToCopy: _translationController.sourceOutputText.value,
             onMusicPlayOrStop: () => _onAudioPlayStop(true),
             onFileShare: () => _onFileShare(isSourceLang: true),
             playerController: _translationController.controller,
@@ -166,6 +167,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
+            textToCopy: _translationController.targetOutputText.value,
             onFileShare: () => _onFileShare(isSourceLang: false),
             onMusicPlayOrStop: () => _onAudioPlayStop(false),
             playerController: _translationController.controller,
@@ -207,8 +209,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     if (_translationController.isTranslateCompleted.value) {
       // first check if already compute call finished and TTS file generated
       String? audioPathToShare = isSourceLang
-          ? _translationController.sourceLangTTSPath
-          : _translationController.targetLangTTSPath;
+          ? _translationController.sourceLangTTSPath.value
+          : _translationController.targetLangTTSPath.value;
       if (audioPathToShare != null && audioPathToShare.isNotEmpty) {
         _translationController.shareAudioFile(audioPathToShare);
       } else {

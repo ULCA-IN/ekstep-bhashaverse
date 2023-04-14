@@ -41,12 +41,15 @@ class ConversationController extends GetxController {
   RxBool isTranslateCompleted = false.obs;
   bool isMicPermissionGranted = false;
   RxBool isLoading = false.obs;
-  RxString selectedSourceLanguageCode = ''.obs;
-  RxString selectedTargetLanguageCode = ''.obs;
+  RxString selectedSourceLanguageCode = ''.obs,
+      selectedTargetLanguageCode = ''.obs,
+      sourceOutputText = ''.obs,
+      targetOutputText = ''.obs,
+      sourceLangTTSPath = ''.obs,
+      targetLangTTSPath = ''.obs;
   dynamic ttsResponse;
   RxBool isRecordedViaMic = false.obs;
   RxBool isKeyboardVisible = false.obs;
-  String? sourceLangTTSPath = '', targetLangTTSPath = '';
   RxInt maxDuration = 0.obs, currentDuration = 0.obs;
   File? ttsAudioFile;
   late SocketIOClient _socketIOClient;
@@ -339,8 +342,8 @@ class ConversationController extends GetxController {
             await _voiceRecorder.stopRecordingVoiceAndGetOutput();
         String recordedAudioPath = _voiceRecorder.getAudioFilePath()!;
         currentMic.value == CurrentlySelectedMic.source
-            ? sourceLangTTSPath = recordedAudioPath
-            : targetLangTTSPath = recordedAudioPath;
+            ? sourceLangTTSPath.value = recordedAudioPath
+            : targetLangTTSPath.value = recordedAudioPath;
         if (base64EncodedAudioContent == null ||
             base64EncodedAudioContent.isEmpty) {
           showDefaultSnackbar(message: errorInRecording.tr);
@@ -405,21 +408,21 @@ class ConversationController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
-        String outputTargetText = taskResponse.pipelineResponse
+        targetOutputText.value = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
                 ?.first
                 .target
                 ?.trim() ??
             '';
-        if (outputTargetText.isEmpty) {
+        if (targetOutputText.value.isEmpty) {
           // something went wrong in API call
           isLoading.value = false;
           showDefaultSnackbar(message: responseNotReceived.tr);
           return;
         }
 
-        String sourceLangText = taskResponse.pipelineResponse
+        sourceOutputText.value = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'asr')
                 .output
                 ?.first
@@ -430,20 +433,20 @@ class ConversationController extends GetxController {
         // if voice recorded from target mic, then add source response value in it
 
         if (currentMic.value == CurrentlySelectedMic.source) {
-          sourceLangTextController.text = sourceLangText;
-          targetLangTextController.text = outputTargetText;
-          targetLangTTSPath = '';
+          sourceLangTextController.text = sourceOutputText.value;
+          targetLangTextController.text = targetOutputText.value;
+          targetLangTTSPath.value = '';
           getComputeResTTS(
-              sourceText: outputTargetText,
+              sourceText: targetOutputText.value,
               languageCode: selectedTargetLanguageCode.value,
               isTargetLanguage: true,
               shouldPlayAudio: true);
         } else {
-          targetLangTextController.text = sourceLangText;
-          sourceLangTextController.text = outputTargetText;
-          sourceLangTTSPath = '';
+          targetLangTextController.text = targetOutputText.value;
+          sourceLangTextController.text = sourceOutputText.value;
+          sourceLangTTSPath.value = '';
           getComputeResTTS(
-              sourceText: outputTargetText,
+              sourceText: sourceOutputText.value,
               languageCode: selectedSourceLanguageCode.value,
               isTargetLanguage: false,
               shouldPlayAudio: true);
@@ -467,8 +470,8 @@ class ConversationController extends GetxController {
     required bool isTargetLanguage,
     required bool shouldPlayAudio,
   }) async {
-    if ((isTargetLanguage && (targetLangTTSPath ?? '').isEmpty) ||
-        (!isTargetLanguage && (sourceLangTTSPath ?? '').isEmpty)) {
+    if ((isTargetLanguage && (targetLangTTSPath.value).isEmpty) ||
+        (!isTargetLanguage && (sourceLangTTSPath.value).isEmpty)) {
       if (shouldPlayAudio)
         isTargetLanguage
             ? targetSpeakerStatus.value = SpeakerStatus.loading
@@ -513,8 +516,8 @@ class ConversationController extends GetxController {
             String ttsFilePath =
                 '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
             isTargetLanguage
-                ? targetLangTTSPath = ttsFilePath
-                : sourceLangTTSPath = ttsFilePath;
+                ? targetLangTTSPath.value = ttsFilePath
+                : sourceLangTTSPath.value = ttsFilePath;
             ttsAudioFile = File(ttsFilePath);
             if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
               await ttsAudioFile?.writeAsBytes(fileAsBytes);
@@ -543,15 +546,16 @@ class ConversationController extends GetxController {
     } else {
       await prepareWaveforms(
           isTargetLanguage
-              ? (targetLangTTSPath ?? '')
-              : (sourceLangTTSPath ?? ''),
+              ? (targetLangTTSPath.value)
+              : (sourceLangTTSPath.value),
           isRecordedAudio: false,
           isTargetLanguage: isTargetLanguage);
     }
   }
 
   void playTTSOutput(bool isSource) async {
-    String? audioPath = isSource ? sourceLangTTSPath : targetLangTTSPath;
+    String? audioPath =
+        isSource ? sourceLangTTSPath.value : targetLangTTSPath.value;
     if (audioPath != null && audioPath.isNotEmpty) {
       isSource
           ? sourceSpeakerStatus.value = SpeakerStatus.playing
@@ -585,9 +589,10 @@ class ConversationController extends GetxController {
     await stopPlayer();
     sourceSpeakerStatus.value = SpeakerStatus.disabled;
     targetSpeakerStatus.value = SpeakerStatus.disabled;
-    // sourceLangASRPath = '';
-    sourceLangTTSPath = '';
-    targetLangTTSPath = '';
+    sourceOutputText.value = '';
+    targetOutputText.value = '';
+    sourceLangTTSPath.value = '';
+    targetLangTTSPath.value = '';
   }
 
   Future<void> prepareWaveforms(
