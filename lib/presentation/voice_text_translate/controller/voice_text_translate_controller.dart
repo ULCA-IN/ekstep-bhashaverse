@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:mic_stream/mic_stream.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:vibration/vibration.dart';
 
@@ -27,6 +28,7 @@ import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/permission_handler.dart';
+import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../utils/voice_recorder.dart';
 import '../../../utils/waveform_style.dart';
@@ -36,40 +38,42 @@ class VoiceTextTranslateController extends GetxController {
   late TransliterationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
 
-  TextEditingController sourceLanTextController = TextEditingController();
-  TextEditingController targetLangTextController = TextEditingController();
+  TextEditingController sourceLangTextController = TextEditingController(),
+      targetLangTextController = TextEditingController();
 
   final ScrollController transliterationHintsScrollController =
       ScrollController();
 
-  RxBool isTranslateCompleted = false.obs;
   bool isMicPermissionGranted = false;
-  RxBool isLoading = false.obs;
-  RxString selectedSourceLanguageCode = ''.obs;
-  RxString selectedTargetLanguageCode = ''.obs;
+  RxBool isTranslateCompleted = false.obs,
+      isLoading = false.obs,
+      isKeyboardVisible = false.obs,
+      isScrolledTransliterationHints = false.obs,
+      isRecordedViaMic = false.obs,
+      isSourceShareLoading = false.obs,
+      isTargetShareLoading = false.obs;
+  RxString selectedSourceLanguageCode = ''.obs,
+      selectedTargetLanguageCode = ''.obs,
+      targetOutputText = ''.obs,
+      sourceLangTTSPath = ''.obs,
+      targetLangTTSPath = ''.obs;
   dynamic ttsResponse;
-  RxBool isRecordedViaMic = false.obs;
-  RxBool isKeyboardVisible = false.obs;
-  String? sourceLangASRPath = '';
-  String sourceLangTTSPath = '', targetLangTTSPath = '';
+  String? sourceLangASRPath = '', transliterationModelToUse = '';
   RxInt maxDuration = 0.obs,
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
   File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
-  String? transliterationModelToUse = '';
-  String currentlyTypedWordForTransliteration = '';
-  RxBool isScrolledTransliterationHints = false.obs;
-  late SocketIOClient _socketIOClient;
+  String currentlyTypedWordForTransliteration = '', beepSoundPath = '';
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
   DateTime? recordingStartTime;
-  String beepSoundPath = '';
-  late File beepSoundFile;
   PlayerController _playerController = PlayerController();
-  late Directory appDirectory;
-  Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled);
-  Rx<SpeakerStatus> targetSpeakerStatus = Rx(SpeakerStatus.disabled);
+  Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
+      targetSpeakerStatus = Rx(SpeakerStatus.disabled);
   int samplingRate = 16000;
+  late SocketIOClient _socketIOClient;
+  late File beepSoundFile;
+  late Directory appDirectory;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -138,7 +142,7 @@ class VoiceTextTranslateController extends GetxController {
     super.onInit();
     streamingResponseListener =
         ever(_socketIOClient.socketResponseText, (socketResponseText) {
-      sourceLanTextController.text = socketResponseText;
+      sourceLangTextController.text = socketResponseText;
       if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
       if (!_socketIOClient.isMicConnected.value) {
         streamingResponseListener.dispose();
@@ -158,7 +162,7 @@ class VoiceTextTranslateController extends GetxController {
     streamingResponseListener.dispose();
     socketIOErrorListener.dispose();
     _socketIOClient.disconnect();
-    sourceLanTextController.dispose();
+    sourceLangTextController.dispose();
     targetLangTextController.dispose();
     await stopWatchTimer.dispose();
     disposePlayer();
@@ -433,7 +437,7 @@ class VoiceTextTranslateController extends GetxController {
   Future<void> getComputeResponseASRTrans({
     required bool isRecorded,
     String? base64Value,
-    String? sourceText,
+    bool clearSourceTTS = true,
   }) async {
     isLoading.value = true;
     String asrServiceId = '';
@@ -454,7 +458,7 @@ class VoiceTextTranslateController extends GetxController {
         srcLanguage: selectedSourceLanguageCode.value,
         targetLanguage: selectedTargetLanguageCode.value,
         isRecorded: isRecorded,
-        inputData: isRecorded ? base64Value! : sourceLanTextController.text,
+        inputData: isRecorded ? base64Value! : sourceLangTextController.text,
         audioFormat: Platform.isIOS ? 'flac' : 'wav',
         asrServiceID: asrServiceId,
         translationServiceID: translationServiceId,
@@ -473,7 +477,7 @@ class VoiceTextTranslateController extends GetxController {
     response.when(
       success: (taskResponse) async {
         if (isRecorded) {
-          sourceLanTextController.text = taskResponse.pipelineResponse
+          sourceLangTextController.text = taskResponse.pipelineResponse
                   ?.firstWhere((element) => element.taskType == 'asr')
                   .output
                   ?.first
@@ -481,23 +485,23 @@ class VoiceTextTranslateController extends GetxController {
                   ?.trim() ??
               '';
         }
-        String outputTargetText = taskResponse.pipelineResponse
+        targetOutputText.value = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
                 ?.first
                 .target
                 ?.trim() ??
             '';
-        if (outputTargetText.isEmpty) {
+        if (targetOutputText.value.isEmpty) {
           isLoading.value = false;
           showDefaultSnackbar(message: responseNotReceived.tr);
           return;
         }
-        targetLangTextController.text = outputTargetText;
+        targetLangTextController.text = targetOutputText.value;
         isTranslateCompleted.value = true;
         isLoading.value = false;
-        sourceLangTTSPath = '';
-        targetLangTTSPath = '';
+        if (clearSourceTTS) sourceLangTTSPath.value = '';
+        targetLangTTSPath.value = '';
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
       },
@@ -514,80 +518,65 @@ class VoiceTextTranslateController extends GetxController {
     required String languageCode,
     required bool isTargetLanguage,
   }) async {
-    if ((isTargetLanguage && targetLangTTSPath.isEmpty) ||
-        (!isTargetLanguage && sourceLangTTSPath.isEmpty)) {
-      isTargetLanguage
-          ? targetSpeakerStatus.value = SpeakerStatus.loading
-          : sourceSpeakerStatus.value = SpeakerStatus.loading;
+    String ttsServiceId = getTaskTypeServiceID(
+            _languageModelController.taskSequenceResponse,
+            'tts',
+            languageCode) ??
+        '';
 
-      String ttsServiceId = getTaskTypeServiceID(
-              _languageModelController.taskSequenceResponse,
-              'tts',
-              selectedSourceLanguageCode.value) ??
-          '';
+    var asrPayloadToSend = APIConstants.createComputePayloadTTS(
+        srcLanguage: languageCode,
+        inputData: sourceText,
+        ttsServiceID: ttsServiceId,
+        preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
 
-      var asrPayloadToSend = APIConstants.createComputePayloadTTS(
-          srcLanguage: languageCode,
-          inputData: sourceText,
-          ttsServiceID: ttsServiceId,
-          preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
+    var response = await _dhruvaapiClient.sendComputeRequest(
+        baseUrl: _languageModelController
+            .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
+        authorizationKey: _languageModelController.taskSequenceResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+        authorizationValue: _languageModelController.taskSequenceResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
+        computePayload: asrPayloadToSend);
 
-      var response = await _dhruvaapiClient.sendComputeRequest(
-          baseUrl: _languageModelController
-              .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
-          authorizationKey: _languageModelController.taskSequenceResponse
-              .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
-          authorizationValue: _languageModelController.taskSequenceResponse
-              .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
-          computePayload: asrPayloadToSend);
+    await response.when(
+      success: (taskResponse) async {
+        ttsResponse = taskResponse.pipelineResponse
+            ?.firstWhere((element) => element.taskType == 'tts')
+            .audio[0]['audioContent'];
 
-      response.when(
-        success: (taskResponse) async {
-          ttsResponse = taskResponse.pipelineResponse
-              ?.firstWhere((element) => element.taskType == 'tts')
-              .audio[0]['audioContent'];
-
-          // Save and Play TTS audio
-          if (ttsResponse != null) {
-            Uint8List? fileAsBytes = base64Decode(ttsResponse);
-            Directory appDocDir = await getApplicationDocumentsDirectory();
-            String recordingPath = '${appDocDir.path}/$recordingFolderName';
-            if (!await Directory(recordingPath).exists()) {
-              Directory(recordingPath).create();
-            }
-
-            String ttsFilePath =
-                '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
-            isTargetLanguage
-                ? targetLangTTSPath = ttsFilePath
-                : sourceLangTTSPath = ttsFilePath;
-            ttsAudioFile = File(ttsFilePath);
-            if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-              await ttsAudioFile?.writeAsBytes(fileAsBytes);
-
-              await prepareWaveforms(ttsFilePath,
-                  isRecordedAudio: false, isTargetLanguage: isTargetLanguage);
-            }
-          } else {
-            showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
-            return;
+        // Save TTS audio to file
+        if (ttsResponse != null) {
+          Uint8List? fileAsBytes = base64Decode(ttsResponse);
+          Directory appDocDir = await getApplicationDocumentsDirectory();
+          String recordingPath = '${appDocDir.path}/$recordingFolderName';
+          if (!await Directory(recordingPath).exists()) {
+            Directory(recordingPath).create();
           }
-        },
-        failure: (error) {
+
+          String ttsFilePath =
+              '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
           isTargetLanguage
-              ? targetSpeakerStatus.value = SpeakerStatus.stopped
-              : sourceSpeakerStatus.value = SpeakerStatus.stopped;
-          showDefaultSnackbar(
-              message: error.message ?? APIConstants.kErrorMessageGenericError);
+              ? targetLangTTSPath.value = ttsFilePath
+              : sourceLangTTSPath.value = ttsFilePath;
+          ttsAudioFile = File(ttsFilePath);
+          if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
+            await ttsAudioFile?.writeAsBytes(fileAsBytes);
+          }
+        } else {
+          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
           return;
-        },
-      );
-    } else {
-      await prepareWaveforms(
-          isTargetLanguage ? targetLangTTSPath : sourceLangTTSPath,
-          isRecordedAudio: false,
-          isTargetLanguage: isTargetLanguage);
-    }
+        }
+      },
+      failure: (error) {
+        isTargetLanguage
+            ? targetSpeakerStatus.value = SpeakerStatus.stopped
+            : sourceSpeakerStatus.value = SpeakerStatus.stopped;
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        return;
+      },
+    );
   }
 
   String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
@@ -612,11 +601,43 @@ class VoiceTextTranslateController extends GetxController {
     return '';
   }
 
-  void playTTSOutput() async {
-    if (sourceLangASRPath != null && sourceLangASRPath!.isNotEmpty) {
-      sourceSpeakerStatus.value = SpeakerStatus.playing;
-      await prepareWaveforms(sourceLangASRPath!,
-          isRecordedAudio: true, isTargetLanguage: false);
+  void playTTSOutput(bool isPlayingSource) async {
+    String? audioPath = '';
+    if (isPlayingSource && isRecordedViaMic.value) {
+      audioPath = sourceLangASRPath;
+    } else {
+      if (isPlayingSource) {
+        if (sourceLangTTSPath.value.isEmpty) {
+          sourceSpeakerStatus.value = SpeakerStatus.loading;
+          await getComputeResTTS(
+            sourceText: sourceLangTextController.text,
+            languageCode: selectedSourceLanguageCode.value,
+            isTargetLanguage: false,
+          );
+        }
+        audioPath = sourceLangTTSPath.value;
+        sourceSpeakerStatus.value = SpeakerStatus.playing;
+      } else {
+        if (targetLangTTSPath.value.isEmpty) {
+          targetSpeakerStatus.value = SpeakerStatus.loading;
+          await getComputeResTTS(
+            sourceText: targetOutputText.value,
+            languageCode: selectedTargetLanguageCode.value,
+            isTargetLanguage: true,
+          );
+        }
+        audioPath = targetLangTTSPath.value;
+        targetSpeakerStatus.value = SpeakerStatus.playing;
+      }
+    }
+
+    if (audioPath != null && audioPath.isNotEmpty) {
+      isPlayingSource
+          ? sourceSpeakerStatus.value = SpeakerStatus.playing
+          : targetSpeakerStatus.value = SpeakerStatus.playing;
+
+      await prepareWaveforms(audioPath,
+          isRecordedAudio: true, isTargetLanguage: !isPlayingSource);
     }
   }
 
@@ -637,7 +658,7 @@ class VoiceTextTranslateController extends GetxController {
   }
 
   Future<void> resetAllValues() async {
-    sourceLanTextController.clear();
+    sourceLangTextController.clear();
     targetLangTextController.clear();
     isTranslateCompleted.value = false;
     isRecordedViaMic.value = false;
@@ -649,9 +670,12 @@ class VoiceTextTranslateController extends GetxController {
     await stopPlayer();
     sourceSpeakerStatus.value = SpeakerStatus.disabled;
     targetSpeakerStatus.value = SpeakerStatus.disabled;
+    targetOutputText.value = '';
     sourceLangASRPath = '';
-    sourceLangTTSPath = '';
-    targetLangTTSPath = '';
+    sourceLangTTSPath.value = '';
+    targetLangTTSPath.value = '';
+    isSourceShareLoading.value = false;
+    isTargetShareLoading.value = false;
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
       clearTransliterationHints();
@@ -716,6 +740,54 @@ class VoiceTextTranslateController extends GetxController {
       sqrValue = indValue * indValue;
     }
     return (sqrValue / value.length) * 1000;
+  }
+
+  void shareAudioFile({required bool isSourceLang}) async {
+    if (isTranslateCompleted.value) {
+      String? audioPathToShare = isSourceLang
+          ? isRecordedViaMic.value
+              ? sourceLangASRPath
+              : sourceLangTTSPath.value
+          : targetLangTTSPath.value;
+
+      if (audioPathToShare == null || audioPathToShare.isEmpty) {
+        String sourceText = isSourceLang
+            ? sourceLangTextController.text
+            : targetLangTextController.text;
+
+        String languageCode = isSourceLang
+            ? selectedSourceLanguageCode.value
+            : selectedTargetLanguageCode.value;
+
+        if (sourceText.isEmpty) {
+          showDefaultSnackbar(message: noAudioFoundToShare.tr);
+          return;
+        }
+
+        isSourceLang
+            ? isSourceShareLoading.value = true
+            : isTargetShareLoading.value = true;
+
+        await getComputeResTTS(
+          sourceText: sourceText,
+          languageCode: languageCode,
+          isTargetLanguage: !isSourceLang,
+        );
+        audioPathToShare =
+            isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value;
+        isSourceLang
+            ? isSourceShareLoading.value = false
+            : isTargetShareLoading.value = false;
+      }
+
+      await Share.shareXFiles(
+        [XFile(audioPathToShare)],
+        sharePositionOrigin: Rect.fromLTWH(
+            0, 0, ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
+      );
+    } else {
+      showDefaultSnackbar(message: noAudioFoundToShare.tr);
+    }
   }
 
   Future<void> vibrateDevice() async {
