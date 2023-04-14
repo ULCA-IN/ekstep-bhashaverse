@@ -55,6 +55,7 @@ class TransliterationAppAPIClient {
         options: Options(
             headers: {'Content-Type': 'application/json', 'Accept': '*/*'}),
       );
+      return Result.success(response.data);
     } on DioError catch (error) {
       if (error.type != DioErrorType.cancel) {
         return Result.failure(
