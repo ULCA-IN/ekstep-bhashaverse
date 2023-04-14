@@ -12,6 +12,7 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
+import '../custom_circular_loading.dart';
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
@@ -19,6 +20,7 @@ class ASRAndTTSActions extends StatelessWidget {
     required String textToCopy,
     required PlayerController playerController,
     required bool isRecordedAudio,
+    required bool isShareButtonLoading,
     required String currentDuration,
     required String totalDuration,
     required SpeakerStatus speakerStatus,
@@ -27,13 +29,14 @@ class ASRAndTTSActions extends StatelessWidget {
   })  : _textToCopy = textToCopy,
         _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
+        _isShareButtonLoading = isShareButtonLoading,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _speakerStatus = speakerStatus,
         _onAudioPlayOrStop = onMusicPlayOrStop,
         _onFileShare = onFileShare;
 
-  final bool _isRecordedAudio;
+  final bool _isRecordedAudio, _isShareButtonLoading;
   final String _textToCopy;
   final PlayerController _playerController;
   final String _currentDuration;
@@ -54,12 +57,20 @@ class ASRAndTTSActions extends StatelessWidget {
                 onTap: () async => _onFileShare(),
                 child: Padding(
                   padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: SvgPicture.asset(
-                    iconShare,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
-                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
-                  ),
+                  child: _isShareButtonLoading
+                      ? SizedBox(
+                          height: 24.toWidth,
+                          width: 24.toWidth,
+                          child: CustomCircularLoading(),
+                        )
+                      : SvgPicture.asset(
+                          iconShare,
+                          height: 24.toWidth,
+                          width: 24.toWidth,
+                          color: _textToCopy.isNotEmpty
+                              ? brightGrey
+                              : americanSilver,
+                        ),
                 ),
               ),
               SizedBox(width: 12.toWidth),
@@ -145,10 +156,7 @@ class ASRAndTTSActions extends StatelessWidget {
               height: 24.toWidth,
               width: 24.toWidth,
               child: _speakerStatus == SpeakerStatus.loading
-                  ? CircularProgressIndicator(
-                      color: balticSea,
-                      strokeWidth: 2,
-                    )
+                  ? CustomCircularLoading()
                   : SvgPicture.asset(
                       _speakerStatus == SpeakerStatus.playing
                           ? iconStopPlayback
