@@ -130,9 +130,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
+            isShareButtonLoading:
+                _translationController.isTargetShareLoading.value,
             textToCopy: _translationController.sourceOutputText.value,
-            onMusicPlayOrStop: () => _onAudioPlayStop(true),
-            onFileShare: () => _onFileShare(isSourceLang: true),
+            onMusicPlayOrStop: () => _translationController.playTTSOutput(true),
+            onFileShare: () =>
+                _translationController.shareAudioFile(isSourceLang: true),
             playerController: _translationController.controller,
             speakerStatus: _translationController.sourceSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
@@ -167,9 +170,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
+            isShareButtonLoading:
+                _translationController.isSourceShareLoading.value,
             textToCopy: _translationController.targetOutputText.value,
-            onFileShare: () => _onFileShare(isSourceLang: false),
-            onMusicPlayOrStop: () => _onAudioPlayStop(false),
+            onFileShare: () =>
+                _translationController.shareAudioFile(isSourceLang: false),
+            onMusicPlayOrStop: () =>
+                _translationController.playTTSOutput(false),
             playerController: _translationController.controller,
             speakerStatus: _translationController.targetSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
@@ -178,62 +185,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     CurrentlySelectedMic.target),
       ),
     );
-  }
-
-  Future<void> _onAudioPlayStop(bool isPlayingSource) async {
-    if (isAudioPlaying()) {
-      await _translationController.stopPlayer();
-    } else if (_translationController.isRecordedViaMic.value) {
-      _translationController.playTTSOutput(isPlayingSource);
-    } else {
-      String sourceText;
-      String languageCode;
-      if (isPlayingSource) {
-        sourceText = _translationController.sourceLangTextController.text;
-        languageCode = _translationController.selectedSourceLanguageCode.value;
-      } else {
-        sourceText = _translationController.targetLangTextController.text;
-        languageCode = _translationController.selectedTargetLanguageCode.value;
-      }
-
-      _translationController.getComputeResTTS(
-        sourceText: sourceText,
-        languageCode: languageCode,
-        isTargetLanguage: !isPlayingSource,
-        shouldPlayAudio: true,
-      );
-    }
-  }
-
-  void _onFileShare({required bool isSourceLang}) async {
-    if (_translationController.isTranslateCompleted.value) {
-      // first check if already compute call finished and TTS file generated
-      String? audioPathToShare = isSourceLang
-          ? _translationController.sourceLangTTSPath.value
-          : _translationController.targetLangTTSPath.value;
-      if (audioPathToShare != null && audioPathToShare.isNotEmpty) {
-        _translationController.shareAudioFile(audioPathToShare);
-      } else {
-        // else call TTS compute API
-        String sourceText = isSourceLang
-            ? _translationController.sourceLangTextController.text
-            : _translationController.targetLangTextController.text;
-        if (sourceText.isNotEmpty) {
-          await _translationController.getComputeResTTS(
-            sourceText: sourceText,
-            languageCode: isSourceLang
-                ? _translationController.selectedSourceLanguageCode.value
-                : _translationController.selectedTargetLanguageCode.value,
-            isTargetLanguage: !isSourceLang,
-            shouldPlayAudio: false,
-          );
-        } else {
-          showDefaultSnackbar(message: noAudioFoundToShare.tr);
-        }
-      }
-    } else {
-      showDefaultSnackbar(message: noAudioFoundToShare.tr);
-    }
   }
 
   Widget _buildMicButton() {
