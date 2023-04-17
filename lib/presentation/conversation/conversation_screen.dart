@@ -215,7 +215,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 isRecordingStarted: isRecordingStarted() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.source,
-                // expandWhenRecording: false,
+                showLanguage: true,
                 languageName: selectedSourceLanguage,
                 onMicButtonTap: (isPressed) {
                   _translationController.currentMic.value =
@@ -270,6 +270,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 isRecordingStarted: isRecordingStarted() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.target,
+                showLanguage: true,
                 languageName: selectedTargetLanguage,
                 onMicButtonTap: (isPressed) {
                   _translationController.currentMic.value =
