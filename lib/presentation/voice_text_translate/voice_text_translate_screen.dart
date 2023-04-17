@@ -9,6 +9,7 @@ import 'package:lottie/lottie.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/common_app_bar.dart';
+import '../../common/widgets/mic_button.dart';
 import '../../common/widgets/text_field_with_actions.dart';
 import '../../common/widgets/transliteration_hints.dart';
 import '../../enums/mic_button_status.dart';
@@ -424,37 +425,14 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
             ),
           ),
-          GestureDetector(
-            onTapDown: (_) => micButtonActions(startMicRecording: true),
-            onTapUp: (_) => micButtonActions(startMicRecording: false),
-            onTapCancel: () => micButtonActions(startMicRecording: false),
-            onPanEnd: (_) => micButtonActions(startMicRecording: false),
-            child: PhysicalModel(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              elevation: 6,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isRecordingStarted()
-                      ? tangerineOrangeColor
-                      : flushOrangeColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: AppEdgeInsets.instance
-                      .all(isRecordingStarted() ? 28 : 20.0),
-                  child: SvgPicture.asset(
-                    _voiceTextTransController.micButtonStatus.value ==
-                            MicButtonStatus.pressed
-                        ? iconMicStop
-                        : iconMicroPhone,
-                    height: 32.toHeight,
-                    width: 32.toWidth,
-                    color: Colors.black.withOpacity(0.7),
-                  ),
-                ),
-              ),
-            ),
+          MicButton(
+            isRecordingStarted:
+                _voiceTextTransController.micButtonStatus.value ==
+                    MicButtonStatus.pressed,
+            showLanguage: false,
+            onMicButtonTap: (isPressed) {
+              micButtonActions(startMicRecording: isPressed);
+            },
           ),
         ],
       ),
