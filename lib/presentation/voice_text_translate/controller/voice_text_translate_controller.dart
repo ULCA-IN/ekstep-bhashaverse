@@ -18,7 +18,6 @@ import 'package:vibration/vibration.dart';
 
 import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/speaker_status.dart';
-import '../../../models/task_sequence_response_model.dart';
 import '../../../enums/language_enum.dart';
 import '../../../enums/mic_button_status.dart';
 import '../../../localization/localization_keys.dart';
@@ -443,15 +442,16 @@ class VoiceTextTranslateController extends GetxController {
     String asrServiceId = '';
     String translationServiceId = '';
 
-    asrServiceId = getTaskTypeServiceID(
+    asrServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'asr',
             selectedSourceLanguageCode.value) ??
         '';
-    translationServiceId = getTaskTypeServiceID(
+    translationServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'translation',
-            selectedSourceLanguageCode.value) ??
+            selectedSourceLanguageCode.value,
+            selectedTargetLanguageCode.value) ??
         '';
 
     var asrPayloadToSend = APIConstants.createComputePayloadASRTrans(
@@ -518,7 +518,7 @@ class VoiceTextTranslateController extends GetxController {
     required String languageCode,
     required bool isTargetLanguage,
   }) async {
-    String ttsServiceId = getTaskTypeServiceID(
+    String ttsServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'tts',
             languageCode) ??
@@ -577,28 +577,6 @@ class VoiceTextTranslateController extends GetxController {
         return;
       },
     );
-  }
-
-  String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
-      String taskType, String sourceLanguageCode,
-      [String? targetLanguageCode]) {
-    List<Config>? configs = sequenceResponse.pipelineResponseConfig
-        ?.firstWhere((element) => element.taskType == taskType)
-        .config;
-    for (var config in configs!) {
-      if (config.language?.sourceLanguage == sourceLanguageCode) {
-        // sends translation service id
-        if (targetLanguageCode != null) {
-          if (config.language?.targetLanguage == targetLanguageCode) {
-            return config.serviceId;
-          } else {
-            return '';
-          }
-        } else
-          return config.serviceId; // sends ASR, TTS service id
-      }
-    }
-    return '';
   }
 
   void playTTSOutput(bool isPlayingSource) async {

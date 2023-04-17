@@ -10,6 +10,7 @@ import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../common/widgets/text_field_with_actions.dart';
+import '../../common/widgets/transliteration_hints.dart';
 import '../../enums/mic_button_status.dart';
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
@@ -33,7 +34,7 @@ class VoiceTextTranslateScreen extends StatefulWidget {
 
 class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     with WidgetsBindingObserver {
-  late VoiceTextTranslateController _voiceController;
+  late VoiceTextTranslateController _voiceTextTransController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
@@ -43,11 +44,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
   @override
   void initState() {
-    _voiceController = Get.find();
+    _voiceTextTransController = Get.find();
     _languageModelController = Get.find();
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    _voiceController.getSourceTargetLangFromDB();
+    _voiceTextTransController.getSourceTargetLangFromDB();
     WidgetsBinding.instance.addObserver(this);
 
     ScreenUtil().init();
@@ -58,8 +59,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   void didChangeMetrics() {
     final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
     final newValue = bottomInset > 0.0;
-    if (newValue != _voiceController.isKeyboardVisible.value) {
-      _voiceController.isKeyboardVisible.value = newValue;
+    if (newValue != _voiceTextTransController.isKeyboardVisible.value) {
+      _voiceTextTransController.isKeyboardVisible.value = newValue;
     }
   }
 
@@ -91,9 +92,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     child: Column(
                       children: [
                         Obx(
-                          () => _voiceController.isKeyboardVisible.value
-                              ? const SizedBox.shrink()
-                              : _buildSourceTargetLangButtons(),
+                          () =>
+                              _voiceTextTransController.isKeyboardVisible.value
+                                  ? const SizedBox.shrink()
+                                  : _buildSourceTargetLangButtons(),
                         ),
                         SizedBox(height: 20.toHeight),
                         _buildSourceTextField(),
@@ -102,12 +104,12 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     ),
                   ),
                   SizedBox(
-                      height: _voiceController.isKeyboardVisible.value
+                      height: _voiceTextTransController.isKeyboardVisible.value
                           ? 0
                           : 8.toHeight),
                   _buildTransliterationHints(),
                   Obx(
-                    () => _voiceController.isKeyboardVisible.value
+                    () => _voiceTextTransController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
@@ -116,11 +118,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             ),
           ),
           Obx(() {
-            if (_voiceController.isLoading.value)
+            if (_voiceTextTransController.isLoading.value)
               return LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
-                  footerText: _voiceController.isLoading.value
+                  footerText: _voiceTextTransController.isLoading.value
                       ? kHomeLoadingAnimationText.tr
                       : kTranslationLoadingAnimationText.tr);
             else
@@ -135,37 +137,41 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
-          textController: _voiceController.sourceLangTextController,
+          textController: _voiceTextTransController.sourceLangTextController,
           focusNode: _sourceLangFocusNode,
-          hintText: _voiceController.isTranslateCompleted.value
+          hintText: _voiceTextTransController.isTranslateCompleted.value
               ? null
               : isRecordingStarted()
                   ? kListeningHintText.tr
-                  : _voiceController.micButtonStatus.value ==
+                  : _voiceTextTransController.micButtonStatus.value ==
                           MicButtonStatus.pressed
                       ? connecting.tr
                       : kTranslationHintText.tr,
           translateButtonTitle: kTranslate.tr,
-          currentDuration: _voiceController.currentDuration.value,
-          totalDuration: _voiceController.maxDuration.value,
+          currentDuration: _voiceTextTransController.currentDuration.value,
+          totalDuration: _voiceTextTransController.maxDuration.value,
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: 16, //TODO: change to conttand
           bottomBorderRadius: 0,
           showTranslateButton: true,
-          showASRTTSActionButtons: _voiceController.isTranslateCompleted.value,
+          showASRTTSActionButtons:
+              _voiceTextTransController.isTranslateCompleted.value,
           isReadOnly: false,
-          isShareButtonLoading: _voiceController.isSourceShareLoading.value,
-          textToCopy: _voiceController.sourceLangTextController.text,
+          isShareButtonLoading:
+              _voiceTextTransController.isSourceShareLoading.value,
+          textToCopy: _voiceTextTransController.sourceLangTextController.text,
           onChanged: (newText) => _onSourceTextChanged(newText),
           onTranslateButtonTap: () => _onTranslateButtonTap(),
-          onMusicPlayOrStop: () => _voiceController.playTTSOutput(true),
+          onMusicPlayOrStop: () =>
+              _voiceTextTransController.playTTSOutput(true),
           onFileShare: () =>
-              _voiceController.shareAudioFile(isSourceLang: true),
-          playerController: _voiceController.controller,
-          speakerStatus: _voiceController.sourceSpeakerStatus.value,
-          rawTimeStream: _voiceController.stopWatchTimer.rawTime,
-          showMicButton: _voiceController.isKeyboardVisible.value &&
-              _voiceController.micButtonStatus.value == MicButtonStatus.pressed,
+              _voiceTextTransController.shareAudioFile(isSourceLang: true),
+          playerController: _voiceTextTransController.controller,
+          speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
+          rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
+          showMicButton: _voiceTextTransController.isKeyboardVisible.value &&
+              _voiceTextTransController.micButtonStatus.value ==
+                  MicButtonStatus.pressed,
         ),
       ),
     );
@@ -175,129 +181,89 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
-            textController: _voiceController.targetLangTextController,
+            textController: _voiceTextTransController.targetLangTextController,
             focusNode: _targetLangFocusNode,
             translateButtonTitle: kTranslate.tr,
-            currentDuration: _voiceController.currentDuration.value,
-            totalDuration: _voiceController.maxDuration.value,
+            currentDuration: _voiceTextTransController.currentDuration.value,
+            totalDuration: _voiceTextTransController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
             bottomBorderRadius: 16, //TODO: change to conttand
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
-            isShareButtonLoading: _voiceController.isTargetShareLoading.value,
-            textToCopy: _voiceController.targetOutputText.value,
+            isShareButtonLoading:
+                _voiceTextTransController.isTargetShareLoading.value,
+            textToCopy: _voiceTextTransController.targetOutputText.value,
             onFileShare: () =>
-                _voiceController.shareAudioFile(isSourceLang: false),
-            onMusicPlayOrStop: () => _voiceController.playTTSOutput(false),
-            playerController: _voiceController.controller,
-            speakerStatus: _voiceController.targetSpeakerStatus.value,
-            rawTimeStream: _voiceController.stopWatchTimer.rawTime,
-            showMicButton: _voiceController.isKeyboardVisible.value &&
-                _voiceController.micButtonStatus.value ==
+                _voiceTextTransController.shareAudioFile(isSourceLang: false),
+            onMusicPlayOrStop: () =>
+                _voiceTextTransController.playTTSOutput(false),
+            playerController: _voiceTextTransController.controller,
+            speakerStatus: _voiceTextTransController.targetSpeakerStatus.value,
+            rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
+            showMicButton: _voiceTextTransController.isKeyboardVisible.value &&
+                _voiceTextTransController.micButtonStatus.value ==
                     MicButtonStatus.pressed),
       ),
     );
   }
 
   Widget _buildTransliterationHints() {
-    return Obx(() => _voiceController.isKeyboardVisible.value
-        ? SizedBox(
-            height: 85.toHeight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Visibility(
-                  visible:
-                      !_voiceController.isScrolledTransliterationHints.value &&
-                          _voiceController.transliterationWordHints.isNotEmpty,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Icon(
-                      Icons.arrow_forward_outlined,
-                      color: Colors.grey.shade400,
-                      size: 22.toHeight,
-                    ),
-                  ),
-                ),
-                SingleChildScrollView(
-                  controller:
-                      _voiceController.transliterationHintsScrollController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      ..._voiceController.transliterationWordHints
-                          .map((hintText) => GestureDetector(
-                                onTap: () {
-                                  replaceTextWithTransliterationHint(hintText);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(4),
-                                    color: lilyWhite,
-                                  ),
-                                  margin: AppEdgeInsets.instance.all(4),
-                                  padding: AppEdgeInsets.instance
-                                      .symmetric(vertical: 4, horizontal: 6),
-                                  alignment: Alignment.center,
-                                  child: Container(
-                                    constraints: BoxConstraints(
-                                      minWidth:
-                                          (ScreenUtil.screenWidth / 6).toWidth,
-                                    ),
-                                    child: Text(
-                                      hintText,
-                                      style: AppTextStyle()
-                                          .regular18DolphinGrey
-                                          .copyWith(
-                                            color: Colors.black,
-                                          ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
+    return Obx(() => _voiceTextTransController.isKeyboardVisible.value
+        ? TransliterationHints(
+            scrollController:
+                _voiceTextTransController.transliterationHintsScrollController,
+            transliterationHints:
+                _voiceTextTransController.transliterationWordHints,
+            isScrollArrowVisible: !_voiceTextTransController
+                    .isScrolledTransliterationHints.value &&
+                _voiceTextTransController.transliterationWordHints.isNotEmpty,
+            onSelected: (hintText) =>
+                replaceTextWithTransliterationHint(hintText))
         : SizedBox.shrink());
   }
 
   void _onSourceTextChanged(String newText) {
-    _voiceController.sourceTextCharLimit.value = newText.length;
-    _voiceController.isTranslateCompleted.value = false;
-    _voiceController.ttsResponse = null;
-    _voiceController.targetLangTextController.clear();
-    if (_voiceController.controller.playerState == PlayerState.playing)
-      _voiceController.stopPlayer();
-    if (_voiceController.targetSpeakerStatus.value != SpeakerStatus.disabled)
-      _voiceController.targetSpeakerStatus.value = SpeakerStatus.disabled;
-    if (_voiceController.isTransliterationEnabled()) {
-      getTransliterationHints(newText);
-    } else {
-      _voiceController.transliterationWordHints.clear();
+    _voiceTextTransController.sourceTextCharLimit.value = newText.length;
+    _voiceTextTransController.isTranslateCompleted.value = false;
+    _voiceTextTransController.ttsResponse = null;
+    _voiceTextTransController.targetLangTextController.clear();
+    if (_voiceTextTransController.controller.playerState == PlayerState.playing)
+      _voiceTextTransController.stopPlayer();
+    if (_voiceTextTransController.targetSpeakerStatus.value !=
+        SpeakerStatus.disabled)
+      _voiceTextTransController.targetSpeakerStatus.value =
+          SpeakerStatus.disabled;
+
+    bool isNewWordStarted =
+        newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
+
+    if (_voiceTextTransController.isTransliterationEnabled()) {
+      if (isNewWordStarted &&
+          _voiceTextTransController.transliterationWordHints.isNotEmpty) {
+        replaceTextWithTransliterationHint(
+            _voiceTextTransController.transliterationWordHints.first);
+      } else {
+        getTransliterationHints(newText);
+      }
+    } else if (_voiceTextTransController.transliterationWordHints.isNotEmpty) {
+      _voiceTextTransController.transliterationWordHints.clear();
     }
   }
 
   void _onTranslateButtonTap() {
     unFocusTextFields();
-    _voiceController.sourceLangTTSPath.value = '';
-    _voiceController.targetLangTTSPath.value = '';
+    _voiceTextTransController.sourceLangTTSPath.value = '';
+    _voiceTextTransController.targetLangTTSPath.value = '';
 
-    if (_voiceController.sourceLangTextController.text.isEmpty) {
+    if (_voiceTextTransController.sourceLangTextController.text.isEmpty) {
       showDefaultSnackbar(message: kErrorNoSourceText.tr);
-    } else if (_voiceController.isSourceAndTargetLangSelected()) {
-      _voiceController.getComputeResponseASRTrans(
+    } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
+      _voiceTextTransController.getComputeResponseASRTrans(
         isRecorded: false,
       );
-      _voiceController.isRecordedViaMic.value = false;
+      _voiceTextTransController.isRecordedViaMic.value = false;
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
     }
@@ -320,23 +286,24 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               kLanguageList: sourceLanguageList,
               kIsSourceLanguage: true,
               selectedLanguage:
-                  _voiceController.selectedSourceLanguageCode.value,
+                  _voiceTextTransController.selectedSourceLanguageCode.value,
             });
             if (selectedSourceLangCode != null) {
-              _voiceController.selectedSourceLanguageCode.value =
+              _voiceTextTransController.selectedSourceLanguageCode.value =
                   selectedSourceLangCode;
               _hiveDBInstance.put(
                   preferredSourceLanguage, selectedSourceLangCode);
               String selectedTargetLangCode =
-                  _voiceController.selectedTargetLanguageCode.value;
+                  _voiceTextTransController.selectedTargetLanguageCode.value;
               if (selectedTargetLangCode.isNotEmpty) {
                 if (!_languageModelController
                     .sourceTargetLanguageMap[selectedSourceLangCode]!
                     .contains(selectedTargetLangCode)) {
-                  _voiceController.selectedTargetLanguageCode.value = '';
+                  _voiceTextTransController.selectedTargetLanguageCode.value =
+                      '';
                 }
               }
-              await _voiceController.resetAllValues();
+              await _voiceTextTransController.resetAllValues();
               VoiceRecorder voiceRecorder = VoiceRecorder();
               await voiceRecorder.clearOldRecordings();
             }
@@ -351,10 +318,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             ),
             child: Obx(
               () {
-                String selectedSourceLanguage =
-                    _voiceController.selectedSourceLanguageCode.value.isNotEmpty
-                        ? _voiceController.getSelectedSourceLanguageName()
-                        : kTranslateSourceTitle.tr;
+                String selectedSourceLanguage = _voiceTextTransController
+                        .selectedSourceLanguageCode.value.isNotEmpty
+                    ? _voiceTextTransController.getSelectedSourceLanguageName()
+                    : kTranslateSourceTitle.tr;
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
@@ -368,7 +335,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         ),
         GestureDetector(
           onTap: () {
-            _voiceController.swapSourceAndTargetLanguage();
+            _voiceTextTransController.swapSourceAndTargetLanguage();
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
@@ -380,7 +347,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           onTap: () async {
             _sourceLangFocusNode.unfocus();
             _targetLangFocusNode.unfocus();
-            if (_voiceController.selectedSourceLanguageCode.value.isEmpty) {
+            if (_voiceTextTransController
+                .selectedSourceLanguageCode.value.isEmpty) {
               showDefaultSnackbar(
                   message: 'Please select source language first');
               return;
@@ -388,7 +356,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
             List<dynamic> targetLanguageList = _languageModelController
                 .sourceTargetLanguageMap[
-                    _voiceController.selectedSourceLanguageCode.value]!
+                    _voiceTextTransController.selectedSourceLanguageCode.value]!
                 .toList();
 
             dynamic selectedTargetLangCode =
@@ -396,15 +364,16 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               kLanguageList: targetLanguageList,
               kIsSourceLanguage: false,
               selectedLanguage:
-                  _voiceController.selectedTargetLanguageCode.value,
+                  _voiceTextTransController.selectedTargetLanguageCode.value,
             });
             if (selectedTargetLangCode != null) {
-              _voiceController.selectedTargetLanguageCode.value =
+              _voiceTextTransController.selectedTargetLanguageCode.value =
                   selectedTargetLangCode;
               _hiveDBInstance.put(
                   preferredTargetLanguage, selectedTargetLangCode);
-              if (_voiceController.sourceLangTextController.text.isNotEmpty)
-                _voiceController.getComputeResponseASRTrans(
+              if (_voiceTextTransController
+                  .sourceLangTextController.text.isNotEmpty)
+                _voiceTextTransController.getComputeResponseASRTrans(
                     isRecorded: false, clearSourceTTS: false);
             }
           },
@@ -418,10 +387,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             ),
             child: Obx(
               () {
-                String selectedTargetLanguage =
-                    _voiceController.selectedTargetLanguageCode.value.isNotEmpty
-                        ? _voiceController.getSelectedTargetLanguageName()
-                        : kTranslateTargetTitle.tr;
+                String selectedTargetLanguage = _voiceTextTransController
+                        .selectedTargetLanguageCode.value.isNotEmpty
+                    ? _voiceTextTransController.getSelectedTargetLanguageName()
+                    : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
                   style: AppTextStyle()
@@ -475,7 +444,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                   padding: AppEdgeInsets.instance
                       .all(isRecordingStarted() ? 28 : 20.0),
                   child: SvgPicture.asset(
-                    _voiceController.micButtonStatus.value ==
+                    _voiceTextTransController.micButtonStatus.value ==
                             MicButtonStatus.pressed
                         ? iconMicStop
                         : iconMicroPhone,
@@ -495,24 +464,29 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   void getTransliterationHints(String newText) {
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
-      if (_voiceController.selectedSourceLanguageCode.value.isNotEmpty) {
-        _voiceController.getTransliterationOutput(wordToSend);
+      if (_voiceTextTransController
+          .selectedSourceLanguageCode.value.isNotEmpty) {
+        _voiceTextTransController.getTransliterationOutput(wordToSend);
       }
     } else {
-      _voiceController.clearTransliterationHints();
+      _voiceTextTransController.clearTransliterationHints();
     }
   }
 
   void replaceTextWithTransliterationHint(String currentHintText) {
-    List<String> oldString =
-        _voiceController.sourceLangTextController.text.trim().split(' ');
+    List<String> oldString = _voiceTextTransController
+        .sourceLangTextController.text
+        .trim()
+        .split(' ');
     oldString.removeLast();
     oldString.add(currentHintText);
-    _voiceController.sourceLangTextController.text = '${oldString.join(' ')} ';
-    _voiceController.sourceLangTextController.selection =
+    _voiceTextTransController.sourceLangTextController.text =
+        '${oldString.join(' ')} ';
+    _voiceTextTransController.sourceLangTextController.selection =
         TextSelection.fromPosition(TextPosition(
-            offset: _voiceController.sourceLangTextController.text.length));
-    _voiceController.clearTransliterationHints();
+            offset: _voiceTextTransController
+                .sourceLangTextController.text.length));
+    _voiceTextTransController.clearTransliterationHints();
   }
 
   void unFocusTextFields() {
@@ -523,20 +497,24 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   bool isRecordingStarted() {
     return _hiveDBInstance.get(isStreamingPreferred)
         ? _socketIOClient.isMicConnected.value
-        : _voiceController.micButtonStatus.value == MicButtonStatus.pressed;
+        : _voiceTextTransController.micButtonStatus.value ==
+            MicButtonStatus.pressed;
   }
 
   void micButtonActions({required bool startMicRecording}) {
-    if (_voiceController.isSourceAndTargetLangSelected()) {
+    if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
       unFocusTextFields();
 
       if (startMicRecording) {
-        _voiceController.micButtonStatus.value = MicButtonStatus.pressed;
-        _voiceController.startVoiceRecording();
+        _voiceTextTransController.micButtonStatus.value =
+            MicButtonStatus.pressed;
+        _voiceTextTransController.startVoiceRecording();
       } else {
-        if (_voiceController.micButtonStatus.value == MicButtonStatus.pressed) {
-          _voiceController.micButtonStatus.value = MicButtonStatus.released;
-          _voiceController.stopVoiceRecordingAndGetResult();
+        if (_voiceTextTransController.micButtonStatus.value ==
+            MicButtonStatus.pressed) {
+          _voiceTextTransController.micButtonStatus.value =
+              MicButtonStatus.released;
+          _voiceTextTransController.stopVoiceRecordingAndGetResult();
         }
       }
     } else if (startMicRecording) {
