@@ -11,65 +11,60 @@ class MicButton extends StatelessWidget {
   const MicButton({
     super.key,
     required bool isRecordingStarted,
-    bool expandWhenRecording = true,
-    required String languageName,
+    required bool showLanguage,
+    String languageName = '',
     required Function onMicButtonTap,
-    required Function onLanguageTap,
+    Function? onLanguageTap,
   })  : _isRecordingStarted = isRecordingStarted,
-        _expandWhenRecording = expandWhenRecording,
+        _showLanguage = showLanguage,
         _languageName = languageName,
         _onMicButtonTap = onMicButtonTap,
         _onLanguageTap = onLanguageTap;
 
-  final bool _isRecordingStarted, _expandWhenRecording;
+  final bool _isRecordingStarted, _showLanguage;
   final String _languageName;
-  final Function _onMicButtonTap, _onLanguageTap;
+  final Function _onMicButtonTap;
+  final Function? _onLanguageTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // color: Colors.redAccent,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            // color: Colors.blueAccent,
-            child: GestureDetector(
-              onTapDown: (_) => _onMicButtonTap(true),
-              onTapUp: (_) => _onMicButtonTap(false),
-              onTapCancel: () => _onMicButtonTap(false),
-              onPanEnd: (_) => _onMicButtonTap(false),
-              child: PhysicalModel(
-                color: Colors.transparent,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTapDown: (_) => _onMicButtonTap(true),
+          onTapUp: (_) => _onMicButtonTap(false),
+          onTapCancel: () => _onMicButtonTap(false),
+          onPanEnd: (_) => _onMicButtonTap(false),
+          child: PhysicalModel(
+            color: Colors.transparent,
+            shape: BoxShape.circle,
+            elevation: 6,
+            child: Container(
+              decoration: BoxDecoration(
+                color: _isRecordingStarted
+                    ? tangerineOrangeColor
+                    : flushOrangeColor,
                 shape: BoxShape.circle,
-                elevation: 6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _isRecordingStarted
-                        ? tangerineOrangeColor
-                        : flushOrangeColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: AppEdgeInsets.instance.all(
-                        _isRecordingStarted && _expandWhenRecording
-                            ? 28
-                            : 20.0),
-                    child: SvgPicture.asset(
-                      _isRecordingStarted ? iconMicStop : iconMicroPhone,
-                      height: 32.toHeight,
-                      width: 32.toWidth,
-                      color: Colors.black.withOpacity(0.7),
-                    ),
-                  ),
+              ),
+              child: Padding(
+                padding:
+                    AppEdgeInsets.instance.all(_isRecordingStarted ? 28 : 20.0),
+                child: SvgPicture.asset(
+                  _isRecordingStarted ? iconMicStop : iconMicroPhone,
+                  height: 32.toHeight,
+                  width: 32.toWidth,
+                  color: Colors.black.withOpacity(0.7),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 10.toHeight),
+        ),
+        SizedBox(height: _showLanguage ? 10.toHeight : 0),
+        if (_showLanguage)
           Container(
             child: GestureDetector(
-              onTap: () => _onLanguageTap(),
+              onTap: () => _onLanguageTap != null ? _onLanguageTap!() : null,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,8 +88,7 @@ class MicButton extends StatelessWidget {
               ),
             ),
           )
-        ],
-      ),
+      ],
     );
   }
 }
