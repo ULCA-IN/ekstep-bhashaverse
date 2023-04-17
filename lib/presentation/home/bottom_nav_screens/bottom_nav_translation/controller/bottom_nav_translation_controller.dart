@@ -453,7 +453,8 @@ class BottomNavTranslationController extends GetxController {
     translationServiceId = getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
             'translation',
-            selectedSourceLanguageCode.value) ??
+            selectedSourceLanguageCode.value,
+            selectedTargetLanguageCode.value) ??
         '';
 
     var asrPayloadToSend = APIConstants.createComputePayloadASRTrans(
