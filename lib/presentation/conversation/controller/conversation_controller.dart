@@ -57,14 +57,12 @@ class ConversationController extends GetxController {
   late SocketIOClient _socketIOClient;
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
   DateTime? recordingStartTime;
-  String beepSoundPath = '';
-  late File beepSoundFile;
-  PlayerController _playerController = PlayerController();
   late Directory appDirectory;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled);
   Rx<SpeakerStatus> targetSpeakerStatus = Rx(SpeakerStatus.disabled);
   int samplingRate = 16000;
   Rx<CurrentlySelectedMic> currentMic = Rx(CurrentlySelectedMic.none);
+  String? base64EncodedAudioContent;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
 
@@ -90,7 +88,6 @@ class ConversationController extends GetxController {
     Connectivity().onConnectivityChanged.listen(
           (newConnectivity) => updateSamplingRate(newConnectivity),
         );
-    setBeepSoundFile();
     controller.onCompletion.listen((event) {
       sourceSpeakerStatus.value = SpeakerStatus.stopped;
       targetSpeakerStatus.value = SpeakerStatus.stopped;
@@ -181,16 +178,6 @@ class ConversationController extends GetxController {
     }
   }
 
-  setBeepSoundFile() async {
-    appDirectory = await getApplicationDocumentsDirectory();
-    beepSoundPath = "${appDirectory.path}/mic_tap_sound.wav";
-    beepSoundFile = File(beepSoundPath);
-    if (!await beepSoundFile.exists()) {
-      await beepSoundFile.writeAsBytes(
-          (await rootBundle.load(micBeepSound)).buffer.asUint8List());
-    }
-  }
-
   bool isSourceAndTargetLangSelected() =>
       selectedSourceLanguageCode.value.isNotEmpty &&
       selectedTargetLanguageCode.value.isNotEmpty;
@@ -221,10 +208,7 @@ class ConversationController extends GetxController {
       //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
-        await playBeepSound();
         await vibrateDevice();
-        // wait until beep sound finished
-        await Future.delayed(const Duration(milliseconds: 600));
 
         recordingStartTime = DateTime.now();
         if (_hiveDBInstance.get(isStreamingPreferred)) {
@@ -307,7 +291,6 @@ class ConversationController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    await playBeepSound();
     await vibrateDevice();
 
     int timeTakenForLastRecording = stopWatchTimer.rawTime.value;
@@ -340,14 +323,14 @@ class ConversationController extends GetxController {
       _socketIOClient.disconnect();
     } else {
       if (await _voiceRecorder.isVoiceRecording()) {
-        String? base64EncodedAudioContent =
+        base64EncodedAudioContent =
             await _voiceRecorder.stopRecordingVoiceAndGetOutput();
         String recordedAudioPath = _voiceRecorder.getAudioFilePath()!;
         currentMic.value == CurrentlySelectedMic.source
             ? sourceLangTTSPath.value = recordedAudioPath
             : targetLangTTSPath.value = recordedAudioPath;
         if (base64EncodedAudioContent == null ||
-            base64EncodedAudioContent.isEmpty) {
+            (base64EncodedAudioContent ?? '').isEmpty) {
           showDefaultSnackbar(message: errorInRecording.tr);
           return;
         } else {
@@ -540,32 +523,28 @@ class ConversationController extends GetxController {
 
   void playTTSOutput(bool isPlayingSource) async {
     String? audioPath = '';
-    if (isPlayingSource && isRecordedViaMic.value) {
-      audioPath = sourceLangTTSPath.value;
-    } else {
-      if (isPlayingSource) {
-        if (sourceLangTTSPath.value.isEmpty) {
-          sourceSpeakerStatus.value = SpeakerStatus.loading;
-          await getComputeResTTS(
-            sourceText: sourceLangTextController.text,
-            languageCode: selectedSourceLanguageCode.value,
-            isTargetLanguage: false,
-          );
-        }
-        audioPath = sourceLangTTSPath.value;
-        sourceSpeakerStatus.value = SpeakerStatus.playing;
-      } else {
-        if (targetLangTTSPath.value.isEmpty) {
-          targetSpeakerStatus.value = SpeakerStatus.loading;
-          await getComputeResTTS(
-            sourceText: targetOutputText.value,
-            languageCode: selectedTargetLanguageCode.value,
-            isTargetLanguage: true,
-          );
-        }
-        audioPath = targetLangTTSPath.value;
-        targetSpeakerStatus.value = SpeakerStatus.playing;
+    if (isPlayingSource) {
+      if (sourceLangTTSPath.value.isEmpty) {
+        sourceSpeakerStatus.value = SpeakerStatus.loading;
+        await getComputeResTTS(
+          sourceText: sourceLangTextController.text,
+          languageCode: selectedSourceLanguageCode.value,
+          isTargetLanguage: false,
+        );
       }
+      audioPath = sourceLangTTSPath.value;
+      sourceSpeakerStatus.value = SpeakerStatus.playing;
+    } else {
+      if (targetLangTTSPath.value.isEmpty) {
+        targetSpeakerStatus.value = SpeakerStatus.loading;
+        await getComputeResTTS(
+          sourceText: targetOutputText.value,
+          languageCode: selectedTargetLanguageCode.value,
+          isTargetLanguage: true,
+        );
+      }
+      audioPath = targetLangTTSPath.value;
+      targetSpeakerStatus.value = SpeakerStatus.playing;
     }
 
     if (audioPath.isNotEmpty) {
@@ -638,6 +617,7 @@ class ConversationController extends GetxController {
     targetOutputText.value = '';
     sourceLangTTSPath.value = '';
     targetLangTTSPath.value = '';
+    base64EncodedAudioContent = null;
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
   }
@@ -707,18 +687,6 @@ class ConversationController extends GetxController {
         await Vibration.vibrate();
       }
     }
-  }
-
-  Future<void> playBeepSound() async {
-    if (_playerController.playerState == PlayerState.playing ||
-        _playerController.playerState == PlayerState.paused) {
-      await _playerController.stopPlayer();
-    }
-    await _playerController.preparePlayer(
-      path: beepSoundFile.path,
-      shouldExtractWaveform: false,
-    );
-    await _playerController.startPlayer(finishMode: FinishMode.pause);
   }
 
   void updateSamplingRate(ConnectivityResult newConnectivity) {
