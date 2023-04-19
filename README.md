@@ -83,7 +83,6 @@ flutter_icons:
     - assets/images/onboarding_image/
     - assets/images/menu_images/
     - assets/animation/lottie_animation/
-    - assets/audio/
 ```
 
 - Enter the terminal and execute following commands:
