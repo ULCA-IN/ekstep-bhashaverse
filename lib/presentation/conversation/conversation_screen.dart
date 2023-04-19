@@ -112,7 +112,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.sourceLangTextController,
             focusNode: FocusNode(),
-            hintText: isRecordingStarted()
+            hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
                         CurrentlySelectedMic.source
                     ? kListeningHintText.tr
@@ -125,7 +125,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             currentDuration: _translationController.currentDuration.value,
             totalDuration: _translationController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
-            topBorderRadius: 16, //TODO: change to conttand
+            topBorderRadius: textFieldRadius,
             bottomBorderRadius: 0,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
@@ -139,7 +139,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             playerController: _translationController.controller,
             speakerStatus: _translationController.sourceSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
-            showMicButton: isRecordingStarted() &&
+            showMicButton: isCurrentlyRecording() &&
                 _translationController.currentMic.value ==
                     CurrentlySelectedMic.source),
       ),
@@ -152,7 +152,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.targetLangTextController,
             focusNode: FocusNode(),
-            hintText: isRecordingStarted()
+            hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
                         CurrentlySelectedMic.target
                     ? kListeningHintText.tr
@@ -166,7 +166,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             totalDuration: _translationController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
-            bottomBorderRadius: 16, //TODO: change to conttand
+            bottomBorderRadius: textFieldRadius,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
@@ -180,7 +180,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             playerController: _translationController.controller,
             speakerStatus: _translationController.targetSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
-            showMicButton: isRecordingStarted() &&
+            showMicButton: isCurrentlyRecording() &&
                 _translationController.currentMic.value ==
                     CurrentlySelectedMic.target),
       ),
@@ -191,20 +191,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Padding(
       padding: AppEdgeInsets.instance.symmetric(horizontal: 14.0),
       child: Stack(
-        // mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           AnimatedOpacity(
-            opacity: isRecordingStarted() ? 1 : 0,
+            opacity: isCurrentlyRecording() ? 1 : 0,
             duration: const Duration(milliseconds: 600),
             child: LottieBuilder.asset(
               animationStaticWaveForRecording,
               fit: BoxFit.fitWidth,
-              animate: isRecordingStarted(),
+              animate: isCurrentlyRecording(),
               repeat: true,
             ),
           ),
           Positioned(
-            // alignment: Alignment.centerLeft,
             left: 30,
             child: Obx(() {
               String selectedSourceLanguage = _translationController
@@ -212,12 +210,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ? _translationController.getSelectedSourceLanguageName()
                   : kTranslateSourceTitle.tr;
               return MicButton(
-                isRecordingStarted: isRecordingStarted() &&
+                isRecordingStarted: isCurrentlyRecording() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.source,
                 showLanguage: true,
                 languageName: selectedSourceLanguage,
                 onMicButtonTap: (isPressed) {
+                  if (_translationController.currentMic.value ==
+                          CurrentlySelectedMic.target &&
+                      isCurrentlyRecording()) return;
                   _translationController.currentMic.value =
                       CurrentlySelectedMic.source;
                   micButtonActions(startMicRecording: isPressed);
@@ -249,11 +250,22 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         _translationController
                             .selectedTargetLanguageCode.value = '';
                         _hiveDBInstance.put(preferredTargetLanguage, null);
+                        await _translationController.resetAllValues();
+                      } else if (_translationController.currentMic.value ==
+                              CurrentlySelectedMic.target &&
+                          _translationController
+                              .selectedTargetLanguageCode.value.isNotEmpty &&
+                          (_translationController.base64EncodedAudioContent ??
+                                  '')
+                              .isNotEmpty) {
+                        _translationController.getComputeResponseASRTrans(
+                            isRecorded: true,
+                            base64Value: _translationController
+                                .base64EncodedAudioContent);
+                      } else {
+                        await _translationController.resetAllValues();
                       }
                     }
-                    await _translationController.resetAllValues();
-                    VoiceRecorder voiceRecorder = VoiceRecorder();
-                    await voiceRecorder.clearOldRecordings();
                   }
                 },
               );
@@ -267,12 +279,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ? _translationController.getSelectedTargetLanguageName()
                   : kTranslateTargetTitle.tr;
               return MicButton(
-                isRecordingStarted: isRecordingStarted() &&
+                isRecordingStarted: isCurrentlyRecording() &&
                     _translationController.currentMic.value ==
                         CurrentlySelectedMic.target,
                 showLanguage: true,
                 languageName: selectedTargetLanguage,
                 onMicButtonTap: (isPressed) {
+                  if (_translationController.currentMic.value ==
+                          CurrentlySelectedMic.source &&
+                      isCurrentlyRecording()) return;
                   _translationController.currentMic.value =
                       CurrentlySelectedMic.target;
                   micButtonActions(startMicRecording: isPressed);
@@ -303,11 +318,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         selectedTargetLangCode;
                     _hiveDBInstance.put(
                         preferredTargetLanguage, selectedTargetLangCode);
-                    await _translationController.resetAllValues();
-                    if (_translationController
-                        .sourceLangTextController.text.isNotEmpty)
+
+                    if (_translationController.currentMic.value ==
+                            CurrentlySelectedMic.source &&
+                        _translationController
+                            .selectedSourceLanguageCode.value.isNotEmpty &&
+                        (_translationController.base64EncodedAudioContent ?? '')
+                            .isNotEmpty) {
                       _translationController.getComputeResponseASRTrans(
-                          isRecorded: false);
+                          isRecorded: true,
+                          base64Value:
+                              _translationController.base64EncodedAudioContent);
+                    } else {
+                      await _translationController.resetAllValues();
+                    }
                   }
                 },
               );
@@ -325,7 +349,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             SpeakerStatus.playing);
   }
 
-  bool isRecordingStarted() {
+  bool isCurrentlyRecording() {
     return _hiveDBInstance.get(isStreamingPreferred)
         ? _socketIOClient.isMicConnected.value
         : _translationController.micButtonStatus.value ==
