@@ -68,6 +68,9 @@ class ScreenUtil {
   /// The offset from the bottom.
   static double get bottomBarHeight => _bottomBarHeight;
 
+  /// The offset from the bottom.
+  static double get bottomBarHeightPx => _bottomBarHeight / _pixelRatio;
+
   /// The ratio of the actual dp to the design draft px
   double get scaleWidth => screenWidth / uiWidthPx;
 
