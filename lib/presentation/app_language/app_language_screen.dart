@@ -116,7 +116,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                   ),
                 ),
                 SizedBox(height: 16.toHeight),
-                elevatedButton(
+                CustomElevetedButton(
                   buttonText: continueText.tr,
                   textStyle: AppTextStyle()
                       .semibold24BalticSea
