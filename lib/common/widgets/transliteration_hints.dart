@@ -9,36 +9,39 @@ class TransliterationHints extends StatelessWidget {
       {super.key,
       required ScrollController scrollController,
       required List<dynamic> transliterationHints,
-      required bool isScrollArrowVisible,
+      required bool showScrollIcon,
+      isScrollArrowVisible,
       required Function onSelected})
       : _scrollController = scrollController,
         _transliterationHints = transliterationHints,
+        _showScrollIcon = showScrollIcon,
         _isScrollArrowVisible = isScrollArrowVisible,
         _onHintTap = onSelected;
 
   final ScrollController _scrollController;
   final List<dynamic> _transliterationHints;
-  final bool _isScrollArrowVisible;
+  final bool _showScrollIcon, _isScrollArrowVisible;
 
   final Function _onHintTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 85.toHeight,
+      height: _showScrollIcon ? 85.toHeight : null,
       child: Column(
         children: [
-          SizedBox(height: 6.toHeight),
-          _isScrollArrowVisible
-              ? Align(
-                  alignment: Alignment.centerRight,
-                  child: Icon(
-                    Icons.arrow_forward_outlined,
-                    color: Colors.grey.shade400,
-                    size: 22.toHeight,
-                  ),
-                )
-              : SizedBox(height: 22.toHeight),
+          SizedBox(height: _showScrollIcon ? 6.toHeight : null),
+          if (_showScrollIcon)
+            _isScrollArrowVisible
+                ? Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.arrow_forward_outlined,
+                      color: Colors.grey.shade400,
+                      size: 22.toHeight,
+                    ),
+                  )
+                : SizedBox(height: 22.toHeight),
           SingleChildScrollView(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -55,11 +58,11 @@ class TransliterationHints extends StatelessWidget {
                         ),
                         margin: AppEdgeInsets.instance.all(4),
                         padding: AppEdgeInsets.instance
-                            .symmetric(vertical: 6, horizontal: 6),
+                            .symmetric(vertical: 4, horizontal: 6),
                         alignment: Alignment.center,
                         child: Container(
                           constraints: BoxConstraints(
-                            minWidth: (ScreenUtil.screenWidth / 7.5).toWidth,
+                            minWidth: (ScreenUtil.screenWidth / 7).toWidth,
                           ),
                           child: Text(
                             hintText,
