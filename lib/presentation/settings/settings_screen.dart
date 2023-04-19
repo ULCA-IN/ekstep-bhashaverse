@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'dart:math' show pi;
 
 import '../../common/widgets/common_app_bar.dart';
 import '../../enums/gender_enum.dart';
@@ -10,7 +9,6 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
@@ -26,7 +24,8 @@ class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
   late AnimationController _controller;
-  late Animation<double> _animation;
+  // TODO: uncomment when Streaming service work
+  // late Animation<double> _animation;
   Duration defaultAnimationTime = const Duration(milliseconds: 300);
 
   @override
@@ -38,11 +37,12 @@ class _SettingsScreenState extends State<SettingsScreen>
       vsync: this,
       duration: defaultAnimationTime,
     );
-    _animation = Tween<double>(
-      begin: 0.0,
-      end: pi,
-    ).animate(_controller);
-    ScreenUtil().init();
+    // TODO: uncomment when Streaming service work
+    // _animation = Tween<double>(
+    //   begin: 0.0,
+    //   end: pi,
+    // ).animate(_controller);
+    // ScreenUtil().init();
   }
 
   @override
@@ -390,7 +390,8 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  Widget _popupMenuBuilder() {
+  // TODO: uncomment when Streaming service work
+  /*  Widget _popupMenuBuilder() {
     return Obx(
       () => PopupMenuButton(
         onSelected: (value) {
@@ -434,7 +435,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       case ThemeMode.dark:
         return dark.tr;
     }
-  }
+  } */
 
   Future<bool> _onWillPop() async {
     Get.back();
