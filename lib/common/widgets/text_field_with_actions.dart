@@ -16,8 +16,9 @@ class TextFieldWithActions extends StatelessWidget {
     super.key,
     required TextEditingController textController,
     required FocusNode focusNode,
-    required String translateButtonTitle,
+    String? translateButtonTitle,
     required String textToCopy,
+    Color backgroundColor = Colors.white,
     required int currentDuration,
     required int totalDuration,
     required bool isRecordedAudio,
@@ -43,6 +44,7 @@ class TextFieldWithActions extends StatelessWidget {
         _hintText = hintText,
         _translateButtonTitle = translateButtonTitle,
         _textToCopy = textToCopy,
+        _backgroundColor = backgroundColor,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _sourceCharLength = sourceCharLength,
@@ -65,7 +67,8 @@ class TextFieldWithActions extends StatelessWidget {
 
   final TextEditingController _textController;
   final FocusNode _focusNode;
-  final String _translateButtonTitle, _textToCopy;
+  final String? _translateButtonTitle;
+  final String _textToCopy;
   final String? _hintText;
   final int _currentDuration, _totalDuration, _sourceCharLength;
   final bool _isRecordedAudio,
@@ -75,7 +78,7 @@ class TextFieldWithActions extends StatelessWidget {
       _isReadOnly,
       _isShareButtonLoading;
   final double _topBorderRadius, _bottomBorderRadius;
-
+  final Color _backgroundColor;
   final Function _onMusicPlayOrStop, _onFileShare;
   final Function? _onTranslateButtonTap, _onChanged, _onSubmitted;
 
@@ -87,7 +90,7 @@ class TextFieldWithActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: _backgroundColor,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(_topBorderRadius),
             topRight: Radius.circular(_topBorderRadius),
