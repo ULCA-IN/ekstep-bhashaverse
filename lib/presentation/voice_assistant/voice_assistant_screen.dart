@@ -67,7 +67,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 ],
               ),
               const Spacer(),
-              elevatedButton(
+              CustomElevetedButton(
                 buttonText: letsTranslate.tr,
                 textStyle: AppTextStyle()
                     .semibold24BalticSea
