@@ -78,11 +78,11 @@ final Map<String, String> en = {
   translationNotPossible: 'translation not possible at the moment',
   bhashiniTitle: 'Bhashini',
   noAudioFoundToShare: 'No audio found to share',
-  converse: 'Converse',
-  video: 'Video',
   text: 'Text',
-  images: 'Images',
-  documents: 'Documents',
+  converse: 'Converse',
   voice: 'Voice',
+  video: 'Video',
+  documents: 'Documents',
+  images: 'Images',
   converseHintText: 'Press mic to begin conversation'
 };
