@@ -18,7 +18,6 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
-import '../../utils/voice_recorder.dart';
 import 'controller/conversation_controller.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -85,22 +84,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
-                  SizedBox(height: 8.toHeight),
+                  SizedBox(height: 25.toHeight),
                 ],
               ),
             ),
           ),
-          Obx(() {
-            if (_translationController.isLoading.value)
-              return LottieAnimation(
-                  context: context,
-                  lottieAsset: animationLoadingLine,
-                  footerText: _translationController.isLoading.value
-                      ? kHomeLoadingAnimationText.tr
-                      : kTranslationLoadingAnimationText.tr);
-            else
-              return const SizedBox.shrink();
-          })
+          _buildLoadingAnimation()
         ],
       ),
     );
@@ -340,6 +329,20 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildLoadingAnimation() {
+    return Obx(() {
+      if (_translationController.isLoading.value)
+        return LottieAnimation(
+            context: context,
+            lottieAsset: animationLoadingLine,
+            footerText: _translationController.isLoading.value
+                ? kHomeLoadingAnimationText.tr
+                : kTranslationLoadingAnimationText.tr);
+      else
+        return const SizedBox.shrink();
+    });
   }
 
   bool isAudioPlaying() {
