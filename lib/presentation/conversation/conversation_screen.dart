@@ -285,8 +285,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 onLanguageTap: () async {
                   if (_translationController
                       .selectedSourceLanguageCode.value.isEmpty) {
-                    showDefaultSnackbar(
-                        message: 'Please select source language first');
+                    showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
                     return;
                   }
 
