@@ -1,6 +1,4 @@
 //common
-import 'package:flutter/material.dart';
-
 const hiveDBName = 'db_bhashini';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
@@ -20,7 +18,6 @@ const recordingMaxTimeLimit = 30000;
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
-const micBeepSound = 'assets/audio/mic_tap_sound.wav';
 
 // Select App Language Screen
 const imgEnglish = 'assets/images/app_language_img/img_english.png';
@@ -63,7 +60,7 @@ const iconUnSelectedRadio =
     'assets/images/common_icon/icon_unselected_radio_button.svg';
 
 // Translation Screen
-const textFieldRadius = Radius.circular(16);
+const textFieldRadius = 16.0;
 const iconArrowSwapHorizontal =
     'assets/images/common_icon/icon_arrow_swap_horizontal.svg';
 const iconMicroPhone = 'assets/images/common_icon/icon_microphone.svg';
