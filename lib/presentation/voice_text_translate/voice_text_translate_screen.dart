@@ -82,13 +82,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 18.toHeight,
-                  ),
+                  SizedBox(height: 18.toHeight),
                   CommonAppBar(title: voice.tr, onBackPress: () => Get.back()),
-                  SizedBox(
-                    height: 24.toHeight,
-                  ),
+                  SizedBox(height: 24.toHeight),
                   Expanded(
                     child: Column(
                       children: [
@@ -118,17 +114,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
             ),
           ),
-          Obx(() {
-            if (_voiceTextTransController.isLoading.value)
-              return LottieAnimation(
-                  context: context,
-                  lottieAsset: animationLoadingLine,
-                  footerText: _voiceTextTransController.isLoading.value
-                      ? kHomeLoadingAnimationText.tr
-                      : kTranslationLoadingAnimationText.tr);
-            else
-              return const SizedBox.shrink();
-          })
+          _buildLoadingAnimation(context)
         ],
       ),
     );
@@ -152,7 +138,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           currentDuration: _voiceTextTransController.currentDuration.value,
           totalDuration: _voiceTextTransController.maxDuration.value,
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
-          topBorderRadius: 16, //TODO: change to conttand
+          topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
           showTranslateButton: true,
           showASRTTSActionButtons:
@@ -164,15 +150,15 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           onChanged: (newText) => _onSourceTextChanged(newText),
           onTranslateButtonTap: () => _onTranslateButtonTap(),
           onMusicPlayOrStop: () =>
-              _voiceTextTransController.playTTSOutput(true),
+              _voiceTextTransController.playStopTTSOutput(true),
           onFileShare: () =>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
-          playerController: _voiceTextTransController.controller,
+          playerController: _voiceTextTransController.playerController,
           speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
           rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
-          showMicButton: _voiceTextTransController.isKeyboardVisible.value &&
-              _voiceTextTransController.micButtonStatus.value ==
-                  MicButtonStatus.pressed,
+          sourceCharLength: _voiceTextTransController.sourceTextCharLimit.value,
+          showMicButton: _voiceTextTransController.micButtonStatus.value ==
+              MicButtonStatus.pressed,
         ),
       ),
     );
@@ -184,12 +170,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         () => TextFieldWithActions(
             textController: _voiceTextTransController.targetLangTextController,
             focusNode: _targetLangFocusNode,
-            translateButtonTitle: kTranslate.tr,
             currentDuration: _voiceTextTransController.currentDuration.value,
             totalDuration: _voiceTextTransController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
-            bottomBorderRadius: 16, //TODO: change to conttand
+            bottomBorderRadius: textFieldRadius,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
             isReadOnly: true,
@@ -199,13 +184,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             onFileShare: () =>
                 _voiceTextTransController.shareAudioFile(isSourceLang: false),
             onMusicPlayOrStop: () =>
-                _voiceTextTransController.playTTSOutput(false),
-            playerController: _voiceTextTransController.controller,
+                _voiceTextTransController.playStopTTSOutput(false),
+            playerController: _voiceTextTransController.playerController,
             speakerStatus: _voiceTextTransController.targetSpeakerStatus.value,
-            rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
-            showMicButton: _voiceTextTransController.isKeyboardVisible.value &&
-                _voiceTextTransController.micButtonStatus.value ==
-                    MicButtonStatus.pressed),
+            showMicButton: false),
       ),
     );
   }
@@ -215,59 +197,16 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         ? TransliterationHints(
             scrollController:
                 _voiceTextTransController.transliterationHintsScrollController,
+            // neet to send with .toList() because of GetX observation issue
             transliterationHints:
-                _voiceTextTransController.transliterationWordHints,
+                _voiceTextTransController.transliterationWordHints.toList(),
+            showScrollIcon: true,
             isScrollArrowVisible: !_voiceTextTransController
                     .isScrolledTransliterationHints.value &&
                 _voiceTextTransController.transliterationWordHints.isNotEmpty,
             onSelected: (hintText) =>
                 replaceTextWithTransliterationHint(hintText))
         : SizedBox.shrink());
-  }
-
-  void _onSourceTextChanged(String newText) {
-    _voiceTextTransController.sourceTextCharLimit.value = newText.length;
-    _voiceTextTransController.isTranslateCompleted.value = false;
-    _voiceTextTransController.ttsResponse = null;
-    _voiceTextTransController.targetLangTextController.clear();
-    if (_voiceTextTransController.controller.playerState == PlayerState.playing)
-      _voiceTextTransController.stopPlayer();
-    if (_voiceTextTransController.targetSpeakerStatus.value !=
-        SpeakerStatus.disabled)
-      _voiceTextTransController.targetSpeakerStatus.value =
-          SpeakerStatus.disabled;
-
-    bool isNewWordStarted =
-        newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
-
-    if (_voiceTextTransController.isTransliterationEnabled()) {
-      if (isNewWordStarted &&
-          _voiceTextTransController.transliterationWordHints.isNotEmpty) {
-        replaceTextWithTransliterationHint(
-            _voiceTextTransController.transliterationWordHints.first);
-      } else {
-        getTransliterationHints(newText);
-      }
-    } else if (_voiceTextTransController.transliterationWordHints.isNotEmpty) {
-      _voiceTextTransController.transliterationWordHints.clear();
-    }
-  }
-
-  void _onTranslateButtonTap() {
-    unFocusTextFields();
-    _voiceTextTransController.sourceLangTTSPath.value = '';
-    _voiceTextTransController.targetLangTTSPath.value = '';
-
-    if (_voiceTextTransController.sourceLangTextController.text.isEmpty) {
-      showDefaultSnackbar(message: kErrorNoSourceText.tr);
-    } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
-      _voiceTextTransController.getComputeResponseASRTrans(
-        isRecorded: false,
-      );
-      _voiceTextTransController.isRecordedViaMic.value = false;
-    } else {
-      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
-    }
   }
 
   Widget _buildSourceTargetLangButtons() {
@@ -302,6 +241,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     .contains(selectedTargetLangCode)) {
                   _voiceTextTransController.selectedTargetLanguageCode.value =
                       '';
+                  _hiveDBInstance.put(preferredTargetLanguage, null);
                 }
               }
               await _voiceTextTransController.resetAllValues();
@@ -439,6 +379,65 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     );
   }
 
+  Widget _buildLoadingAnimation(BuildContext context) {
+    return Obx(() {
+      if (_voiceTextTransController.isLoading.value)
+        return LottieAnimation(
+            context: context,
+            lottieAsset: animationLoadingLine,
+            footerText: _voiceTextTransController.isLoading.value
+                ? kHomeLoadingAnimationText.tr
+                : kTranslationLoadingAnimationText.tr);
+      else
+        return const SizedBox.shrink();
+    });
+  }
+
+  void _onSourceTextChanged(String newText) {
+    _voiceTextTransController.sourceTextCharLimit.value = newText.length;
+    _voiceTextTransController.isTranslateCompleted.value = false;
+    _voiceTextTransController.ttsResponse = null;
+    _voiceTextTransController.targetLangTextController.clear();
+    if (_voiceTextTransController.playerController.playerState ==
+        PlayerState.playing) _voiceTextTransController.stopPlayer();
+    if (_voiceTextTransController.targetSpeakerStatus.value !=
+        SpeakerStatus.disabled)
+      _voiceTextTransController.targetSpeakerStatus.value =
+          SpeakerStatus.disabled;
+
+    bool isNewWordStarted =
+        newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
+
+    if (_voiceTextTransController.isTransliterationEnabled()) {
+      if (isNewWordStarted &&
+          _voiceTextTransController.transliterationWordHints.isNotEmpty) {
+        replaceTextWithTransliterationHint(
+            _voiceTextTransController.transliterationWordHints.first);
+      } else {
+        getTransliterationHints(newText);
+      }
+    } else if (_voiceTextTransController.transliterationWordHints.isNotEmpty) {
+      _voiceTextTransController.transliterationWordHints.clear();
+    }
+  }
+
+  void _onTranslateButtonTap() {
+    unFocusTextFields();
+    _voiceTextTransController.sourceLangTTSPath.value = '';
+    _voiceTextTransController.targetLangTTSPath.value = '';
+
+    if (_voiceTextTransController.sourceLangTextController.text.isEmpty) {
+      showDefaultSnackbar(message: kErrorNoSourceText.tr);
+    } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
+      _voiceTextTransController.getComputeResponseASRTrans(
+        isRecorded: false,
+      );
+      _voiceTextTransController.isRecordedViaMic.value = false;
+    } else {
+      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+    }
+  }
+
   void getTransliterationHints(String newText) {
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
@@ -464,6 +463,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         TextSelection.fromPosition(TextPosition(
             offset: _voiceTextTransController
                 .sourceLangTextController.text.length));
+    _voiceTextTransController.sourceTextCharLimit.value =
+        _voiceTextTransController.sourceLangTextController.text.length;
     _voiceTextTransController.clearTransliterationHints();
   }
 

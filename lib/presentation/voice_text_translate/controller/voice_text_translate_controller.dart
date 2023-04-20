@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -63,15 +62,13 @@ class VoiceTextTranslateController extends GetxController {
       sourceTextCharLimit = 0.obs;
   File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
-  String currentlyTypedWordForTransliteration = '', beepSoundPath = '';
+  String currentlyTypedWordForTransliteration = '';
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
   DateTime? recordingStartTime;
-  PlayerController _playerController = PlayerController();
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
       targetSpeakerStatus = Rx(SpeakerStatus.disabled);
   int samplingRate = 16000;
   late SocketIOClient _socketIOClient;
-  late File beepSoundFile;
   late Directory appDirectory;
 
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
@@ -80,7 +77,7 @@ class VoiceTextTranslateController extends GetxController {
 
   final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
 
-  late PlayerController controller;
+  late PlayerController playerController;
 
   StreamSubscription<Uint8List>? micStreamSubscription;
 
@@ -95,24 +92,24 @@ class VoiceTextTranslateController extends GetxController {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    controller = PlayerController();
+    playerController = PlayerController();
     Connectivity().onConnectivityChanged.listen(
           (newConnectivity) => updateSamplingRate(newConnectivity),
         );
-    setBeepSoundFile();
-    controller.onCompletion.listen((event) {
+
+    playerController.onCompletion.listen((event) {
       sourceSpeakerStatus.value = SpeakerStatus.stopped;
       targetSpeakerStatus.value = SpeakerStatus.stopped;
     });
 
-    controller.onCurrentDurationChanged.listen((duration) {
+    playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
     });
 
-    controller.onPlayerStateChanged.listen((_) {
-      switch (controller.playerState) {
+    playerController.onPlayerStateChanged.listen((_) {
+      switch (playerController.playerState) {
         case PlayerState.initialized:
-          maxDuration.value = controller.maxDuration;
+          maxDuration.value = playerController.maxDuration;
           break;
         case PlayerState.paused:
           sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -196,16 +193,6 @@ class VoiceTextTranslateController extends GetxController {
     }
   }
 
-  setBeepSoundFile() async {
-    appDirectory = await getApplicationDocumentsDirectory();
-    beepSoundPath = "${appDirectory.path}/mic_tap_sound.wav";
-    beepSoundFile = File(beepSoundPath);
-    if (!await beepSoundFile.exists()) {
-      await beepSoundFile.writeAsBytes(
-          (await rootBundle.load(micBeepSound)).buffer.asUint8List());
-    }
-  }
-
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
       if (_languageModelController.sourceTargetLanguageMap.keys
@@ -264,10 +251,7 @@ class VoiceTextTranslateController extends GetxController {
       //if user quickly released tap than Socket continue emit the data
       //So need to check before starting mic streaming
       if (micButtonStatus.value == MicButtonStatus.pressed) {
-        await playBeepSound();
         await vibrateDevice();
-        // wait until beep sound finished
-        await Future.delayed(const Duration(milliseconds: 600));
 
         recordingStartTime = DateTime.now();
         if (_hiveDBInstance.get(isStreamingPreferred)) {
@@ -350,7 +334,6 @@ class VoiceTextTranslateController extends GetxController {
   }
 
   void stopVoiceRecordingAndGetResult() async {
-    await playBeepSound();
     await vibrateDevice();
 
     int timeTakenForLastRecording = stopWatchTimer.rawTime.value;
@@ -579,7 +562,12 @@ class VoiceTextTranslateController extends GetxController {
     );
   }
 
-  void playTTSOutput(bool isPlayingSource) async {
+  void playStopTTSOutput(bool isPlayingSource) async {
+    if (playerController.playerState.isPlaying) {
+      await stopPlayer();
+      return;
+    }
+
     String? audioPath = '';
     if (isPlayingSource && isRecordedViaMic.value) {
       audioPath = sourceLangASRPath;
@@ -630,11 +618,6 @@ class VoiceTextTranslateController extends GetxController {
     currentlyTypedWordForTransliteration = '';
   }
 
-  void cancelPreviousTransliterationRequest() {
-    _translationAppAPIClient.transliterationAPIcancelToken.cancel();
-    _translationAppAPIClient.transliterationAPIcancelToken = CancelToken();
-  }
-
   Future<void> resetAllValues() async {
     sourceLangTextController.clear();
     targetLangTextController.clear();
@@ -670,32 +653,32 @@ class VoiceTextTranslateController extends GetxController {
       targetSpeakerStatus.value = SpeakerStatus.playing;
     else
       sourceSpeakerStatus.value = SpeakerStatus.playing;
-    await controller.preparePlayer(
+    await playerController.preparePlayer(
         path: filePath,
         noOfSamples: WaveformStyle.getDefaultPlayerStyle(
                 isRecordedAudio: isRecordedAudio)
             .getSamplesForWidth(WaveformStyle.getDefaultWidth));
-    maxDuration.value = controller.maxDuration;
+    maxDuration.value = playerController.maxDuration;
     startOrStopPlayer();
   }
 
   void startOrStopPlayer() async {
-    controller.playerState.isPlaying
-        ? await controller.pausePlayer()
-        : await controller.startPlayer(
+    playerController.playerState.isPlaying
+        ? await playerController.pausePlayer()
+        : await playerController.startPlayer(
             finishMode: FinishMode.pause,
           );
   }
 
   disposePlayer() async {
     await stopPlayer();
-    controller.dispose();
+    playerController.dispose();
   }
 
   Future<void> stopPlayer() async {
-    if (controller.playerState.isPlaying ||
-        controller.playerState == PlayerState.paused) {
-      await controller.stopPlayer();
+    if (playerController.playerState.isPlaying ||
+        playerController.playerState == PlayerState.paused) {
+      await playerController.stopPlayer();
     }
     targetSpeakerStatus.value = SpeakerStatus.stopped;
     sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -777,18 +760,6 @@ class VoiceTextTranslateController extends GetxController {
         await Vibration.vibrate();
       }
     }
-  }
-
-  Future<void> playBeepSound() async {
-    if (_playerController.playerState == PlayerState.playing ||
-        _playerController.playerState == PlayerState.paused) {
-      await _playerController.stopPlayer();
-    }
-    await _playerController.preparePlayer(
-      path: beepSoundFile.path,
-      shouldExtractWaveform: false,
-    );
-    await _playerController.startPlayer(finishMode: FinishMode.pause);
   }
 
   void updateSamplingRate(ConnectivityResult newConnectivity) {
