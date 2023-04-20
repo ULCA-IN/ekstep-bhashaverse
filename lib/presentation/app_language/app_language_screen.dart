@@ -77,21 +77,21 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 SizedBox(height: 24.toHeight),
                 _textFormFieldContainer(),
                 SizedBox(height: 24.toHeight),
-                Expanded(
-                  child: ScrollConfiguration(
-                    behavior: RemoveScrollingGlowEffect(),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisSpacing: 8.toHeight,
-                        crossAxisCount: 2,
-                        childAspectRatio: 2,
-                      ),
-                      itemCount:
-                          _appLanguageController.getAppLanguageList().length,
-                      itemBuilder: (context, index) {
-                        return Obx(
-                          () {
-                            return LanguageSelectionWidget(
+                Obx(
+                  () => Expanded(
+                    child: ScrollConfiguration(
+                      behavior: RemoveScrollingGlowEffect(),
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          mainAxisSpacing: 8.toHeight,
+                          crossAxisCount: 2,
+                          childAspectRatio: 2,
+                        ),
+                        itemCount:
+                            _appLanguageController.getAppLanguageList().length,
+                        itemBuilder: (context, index) {
+                          return Obx(
+                            () => LanguageSelectionWidget(
                               title: getLangNameInAppLanguage(
                                   _appLanguageController
                                           .getAppLanguageList()[index]
@@ -108,10 +108,10 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                               index: index,
                               selectedIndex: _appLanguageController
                                   .getSelectedLanguageIndex(),
-                            );
-                          },
-                        );
-                      },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
