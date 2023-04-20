@@ -72,24 +72,9 @@ class _SourceTargetLanguageScreenState
                               subTitle: getNativeNameOfLanguage(
                                   _languageSelectionController
                                       .getLanguageList()[index]),
-                              onItemTap: () async {
-                                if (isUserSelectedFromSearchResult) {
-                                  String selectedLanguageName =
-                                      _languageSelectionController
-                                          .getLanguageList()[index];
-                                  List<dynamic> originalLanguageList =
-                                      Get.arguments[kLanguageList];
-
-                                  Get.back(
-                                      result: originalLanguageList.indexWhere(
-                                          (element) =>
-                                              element == selectedLanguageName));
-                                } else {
-                                  Get.back(
-                                      result: _languageSelectionController
-                                          .getLanguageList()[index]);
-                                }
-                              },
+                              onItemTap: () => Get.back(
+                                  result: _languageSelectionController
+                                      .getLanguageList()[index]),
                               index: index,
                               selectedIndex: _languageSelectionController
                                   .getSelectedLanguageIndex(),
@@ -194,6 +179,13 @@ class _SourceTargetLanguageScreenState
         },
       ).toList();
       _languageSelectionController.setLanguageList(searchedLanguageList);
+      _languageSelectionController.setSelectedLanguageIndex(null);
+      for (var i = 0; i < searchedLanguageList.length; i++) {
+        if (searchedLanguageList[i][APIConstants.kLanguageCode] ==
+            Get.locale?.languageCode) {
+          _languageSelectionController.setSelectedLanguageIndex(i);
+        }
+      }
     } else {
       setLanguageListFromArgument();
       isUserSelectedFromSearchResult = false;
