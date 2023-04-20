@@ -26,6 +26,7 @@ class CustomElevetedButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0,
+        padding: AppEdgeInsets.instance.symmetric(vertical: 14),
         backgroundColor: _backgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius:
@@ -33,8 +34,8 @@ class CustomElevetedButton extends StatelessWidget {
         ),
       ),
       onPressed: _onButtonTap,
-      child: Padding(
-        padding: AppEdgeInsets.instance.symmetric(vertical: 14.0),
+      child: SizedBox(
+        height: 24.toHeight,
         child: Text(
           _buttonText,
           style: _textStyle,
