@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +10,8 @@ import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/asr_tts_actions.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../common/widgets/custom_outline_button.dart';
+import '../../common/widgets/text_field_with_actions.dart';
+import '../../common/widgets/transliteration_hints.dart';
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
@@ -80,89 +80,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                   children: [
                     Column(
                       children: [
-                        SizedBox(
-                          height: 18.toHeight,
-                        ),
+                        SizedBox(height: 18.toHeight),
                         CommonAppBar(
                             title: text.tr, onBackPress: () => Get.back()),
-                        SizedBox(
-                          height: 24.toHeight,
-                        ),
+                        SizedBox(height: 24.toHeight),
                         _buildSourceTargetLangButtons(),
-                        SizedBox(
-                          height: 18.toHeight,
-                        ),
-                        Container(
-                            height: (MediaQueryData.fromWindow(ui.window)
-                                        .size
-                                        .height *
-                                    0.57) -
-                                (MediaQueryData.fromWindow(ui.window)
-                                    .padding
-                                    .top) -
-                                (MediaQuery.of(context).padding.bottom),
-                            decoration: BoxDecoration(
-                                color: lilyGrey,
-                                borderRadius:
-                                    const BorderRadius.all(textFieldRadius),
-                                border: Border.all(
-                                  color: magicMint,
-                                )),
-                            child: Padding(
-                              padding: AppEdgeInsets.instance.all(16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Flexible(child: _buildTargetLanguageInput()),
-                                  SizedBox(height: 6.toHeight),
-                                  Obx(
-                                    () => ASRAndTTSActions(
-                                      textToCopy: _textTranslationController
-                                          .targetLangTextController.text
-                                          .trim(),
-                                      currentDuration: DateTImeUtils()
-                                          .getTimeFromMilliseconds(
-                                              timeInMillisecond:
-                                                  _textTranslationController
-                                                      .currentDuration.value),
-                                      totalDuration: DateTImeUtils()
-                                          .getTimeFromMilliseconds(
-                                              timeInMillisecond:
-                                                  _textTranslationController
-                                                      .maxDuration.value),
-                                      isRecordedAudio: !_hiveDBInstance
-                                          .get(isStreamingPreferred),
-                                      onMusicPlayOrStop: () async {
-                                        if (isAudioPlaying(
-                                            isForTargetSection: true)) {
-                                          await _textTranslationController
-                                              .stopPlayer();
-                                        } else {
-                                          _textTranslationController
-                                              .getComputeResTTS(
-                                            sourceText:
-                                                _textTranslationController
-                                                    .targetLangTextController
-                                                    .text,
-                                            languageCode:
-                                                _textTranslationController
-                                                    .selectedTargetLanguageCode
-                                                    .value,
-                                            isTargetLanguage: true,
-                                          );
-                                        }
-                                      },
-                                      onFileShare: () {},
-                                      playerController:
-                                          _textTranslationController
-                                              .playerController,
-                                      speakerStatus: _textTranslationController
-                                          .targetSpeakerStatus.value,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )),
+                        SizedBox(height: 18.toHeight),
+                        _buildTargetLangInput(),
                         SizedBox(
                             height: _textTranslationController
                                     .isKeyboardVisible.value
@@ -175,160 +99,87 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               ),
             ),
           ),
-          IgnorePointer(
-            ignoring: true,
-            child: Obx(
-              () => Container(
-                color: _textTranslationController.isKeyboardVisible.value
-                    ? balticSea.withOpacity(0.4)
-                    : Colors.transparent,
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    height: ScreenUtil.screenHeight * 0.23,
-                    margin: AppEdgeInsets.instance.all(18),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.all(textFieldRadius),
-                        border: Border.all(
-                          color: americanSilver,
-                        )),
-                    child: Padding(
-                      padding: AppEdgeInsets.instance
-                          .symmetric(vertical: 8, horizontal: 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Obx(() =>
-                              Flexible(child: _buildSourceLanguageInput())),
-                          SizedBox(height: 12.toHeight),
-                          _buildTransliterationHints(),
-                          Obx(
-                            () => _textTranslationController
-                                        .isTranslateCompleted.value ||
-                                    _hiveDBInstance.get(isStreamingPreferred)
-                                ? ASRAndTTSActions(
-                                    textToCopy: _textTranslationController
-                                        .sourceLanTextController.text
-                                        .trim(),
-                                    currentDuration: DateTImeUtils()
-                                        .getTimeFromMilliseconds(
-                                            timeInMillisecond:
-                                                _textTranslationController
-                                                    .currentDuration.value),
-                                    totalDuration: DateTImeUtils()
-                                        .getTimeFromMilliseconds(
-                                            timeInMillisecond:
-                                                _textTranslationController
-                                                    .maxDuration.value),
-                                    isRecordedAudio: !_hiveDBInstance
-                                        .get(isStreamingPreferred),
-                                    onMusicPlayOrStop: () async {
-                                      if (isAudioPlaying(
-                                          isForTargetSection: false)) {
-                                        await _textTranslationController
-                                            .stopPlayer();
-                                      } else {
-                                        _textTranslationController
-                                            .getComputeResTTS(
-                                          sourceText: _textTranslationController
-                                              .sourceLanTextController.text,
-                                          languageCode:
-                                              _textTranslationController
-                                                  .selectedSourceLanguageCode
-                                                  .value,
-                                          isTargetLanguage: false,
-                                        );
-                                      }
-                                    },
-                                    onFileShare: () {},
-                                    playerController: _textTranslationController
-                                        .playerController,
-                                    speakerStatus: _textTranslationController
-                                        .sourceSpeakerStatus.value,
-                                  )
-                                : _buildLimitCountAndTranslateButton(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Obx(() {
-            if (_textTranslationController.isLoading.value)
-              return LottieAnimation(
-                  context: context,
-                  lottieAsset: animationLoadingLine,
-                  footerText: _textTranslationController.isLoading.value
-                      ? kHomeLoadingAnimationText.tr
-                      : kTranslationLoadingAnimationText.tr);
-            else
-              return const SizedBox.shrink();
-          })
+          _buildBackdropContainer(),
+          _buildSourceLangInput(),
+          _buildLoadingAnimation(),
         ],
       ),
     );
   }
 
-  Widget _buildTransliterationHints() {
-    return Obx(() => _textTranslationController.isKeyboardVisible.value
-        ? SingleChildScrollView(
-            controller:
-                _textTranslationController.transliterationHintsScrollController,
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ..._textTranslationController.transliterationWordHints
-                    .map((hintText) => GestureDetector(
-                          onTap: () {
-                            replaceTextWithTransliterationHint(hintText);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              color: lilyWhite,
-                            ),
-                            margin: AppEdgeInsets.instance.all(4),
-                            padding: AppEdgeInsets.instance
-                                .symmetric(vertical: 4, horizontal: 6),
-                            alignment: Alignment.center,
-                            child: Container(
-                              constraints: BoxConstraints(
-                                minWidth: (ScreenUtil.screenWidth / 7).toWidth,
-                              ),
-                              child: Text(
-                                hintText,
-                                style: AppTextStyle().regular14Arsenic.copyWith(
-                                      color: Colors.black,
-                                    ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        )),
-              ],
+  Widget _buildSourceLangInput() {
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: ScreenUtil.screenHeight * 0.23,
+              margin: AppEdgeInsets.instance.all(18),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      const BorderRadius.all(Radius.circular(textFieldRadius)),
+                  border: Border.all(
+                    color: americanSilver,
+                  )),
+              child: Padding(
+                padding: AppEdgeInsets.instance
+                    .symmetric(vertical: 8, horizontal: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Obx(() => Flexible(child: _buildSourceLangTextField())),
+                    SizedBox(height: 12.toHeight),
+                    _buildTransliterationHints(),
+                    Obx(
+                      () => _textTranslationController
+                                  .isTranslateCompleted.value ||
+                              _hiveDBInstance.get(isStreamingPreferred)
+                          ? ASRAndTTSActions(
+                              textToCopy: _textTranslationController
+                                  .sourceLangTextController.text
+                                  .trim(),
+                              currentDuration: DateTImeUtils()
+                                  .getTimeFromMilliseconds(
+                                      timeInMillisecond:
+                                          _textTranslationController
+                                              .currentDuration.value),
+                              totalDuration: DateTImeUtils()
+                                  .getTimeFromMilliseconds(
+                                      timeInMillisecond:
+                                          _textTranslationController
+                                              .maxDuration.value),
+                              isRecordedAudio:
+                                  !_hiveDBInstance.get(isStreamingPreferred),
+                              isShareButtonLoading: _textTranslationController
+                                  .isSourceShareLoading.value,
+                              onMusicPlayOrStop: () =>
+                                  _textTranslationController
+                                      .playStopTTSOutput(true),
+                              onFileShare: () => _textTranslationController
+                                  .shareAudioFile(isSourceLang: true),
+                              playerController:
+                                  _textTranslationController.playerController,
+                              speakerStatus: _textTranslationController
+                                  .sourceSpeakerStatus.value,
+                            )
+                          : _buildLimitCountAndTranslateButton(),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          )
-        : SizedBox.shrink());
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _buildSourceLanguageInput() {
+  Widget _buildSourceLangTextField() {
     return TextField(
-      controller: _textTranslationController.sourceLanTextController,
+      controller: _textTranslationController.sourceLangTextController,
       focusNode: _sourceLangFocusNode,
       style: AppTextStyle().regular18balticSea,
       maxLines: null,
@@ -358,30 +209,92 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             SpeakerStatus.disabled)
           _textTranslationController.targetSpeakerStatus.value =
               SpeakerStatus.disabled;
+        bool isNewWordStarted =
+            newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
+
         if (_textTranslationController.isTransliterationEnabled()) {
-          getTransliterationHints(newText);
-        } else {
+          if (isNewWordStarted &&
+              _textTranslationController.transliterationWordHints.isNotEmpty) {
+            replaceTextWithTransliterationHint(
+                _textTranslationController.transliterationWordHints.first);
+          } else {
+            getTransliterationHints(newText);
+          }
+        } else if (_textTranslationController
+            .transliterationWordHints.isNotEmpty) {
           _textTranslationController.transliterationWordHints.clear();
         }
       },
     );
   }
 
-  Widget _buildTargetLanguageInput() {
-    return TextField(
-      controller: _textTranslationController.targetLangTextController,
-      focusNode: _targetLangFocusNode,
-      maxLines: null,
-      expands: true,
-      style: AppTextStyle().regular18balticSea,
-      readOnly: true,
-      textInputAction: TextInputAction.done,
-      decoration: const InputDecoration(
-        border: InputBorder.none,
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
+  Widget _buildBackdropContainer() {
+    return IgnorePointer(
+      ignoring: true,
+      child: Obx(
+        () => Container(
+          color: _textTranslationController.isKeyboardVisible.value
+              ? balticSea.withOpacity(0.4)
+              : Colors.transparent,
+        ),
       ),
     );
+  }
+
+  Widget _buildTargetLangInput() {
+    return Container(
+      height: (ScreenUtil.screenHeight * 0.57) -
+          ScreenUtil.statusBarHeight -
+          ScreenUtil.bottomBarHeightPx,
+      decoration: BoxDecoration(
+          color: lilyGrey,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(textFieldRadius),
+          ),
+          border: Border.all(
+            color: magicMint,
+          )),
+      child: Obx(
+        () => TextFieldWithActions(
+          textController: _textTranslationController.targetLangTextController,
+          focusNode: _targetLangFocusNode,
+          backgroundColor: Colors.transparent,
+          currentDuration: _textTranslationController.currentDuration.value,
+          totalDuration: _textTranslationController.maxDuration.value,
+          isRecordedAudio: false,
+          topBorderRadius: textFieldRadius,
+          bottomBorderRadius: 16,
+          showTranslateButton: false,
+          showASRTTSActionButtons: true,
+          isReadOnly: true,
+          isShareButtonLoading:
+              _textTranslationController.isTargetShareLoading.value,
+          textToCopy: _textTranslationController.targetOutputText.value,
+          onMusicPlayOrStop: () =>
+              _textTranslationController.playStopTTSOutput(false),
+          onFileShare: () =>
+              _textTranslationController.shareAudioFile(isSourceLang: false),
+          playerController: _textTranslationController.playerController,
+          speakerStatus: _textTranslationController.targetSpeakerStatus.value,
+          showMicButton: false,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransliterationHints() {
+    return Obx(() => _textTranslationController.isKeyboardVisible.value
+        ? TransliterationHints(
+            scrollController:
+                _textTranslationController.transliterationHintsScrollController,
+            // neet to send with .toList() because of GetX observation issue
+            transliterationHints:
+                _textTranslationController.transliterationWordHints.toList(),
+            showScrollIcon: false,
+            isScrollArrowVisible: false,
+            onSelected: (hintText) =>
+                replaceTextWithTransliterationHint(hintText))
+        : SizedBox.shrink());
   }
 
   Widget _buildLimitCountAndTranslateButton() {
@@ -408,11 +321,11 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           isHighlighted: true,
           onTap: () {
             unFocusTextFields();
-            _textTranslationController.sourceLangTTSPath = '';
-            _textTranslationController.targetLangTTSPath = '';
+            _textTranslationController.sourceLangTTSPath.value = '';
+            _textTranslationController.targetLangTTSPath.value = '';
 
             if (_textTranslationController
-                .sourceLanTextController.text.isEmpty) {
+                .sourceLangTextController.text.isEmpty) {
               showDefaultSnackbar(message: kErrorNoSourceText.tr);
             } else if (_textTranslationController
                 .isSourceAndTargetLangSelected()) {
@@ -459,6 +372,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     .contains(selectedTargetLangCode)) {
                   _textTranslationController.selectedTargetLanguageCode.value =
                       '';
+                  _hiveDBInstance.put(preferredTargetLanguage, null);
                 }
               }
               await _textTranslationController.resetAllValues();
@@ -530,7 +444,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _hiveDBInstance.put(
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_textTranslationController
-                  .sourceLanTextController.text.isNotEmpty)
+                  .sourceLangTextController.text.isNotEmpty)
                 _textTranslationController.getComputeResponseASRTrans();
             }
           },
@@ -565,6 +479,20 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     );
   }
 
+  Widget _buildLoadingAnimation() {
+    return Obx(() {
+      if (_textTranslationController.isLoading.value)
+        return LottieAnimation(
+            context: context,
+            lottieAsset: animationLoadingLine,
+            footerText: _textTranslationController.isLoading.value
+                ? kHomeLoadingAnimationText.tr
+                : kTranslationLoadingAnimationText.tr);
+      else
+        return const SizedBox.shrink();
+    });
+  }
+
   void getTransliterationHints(String newText) {
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
@@ -579,27 +507,20 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
   void replaceTextWithTransliterationHint(String currentHintText) {
     List<String> oldString = _textTranslationController
-        .sourceLanTextController.text
+        .sourceLangTextController.text
         .trim()
         .split(' ');
     oldString.removeLast();
     oldString.add(currentHintText);
-    _textTranslationController.sourceLanTextController.text =
+    _textTranslationController.sourceLangTextController.text =
         '${oldString.join(' ')} ';
-    _textTranslationController.sourceLanTextController.selection =
+    _textTranslationController.sourceLangTextController.selection =
         TextSelection.fromPosition(TextPosition(
             offset: _textTranslationController
-                .sourceLanTextController.text.length));
+                .sourceLangTextController.text.length));
+    _textTranslationController.sourceTextCharLimit.value =
+        _textTranslationController.sourceLangTextController.text.length;
     _textTranslationController.clearTransliterationHints();
-  }
-
-  bool isAudioPlaying({required bool isForTargetSection}) {
-    return ((isForTargetSection &&
-            _textTranslationController.targetSpeakerStatus.value ==
-                SpeakerStatus.playing) ||
-        (!isForTargetSection &&
-            _textTranslationController.sourceSpeakerStatus.value ==
-                SpeakerStatus.playing));
   }
 
   void unFocusTextFields() {
