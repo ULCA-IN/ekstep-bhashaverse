@@ -28,7 +28,7 @@ class SourceTargetLanguageController extends GetxController {
     return _selectedLanguageIndex.value;
   }
 
-  void setSelectedLanguageIndex(int index) {
+  void setSelectedLanguageIndex(int? index) {
     _selectedLanguageIndex.value = index;
   }
 }
