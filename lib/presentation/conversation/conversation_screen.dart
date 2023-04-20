@@ -122,7 +122,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
             isShareButtonLoading:
                 _translationController.isTargetShareLoading.value,
             textToCopy: _translationController.sourceOutputText.value,
-            onMusicPlayOrStop: () => _translationController.playTTSOutput(true),
+            onMusicPlayOrStop: () =>
+                _translationController.playStopTTSOutput(true),
             onFileShare: () =>
                 _translationController.shareAudioFile(isSourceLang: true),
             playerController: _translationController.controller,
@@ -165,7 +166,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             onFileShare: () =>
                 _translationController.shareAudioFile(isSourceLang: false),
             onMusicPlayOrStop: () =>
-                _translationController.playTTSOutput(false),
+                _translationController.playStopTTSOutput(false),
             playerController: _translationController.controller,
             speakerStatus: _translationController.targetSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,

@@ -446,7 +446,7 @@ class ConversationController extends GetxController {
         }
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
-        playTTSOutput(currentMic.value != CurrentlySelectedMic.source);
+        playStopTTSOutput(currentMic.value != CurrentlySelectedMic.source);
         isTranslateCompleted.value = true;
       },
       failure: (error) {
@@ -521,8 +521,13 @@ class ConversationController extends GetxController {
     );
   }
 
-  void playTTSOutput(bool isPlayingSource) async {
+  void playStopTTSOutput(bool isPlayingSource) async {
+    if (controller.playerState.isPlaying) {
+      await stopPlayer();
+      return;
+    }
     String? audioPath = '';
+
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
         sourceSpeakerStatus.value = SpeakerStatus.loading;
