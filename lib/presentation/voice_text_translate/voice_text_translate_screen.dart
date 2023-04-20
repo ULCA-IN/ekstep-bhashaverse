@@ -114,7 +114,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
             ),
           ),
-          _buildLoadingAnimation(context)
+          _buildLoadingAnimation()
         ],
       ),
     );
@@ -379,7 +379,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     );
   }
 
-  Widget _buildLoadingAnimation(BuildContext context) {
+  Widget _buildLoadingAnimation() {
     return Obx(() {
       if (_voiceTextTransController.isLoading.value)
         return LottieAnimation(
