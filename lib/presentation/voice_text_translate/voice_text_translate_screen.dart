@@ -290,8 +290,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             _targetLangFocusNode.unfocus();
             if (_voiceTextTransController
                 .selectedSourceLanguageCode.value.isEmpty) {
-              showDefaultSnackbar(
-                  message: 'Please select source language first');
+              showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
               return;
             }
 

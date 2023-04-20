@@ -52,6 +52,7 @@ final Map<String, String> en = {
   kTranslate: 'Translate',
   kReset: 'Reset',
   kErrorNoSourceText: 'Please enter text first',
+  errorSelectSourceLangFirst: 'Please select source language first',
   kErrorSelectSourceAndTargetScreen:
       'Please select source and target language first',
   errorMicPermission: 'Mic permission required for recording sound',

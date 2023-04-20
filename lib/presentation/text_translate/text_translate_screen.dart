@@ -421,8 +421,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             _targetLangFocusNode.unfocus();
             if (_textTranslationController
                 .selectedSourceLanguageCode.value.isEmpty) {
-              showDefaultSnackbar(
-                  message: 'Please select source language first');
+              showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
               return;
             }
 

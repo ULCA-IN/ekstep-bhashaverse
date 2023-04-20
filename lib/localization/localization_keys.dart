@@ -60,6 +60,7 @@ const String noVoiceAssistantAvailable = 'noVoiceAssistantAvailable';
 const String kTranslationLoadingAnimationText =
     'kTranslationLoadingAnimationText';
 const String errorPleaseSelectLanguage = 'errorPleaseSelectLanguage';
+const String errorSelectSourceLangFirst = 'errorSelectSourceLangFirst';
 const String featureAvailableSoonInfo = 'featureAvailableSoonInfo';
 const String errorSelectVoiceAssistant = 'errorSelectVoiceAssistant';
 const String noTextForShare = 'noTextForShare';
