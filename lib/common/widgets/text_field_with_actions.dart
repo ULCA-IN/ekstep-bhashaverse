@@ -114,6 +114,7 @@ class TextFieldWithActions extends StatelessWidget {
                 maxLines: null,
                 expands: true,
                 maxLength: textCharMaxLength,
+                autocorrect: false,
                 textInputAction: TextInputAction.done,
                 readOnly: _isReadOnly,
                 decoration: InputDecoration(
