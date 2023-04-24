@@ -602,8 +602,9 @@ class VoiceTextTranslateController extends GetxController {
           ? sourceSpeakerStatus.value = SpeakerStatus.playing
           : targetSpeakerStatus.value = SpeakerStatus.playing;
 
-      await prepareWaveforms(audioPath,
-          isRecordedAudio: true, isTargetLanguage: !isPlayingSource);
+      await preparePlayerAndWaveforms(audioPath,
+          isRecordedAudio: isRecordedViaMic.value,
+          isTargetLanguage: !isPlayingSource);
     }
   }
 
@@ -643,7 +644,7 @@ class VoiceTextTranslateController extends GetxController {
     }
   }
 
-  Future<void> prepareWaveforms(
+  Future<void> preparePlayerAndWaveforms(
     String filePath, {
     required bool isRecordedAudio,
     required bool isTargetLanguage,
@@ -659,10 +660,10 @@ class VoiceTextTranslateController extends GetxController {
                 isRecordedAudio: isRecordedAudio)
             .getSamplesForWidth(WaveformStyle.getDefaultWidth));
     maxDuration.value = playerController.maxDuration;
-    startOrStopPlayer();
+    startOrPausePlayer();
   }
 
-  void startOrStopPlayer() async {
+  void startOrPausePlayer() async {
     playerController.playerState.isPlaying
         ? await playerController.pausePlayer()
         : await playerController.startPlayer(
