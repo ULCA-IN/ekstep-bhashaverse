@@ -40,6 +40,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
+  String oldSourceText = '';
 
   late final Box _hiveDBInstance;
 
@@ -197,15 +198,14 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         ? TransliterationHints(
             scrollController:
                 _voiceTextTransController.transliterationHintsScrollController,
-            // neet to send with .toList() because of GetX observation issue
+            // need to send with .toList() because of GetX observation issue
             transliterationHints:
                 _voiceTextTransController.transliterationWordHints.toList(),
             showScrollIcon: true,
             isScrollArrowVisible: !_voiceTextTransController
                     .isScrolledTransliterationHints.value &&
                 _voiceTextTransController.transliterationWordHints.isNotEmpty,
-            onSelected: (hintText) =>
-                replaceTextWithTransliterationHint(hintText))
+            onSelected: (hintText) => replaceTranslietrationHint(hintText))
         : SizedBox.shrink());
   }
 
@@ -404,20 +404,55 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
       _voiceTextTransController.targetSpeakerStatus.value =
           SpeakerStatus.disabled;
 
-    bool isNewWordStarted =
-        newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
-
-    if (_voiceTextTransController.isTransliterationEnabled()) {
-      if (isNewWordStarted &&
-          _voiceTextTransController.transliterationWordHints.isNotEmpty) {
-        replaceTextWithTransliterationHint(
-            _voiceTextTransController.transliterationWordHints.first);
-      } else {
-        getTransliterationHints(newText);
+    if (newText.length > oldSourceText.length) {
+      if (_voiceTextTransController.isTransliterationEnabled()) {
+        int cursorPosition = _voiceTextTransController
+            .sourceLangTextController.selection.base.offset;
+        String sourceText =
+            _voiceTextTransController.sourceLangTextController.text;
+        if (sourceText.trim().isNotEmpty &&
+            sourceText[cursorPosition - 1] != ' ')
+          getTransliterationHints(
+              getWordFromCursorPosition(sourceText, cursorPosition));
+        else if (sourceText.trim().isNotEmpty &&
+            _voiceTextTransController.transliterationWordHints.isNotEmpty) {
+          String wordTOReplace =
+              _voiceTextTransController.transliterationWordHints.first;
+          replaceTranslietrationHint(wordTOReplace);
+        } else if (_voiceTextTransController
+            .transliterationWordHints.isNotEmpty) {
+          _voiceTextTransController.transliterationWordHints.clear();
+        }
+      } else if (_voiceTextTransController
+          .transliterationWordHints.isNotEmpty) {
+        _voiceTextTransController.transliterationWordHints.clear();
       }
-    } else if (_voiceTextTransController.transliterationWordHints.isNotEmpty) {
-      _voiceTextTransController.transliterationWordHints.clear();
     }
+    oldSourceText = newText;
+  }
+
+  void replaceTranslietrationHint(String wordTOReplace) {
+    String sourceText = _voiceTextTransController.sourceLangTextController.text;
+    int cursorPosition = _voiceTextTransController
+        .sourceLangTextController.selection.base.offset;
+    int? startingPosition =
+        getStartingIndexOfWord(sourceText, cursorPosition - 1);
+    int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
+    String firstHalf = sourceText.substring(0, startingPosition);
+    String secondtHalf =
+        sourceText.substring(endingPosition, (sourceText.length - 1));
+
+    String newSentence =
+        '${firstHalf.trim()} $wordTOReplace  ${secondtHalf.trim()}';
+    _voiceTextTransController.sourceLangTextController.text = newSentence;
+
+    _voiceTextTransController.sourceLangTextController.selection =
+        TextSelection.fromPosition(
+            TextPosition(offset: '${firstHalf.trim()} $wordTOReplace '.length));
+
+    _voiceTextTransController.sourceTextCharLimit.value =
+        _voiceTextTransController.sourceLangTextController.text.length;
+    _voiceTextTransController.clearTransliterationHints();
   }
 
   void _onTranslateButtonTap() {
@@ -449,22 +484,29 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     }
   }
 
-  void replaceTextWithTransliterationHint(String currentHintText) {
-    List<String> oldString = _voiceTextTransController
-        .sourceLangTextController.text
-        .trim()
-        .split(' ');
-    oldString.removeLast();
-    oldString.add(currentHintText);
-    _voiceTextTransController.sourceLangTextController.text =
-        '${oldString.join(' ')} ';
-    _voiceTextTransController.sourceLangTextController.selection =
-        TextSelection.fromPosition(TextPosition(
-            offset: _voiceTextTransController
-                .sourceLangTextController.text.length));
-    _voiceTextTransController.sourceTextCharLimit.value =
-        _voiceTextTransController.sourceLangTextController.text.length;
-    _voiceTextTransController.clearTransliterationHints();
+  String getWordFromCursorPosition(String text, int cursorPosition) {
+    int? startingPosition = getStartingIndexOfWord(text, cursorPosition);
+    int endPosition = getEndIndexOfWord(text, startingPosition ?? 0);
+    if (startingPosition != null)
+      return text.substring(startingPosition, endPosition);
+    else
+      return '';
+  }
+
+  int? getStartingIndexOfWord(String text, int cursorPosition) {
+    int? startingPosOfWord;
+    for (var i = (cursorPosition - 1); i >= 0 && text[i] != ' '; i--) {
+      startingPosOfWord = i;
+    }
+    return startingPosOfWord;
+  }
+
+  int getEndIndexOfWord(String text, int startingPosition) {
+    int endPosition = startingPosition;
+    for (var i = startingPosition; i < (text.length) && text[i] != ' '; i++) {
+      endPosition = i;
+    }
+    return endPosition + 1;
   }
 
   void unFocusTextFields() {

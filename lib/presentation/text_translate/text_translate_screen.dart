@@ -38,6 +38,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
   late final Box _hiveDBInstance;
+  String oldSourceText = '';
 
   @override
   void initState() {
@@ -186,6 +187,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       expands: true,
       maxLength: textCharMaxLength,
       textInputAction: TextInputAction.done,
+      autocorrect: false,
       decoration: InputDecoration(
         hintText: _textTranslationController.isTranslateCompleted.value
             ? null
@@ -209,21 +211,33 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             SpeakerStatus.disabled)
           _textTranslationController.targetSpeakerStatus.value =
               SpeakerStatus.disabled;
-        bool isNewWordStarted =
-            newText.isNotEmpty && (newText[newText.length - 1]) == ' ';
 
-        if (_textTranslationController.isTransliterationEnabled()) {
-          if (isNewWordStarted &&
-              _textTranslationController.transliterationWordHints.isNotEmpty) {
-            replaceTextWithTransliterationHint(
-                _textTranslationController.transliterationWordHints.first);
-          } else {
-            getTransliterationHints(newText);
+        if (newText.length > oldSourceText.length) {
+          if (_textTranslationController.isTransliterationEnabled()) {
+            int cursorPosition = _textTranslationController
+                .sourceLangTextController.selection.base.offset;
+            String sourceText =
+                _textTranslationController.sourceLangTextController.text;
+            if (sourceText.trim().isNotEmpty &&
+                sourceText[cursorPosition - 1] != ' ') {
+              getTransliterationHints(
+                  getWordFromCursorPosition(sourceText, cursorPosition));
+            } else if (sourceText.trim().isNotEmpty &&
+                _textTranslationController
+                    .transliterationWordHints.isNotEmpty) {
+              String wordTOReplace =
+                  _textTranslationController.transliterationWordHints.first;
+              replaceTranslietrationHint(wordTOReplace);
+            } else if (_textTranslationController
+                .transliterationWordHints.isNotEmpty) {
+              _textTranslationController.transliterationWordHints.clear();
+            }
+          } else if (_textTranslationController
+              .transliterationWordHints.isNotEmpty) {
+            _textTranslationController.transliterationWordHints.clear();
           }
-        } else if (_textTranslationController
-            .transliterationWordHints.isNotEmpty) {
-          _textTranslationController.transliterationWordHints.clear();
         }
+        oldSourceText = newText;
       },
     );
   }
@@ -287,13 +301,12 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ? TransliterationHints(
             scrollController:
                 _textTranslationController.transliterationHintsScrollController,
-            // neet to send with .toList() because of GetX observation issue
+            // need to send with .toList() because of GetX observation issue
             transliterationHints:
                 _textTranslationController.transliterationWordHints.toList(),
             showScrollIcon: false,
             isScrollArrowVisible: false,
-            onSelected: (hintText) =>
-                replaceTextWithTransliterationHint(hintText))
+            onSelected: (hintText) => replaceTranslietrationHint(hintText))
         : SizedBox.shrink());
   }
 
@@ -504,19 +517,51 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     }
   }
 
-  void replaceTextWithTransliterationHint(String currentHintText) {
-    List<String> oldString = _textTranslationController
-        .sourceLangTextController.text
-        .trim()
-        .split(' ');
-    oldString.removeLast();
-    oldString.add(currentHintText);
-    _textTranslationController.sourceLangTextController.text =
-        '${oldString.join(' ')} ';
+  String getWordFromCursorPosition(String text, int cursorPosition) {
+    int? startingPosition = getStartingIndexOfWord(text, cursorPosition);
+    int endPosition = getEndIndexOfWord(text, startingPosition ?? 0);
+    if (startingPosition != null)
+      return text.substring(startingPosition, endPosition);
+    else
+      return '';
+  }
+
+  int? getStartingIndexOfWord(String text, int cursorPosition) {
+    int? startingPosOfWord;
+    for (var i = (cursorPosition - 1); i >= 0 && text[i] != ' '; i--) {
+      startingPosOfWord = i;
+    }
+    return startingPosOfWord;
+  }
+
+  int getEndIndexOfWord(String text, int startingPosition) {
+    int endPosition = startingPosition;
+    for (var i = startingPosition; i < (text.length) && text[i] != ' '; i++) {
+      endPosition = i;
+    }
+    return endPosition + 1;
+  }
+
+  void replaceTranslietrationHint(String wordTOReplace) {
+    String sourceText =
+        _textTranslationController.sourceLangTextController.text;
+    int cursorPosition = _textTranslationController
+        .sourceLangTextController.selection.base.offset;
+    int? startingPosition =
+        getStartingIndexOfWord(sourceText, cursorPosition - 1);
+    int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
+    String firstHalf = sourceText.substring(0, startingPosition);
+    String secondtHalf =
+        sourceText.substring(endingPosition, (sourceText.length - 1));
+
+    String newSentence =
+        '${firstHalf.trim()} $wordTOReplace ${secondtHalf.trim()}';
+    _textTranslationController.sourceLangTextController.text = newSentence;
+
     _textTranslationController.sourceLangTextController.selection =
-        TextSelection.fromPosition(TextPosition(
-            offset: _textTranslationController
-                .sourceLangTextController.text.length));
+        TextSelection.fromPosition(
+            TextPosition(offset: '${firstHalf.trim()} $wordTOReplace '.length));
+
     _textTranslationController.sourceTextCharLimit.value =
         _textTranslationController.sourceLangTextController.text.length;
     _textTranslationController.clearTransliterationHints();
