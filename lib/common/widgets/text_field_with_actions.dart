@@ -160,7 +160,7 @@ class TextFieldWithActions extends StatelessWidget {
                       if (_showTranslateButton)
                         CustomOutlineButton(
                           title: _translateButtonTitle,
-                          isHighlighted: true,
+                          isDisabled: _sourceCharLength > textCharMaxLength,
                           onTap: () => _onTranslateButtonTap != null
                               ? _onTranslateButtonTap!()
                               : null,

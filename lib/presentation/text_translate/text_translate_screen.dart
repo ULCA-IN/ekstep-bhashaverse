@@ -329,25 +329,28 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             );
           },
         ),
-        CustomOutlineButton(
-          title: kTranslate.tr,
-          isHighlighted: true,
-          onTap: () {
-            unFocusTextFields();
-            _textTranslationController.sourceLangTTSPath.value = '';
-            _textTranslationController.targetLangTTSPath.value = '';
+        Obx(
+          () => CustomOutlineButton(
+            title: kTranslate.tr,
+            isDisabled: _textTranslationController.sourceTextCharLimit.value >
+                textCharMaxLength,
+            onTap: () {
+              unFocusTextFields();
+              _textTranslationController.sourceLangTTSPath.value = '';
+              _textTranslationController.targetLangTTSPath.value = '';
 
-            if (_textTranslationController
-                .sourceLangTextController.text.isEmpty) {
-              showDefaultSnackbar(message: kErrorNoSourceText.tr);
-            } else if (_textTranslationController
-                .isSourceAndTargetLangSelected()) {
-              _textTranslationController.getComputeResponseASRTrans();
-            } else {
-              showDefaultSnackbar(
-                  message: kErrorSelectSourceAndTargetScreen.tr);
-            }
-          },
+              if (_textTranslationController
+                  .sourceLangTextController.text.isEmpty) {
+                showDefaultSnackbar(message: kErrorNoSourceText.tr);
+              } else if (_textTranslationController
+                  .isSourceAndTargetLangSelected()) {
+                _textTranslationController.getComputeResponseASRTrans();
+              } else {
+                showDefaultSnackbar(
+                    message: kErrorSelectSourceAndTargetScreen.tr);
+              }
+            },
+          ),
         ),
       ],
     );
