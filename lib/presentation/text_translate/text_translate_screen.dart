@@ -191,7 +191,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       decoration: InputDecoration(
         hintText: _textTranslationController.isTranslateCompleted.value
             ? null
-            : kTranslationHintText.tr,
+            : textTranslateHintText.tr,
         hintStyle:
             AppTextStyle().regular24BalticSea.copyWith(color: mischkaGrey),
         hintMaxLines: 4,
