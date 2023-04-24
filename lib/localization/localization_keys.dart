@@ -86,3 +86,4 @@ const String video = 'video';
 const String documents = 'documents';
 const String images = 'images';
 const String converseHintText = 'converseHintText';
+const String textTranslateHintText = 'textTranslateHintText';

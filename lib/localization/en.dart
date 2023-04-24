@@ -85,5 +85,6 @@ final Map<String, String> en = {
   video: 'Video',
   documents: 'Documents',
   images: 'Images',
-  converseHintText: 'Press mic to begin conversation'
+  converseHintText: 'Press mic to begin conversation',
+  textTranslateHintText: 'Start typing to begin'
 };
