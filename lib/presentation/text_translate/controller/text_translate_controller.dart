@@ -361,7 +361,7 @@ class TextTranslateController extends GetxController {
           : targetSpeakerStatus.value = SpeakerStatus.playing;
 
       await preparePlayerAndWaveforms(audioPath,
-          isRecordedAudio: true, isTargetLanguage: !isPlayingSource);
+          isRecordedAudio: false, isTargetLanguage: !isPlayingSource);
     }
   }
 
@@ -448,6 +448,7 @@ class TextTranslateController extends GetxController {
     required bool isRecordedAudio,
     required bool isTargetLanguage,
   }) async {
+    await stopPlayer();
     if (isTargetLanguage)
       targetSpeakerStatus.value = SpeakerStatus.playing;
     else
