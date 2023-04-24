@@ -179,8 +179,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildMicButton() {
     return Padding(
-      padding: AppEdgeInsets.instance.symmetric(horizontal: 14.0),
+      padding: AppEdgeInsets.instance.symmetric(horizontal: 14.0, vertical: 8),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           AnimatedOpacity(
             opacity: isCurrentlyRecording() ? 1 : 0,
