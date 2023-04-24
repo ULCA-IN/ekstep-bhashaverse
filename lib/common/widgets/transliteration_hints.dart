@@ -27,7 +27,7 @@ class TransliterationHints extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: _showScrollIcon ? 85.toHeight : null,
+      height: _showScrollIcon ? 85.toHeight : 50.toHeight,
       child: Column(
         children: [
           SizedBox(height: _showScrollIcon ? 6.toHeight : null),
