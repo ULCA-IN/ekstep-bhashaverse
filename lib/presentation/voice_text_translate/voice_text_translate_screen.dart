@@ -440,10 +440,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
     String firstHalf = sourceText.substring(0, startingPosition);
     String secondtHalf =
-        sourceText.substring(endingPosition, (sourceText.length - 1));
+        sourceText.substring(endingPosition, (sourceText.length));
 
     String newSentence =
-        '${firstHalf.trim()} $wordTOReplace  ${secondtHalf.trim()}';
+        '${firstHalf.trim()} $wordTOReplace ${secondtHalf.trim()}';
     _voiceTextTransController.sourceLangTextController.text = newSentence;
 
     _voiceTextTransController.sourceLangTextController.selection =

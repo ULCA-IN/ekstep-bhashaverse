@@ -555,7 +555,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
     String firstHalf = sourceText.substring(0, startingPosition);
     String secondtHalf =
-        sourceText.substring(endingPosition, (sourceText.length - 1));
+        sourceText.substring(endingPosition, (sourceText.length));
 
     String newSentence =
         '${firstHalf.trim()} $wordTOReplace ${secondtHalf.trim()}';
