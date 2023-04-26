@@ -49,6 +49,7 @@ class TextTranslateController extends GetxController {
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
   RxList transliterationWordHints = [].obs;
+  int lastOffsetOfCursor = 0;
   File? ttsAudioFile;
   dynamic ttsResponse;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
@@ -64,6 +65,9 @@ class TextTranslateController extends GetxController {
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     playerController = PlayerController();
+
+    sourceLangTextController
+        .addListener(clearTransliterationHintsIfCursorMoved);
 
     playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
@@ -94,6 +98,8 @@ class TextTranslateController extends GetxController {
 
   @override
   void onClose() async {
+    sourceLangTextController
+        .removeListener(clearTransliterationHintsIfCursorMoved);
     sourceLangTextController.dispose();
     targetLangTextController.dispose();
     await disposePlayer();
@@ -414,6 +420,15 @@ class TextTranslateController extends GetxController {
     transliterationModelToUse =
         _languageModelController.getAvailableTransliterationModelsForLanguage(
             selectedSourceLanguageCode.value);
+  }
+
+  void clearTransliterationHintsIfCursorMoved() {
+    int difference =
+        lastOffsetOfCursor - sourceLangTextController.selection.base.offset;
+    if (difference > 0 || difference < -1) {
+      clearTransliterationHints();
+    }
+    lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
   }
 
   void clearTransliterationHints() {

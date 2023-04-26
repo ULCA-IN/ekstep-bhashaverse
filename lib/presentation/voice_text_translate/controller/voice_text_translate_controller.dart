@@ -67,7 +67,7 @@ class VoiceTextTranslateController extends GetxController {
   DateTime? recordingStartTime;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
       targetSpeakerStatus = Rx(SpeakerStatus.disabled);
-  int samplingRate = 16000;
+  int samplingRate = 16000, lastOffsetOfCursor = 0;
   late SocketIOClient _socketIOClient;
   late Directory appDirectory;
 
@@ -105,6 +105,9 @@ class VoiceTextTranslateController extends GetxController {
     playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
     });
+
+    sourceLangTextController
+        .addListener(clearTransliterationHintsIfCursorMoved);
 
     playerController.onPlayerStateChanged.listen((_) {
       switch (playerController.playerState) {
@@ -155,6 +158,8 @@ class VoiceTextTranslateController extends GetxController {
 
   @override
   void onClose() async {
+    sourceLangTextController
+        .removeListener(clearTransliterationHintsIfCursorMoved);
     streamingResponseListener.dispose();
     socketIOErrorListener.dispose();
     _socketIOClient.disconnect();
@@ -687,6 +692,15 @@ class VoiceTextTranslateController extends GetxController {
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
+  }
+
+  void clearTransliterationHintsIfCursorMoved() {
+    int difference =
+        lastOffsetOfCursor - sourceLangTextController.selection.base.offset;
+    if (difference > 0 || difference < -1) {
+      clearTransliterationHints();
+    }
+    lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
   }
 
   void connectToSocket() {
