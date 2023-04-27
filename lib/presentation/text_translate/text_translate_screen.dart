@@ -116,7 +116,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: ScreenUtil.screenHeight * 0.28,
+              height: ScreenUtil.screenHeight * 0.34,
               margin: AppEdgeInsets.instance.all(18),
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -257,7 +257,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
   Widget _buildTargetLangInput() {
     return Container(
-      height: (ScreenUtil.screenHeight * 0.52) -
+      height: (ScreenUtil.screenHeight * 0.46) -
           ScreenUtil.statusBarHeight -
           ScreenUtil.bottomBarHeightPx,
       decoration: BoxDecoration(
