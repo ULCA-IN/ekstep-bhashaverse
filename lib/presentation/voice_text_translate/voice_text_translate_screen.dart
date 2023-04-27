@@ -18,6 +18,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
@@ -312,7 +313,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _hiveDBInstance.put(
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_voiceTextTransController
-                  .sourceLangTextController.text.isNotEmpty)
+                      .sourceLangTextController.text.isNotEmpty &&
+                  await isNetworkConnected())
                 _voiceTextTransController.getComputeResponseASRTrans(
                     isRecorded: false, clearSourceTTS: false);
             }
@@ -455,8 +457,14 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _voiceTextTransController.clearTransliterationHints();
   }
 
-  void _onTranslateButtonTap() {
+  void _onTranslateButtonTap() async {
     unFocusTextFields();
+
+    if (!await isNetworkConnected()) {
+      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+      return;
+    }
+
     _voiceTextTransController.sourceLangTTSPath.value = '';
     _voiceTextTransController.targetLangTTSPath.value = '';
 
@@ -521,8 +529,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             MicButtonStatus.pressed;
   }
 
-  void micButtonActions({required bool startMicRecording}) {
-    if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
+  void micButtonActions({required bool startMicRecording}) async {
+    if (!await isNetworkConnected()) {
+      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+    } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
       unFocusTextFields();
 
       if (startMicRecording) {

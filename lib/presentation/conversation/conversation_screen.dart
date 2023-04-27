@@ -15,6 +15,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
@@ -248,7 +249,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               .selectedTargetLanguageCode.value.isNotEmpty &&
                           (_translationController.base64EncodedAudioContent ??
                                   '')
-                              .isNotEmpty) {
+                              .isNotEmpty &&
+                          await isNetworkConnected()) {
                         _translationController.getComputeResponseASRTrans(
                             isRecorded: true,
                             base64Value: _translationController
@@ -314,7 +316,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         _translationController
                             .selectedSourceLanguageCode.value.isNotEmpty &&
                         (_translationController.base64EncodedAudioContent ?? '')
-                            .isNotEmpty) {
+                            .isNotEmpty &&
+                        await isNetworkConnected()) {
                       _translationController.getComputeResponseASRTrans(
                           isRecorded: true,
                           base64Value:
@@ -360,8 +363,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
             MicButtonStatus.pressed;
   }
 
-  void micButtonActions({required bool startMicRecording}) {
-    if (_translationController.isSourceAndTargetLangSelected()) {
+  void micButtonActions({required bool startMicRecording}) async {
+    if (!await isNetworkConnected()) {
+      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+    } else if (_translationController.isSourceAndTargetLangSelected()) {
       if (startMicRecording) {
         _translationController.micButtonStatus.value = MicButtonStatus.pressed;
         _translationController.startVoiceRecording();

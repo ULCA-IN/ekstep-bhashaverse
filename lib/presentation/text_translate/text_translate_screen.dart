@@ -17,6 +17,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
@@ -334,8 +335,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             title: kTranslate.tr,
             isDisabled: _textTranslationController.sourceTextCharLimit.value >
                 textCharMaxLength,
-            onTap: () {
+            onTap: () async {
               unFocusTextFields();
+              if (!await isNetworkConnected()) {
+                showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+                return;
+              }
+
               _textTranslationController.sourceLangTTSPath.value = '';
               _textTranslationController.targetLangTTSPath.value = '';
 
@@ -459,7 +465,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _hiveDBInstance.put(
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_textTranslationController
-                  .sourceLangTextController.text.isNotEmpty)
+                      .sourceLangTextController.text.isNotEmpty &&
+                  await isNetworkConnected())
                 _textTranslationController.getComputeResponseASRTrans();
             }
           },
