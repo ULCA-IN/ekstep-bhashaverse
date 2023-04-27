@@ -86,5 +86,6 @@ final Map<String, String> en = {
   documents: 'Documents',
   images: 'Images',
   converseHintText: 'Press mic to begin conversation',
-  textTranslateHintText: 'Start typing to begin'
+  textTranslateHintText: 'Start typing to begin',
+  errorNoInternetAvailable: 'Please check your internet connection'
 };
