@@ -32,13 +32,15 @@ class NoInternetScreen extends StatelessWidget {
                     SvgPicture.asset(imgNoInternet),
                     SizedBox(height: 16.toHeight),
                     Text(
-                      'No Internet connected',
+                      errorNoInternetTitle.tr,
                       style: AppTextStyle().bold24BalticSea,
                     ),
                     SizedBox(height: 12.toHeight),
                     Text(
-                      'Please check your internet connection and try again.',
-                      style: AppTextStyle().regular18balticSea,
+                      errorNoInternetSubTitle.tr,
+                      style: AppTextStyle()
+                          .regular16DolphinGrey
+                          .copyWith(color: brightGrey),
                     ),
                   ],
                 ),
