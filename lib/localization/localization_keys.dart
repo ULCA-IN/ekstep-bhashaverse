@@ -87,4 +87,5 @@ const String documents = 'documents';
 const String images = 'images';
 const String converseHintText = 'converseHintText';
 const String textTranslateHintText = 'textTranslateHintText';
-const String errorNoInternetAvailable = 'noInternetAvailable';
+const String errorNoInternetTitle = 'errorNoInternetTitle';
+const String errorNoInternetSubTitle = 'errorNoInternetSubTitle';
