@@ -461,7 +461,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     unFocusTextFields();
 
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+      showDefaultSnackbar(message: errorNoInternetTitle.tr);
       return;
     }
 
@@ -531,7 +531,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
   void micButtonActions({required bool startMicRecording}) async {
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+      showDefaultSnackbar(message: errorNoInternetTitle.tr);
     } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
       unFocusTextFields();
 

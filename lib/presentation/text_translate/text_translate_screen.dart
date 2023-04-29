@@ -338,7 +338,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             onTap: () async {
               unFocusTextFields();
               if (!await isNetworkConnected()) {
-                showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+                showDefaultSnackbar(message: errorNoInternetTitle.tr);
                 return;
               }
 

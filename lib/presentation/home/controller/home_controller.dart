@@ -29,7 +29,7 @@ class HomeController extends GetxController {
       if (isConnected) {
         fetchConfigData();
       } else {
-        showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+        showDefaultSnackbar(message: errorNoInternetTitle.tr);
       }
       listenNetworkChange();
     });

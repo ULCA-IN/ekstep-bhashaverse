@@ -341,7 +341,7 @@ class TextTranslateController extends GetxController {
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
           return;
         }
         sourceSpeakerStatus.value = SpeakerStatus.loading;
@@ -356,7 +356,7 @@ class TextTranslateController extends GetxController {
     } else {
       if (targetLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
           return;
         }
         targetSpeakerStatus.value = SpeakerStatus.loading;
@@ -387,7 +387,7 @@ class TextTranslateController extends GetxController {
 
       if (audioPathToShare.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
           return;
         }
         String sourceText = isSourceLang

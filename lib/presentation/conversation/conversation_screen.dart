@@ -365,7 +365,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   void micButtonActions({required bool startMicRecording}) async {
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetAvailable.tr);
+      showDefaultSnackbar(message: errorNoInternetTitle.tr);
     } else if (_translationController.isSourceAndTargetLangSelected()) {
       if (startMicRecording) {
         _translationController.micButtonStatus.value = MicButtonStatus.pressed;
