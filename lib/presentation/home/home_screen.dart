@@ -24,15 +24,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final HomeController _homeController;
 
+// uncomment pending menus for demonstration purpose
   final List<HomeMenuModel> menuItems = [
     HomeMenuModel(name: text.tr, imagePath: imgText, isDisabled: false),
     HomeMenuModel(
         name: converse.tr, imagePath: imgVoiceSpeaking, isDisabled: false),
     HomeMenuModel(name: voice.tr, imagePath: imgMic, isDisabled: false),
-    HomeMenuModel(name: video.tr, imagePath: imgVideo, isDisabled: true),
-    HomeMenuModel(
-        name: documents.tr, imagePath: imgDocuments, isDisabled: true),
-    HomeMenuModel(name: images.tr, imagePath: imgImages, isDisabled: true),
+    // HomeMenuModel(name: video.tr, imagePath: imgVideo, isDisabled: true),
+    // HomeMenuModel(
+    //     name: documents.tr, imagePath: imgDocuments, isDisabled: true),
+    // HomeMenuModel(name: images.tr, imagePath: imgImages, isDisabled: true),
   ];
 
   @override
