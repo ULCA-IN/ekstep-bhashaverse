@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:bhashaverse/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -18,6 +17,7 @@ import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/network_utils.dart';
 import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../utils/waveform_style.dart';
