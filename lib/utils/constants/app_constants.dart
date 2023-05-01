@@ -18,6 +18,7 @@ const recordingMaxTimeLimit = 30000;
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
+const imgNoInternet = 'assets/images/common_icon/no_internet.svg';
 
 // Select App Language Screen
 const imgEnglish = 'assets/images/app_language_img/img_english.png';

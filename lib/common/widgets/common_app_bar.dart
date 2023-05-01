@@ -9,30 +9,34 @@ class CommonAppBar extends StatelessWidget {
   const CommonAppBar({
     super.key,
     required String title,
-    required Function onBackPress,
+    bool showBackButton = true,
+    VoidCallback? onBackPress,
   })  : _title = title,
+        _showBackButton = showBackButton,
         _onBackPress = onBackPress;
 
-  final Function _onBackPress;
+  final VoidCallback? _onBackPress;
+  final bool _showBackButton;
   final String _title;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => _onBackPress(),
-            child: Padding(
-              padding: AppEdgeInsets.instance.all(8.0),
-              child: SvgPicture.asset(
-                iconPrevious,
+        if (_showBackButton)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: _onBackPress,
+              child: Padding(
+                padding: AppEdgeInsets.instance.all(8.0),
+                child: SvgPicture.asset(
+                  iconPrevious,
+                ),
               ),
             ),
           ),
-        ),
         Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,

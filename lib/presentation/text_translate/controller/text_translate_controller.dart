@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:bhashaverse/utils/network_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -339,6 +340,10 @@ class TextTranslateController extends GetxController {
 
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         sourceSpeakerStatus.value = SpeakerStatus.loading;
         await getComputeResTTS(
           sourceText: sourceLangTextController.text,
@@ -350,6 +355,10 @@ class TextTranslateController extends GetxController {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
     } else {
       if (targetLangTTSPath.value.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         targetSpeakerStatus.value = SpeakerStatus.loading;
         await getComputeResTTS(
           sourceText: targetOutputText.value,
@@ -377,6 +386,10 @@ class TextTranslateController extends GetxController {
           isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value;
 
       if (audioPathToShare.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         String sourceText = isSourceLang
             ? sourceLangTextController.text
             : targetLangTextController.text;

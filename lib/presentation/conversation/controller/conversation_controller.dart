@@ -25,6 +25,7 @@ import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
 import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
@@ -530,6 +531,10 @@ class ConversationController extends GetxController {
 
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         sourceSpeakerStatus.value = SpeakerStatus.loading;
         await getComputeResTTS(
           sourceText: sourceLangTextController.text,
@@ -541,6 +546,10 @@ class ConversationController extends GetxController {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
     } else {
       if (targetLangTTSPath.value.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         targetSpeakerStatus.value = SpeakerStatus.loading;
         await getComputeResTTS(
           sourceText: targetOutputText.value,
@@ -568,6 +577,10 @@ class ConversationController extends GetxController {
           isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value;
 
       if (audioPathToShare.isEmpty) {
+        if (!await isNetworkConnected()) {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          return;
+        }
         String sourceText = isSourceLang
             ? sourceLangTextController.text
             : targetLangTextController.text;
