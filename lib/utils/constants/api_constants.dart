@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import '../../enums/language_enum.dart';
+import '../../models/task_sequence_response_model.dart';
 import 'language_map_translated.dart';
 
 class APIConstants {
@@ -163,6 +164,28 @@ class APIConstants {
         }
       }
     ];
+  }
+
+  static String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
+      String taskType, String sourceLanguageCode,
+      [String? targetLanguageCode]) {
+    List<Config>? configs = sequenceResponse.pipelineResponseConfig
+        ?.firstWhere((element) => element.taskType == taskType)
+        .config;
+    for (var config in configs!) {
+      if (config.language?.sourceLanguage == sourceLanguageCode) {
+        // sends translation service id
+        if (targetLanguageCode != null) {
+          if (config.language?.targetLanguage == targetLanguageCode) {
+            return config.serviceId;
+          } else {
+            return '';
+          }
+        } else
+          return config.serviceId; // sends ASR, TTS service id
+      }
+    }
+    return '';
   }
 
 // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
@@ -376,5 +399,12 @@ class APIConstants {
     } catch (e) {
       return '';
     }
+  }
+
+  static String getLanguageNameFromCode(String languageCode) {
+    return APIConstants.getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 }

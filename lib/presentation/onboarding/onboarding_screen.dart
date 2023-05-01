@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
-import '../../common/elevated_button.dart';
+import '../../common/widgets/custom_elevated_button.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
@@ -64,7 +64,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   ),
                 ),
                 SizedBox(height: 32.toHeight),
-                elevatedButton(
+                CustomElevetedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)

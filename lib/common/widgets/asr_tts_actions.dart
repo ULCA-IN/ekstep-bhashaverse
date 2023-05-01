@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
@@ -13,35 +12,37 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_colors.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
+import '../custom_circular_loading.dart';
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
     required String textToCopy,
-    String? audioPathToShare,
     required PlayerController playerController,
     required bool isRecordedAudio,
+    required bool isShareButtonLoading,
     required String currentDuration,
     required String totalDuration,
-    required Function onMusicPlayOrStop,
     required SpeakerStatus speakerStatus,
+    required Function onMusicPlayOrStop,
+    required Function onFileShare,
   })  : _textToCopy = textToCopy,
-        _audioPathToShare = audioPathToShare,
         _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
+        _isShareButtonLoading = isShareButtonLoading,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
+        _speakerStatus = speakerStatus,
         _onAudioPlayOrStop = onMusicPlayOrStop,
-        _speakerStatus = speakerStatus;
+        _onFileShare = onFileShare;
 
-  final bool _isRecordedAudio;
+  final bool _isRecordedAudio, _isShareButtonLoading;
   final String _textToCopy;
-  final String? _audioPathToShare;
-  final Function _onAudioPlayOrStop;
   final PlayerController _playerController;
   final String _currentDuration;
   final String _totalDuration;
   final SpeakerStatus _speakerStatus;
+  final Function _onAudioPlayOrStop, _onFileShare;
 
   @override
   Widget build(BuildContext context) {
@@ -53,26 +54,23 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Row(
             children: [
               InkWell(
-                onTap: () async {
-                  if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
-                    showDefaultSnackbar(message: noAudioFoundToShare.tr);
-                    return;
-                  } else {
-                    await Share.shareXFiles(
-                      [XFile(_audioPathToShare!)],
-                      sharePositionOrigin: Rect.fromLTWH(0, 0,
-                          ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
-                    );
-                  }
-                },
+                onTap: () async => _onFileShare(),
                 child: Padding(
                   padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: SvgPicture.asset(
-                    iconShare,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
-                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
-                  ),
+                  child: _isShareButtonLoading
+                      ? SizedBox(
+                          height: 24.toWidth,
+                          width: 24.toWidth,
+                          child: CustomCircularLoading(),
+                        )
+                      : SvgPicture.asset(
+                          iconShare,
+                          height: 24.toWidth,
+                          width: 24.toWidth,
+                          color: _textToCopy.isNotEmpty
+                              ? brightGrey
+                              : americanSilver,
+                        ),
                 ),
               ),
               SizedBox(width: 12.toWidth),
@@ -158,10 +156,7 @@ class ASRAndTTSActions extends StatelessWidget {
               height: 24.toWidth,
               width: 24.toWidth,
               child: _speakerStatus == SpeakerStatus.loading
-                  ? CircularProgressIndicator(
-                      color: balticSea,
-                      strokeWidth: 2,
-                    )
+                  ? CustomCircularLoading()
                   : SvgPicture.asset(
                       _speakerStatus == SpeakerStatus.playing
                           ? iconStopPlayback
