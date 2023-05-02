@@ -1,79 +1,76 @@
 import 'package:flutter/material.dart';
 
 import '../screen_util/screen_util.dart';
+import '../../utils/theme/app_theme_provider.dart';
 
-import 'app_colors.dart';
+TextStyle regular12(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 12.toFont,
+      color: context.appTheme.highlightedTextColor,
+    );
 
-class AppTextStyle {
-  final regular12Arsenic = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 12.toFont,
-    color: arsenicColor,
-  );
+TextStyle regular14(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 14.toFont,
+      color: context.appTheme.highlightedTextColor,
+    );
 
-  final regular14Arsenic = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 14.toFont,
-    color: arsenicColor,
-  );
+TextStyle regular14Title(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 14.toFont,
+      color: context.appTheme.titleTextColor,
+    );
 
-  final grey14Arsenic = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 14.toFont,
-    color: manateeGray,
-  );
+TextStyle light16(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w400,
+      fontSize: 16.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final light16BalticSea = TextStyle(
-    fontWeight: FontWeight.w400,
-    fontSize: 16.toFont,
-    color: balticSea,
-  );
+TextStyle regular16(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 16.toFont,
+      color: context.appTheme.secondaryTextColor,
+    );
 
-  final regular16DolphinGrey = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 16.toFont,
-    color: dolphinGray,
-  );
+TextStyle regular18Primary(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 18.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final regular18DolphinGrey = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 18.toFont,
-    color: dolphinGray,
-  );
+TextStyle regular18Secondary(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 18.toFont,
+      color: context.appTheme.secondaryTextColor,
+    );
 
-  final regular18balticSea = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 18.toFont,
-    color: balticSea,
-  );
+TextStyle semibold22(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 22.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final semibold22BalticSea = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 22.toFont,
-    color: balticSea,
-  );
+TextStyle regular24(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 24.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final regular24BalticSea = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 24.toFont,
-    color: balticSea,
-  );
+TextStyle semibold24(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 24.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final semibold24BalticSea = TextStyle(
-    fontWeight: FontWeight.w600,
-    fontSize: 24.toFont,
-    color: balticSea,
-  );
+TextStyle bold24(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w800,
+      fontSize: 24.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
 
-  final bold24BalticSea = TextStyle(
-    fontWeight: FontWeight.w800,
-    fontSize: 24.toFont,
-    color: balticSea,
-  );
-
-  final regular28BalticSea = TextStyle(
-    fontWeight: FontWeight.w500,
-    fontSize: 28.toFont,
-    color: balticSea,
-  );
-}
+TextStyle regular28(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 28.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
