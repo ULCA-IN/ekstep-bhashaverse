@@ -3,6 +3,7 @@ const hiveDBName = 'db_bhashini';
 const preferredVoiceAssistantGender = 'preferred_voice_assistant_gender';
 const enableTransliteration = 'enable_transliteration';
 const preferredAppLocale = 'preferred_app_locale';
+const preferredAppTheme = 'preferred_app_theme';
 const isStreamingPreferred = 'is_streaming_preferred';
 const preferredSourceLanguage = 'preferred_source_language';
 const preferredTargetLanguage = 'preferred_target_language';
