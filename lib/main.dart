@@ -3,8 +3,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 
 import 'enums/gender_enum.dart';
 import 'localization/app_localization.dart';
@@ -12,7 +12,9 @@ import 'localization/localization_keys.dart';
 import 'presentation/splash/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
 import 'utils/constants/app_constants.dart';
-import 'utils/theme/app_colors.dart';
+import 'utils/theme/app_theme.dart';
+import 'utils/theme/app_theme_provider.dart';
+import 'utils/theme/app_theme_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +28,14 @@ void main() async {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Hive.initFlutter();
   await Hive.openBox(hiveDBName);
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => AppThemeProvider(),
+      ),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -42,6 +51,30 @@ class MyApp extends StatelessWidget {
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
     }
+
+    // Set user selected theme (from Settings screen)
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Provider.of<AppThemeProvider>(context, listen: false)
+          .loadUserPreferredTheme();
+    });
+
+    // This callback is called every time the system brightness changes
+    var window = WidgetsBinding.instance.window;
+    window.onPlatformBrightnessChanged = () {
+      WidgetsBinding.instance.handlePlatformBrightnessChanged();
+      var brightness = window.platformBrightness;
+      ThemeMode userPreferredThemeMode =
+          getUserPreferredThemeMode(hiveDBInstance);
+      if (userPreferredThemeMode == ThemeMode.system) {
+        if (brightness == Brightness.light) {
+          Provider.of<AppThemeProvider>(context, listen: false)
+              .setAppTheme(ThemeMode.light, storeToPreference: false);
+        } else {
+          Provider.of<AppThemeProvider>(context, listen: false)
+              .setAppTheme(ThemeMode.dark, storeToPreference: false);
+        }
+      }
+    };
 
     // Voice assistant preference
     if (hiveDBInstance.get(preferredVoiceAssistantGender) == null) {
@@ -64,11 +97,9 @@ class MyApp extends StatelessWidget {
       translations: AppLocalization(),
       locale: Locale(appLocale),
       fallbackLocale: const Locale('en', 'US'),
-      theme: ThemeData(
-        primaryColor: primaryColor,
-        textTheme: GoogleFonts.latoTextTheme(),
-        canvasColor: Colors.white,
-      ),
+      themeMode: context.appThemeMode,
+      theme: lightMaterialThemeData(),
+      darkTheme: darkMaterialThemeData(),
       getPages: AppRoutes.pages,
       initialBinding: SplashBinding(),
       initialRoute: AppRoutes.splashRoute,
