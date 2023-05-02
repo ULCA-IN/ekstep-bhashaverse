@@ -26,6 +26,7 @@ name: bhashaverse
   cupertino_icons: ^1.0.2
   get: ^4.6.5
   dio: ^4.0.6
+  provider: ^6.0.2
   permission_handler: ^10.2.0
   path_provider: ^2.0.12
   connectivity_plus: ^3.0.5
