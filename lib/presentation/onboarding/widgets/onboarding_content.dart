@@ -23,14 +23,14 @@ class OnBoardingContentWidget extends StatelessWidget {
         Text(
           headerText,
           textAlign: TextAlign.left,
-          style: AppTextStyle().semibold24BalticSea.copyWith(
-                fontSize: 36.toFont,
-              ),
+          style: semibold24(context).copyWith(
+            fontSize: 36.toFont,
+          ),
         ),
         SizedBox(height: 8.toHeight),
         Text(
           bodyText,
-          style: AppTextStyle().regular18DolphinGrey,
+          style: regular18Secondary(context),
         ),
         SizedBox(height: 100.toHeight),
         Image.asset(imagePath, height: 300.toHeight),

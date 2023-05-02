@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../utils/screen_util/screen_util.dart';
-import '../../../utils/theme/app_colors.dart';
+import '../../../utils/theme/app_theme_provider.dart';
 
 class IndicatorWidget extends StatelessWidget {
   final int currentIndex;
@@ -19,7 +19,9 @@ class IndicatorWidget extends StatelessWidget {
       margin: AppEdgeInsets.instance.only(right: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        color: currentIndex == indicatorIndex ? japaneseLaurel : sassyGreen,
+        color: currentIndex == indicatorIndex
+            ? context.appTheme.highlightedBGColor
+            : context.appTheme.lightBGColor,
       ),
     );
   }

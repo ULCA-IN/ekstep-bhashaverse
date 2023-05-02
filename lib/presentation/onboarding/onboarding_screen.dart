@@ -8,7 +8,7 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
 import 'widgets/indicator.dart';
@@ -43,6 +43,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
         child: Padding(
           padding: AppEdgeInsets.instance.all(16),
@@ -70,10 +71,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               1)
                       ? getStarted.tr
                       : next.tr,
-                  textStyle: AppTextStyle()
-                      .semibold24BalticSea
-                      .copyWith(fontSize: 18.toFont),
-                  backgroundColor: primaryColor,
+                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
+                  backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
@@ -110,7 +109,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             padding: AppEdgeInsets.instance.all(8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(width: 1.toWidth, color: goastWhite),
+              border: Border.all(
+                  width: 1.toWidth, color: context.appTheme.containerColor),
             ),
             child: SvgPicture.asset(
               iconPrevious,
@@ -127,9 +127,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
               skip.tr,
-              style: AppTextStyle().light16BalticSea.copyWith(
-                    color: japaneseLaurel,
-                  ),
+              style: light16(context).copyWith(
+                color: context.appTheme.highlightedBGColor,
+              ),
             ),
           ),
         ),

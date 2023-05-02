@@ -12,7 +12,7 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/app_language_controller.dart';
 
@@ -56,6 +56,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
     return WillPopScope(
       onWillPop: () => _onWillPop(),
       child: Scaffold(
+        backgroundColor: context.appTheme.listingScreenBGColor,
         body: SafeArea(
           child: Padding(
             padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
@@ -65,14 +66,13 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 SizedBox(height: 16.toHeight),
                 Text(
                   selectAppLanguage.tr,
-                  style: AppTextStyle().semibold24BalticSea,
+                  style: semibold22(context),
                 ),
                 SizedBox(height: 8.toHeight),
                 Text(
                   youCanAlwaysChange.tr,
-                  style: AppTextStyle()
-                      .light16BalticSea
-                      .copyWith(color: dolphinGray),
+                  style: light16(context)
+                      .copyWith(color: context.appTheme.secondaryTextColor),
                 ),
                 SizedBox(height: 24.toHeight),
                 _textFormFieldContainer(),
@@ -118,10 +118,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 SizedBox(height: 16.toHeight),
                 CustomElevetedButton(
                   buttonText: continueText.tr,
-                  textStyle: AppTextStyle()
-                      .semibold24BalticSea
-                      .copyWith(fontSize: 18.toFont),
-                  backgroundColor: primaryColor,
+                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
+                  backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
                     if (_appLanguageController
@@ -165,21 +163,20 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: goastWhite,
+        color: context.appTheme.containerColor,
       ),
       child: TextFormField(
-        cursorColor: dolphinGray,
+        cursorColor: context.appTheme.secondaryTextColor,
         decoration: InputDecoration(
           contentPadding: AppEdgeInsets.instance.all(0),
           border: InputBorder.none,
-          icon: const Icon(
+          icon: Icon(
             Icons.search,
-            color: dolphinGray,
+            color: context.appTheme.secondaryTextColor,
           ),
           hintText: searchLanguage.tr,
-          hintStyle: AppTextStyle()
-              .light16BalticSea
-              .copyWith(fontSize: 18.toFont, color: manateeGray),
+          hintStyle: light16(context).copyWith(
+              fontSize: 18.toFont, color: context.appTheme.titleTextColor),
         ),
         onChanged: ((value) => performLanguageSearch(value)),
         controller: _languageSearchController,
