@@ -9,7 +9,7 @@ import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
 import '../custom_circular_loading.dart';
@@ -68,8 +68,8 @@ class ASRAndTTSActions extends StatelessWidget {
                           height: 24.toWidth,
                           width: 24.toWidth,
                           color: _textToCopy.isNotEmpty
-                              ? brightGrey
-                              : americanSilver,
+                              ? context.appTheme.disabledTextColor
+                              : context.appTheme.disabledIconOutlineColor,
                         ),
                 ),
               ),
@@ -90,7 +90,9 @@ class ASRAndTTSActions extends StatelessWidget {
                     iconCopy,
                     height: 24.toWidth,
                     width: 24.toWidth,
-                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
+                    color: _textToCopy.isNotEmpty
+                        ? context.appTheme.disabledTextColor
+                        : context.appTheme.disabledIconOutlineColor,
                   ),
                 ),
               ),
@@ -119,14 +121,12 @@ class ASRAndTTSActions extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(_currentDuration,
-                          style: AppTextStyle()
-                              .regular12Arsenic
-                              .copyWith(color: manateeGray),
+                          style: regular12(context)
+                              .copyWith(color: context.appTheme.titleTextColor),
                           textAlign: TextAlign.start),
                       Text(_totalDuration,
-                          style: AppTextStyle()
-                              .regular12Arsenic
-                              .copyWith(color: manateeGray),
+                          style: regular12(context)
+                              .copyWith(color: context.appTheme.titleTextColor),
                           textAlign: TextAlign.end),
                     ],
                   ),
@@ -148,8 +148,8 @@ class ASRAndTTSActions extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: _speakerStatus != SpeakerStatus.disabled
-                  ? flushOrangeColor
-                  : goastWhite,
+                  ? context.appTheme.buttonSelectedColor
+                  : context.appTheme.speackerColor,
             ),
             padding: AppEdgeInsets.instance.all(8),
             child: SizedBox(
@@ -162,8 +162,8 @@ class ASRAndTTSActions extends StatelessWidget {
                           ? iconStopPlayback
                           : iconSound,
                       color: _speakerStatus != SpeakerStatus.disabled
-                          ? balticSea
-                          : americanSilver,
+                          ? context.appTheme.iconOutlineColor
+                          : context.appTheme.disabledIconOutlineColor,
                     ),
             ),
           ),
