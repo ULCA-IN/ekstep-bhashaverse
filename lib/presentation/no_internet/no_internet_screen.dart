@@ -6,7 +6,7 @@ import '../../common/widgets/common_app_bar.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class NoInternetScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class NoInternetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: honeydew,
+      backgroundColor: context.appTheme.backgroundColor,
       body: WillPopScope(
         onWillPop: () => Future.value(false),
         child: SafeArea(
@@ -33,14 +33,13 @@ class NoInternetScreen extends StatelessWidget {
                     SizedBox(height: 16.toHeight),
                     Text(
                       errorNoInternetTitle.tr,
-                      style: AppTextStyle().bold24BalticSea,
+                      style: bold24(context),
                     ),
                     SizedBox(height: 12.toHeight),
                     Text(
                       errorNoInternetSubTitle.tr,
-                      style: AppTextStyle()
-                          .regular16DolphinGrey
-                          .copyWith(color: brightGrey),
+                      style: regular16(context)
+                          .copyWith(color: context.appTheme.disabledTextColor),
                     ),
                   ],
                 ),

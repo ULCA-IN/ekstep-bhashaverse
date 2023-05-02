@@ -51,7 +51,7 @@ class CommonAppBar extends StatelessWidget {
               ),
               Text(
                 _title,
-                style: AppTextStyle().regular24BalticSea,
+                style: regular24(context),
                 textAlign: TextAlign.center,
               ),
             ],
