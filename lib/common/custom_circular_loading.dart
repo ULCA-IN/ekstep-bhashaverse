@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/theme/app_colors.dart';
+import '../utils/theme/app_theme_provider.dart';
 
 class CustomCircularLoading extends StatelessWidget {
   const CustomCircularLoading({
@@ -10,7 +10,7 @@ class CustomCircularLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircularProgressIndicator(
-      color: balticSea,
+      color: context.appTheme.primaryTextColor,
       strokeWidth: 2,
     );
   }

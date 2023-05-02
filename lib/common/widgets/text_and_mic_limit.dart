@@ -4,7 +4,7 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class TextAndMicLimit extends StatelessWidget {
@@ -30,14 +30,14 @@ class TextAndMicLimit extends StatelessWidget {
                 AvatarGlow(
                   animate: true,
                   repeat: true,
-                  glowColor: brickRed,
+                  glowColor: context.appTheme.errorColor,
                   endRadius: 16,
                   shape: BoxShape.circle,
                   showTwoGlows: true,
                   curve: Curves.easeInOut,
                   child: Icon(
                     Icons.mic_none,
-                    color: frolyRed,
+                    color: context.appTheme.warningColor,
                   ),
                 ),
                 SizedBox(width: 4.toWidth),
@@ -55,13 +55,13 @@ class TextAndMicLimit extends StatelessWidget {
                           milliSecond: true);
                       return Text(
                         '-$displayTime',
-                        style: AppTextStyle().grey14Arsenic.copyWith(
+                        style: regular14Title(context).copyWith(
                             color: (recordingMaxTimeLimit - (value ?? 0)) >=
                                     5000
-                                ? manateeGray
+                                ? context.appTheme.titleTextColor
                                 : (recordingMaxTimeLimit - (value ?? 0)) >= 2000
-                                    ? frolyRed
-                                    : brickRed),
+                                    ? context.appTheme.warningColor
+                                    : context.appTheme.errorColor),
                       );
                     },
                   ),
@@ -70,12 +70,12 @@ class TextAndMicLimit extends StatelessWidget {
             )
           : Text(
               '$_sourceCharLength/$textCharMaxLength',
-              style: AppTextStyle().grey14Arsenic.copyWith(
+              style: regular14Title(context).copyWith(
                   color: _sourceCharLength >= textCharMaxLength
-                      ? brickRed
+                      ? context.appTheme.errorColor
                       : _sourceCharLength >= textCharMaxLength - 20
-                          ? frolyRed
-                          : manateeGray),
+                          ? context.appTheme.warningColor
+                          : context.appTheme.titleTextColor),
             ),
     ]);
   }

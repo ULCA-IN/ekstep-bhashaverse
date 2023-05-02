@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class TransliterationHints extends StatelessWidget {
@@ -54,7 +54,7 @@ class TransliterationHints extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4),
-                          color: lilyWhite,
+                          color: context.appTheme.lightBGColor,
                         ),
                         margin: AppEdgeInsets.instance.all(4),
                         padding: AppEdgeInsets.instance
@@ -66,9 +66,8 @@ class TransliterationHints extends StatelessWidget {
                           ),
                           child: Text(
                             hintText,
-                            style: AppTextStyle().regular16DolphinGrey.copyWith(
-                                  color: Colors.black,
-                                ),
+                            style: regular16(context).copyWith(
+                                color: context.appTheme.primaryTextColor),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
