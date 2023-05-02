@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 import '../../common/widgets/common_app_bar.dart';
 import '../../enums/gender_enum.dart';
@@ -9,7 +10,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
 
@@ -33,30 +34,30 @@ class _SettingsScreenState extends State<SettingsScreen>
     _settingsController = Get.find();
 
     super.initState();
-    _controller = AnimationController(
+    /*  _controller = AnimationController(
       vsync: this,
       duration: defaultAnimationTime,
     );
     // TODO: uncomment when Streaming service work
-    // _animation = Tween<double>(
-    //   begin: 0.0,
-    //   end: pi,
-    // ).animate(_controller);
-    // ScreenUtil().init();
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: pi,
+    ).animate(_controller); */
+    ScreenUtil().init();
   }
 
-  @override
+/*   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => _onWillPop(),
       child: Scaffold(
-        backgroundColor: honeydew,
+        backgroundColor: context.appTheme.backgroundColor,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -68,13 +69,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                   CommonAppBar(
                       title: kSettings.tr,
                       onBackPress: () async => _onWillPop()),
-                  // TODO: uncoment when dark theme added
-                  /*  SizedBox(height: 48.toHeight),
+
+                  SizedBox(height: 48.toHeight),
                   _settingHeading(
                     action: _popupMenuBuilder(),
                     title: appTheme.tr,
                     subtitle: appInterfaceWillChange.tr,
-                  ), */
+                  ),
                   SizedBox(height: 24.toHeight),
                   Obx(
                     () => InkWell(
@@ -91,14 +92,14 @@ class _SettingsScreenState extends State<SettingsScreen>
                           children: [
                             Text(
                               _settingsController.preferredLanguage.value,
-                              style: AppTextStyle()
-                                  .light16BalticSea
-                                  .copyWith(color: arsenicColor),
+                              style: light16(context).copyWith(
+                                  color: context.appTheme.highlightedTextColor),
                             ),
                             SizedBox(width: 8.toWidth),
                             RotatedBox(
                               quarterTurns: 3,
-                              child: SvgPicture.asset(iconArrowDown),
+                              child: SvgPicture.asset(iconArrowDown,
+                                  color: context.appTheme.highlightedTextColor),
                             ),
                           ],
                         ),
@@ -115,8 +116,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                       () => CupertinoSwitch(
                         value:
                             _settingsController.isTransLiterationEnabled.value,
-                        activeColor: japaneseLaurel,
-                        trackColor: americanSilver,
+                        activeColor: context.appTheme.highlightedBorderColor,
+                        trackColor: context.appTheme.disabledBGColor,
                         onChanged: (value) => _settingsController
                             .changeTransliterationPref(value),
                       ),
@@ -126,7 +127,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ),
                   SizedBox(height: 24.toHeight),
                   // TODO: uncomment when Streaming service work
-                  /*   Obx(
+                  /*  Obx(
                     () => _expandableSettingHeading(
                       height: _settingsController.isAdvanceMenuOpened.value
                           ? 130.toHeight
@@ -140,7 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 ..rotateZ(
                                   _animation.value,
                                 ),
-                              child: SvgPicture.asset(iconArrowDown),
+                              child: SvgPicture.asset(iconArrowDown,
+                                  color: context.appTheme.highlightedTextColor),
                             );
                           }),
                       title: advanceSettings.tr,
@@ -167,20 +169,21 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 children: [
                                   Text(
                                     s2sStreaming.tr,
-                                    style: AppTextStyle()
-                                        .regular18DolphinGrey
-                                        .copyWith(
-                                          fontSize: 18.toFont,
-                                          color: balticSea,
-                                        ),
+                                    style:
+                                        regular18DolphinGrey(context).copyWith(
+                                      fontSize: 18.toFont,
+                                      color: context.appTheme.primaryTextColor,
+                                    ),
                                   ),
                                   const Spacer(),
                                   Obx(
                                     () => CupertinoSwitch(
                                       value: _settingsController
                                           .isStreamingEnabled.value,
-                                      activeColor: japaneseLaurel,
-                                      trackColor: americanSilver,
+                                      activeColor: context
+                                          .appTheme.highlightedBorderColor,
+                                      trackColor:
+                                          context.appTheme.disabledBGColor,
                                       onChanged: (value) {
                                         _settingsController
                                             .changeStreamingPref(value);
@@ -193,8 +196,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ],
                         ),
                       ),
-                    ), 
-                  ),*/
+                    ),
+                  ), */
                 ],
               ),
             ),
@@ -216,13 +219,12 @@ class _SettingsScreenState extends State<SettingsScreen>
       padding: AppEdgeInsets.instance.all(16),
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.toWidth,
-          color: goastWhite,
-        ),
-        color: Colors.white,
-      ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            width: 1.toWidth,
+            color: context.appTheme.containerColor,
+          ),
+          color: context.appTheme.cardBGColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -231,10 +233,10 @@ class _SettingsScreenState extends State<SettingsScreen>
               Expanded(
                 child: Text(
                   title,
-                  style: AppTextStyle().regular18DolphinGrey.copyWith(
-                        fontSize: 20.toFont,
-                        color: balticSea,
-                      ),
+                  style: regular18Secondary(context).copyWith(
+                    fontSize: 20.toFont,
+                    color: context.appTheme.primaryTextColor,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -248,10 +250,10 @@ class _SettingsScreenState extends State<SettingsScreen>
                 SizedBox(height: 16.toHeight),
                 Text(
                   subtitle,
-                  style: AppTextStyle().light16BalticSea.copyWith(
-                        fontSize: 14.toFont,
-                        color: dolphinGray,
-                      ),
+                  style: light16(context).copyWith(
+                    fontSize: 14.toFont,
+                    color: context.appTheme.secondaryTextColor,
+                  ),
                 ),
               ],
             ),
@@ -262,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   // TODO: uncomment when Streaming service work
-  /*  Widget _expandableSettingHeading({
+  /* Widget _expandableSettingHeading({
     required String title,
     required Widget icon,
     Widget? child,
@@ -274,13 +276,12 @@ class _SettingsScreenState extends State<SettingsScreen>
       padding: AppEdgeInsets.instance.only(top: 16, left: 16, right: 16),
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.toWidth,
-          color: goastWhite,
-        ),
-        color: Colors.white,
-      ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            width: 1.toWidth,
+            color: context.appTheme.containerColor,
+          ),
+          color: context.appTheme.cardBGColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -290,10 +291,10 @@ class _SettingsScreenState extends State<SettingsScreen>
               children: [
                 Text(
                   title,
-                  style: AppTextStyle().regular18DolphinGrey.copyWith(
-                        fontSize: 20.toFont,
-                        color: balticSea,
-                      ),
+                  style: regular18DolphinGrey(context).copyWith(
+                    fontSize: 20.toFont,
+                    color: context.appTheme.primaryTextColor,
+                  ),
                 ),
                 const Spacer(),
                 icon,
@@ -304,28 +305,27 @@ class _SettingsScreenState extends State<SettingsScreen>
         ],
       ),
     );
-  }*/
+  } */
 
   Widget _voiceAssistantTileWidget() {
     return Container(
       padding: AppEdgeInsets.instance.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.toWidth,
-          color: goastWhite,
-        ),
-        color: Colors.white,
-      ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            width: 1.toWidth,
+            color: context.appTheme.containerColor,
+          ),
+          color: context.appTheme.cardBGColor),
       child: Row(
         children: [
           Expanded(
             child: Text(
               voiceAssistant.tr,
-              style: AppTextStyle().regular18DolphinGrey.copyWith(
-                    fontSize: 20.toFont,
-                    color: balticSea,
-                  ),
+              style: regular18Secondary(context).copyWith(
+                fontSize: 20.toFont,
+                color: context.appTheme.primaryTextColor,
+              ),
             ),
           ),
           _radioWidgetBuilder(
@@ -356,8 +356,8 @@ class _SettingsScreenState extends State<SettingsScreen>
               width: 1.toWidth,
               color: (_settingsController.preferredVoiceAssistant.value ==
                       currentGender)
-                  ? japaneseLaurel
-                  : americanSilver,
+                  ? context.appTheme.highlightedBorderColor
+                  : context.appTheme.secondaryTextColor,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -365,23 +365,27 @@ class _SettingsScreenState extends State<SettingsScreen>
               AppEdgeInsets.instance.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             children: <Widget>[
-              SvgPicture.asset(
+              Icon(
                 (_settingsController.preferredVoiceAssistant.value ==
                         currentGender)
-                    ? iconSelectedRadio
-                    : iconUnSelectedRadio,
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_off,
+                color: (_settingsController.preferredVoiceAssistant.value ==
+                        currentGender)
+                    ? context.appTheme.highlightedBorderColor
+                    : context.appTheme.secondaryTextColor,
+                size: 22.toWidth,
               ),
               SizedBox(width: 5.toWidth),
               Text(
                 title,
-                style: AppTextStyle().regular18DolphinGrey.copyWith(
-                      fontSize: 16.toFont,
-                      color:
-                          (_settingsController.preferredVoiceAssistant.value ==
-                                  currentGender)
-                              ? japaneseLaurel
-                              : dolphinGray,
-                    ),
+                style: regular18Secondary(context).copyWith(
+                  fontSize: 16.toFont,
+                  color: (_settingsController.preferredVoiceAssistant.value ==
+                          currentGender)
+                      ? context.appTheme.highlightedBorderColor
+                      : context.appTheme.secondaryTextColor,
+                ),
               ),
             ],
           ),
@@ -390,28 +394,30 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  // TODO: uncomment when Streaming service work
-  /*  Widget _popupMenuBuilder() {
+  Widget _popupMenuBuilder() {
     return Obx(
       () => PopupMenuButton(
         onSelected: (value) {
-          showDefaultSnackbar(message: featureAvailableSoonInfo.tr);
+          Provider.of<AppThemeProvider>(context, listen: false)
+              .setAppTheme(value);
+          _settingsController.selectedThemeMode.value = value;
         },
         child: Row(
           children: [
             Text(
               _getThemeModeName(_settingsController.selectedThemeMode.value),
-              style:
-                  AppTextStyle().light16BalticSea.copyWith(color: arsenicColor),
+              style: light16(context)
+                  .copyWith(color: context.appTheme.highlightedTextColor),
             ),
             SizedBox(width: 8.toWidth),
-            SvgPicture.asset(iconArrowDown),
+            SvgPicture.asset(iconArrowDown,
+                color: context.appTheme.highlightedTextColor),
           ],
         ),
         itemBuilder: (context) => [
           PopupMenuItem(
             value: ThemeMode.light,
-            child: Text((light.tr)),
+            child: Text(light.tr),
           ),
           PopupMenuItem(
             value: ThemeMode.dark,
@@ -435,7 +441,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       case ThemeMode.dark:
         return dark.tr;
     }
-  } */
+  }
 
   Future<bool> _onWillPop() async {
     Get.back();
