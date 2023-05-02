@@ -20,7 +20,7 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/date_time_utils.dart';
 import 'controller/text_translate_controller.dart';
@@ -71,7 +71,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: honeydew,
+      backgroundColor: context.appTheme.backgroundColor,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -120,12 +120,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               height: ScreenUtil.screenHeight * 0.34,
               margin: AppEdgeInsets.instance.all(18),
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius:
-                      const BorderRadius.all(Radius.circular(textFieldRadius)),
-                  border: Border.all(
-                    color: americanSilver,
-                  )),
+                color: context.appTheme.normalTextFeildColor,
+                borderRadius:
+                    const BorderRadius.all(Radius.circular(textFieldRadius)),
+                border: Border.all(
+                  color: context.appTheme.disabledBGColor,
+                ),
+              ),
               child: Padding(
                 padding: AppEdgeInsets.instance
                     .symmetric(vertical: 8, horizontal: 16),
@@ -183,7 +184,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     return TextField(
       controller: _textTranslationController.sourceLangTextController,
       focusNode: _sourceLangFocusNode,
-      style: AppTextStyle().regular18balticSea,
+      style: regular18Primary(context),
       maxLines: null,
       expands: true,
       maxLength: textCharMaxLength,
@@ -194,7 +195,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             ? null
             : textTranslateHintText.tr,
         hintStyle:
-            AppTextStyle().regular24BalticSea.copyWith(color: mischkaGrey),
+            regular24(context).copyWith(color: context.appTheme.hintTextColor),
         hintMaxLines: 4,
         border: InputBorder.none,
         isDense: true,
@@ -249,7 +250,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       child: Obx(
         () => Container(
           color: _textTranslationController.isKeyboardVisible.value
-              ? balticSea.withOpacity(0.4)
+              ? context.appTheme.primaryTextColor.withOpacity(0.4)
               : Colors.transparent,
         ),
       ),
@@ -261,19 +262,21 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       height: (ScreenUtil.screenHeight * 0.46) -
           ScreenUtil.statusBarHeight -
           ScreenUtil.bottomBarHeightPx,
-      decoration: BoxDecoration(
-          color: lilyGrey,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(textFieldRadius),
-          ),
-          border: Border.all(
-            color: magicMint,
-          )),
+      // decoration: BoxDecoration(
+      //   color: context.appTheme.hightlitedTextFeildColor,
+      //   borderRadius: const BorderRadius.all(
+      //     Radius.circular(textFieldRadius),
+      //   ),
+      //   border: Border.all(
+      //     color: context.appTheme.highlightedBorderColor,
+      //   ),
+      // ),
       child: Obx(
         () => TextFieldWithActions(
           textController: _textTranslationController.targetLangTextController,
           focusNode: _targetLangFocusNode,
-          backgroundColor: Colors.transparent,
+          backgroundColor: context.appTheme.hightlitedTextFeildColor,
+          borderColor: context.appTheme.textFieldBorderColor,
           currentDuration: _textTranslationController.currentDuration.value,
           totalDuration: _textTranslationController.maxDuration.value,
           isRecordedAudio: false,
@@ -321,12 +324,12 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 _textTranslationController.sourceTextCharLimit.value;
             return Text(
               '$sourceCharLength/$textCharMaxLength',
-              style: AppTextStyle().grey14Arsenic.copyWith(
+              style: regular14Title(context).copyWith(
                   color: sourceCharLength >= textCharMaxLength
-                      ? brickRed
+                      ? context.appTheme.errorColor
                       : sourceCharLength >= textCharMaxLength - 20
-                          ? frolyRed
-                          : manateeGray),
+                          ? context.appTheme.warningColor
+                          : context.appTheme.titleTextColor),
             );
           },
         ),
@@ -404,8 +407,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             width: ScreenUtil.screenWidth / 2.8,
             height: 50.toHeight,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: context.appTheme.cardBGColor,
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
@@ -419,9 +422,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
+                  style:
+                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
                 );
               },
             ),
@@ -474,8 +476,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             width: ScreenUtil.screenWidth / 2.8,
             height: 50.toHeight,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: context.appTheme.cardBGColor,
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
@@ -488,9 +490,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(fontSize: 16.toFont),
+                  style:
+                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
                   maxLines: 2,
                 );
               },

@@ -18,7 +18,7 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import 'controller/conversation_controller.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -49,7 +49,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: honeydew,
+      backgroundColor: context.appTheme.backgroundColor,
       body: Stack(
         children: [
           SafeArea(
@@ -102,6 +102,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.sourceLangTextController,
             focusNode: FocusNode(),
+            backgroundColor: context.appTheme.normalTextFeildColor,
+            borderColor: context.appTheme.disabledBGColor,
             hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
                         CurrentlySelectedMic.source
@@ -143,6 +145,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.targetLangTextController,
             focusNode: FocusNode(),
+            backgroundColor: context.appTheme.normalTextFeildColor,
+            borderColor: context.appTheme.disabledBGColor,
             hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
                         CurrentlySelectedMic.target

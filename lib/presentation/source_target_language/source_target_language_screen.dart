@@ -8,7 +8,7 @@ import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/source_target_language_controller.dart';
 
@@ -39,6 +39,7 @@ class _SourceTargetLanguageScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
         child: Padding(
           padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
@@ -101,21 +102,21 @@ class _SourceTargetLanguageScreenState
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: goastWhite,
+        color: context.appTheme.containerColor,
       ),
       child: TextFormField(
-        cursorColor: dolphinGray,
+        cursorColor: context.appTheme.secondaryTextColor,
+        style: regular18Primary(context),
         decoration: InputDecoration(
           contentPadding: AppEdgeInsets.instance.all(0),
           border: InputBorder.none,
-          icon: const Icon(
+          icon: Icon(
             Icons.search,
-            color: dolphinGray,
+            color: context.appTheme.secondaryTextColor,
           ),
           hintText: searchLanguage.tr,
-          hintStyle: AppTextStyle()
-              .light16BalticSea
-              .copyWith(fontSize: 18.toFont, color: manateeGray),
+          hintStyle: light16(context).copyWith(
+              fontSize: 18.toFont, color: context.appTheme.titleTextColor),
         ),
         onChanged: (value) {
           performLanguageSearch(value);
@@ -136,7 +137,8 @@ class _SourceTargetLanguageScreenState
             padding: AppEdgeInsets.instance.all(8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(width: 1.toWidth, color: goastWhite),
+              border: Border.all(
+                  width: 1.toWidth, color: context.appTheme.containerColor),
             ),
             child: SvgPicture.asset(
               iconPrevious,
@@ -148,7 +150,7 @@ class _SourceTargetLanguageScreenState
           Get.arguments[kIsSourceLanguage]
               ? kTranslateSourceTitle.tr
               : kTranslateTargetTitle.tr,
-          style: AppTextStyle().semibold24BalticSea,
+          style: semibold24(context),
         ),
       ],
     );

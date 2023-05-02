@@ -10,7 +10,7 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import 'controller/home_controller.dart';
 import 'widgets/menu_item_widget.dart';
 
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: honeydew,
+      backgroundColor: context.appTheme.backgroundColor,
       body: Stack(
         children: [
           SafeArea(
@@ -84,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           onTap: () => Get.toNamed(AppRoutes.settingsRoute),
                           child: SvgPicture.asset(
                             iconSettings,
+                            color: context.appTheme.primaryTextColor,
                             width: 30.toWidth,
                             height: 30.toHeight,
                           ),
