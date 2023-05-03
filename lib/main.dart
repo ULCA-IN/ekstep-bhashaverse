@@ -38,15 +38,24 @@ void main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final Box hiveDBInstance = Hive.box(hiveDBName);
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Box hiveDBInstance;
+  late String appLocale;
+
+  @override
+  void initState() {
+    super.initState();
+    hiveDBInstance = Hive.box(hiveDBName);
 
     // Localization preference
-    String appLocale = hiveDBInstance.get(preferredAppLocale,
+    appLocale = hiveDBInstance.get(preferredAppLocale,
         defaultValue: Get.deviceLocale?.languageCode);
     if (appLocale.isEmpty) {
       hiveDBInstance.put(preferredAppLocale, appLocale);
@@ -90,7 +99,10 @@ class MyApp extends StatelessWidget {
     if (hiveDBInstance.get(isStreamingPreferred) == null) {
       hiveDBInstance.put(isStreamingPreferred, false);
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return GetMaterialApp(
       onGenerateTitle: (context) => bhashiniTitle.tr,
       debugShowCheckedModeBanner: false,
