@@ -30,7 +30,7 @@ class BhashiniTitle extends StatelessWidget {
         Text(
           bhashiniTitle.tr,
           textAlign: TextAlign.center,
-          style: AppTextStyle().bold24BalticSea,
+          style: bold24(context),
         ),
         if (_action != null) _action!
       ],

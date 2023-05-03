@@ -1,9 +1,7 @@
-
-
 import 'package:flutter/material.dart';
 
 import '../../../utils/screen_util/screen_util.dart';
-import '../../../utils/theme/app_colors.dart';
+import '../../../utils/theme/app_theme_provider.dart';
 import '../../../utils/theme/app_text_style.dart';
 
 class MenuItem extends StatelessWidget {
@@ -31,7 +29,7 @@ class MenuItem extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appTheme.cardBGColor,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Column(
@@ -44,7 +42,7 @@ class MenuItem extends StatelessWidget {
                 ),
                 Text(
                   _title,
-                  style: AppTextStyle().semibold22BalticSea,
+                  style: semibold22(context),
                 ),
                 SizedBox(height: 16.toHeight)
               ],
@@ -53,7 +51,7 @@ class MenuItem extends StatelessWidget {
           if (_isDisabled)
             Container(
               decoration: BoxDecoration(
-                color: americanSilver.withOpacity(.6),
+                color: context.appTheme.disabledBGColor.withOpacity(.6),
                 borderRadius: BorderRadius.circular(18),
               ),
             ),

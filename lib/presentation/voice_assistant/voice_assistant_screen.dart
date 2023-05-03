@@ -8,7 +8,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/voice_assistant_controller.dart';
 
@@ -32,6 +32,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
         child: Padding(
           padding: AppEdgeInsets.instance.all(16),
@@ -41,14 +42,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
               SizedBox(height: 16.toHeight),
               Text(
                 selectVoiceAssistant.tr,
-                style: AppTextStyle().semibold24BalticSea,
+                style: semibold24(context),
               ),
               SizedBox(height: 8.toHeight),
               Text(
                 youWillHearTheTranslationText.tr,
-                style: AppTextStyle()
-                    .light16BalticSea
-                    .copyWith(color: dolphinGray),
+                style: light16(context)
+                    .copyWith(color: context.appTheme.highlightedTextColor),
               ),
               SizedBox(height: 56.toHeight),
               Row(
@@ -69,10 +69,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
               const Spacer(),
               CustomElevetedButton(
                 buttonText: letsTranslate.tr,
-                textStyle: AppTextStyle()
-                    .semibold24BalticSea
-                    .copyWith(fontSize: 18.toFont),
-                backgroundColor: primaryColor,
+                textStyle: semibold24(context).copyWith(fontSize: 18.toFont),
+                backgroundColor: context.appTheme.primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
                   Box hiveDBInstance = Hive.box(hiveDBName);
@@ -102,14 +100,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             padding: AppEdgeInsets.instance.all(22),
             decoration: BoxDecoration(
               color: (_voiceAssistantController.getSelectedGender() == gender)
-                  ? sassyGreen
-                  : Colors.white,
+                  ? context.appTheme.lightBGColor
+                  : context.appTheme.voiceAssistantBGColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 width: 1.toWidth,
                 color: (_voiceAssistantController.getSelectedGender() == gender)
-                    ? japaneseLaurel
-                    : americanSilver,
+                    ? context.appTheme.highlightedBorderColor
+                    : context.appTheme.disabledBGColor,
               ),
             ),
             child: Column(
@@ -118,10 +116,10 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 SizedBox(height: 16.toHeight),
                 Text(
                   avatarTitle,
-                  style: AppTextStyle().regular18DolphinGrey.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
+                  style: regular18Secondary(context).copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: context.appTheme.titleTextColor,
+                  ),
                 ),
               ],
             ),

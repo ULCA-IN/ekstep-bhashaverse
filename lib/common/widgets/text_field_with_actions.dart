@@ -5,7 +5,7 @@ import '../../enums/speaker_status.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/date_time_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'asr_tts_actions.dart';
 import 'custom_outline_button.dart';
@@ -18,7 +18,8 @@ class TextFieldWithActions extends StatelessWidget {
     required FocusNode focusNode,
     String? translateButtonTitle,
     required String textToCopy,
-    Color backgroundColor = Colors.white,
+    required Color backgroundColor,
+    required Color borderColor,
     required int currentDuration,
     required int totalDuration,
     required bool isRecordedAudio,
@@ -45,6 +46,7 @@ class TextFieldWithActions extends StatelessWidget {
         _translateButtonTitle = translateButtonTitle,
         _textToCopy = textToCopy,
         _backgroundColor = backgroundColor,
+        _borderColor = borderColor,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _sourceCharLength = sourceCharLength,
@@ -78,7 +80,7 @@ class TextFieldWithActions extends StatelessWidget {
       _isReadOnly,
       _isShareButtonLoading;
   final double _topBorderRadius, _bottomBorderRadius;
-  final Color _backgroundColor;
+  final Color _backgroundColor, _borderColor;
   final Function _onMusicPlayOrStop, _onFileShare;
   final Function? _onTranslateButtonTap, _onChanged, _onSubmitted;
 
@@ -90,16 +92,17 @@ class TextFieldWithActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       decoration: BoxDecoration(
-          color: _backgroundColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(_topBorderRadius),
-            topRight: Radius.circular(_topBorderRadius),
-            bottomLeft: Radius.circular(_bottomBorderRadius),
-            bottomRight: Radius.circular(_bottomBorderRadius),
-          ),
-          border: Border.all(
-            color: americanSilver,
-          )),
+        color: _backgroundColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(_topBorderRadius),
+          topRight: Radius.circular(_topBorderRadius),
+          bottomLeft: Radius.circular(_bottomBorderRadius),
+          bottomRight: Radius.circular(_bottomBorderRadius),
+        ),
+        border: Border.all(
+          color: _borderColor,
+        ),
+      ),
       duration: const Duration(milliseconds: 500),
       child: Padding(
         padding: AppEdgeInsets.instance.all(16),
@@ -110,7 +113,7 @@ class TextFieldWithActions extends StatelessWidget {
               child: TextField(
                 controller: _textController,
                 focusNode: _focusNode,
-                style: AppTextStyle().regular18balticSea,
+                style: regular18Primary(context),
                 maxLines: null,
                 expands: true,
                 maxLength: textCharMaxLength,
@@ -119,9 +122,8 @@ class TextFieldWithActions extends StatelessWidget {
                 readOnly: _isReadOnly,
                 decoration: InputDecoration(
                   hintText: _hintText,
-                  hintStyle: AppTextStyle()
-                      .regular24BalticSea
-                      .copyWith(color: mischkaGrey),
+                  hintStyle: regular24(context)
+                      .copyWith(color: context.appTheme.hintTextColor),
                   hintMaxLines: 4,
                   border: InputBorder.none,
                   isDense: true,

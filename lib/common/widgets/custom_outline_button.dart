@@ -2,7 +2,7 @@ import '../../utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class CustomOutlineButton extends StatelessWidget {
@@ -25,14 +25,17 @@ class CustomOutlineButton extends StatelessWidget {
       style: ButtonStyle(
         elevation: MaterialStateProperty.all(0),
         overlayColor: MaterialStateProperty.all(
-          isDisabled ? Colors.transparent : japaneseLaurel.withOpacity(0.2),
+          isDisabled
+              ? Colors.transparent
+              : context.appTheme.highlightedBGColor.withOpacity(0.2),
         ),
-        backgroundColor: MaterialStateProperty.all(
-          Colors.white,
-        ),
+        backgroundColor:
+            MaterialStateProperty.all(context.appTheme.normalTextFeildColor),
         side: MaterialStateProperty.resolveWith((state) {
           return BorderSide(
-            color: isDisabled ? manateeGray : japaneseLaurel,
+            color: isDisabled
+                ? context.appTheme.titleTextColor
+                : context.appTheme.highlightedBGColor,
           );
         }),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -54,8 +57,10 @@ class CustomOutlineButton extends StatelessWidget {
             ),
           if (title != null && title!.isNotEmpty)
             Text(title!,
-                style: AppTextStyle().regular14Arsenic.copyWith(
-                    color: isDisabled ? manateeGray : japaneseLaurel)),
+                style: regular14(context).copyWith(
+                    color: isDisabled
+                        ? context.appTheme.titleTextColor
+                        : context.appTheme.highlightedBGColor)),
         ],
       ),
     );

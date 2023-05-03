@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class MicButton extends StatelessWidget {
@@ -43,8 +43,8 @@ class MicButton extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 color: _isRecordingStarted
-                    ? tangerineOrangeColor
-                    : flushOrangeColor,
+                    ? context.appTheme.buttonSelectedColor
+                    : context.appTheme.disabledOrangeColor,
                 shape: BoxShape.circle,
               ),
               child: Padding(
@@ -73,14 +73,14 @@ class MicButton extends StatelessWidget {
                     child: AutoSizeText(
                       _languageName,
                       maxLines: 2,
-                      style: AppTextStyle()
-                          .regular18balticSea
+                      style: regular18Primary(context)
                           .copyWith(fontSize: 16.toFont),
                     ),
                   ),
                   SizedBox(width: 6.toWidth),
                   SvgPicture.asset(
                     iconDownArrow,
+                    color: context.appTheme.primaryTextColor,
                     width: 8.toWidth,
                     height: 8.toWidth,
                   )

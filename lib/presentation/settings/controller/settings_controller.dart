@@ -6,6 +6,7 @@ import '../../../../../enums/gender_enum.dart';
 import '../../../../../enums/language_enum.dart';
 import '../../../../../utils/constants/api_constants.dart';
 import '../../../../../utils/constants/app_constants.dart';
+import '../../../utils/theme/app_theme_utils.dart';
 
 class SettingsController extends GetxController {
   RxBool isTransLiterationEnabled = true.obs;
@@ -13,7 +14,7 @@ class SettingsController extends GetxController {
   RxString preferredLanguage = ''.obs;
 
   Rx<GenderEnum> preferredVoiceAssistant = (GenderEnum.male).obs;
-  Rx<ThemeMode> selectedThemeMode = (ThemeMode.light).obs;
+  Rx<ThemeMode> selectedThemeMode = (ThemeMode.system).obs;
   RxBool isAdvanceMenuOpened = false.obs;
 
   late final Box _hiveDBInstance;
@@ -26,6 +27,7 @@ class SettingsController extends GetxController {
     isStreamingEnabled.value = _hiveDBInstance.get(isStreamingPreferred);
     preferredVoiceAssistant.value = GenderEnum.values
         .byName(_hiveDBInstance.get(preferredVoiceAssistantGender));
+    selectedThemeMode.value = getUserPreferredThemeMode(_hiveDBInstance);
     getPreferredLanguage();
     super.onInit();
   }

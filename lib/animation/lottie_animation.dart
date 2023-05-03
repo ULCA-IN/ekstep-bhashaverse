@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 import '../utils/screen_util/screen_util.dart';
-import '../utils/theme/app_colors.dart';
+import '../utils/theme/app_theme_provider.dart';
 import '../utils/theme/app_text_style.dart';
 
 class LottieAnimation extends StatelessWidget {
@@ -36,7 +36,7 @@ class LottieAnimation extends StatelessWidget {
             margin: AppEdgeInsets.instance.symmetric(horizontal: 22),
             padding: AppEdgeInsets.instance.all(22),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appTheme.cardBGColor,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -51,9 +51,8 @@ class LottieAnimation extends StatelessWidget {
                 SizedBox(height: 14.toHeight),
                 Text(
                   footerText,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(color: balticSea),
+                  style: regular18Secondary(context)
+                      .copyWith(color: context.appTheme.primaryTextColor),
                 ),
                 SizedBox(height: 20.toHeight)
               ],
