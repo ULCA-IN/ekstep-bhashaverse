@@ -12,6 +12,7 @@ abstract class AppTheme {
   Color get disabledBGColor;
   Color get containerColor;
   Color get cardBGColor;
+  Color get splashScreenBGColor;
   Color get voiceAssistantBGColor;
 
   Color get errorColor;

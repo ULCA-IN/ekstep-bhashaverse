@@ -89,4 +89,7 @@ class DarkAppTheme implements AppTheme {
 
   @override
   Color get voiceAssistantBGColor => _AppColors.bastilleBlack;
+
+  @override
+  Color get splashScreenBGColor => _AppColors.jaguarBlack;
 }

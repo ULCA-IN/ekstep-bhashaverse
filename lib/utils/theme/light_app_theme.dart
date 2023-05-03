@@ -89,4 +89,7 @@ class LightAppTheme implements AppTheme {
 
   @override
   Color get voiceAssistantBGColor => _AppColors.white;
+
+  @override
+  Color get splashScreenBGColor => _AppColors.bisqueOrangeColor;
 }
