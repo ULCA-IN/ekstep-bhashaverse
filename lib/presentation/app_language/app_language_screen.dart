@@ -34,9 +34,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
     _appLanguageController = Get.find();
     _languageSearchController = TextEditingController();
     _hiveDBInstance = Hive.box(hiveDBName);
-    if (Get.arguments != null && Get.arguments[selectedLanguage] != null) {
-      setSelectedLanguageFromArg(Get.arguments[selectedLanguage]);
-    }
+    setSelectedLanguageFromArg();
     ScreenUtil().init();
     super.initState();
   }
@@ -230,10 +228,14 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
         langCode: selectedLangCode);
   }
 
-  void setSelectedLanguageFromArg(String name) {
-    _appLanguageController.setSelectedLanguageIndex(_appLanguageController
-        .getAppLanguageList()
-        .indexWhere((element) => element[APIConstants.kNativeName] == name));
+  void setSelectedLanguageFromArg() {
+    if (Get.arguments != null && Get.arguments[selectedLanguage] != null) {
+      _appLanguageController.setSelectedLanguageIndex(_appLanguageController
+          .getAppLanguageList()
+          .indexWhere((element) =>
+              element[APIConstants.kNativeName] ==
+              Get.arguments[selectedLanguage]));
+    }
   }
 
   Future<bool> _onWillPop() async {
