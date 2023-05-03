@@ -72,7 +72,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 Text(
                   youCanAlwaysChange.tr,
                   style: light16(context)
-                      .copyWith(color: context.appTheme.secondaryTextColor),
+                      .copyWith(color: context.appTheme.highlightedTextColor),
                 ),
                 SizedBox(height: 24.toHeight),
                 _textFormFieldContainer(),
@@ -167,6 +167,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       ),
       child: TextFormField(
         cursorColor: context.appTheme.secondaryTextColor,
+        style: regular16(context).copyWith(
+            fontSize: 18.toFont, color: context.appTheme.primaryTextColor),
         decoration: InputDecoration(
           contentPadding: AppEdgeInsets.instance.all(0),
           border: InputBorder.none,

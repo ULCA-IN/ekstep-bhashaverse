@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../utils/theme/app_text_style.dart';
+import '../../../utils/theme/app_theme_provider.dart';
 import '/utils/screen_util/screen_util.dart';
 
 class OnBoardingContentWidget extends StatelessWidget {
@@ -30,7 +31,8 @@ class OnBoardingContentWidget extends StatelessWidget {
         SizedBox(height: 8.toHeight),
         Text(
           bodyText,
-          style: regular18Secondary(context),
+          style: regular18Secondary(context)
+              .copyWith(color: context.appTheme.highlightedTextColor),
         ),
         SizedBox(height: 100.toHeight),
         Image.asset(imagePath, height: 300.toHeight),

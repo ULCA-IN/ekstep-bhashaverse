@@ -32,6 +32,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
         child: Padding(
           padding: AppEdgeInsets.instance.all(16),
@@ -47,7 +48,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
               Text(
                 youWillHearTheTranslationText.tr,
                 style: light16(context)
-                    .copyWith(color: context.appTheme.secondaryTextColor),
+                    .copyWith(color: context.appTheme.highlightedTextColor),
               ),
               SizedBox(height: 56.toHeight),
               Row(
