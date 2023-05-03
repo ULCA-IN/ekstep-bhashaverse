@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -7,7 +6,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
 
@@ -41,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bisqueOrangeColor,
+      backgroundColor: context.appTheme.splashScreenBGColor,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -58,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 bhashiniTitle.tr,
                 textAlign: TextAlign.center,
-                style: AppTextStyle().bold24BalticSea,
+                style: bold24(context),
               ),
             ],
           ),
