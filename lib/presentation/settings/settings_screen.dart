@@ -252,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                   subtitle,
                   style: light16(context).copyWith(
                     fontSize: 14.toFont,
-                    color: context.appTheme.secondaryTextColor,
+                    color: context.appTheme.highlightedTextColor,
                   ),
                 ),
               ],
