@@ -24,7 +24,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
-  late AnimationController _controller;
+  // late AnimationController _controller;
   // TODO: uncomment when Streaming service work
   // late Animation<double> _animation;
   Duration defaultAnimationTime = const Duration(milliseconds: 300);
