@@ -9,6 +9,7 @@ class AppLanguageController extends GetxController {
   final RxList<Map<String, dynamic>> _languageList =
       <Map<String, dynamic>>[].obs;
   late final Box _hiveDBInstance;
+  String _selectedLanguageCode = '';
 
   @override
   void onInit() {
@@ -23,11 +24,14 @@ class AppLanguageController extends GetxController {
 
   void setSelectedLanguageIndex(int? index) {
     _selectedLanguageIndex.value = index;
+    if (index != null) {
+      _selectedLanguageCode =
+          getAppLanguageList()[index][APIConstants.kLanguageCode];
+    }
   }
 
   String getSelectedLanguageCode() {
-    return getAppLanguageList()[getSelectedLanguageIndex() ?? 0]
-        [APIConstants.kLanguageCode];
+    return _selectedLanguageCode;
   }
 
   void saveSelectedLocaleInDB() {
@@ -46,6 +50,7 @@ class AppLanguageController extends GetxController {
       _languageList.add(language);
       if (language[APIConstants.kLanguageCode] == Get.locale?.languageCode) {
         setSelectedLanguageIndex(i);
+        _selectedLanguageCode = language[APIConstants.kLanguageCode]!;
       }
     }
   }
