@@ -26,8 +26,8 @@ class LanguageModelController extends GetxController {
     });
   }
 
-  late SearchModel _availableTransliterationModels;
-  SearchModel get availableTransliterationModels =>
+  SearchModel? _availableTransliterationModels;
+  SearchModel? get availableTransliterationModels =>
       _availableTransliterationModels;
 
   void calcAvailableTransliterationModels(
@@ -35,10 +35,12 @@ class LanguageModelController extends GetxController {
     _availableTransliterationModels = transliterationModel;
 
     Set<String> availableTransliterationModelLanguagesSet = {};
-    for (SearchModelData eachTransliterationModel
-        in _availableTransliterationModels.data) {
-      availableTransliterationModelLanguagesSet
-          .add(eachTransliterationModel.languages[0].sourceLanguage.toString());
+    if (_availableTransliterationModels != null) {
+      for (SearchModelData eachTransliterationModel
+          in _availableTransliterationModels!.data) {
+        availableTransliterationModelLanguagesSet.add(
+            eachTransliterationModel.languages[0].sourceLanguage.toString());
+      }
     }
   }
 
@@ -48,17 +50,19 @@ class LanguageModelController extends GetxController {
     bool isAtLeastOneDefaultModelTypeFound = false;
 
     List<String> availableSubmittersList = [];
-    for (var eachAvailableTransliterationModelData
-        in availableTransliterationModels.data) {
-      //using English as source language for now
-      if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
-              'en' &&
-          eachAvailableTransliterationModelData.languages[0].targetLanguage ==
-              languageCode) {
-        if (!availableSubmittersList.contains(
-            eachAvailableTransliterationModelData.name.toLowerCase())) {
-          availableSubmittersList
-              .add(eachAvailableTransliterationModelData.name.toLowerCase());
+    if (_availableTransliterationModels != null) {
+      for (var eachAvailableTransliterationModelData
+          in availableTransliterationModels!.data) {
+        //using English as source language for now
+        if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
+                'en' &&
+            eachAvailableTransliterationModelData.languages[0].targetLanguage ==
+                languageCode) {
+          if (!availableSubmittersList.contains(
+              eachAvailableTransliterationModelData.name.toLowerCase())) {
+            availableSubmittersList
+                .add(eachAvailableTransliterationModelData.name.toLowerCase());
+          }
         }
       }
     }
@@ -74,26 +78,29 @@ class LanguageModelController extends GetxController {
         ai4BharatModelName = eachSubmitter;
       }
     }
-
-    if (ai4BharatModelName.isNotEmpty) {
-      for (var eachAvailableTransliterationModelData
-          in availableTransliterationModels.data) {
-        if (eachAvailableTransliterationModelData.name.toLowerCase() ==
-            ai4BharatModelName.toLowerCase()) {
-          availableTransliterationModelsForSelectedLangInUIDefault
-              .add(eachAvailableTransliterationModelData.modelId);
-          isAtLeastOneDefaultModelTypeFound = true;
+    if (_availableTransliterationModels != null) {
+      if (ai4BharatModelName.isNotEmpty) {
+        for (var eachAvailableTransliterationModelData
+            in availableTransliterationModels!.data) {
+          if (eachAvailableTransliterationModelData.name.toLowerCase() ==
+              ai4BharatModelName.toLowerCase()) {
+            availableTransliterationModelsForSelectedLangInUIDefault
+                .add(eachAvailableTransliterationModelData.modelId);
+            isAtLeastOneDefaultModelTypeFound = true;
+          }
         }
-      }
-    } else {
-      for (var eachAvailableTransliterationModelData
-          in availableTransliterationModels.data) {
-        if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
-                'en' &&
-            eachAvailableTransliterationModelData.languages[0].targetLanguage ==
-                languageCode) {
-          availableTransliterationModelsForSelectedLangInUI
-              .add(eachAvailableTransliterationModelData.modelId);
+      } else {
+        for (var eachAvailableTransliterationModelData
+            in availableTransliterationModels!.data) {
+          if (eachAvailableTransliterationModelData
+                      .languages[0].sourceLanguage ==
+                  'en' &&
+              eachAvailableTransliterationModelData
+                      .languages[0].targetLanguage ==
+                  languageCode) {
+            availableTransliterationModelsForSelectedLangInUI
+                .add(eachAvailableTransliterationModelData.modelId);
+          }
         }
       }
     }
