@@ -1,145 +1,159 @@
-class SocketIOComputeResponseModel {
-  List<Results>? results;
+// To parse this JSON data, do
+//
+//     final socketIoComputeResponseModel = socketIoComputeResponseModelFromJson(jsonString);
 
-  SocketIOComputeResponseModel({results});
+import 'dart:convert';
 
-  SocketIOComputeResponseModel.fromJson(Map<String, dynamic> json) {
-    if (json['results'] != null) {
-      results = <Results>[];
-      json['results'].forEach((v) {
-        results!.add(Results.fromJson(v));
-      });
-    }
-  }
+SocketIoComputeResponseModel socketIoComputeResponseModelFromJson(String str) =>
+    SocketIoComputeResponseModel.fromJson(json.decode(str));
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (results != null) {
-      data['results'] = results!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
+String socketIoComputeResponseModelToJson(SocketIoComputeResponseModel data) =>
+    json.encode(data.toJson());
+
+class SocketIoComputeResponseModel {
+  List<PipelineResponse> pipelineResponse;
+
+  SocketIoComputeResponseModel({
+    required this.pipelineResponse,
+  });
+
+  factory SocketIoComputeResponseModel.fromJson(Map<String, dynamic> json) =>
+      SocketIoComputeResponseModel(
+        pipelineResponse: List<PipelineResponse>.from(
+            json["pipelineResponse"].map((x) => PipelineResponse.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "pipelineResponse":
+            List<dynamic>.from(pipelineResponse.map((x) => x.toJson())),
+      };
 }
 
-class Results {
+class PipelineResponse {
+  String taskType;
   Config? config;
   List<Output>? output;
-  List<Audio?>? audio;
+  List<Audio>? audio;
 
-  Results({config, output, audio});
+  PipelineResponse({
+    required this.taskType,
+    this.config,
+    this.output,
+    this.audio,
+  });
 
-  Results.fromJson(Map<String, dynamic> json) {
-    config = json['config'] != null ? Config.fromJson(json['config']) : null;
-    if (json['output'] != null) {
-      output = <Output>[];
-      json['output'].forEach((v) {
-        output!.add(Output.fromJson(v));
-      });
-    }
-    if (json['audio'] != null) {
-      audio = <Audio>[];
-      json['audio'].forEach((v) {
-        audio!.add(Audio.fromJson(v));
-      });
-    }
-  }
+  factory PipelineResponse.fromJson(Map<String, dynamic> json) =>
+      PipelineResponse(
+        taskType: json["taskType"],
+        config: json["config"] == null ? null : Config.fromJson(json["config"]),
+        output: json["output"] == null
+            ? []
+            : List<Output>.from(json["output"]!.map((x) => Output.fromJson(x))),
+        audio: json["audio"] == null
+            ? []
+            : List<Audio>.from(json["audio"]!.map((x) => Audio.fromJson(x))),
+      );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (config != null) {
-      data['config'] = config!.toJson();
-    }
-    if (output != null) {
-      data['output'] = output!.map((v) => v.toJson()).toList();
-    }
-    if (audio != null) {
-      data['audio'] = audio!.map((v) => v!.toJson()).toList();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        "taskType": taskType,
+        "config": config?.toJson(),
+        "output": output == null
+            ? []
+            : List<dynamic>.from(output!.map((x) => x.toJson())),
+        "audio": audio == null
+            ? []
+            : List<dynamic>.from(audio!.map((x) => x.toJson())),
+      };
+}
+
+class Audio {
+  String audioContent;
+
+  Audio({
+    required this.audioContent,
+  });
+
+  factory Audio.fromJson(Map<String, dynamic> json) => Audio(
+        audioContent: json["audioContent"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "audioContent": audioContent,
+      };
 }
 
 class Config {
-  Language? language;
+  String? serviceId;
+  Language language;
   String? audioFormat;
   String? encoding;
-  int? samplingRate;
+  int samplingRate;
   dynamic postProcessors;
 
-  Config({language, audioFormat, encoding, samplingRate, postProcessors});
+  Config({
+    this.serviceId,
+    required this.language,
+    this.audioFormat,
+    this.encoding,
+    required this.samplingRate,
+    this.postProcessors,
+  });
 
-  Config.fromJson(Map<String, dynamic> json) {
-    language =
-        json['language'] != null ? Language.fromJson(json['language']) : null;
-    audioFormat = json['audioFormat'];
-    encoding = json['encoding'];
-    samplingRate = json['samplingRate'];
-    postProcessors = json['postProcessors'];
-  }
+  factory Config.fromJson(Map<String, dynamic> json) => Config(
+        serviceId: json["serviceId"],
+        language: Language.fromJson(json["language"]),
+        audioFormat: json["audioFormat"],
+        encoding: json["encoding"],
+        samplingRate: json["samplingRate"],
+        postProcessors: json["postProcessors"],
+      );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (language != null) {
-      data['language'] = language!.toJson();
-    }
-    data['audioFormat'] = audioFormat;
-    data['encoding'] = encoding;
-    data['samplingRate'] = samplingRate;
-    data['postProcessors'] = postProcessors;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        "serviceId": serviceId,
+        "language": language.toJson(),
+        "audioFormat": audioFormat,
+        "encoding": encoding,
+        "samplingRate": samplingRate,
+        "postProcessors": postProcessors,
+      };
 }
 
 class Language {
-  String? sourceLanguage;
-  String? targetLanguage;
+  String sourceLanguage;
+  String sourceScriptCode;
 
-  Language({sourceLanguage, targetLanguage});
+  Language({
+    required this.sourceLanguage,
+    required this.sourceScriptCode,
+  });
 
-  Language.fromJson(Map<String, dynamic> json) {
-    sourceLanguage = json['sourceLanguage'];
-    targetLanguage = json['targetLanguage'];
-  }
+  factory Language.fromJson(Map<String, dynamic> json) => Language(
+        sourceLanguage: json["sourceLanguage"],
+        sourceScriptCode: json["sourceScriptCode"],
+      );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['sourceLanguage'] = sourceLanguage;
-    data['targetLanguage'] = targetLanguage;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        "sourceLanguage": sourceLanguage,
+        "sourceScriptCode": sourceScriptCode,
+      };
 }
 
 class Output {
   String? source;
   String? target;
 
-  Output({source, target});
+  Output({
+    required this.source,
+    this.target,
+  });
 
-  Output.fromJson(Map<String, dynamic> json) {
-    source = json['source'];
-    target = json['target'];
-  }
+  factory Output.fromJson(Map<String, dynamic> json) => Output(
+        source: json["source"],
+        target: json["target"],
+      );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['source'] = source;
-    data['target'] = target;
-    return data;
-  }
-}
-
-class Audio {
-  dynamic audioContent;
-
-  Audio({audioContent});
-
-  Audio.fromJson(Map<String, dynamic> json) {
-    if (audioContent != null) audioContent = json['audioContent'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['audioContent'] = audioContent;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+        "source": source,
+        "target": target,
+      };
 }
