@@ -146,6 +146,8 @@ class VoiceTextTranslateController extends GetxController {
       if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
       if (!_socketIOClient.isMicConnected.value) {
         streamingResponseListener.dispose();
+      } else {
+        stopWatchTimer.onStartTimer();
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
@@ -277,7 +279,7 @@ class VoiceTextTranslateController extends GetxController {
 
           MicStream.microphone(
                   audioSource: AudioSource.DEFAULT,
-                  sampleRate: 44100,
+                  sampleRate: 16000,
                   channelConfig: ChannelConfig.CHANNEL_IN_MONO,
                   audioFormat: AudioFormat.ENCODING_PCM_16BIT)
               .then((stream) {
@@ -289,7 +291,7 @@ class VoiceTextTranslateController extends GetxController {
                   emittingData: [
                     {
                       "audio": [
-                        {"audioContent": value}
+                        {"audioContent": value.sublist(0)}
                       ]
                     },
                     {"response_depth": 1},
@@ -316,7 +318,7 @@ class VoiceTextTranslateController extends GetxController {
                       emittingData: [
                         {
                           "audio": [
-                            {"audioContent": value}
+                            {"audioContent": value.sublist(0)}
                           ]
                         },
                         {"response_depth": 2},
@@ -367,7 +369,6 @@ class VoiceTextTranslateController extends GetxController {
               true
             ],
             isDataToSend: true);
-        await Future.delayed(const Duration(seconds: 5));
       }
       _socketIOClient.disconnect();
     } else {
