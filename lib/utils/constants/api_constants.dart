@@ -134,21 +134,21 @@ class APIConstants {
     return computeRequestToSend;
   }
 
-  static List<Map<String, Map<String, dynamic>>> createSocketIOComputePayload({
+  static List<Map<String, dynamic>> createSocketIOComputePayload({
     required String srcLanguage,
     required String targetLanguage,
     required String preferredGender,
   }) {
     return [
       {
-        "task": {"type": "asr"},
+        "taskType": "asr",
         "config": {
           "language": {"sourceLanguage": srcLanguage},
-          "samplingRate": 44100,
+          "samplingRate": 16000,
         }
       },
       {
-        "task": {"type": "translation"},
+        "taskType": "translation",
         "config": {
           "language": {
             "sourceLanguage": srcLanguage,
@@ -157,7 +157,7 @@ class APIConstants {
         }
       },
       {
-        "task": {"type": "tts"},
+        "taskType": "tts",
         "config": {
           "language": {"sourceLanguage": targetLanguage},
           "gender": preferredGender
