@@ -178,11 +178,10 @@ class APIConstants {
         if (targetLanguageCode != null) {
           if (config.language?.targetLanguage == targetLanguageCode) {
             return config.serviceId;
-          } else {
-            return '';
           }
-        } else
+        } else {
           return config.serviceId; // sends ASR, TTS service id
+        }
       }
     }
     return '';
