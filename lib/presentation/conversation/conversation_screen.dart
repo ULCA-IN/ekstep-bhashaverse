@@ -129,7 +129,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 _translationController.playStopTTSOutput(true),
             onFileShare: () =>
                 _translationController.shareAudioFile(isSourceLang: true),
-            playerController: _translationController.controller,
+            playerController: _translationController.playerController,
             speakerStatus: _translationController.sourceSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
             showMicButton: isCurrentlyRecording() &&
@@ -172,7 +172,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 _translationController.shareAudioFile(isSourceLang: false),
             onMusicPlayOrStop: () =>
                 _translationController.playStopTTSOutput(false),
-            playerController: _translationController.controller,
+            playerController: _translationController.playerController,
             speakerStatus: _translationController.targetSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
             showMicButton: isCurrentlyRecording() &&
@@ -206,9 +206,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ? _translationController.getSelectedSourceLanguageName()
                   : kTranslateSourceTitle.tr;
               return MicButton(
-                isRecordingStarted: isCurrentlyRecording() &&
-                    _translationController.currentMic.value ==
-                        CurrentlySelectedMic.source,
+                micButtonStatus: _translationController.currentMic.value ==
+                        CurrentlySelectedMic.source
+                    ? _translationController.micButtonStatus.value
+                    : MicButtonStatus.released,
                 showLanguage: true,
                 languageName: selectedSourceLanguage,
                 onMicButtonTap: (isPressed) {
@@ -276,9 +277,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ? _translationController.getSelectedTargetLanguageName()
                   : kTranslateTargetTitle.tr;
               return MicButton(
-                isRecordingStarted: isCurrentlyRecording() &&
-                    _translationController.currentMic.value ==
-                        CurrentlySelectedMic.target,
+                micButtonStatus: _translationController.currentMic.value ==
+                        CurrentlySelectedMic.target
+                    ? _translationController.micButtonStatus.value
+                    : MicButtonStatus.released,
                 showLanguage: true,
                 languageName: selectedTargetLanguage,
                 onMicButtonTap: (isPressed) {
@@ -362,7 +364,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   bool isCurrentlyRecording() {
     return _hiveDBInstance.get(isStreamingPreferred)
-        ? _socketIOClient.isMicConnected.value
+        ? _socketIOClient.isMicConnected.value &&
+            _translationController.micButtonStatus.value ==
+                MicButtonStatus.pressed
         : _translationController.micButtonStatus.value ==
             MicButtonStatus.pressed;
   }
