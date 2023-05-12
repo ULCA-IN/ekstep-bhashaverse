@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -159,6 +160,8 @@ class ConversationController extends GetxController {
         currentMic.value == CurrentlySelectedMic.source
             ? sourceLangTTSPath.value = recordedAudioPath
             : targetLangTTSPath.value = recordedAudioPath;
+        base64EncodedAudioContent =
+            base64Encode(File(recordedAudioPath).readAsBytesSync());
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
