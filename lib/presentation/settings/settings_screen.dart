@@ -1,3 +1,5 @@
+import 'dart:math' show pi;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -24,9 +26,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   late SettingsController _settingsController;
-  // late AnimationController _controller;
-  // TODO: uncomment when Streaming service work
-  // late Animation<double> _animation;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   Duration defaultAnimationTime = const Duration(milliseconds: 300);
 
   @override
@@ -34,23 +35,22 @@ class _SettingsScreenState extends State<SettingsScreen>
     _settingsController = Get.find();
 
     super.initState();
-    /*  _controller = AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: defaultAnimationTime,
     );
-    // TODO: uncomment when Streaming service work
     _animation = Tween<double>(
       begin: 0.0,
       end: pi,
-    ).animate(_controller); */
+    ).animate(_controller);
     ScreenUtil().init();
   }
 
-/*   @override
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  } */
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                   CommonAppBar(
                       title: kSettings.tr,
                       onBackPress: () async => _onWillPop()),
-
                   SizedBox(height: 48.toHeight),
                   _settingHeading(
                     action: _popupMenuBuilder(),
@@ -126,8 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     subtitle: transLiterationWillInitiateWord.tr,
                   ),
                   SizedBox(height: 24.toHeight),
-                  // TODO: uncomment when Streaming service work
-                  /*  Obx(
+                  Obx(
                     () => _expandableSettingHeading(
                       height: _settingsController.isAdvanceMenuOpened.value
                           ? 130.toHeight
@@ -169,8 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 children: [
                                   Text(
                                     s2sStreaming.tr,
-                                    style:
-                                        regular18DolphinGrey(context).copyWith(
+                                    style: regular18Primary(context).copyWith(
                                       fontSize: 18.toFont,
                                       color: context.appTheme.primaryTextColor,
                                     ),
@@ -197,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         ),
                       ),
                     ),
-                  ), */
+                  ),
                 ],
               ),
             ),
@@ -263,8 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  // TODO: uncomment when Streaming service work
-  /* Widget _expandableSettingHeading({
+  Widget _expandableSettingHeading({
     required String title,
     required Widget icon,
     Widget? child,
@@ -291,7 +287,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               children: [
                 Text(
                   title,
-                  style: regular18DolphinGrey(context).copyWith(
+                  style: regular18Primary(context).copyWith(
                     fontSize: 20.toFont,
                     color: context.appTheme.primaryTextColor,
                   ),
@@ -305,7 +301,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         ],
       ),
     );
-  } */
+  }
 
   Widget _voiceAssistantTileWidget() {
     return Container(

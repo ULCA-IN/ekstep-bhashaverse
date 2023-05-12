@@ -42,11 +42,13 @@ name: bhashaverse
   share_plus: ^6.3.0
   audio_waveforms: ^1.0.0
   socket_io_client: ^2.0.1
-  mic_stream: ^0.6.4
   record: ^4.4.4
   auto_size_text: ^3.0.0
   vibration: ^1.7.6
   stop_watch_timer: ^2.0.0
+  sound_stream:
+    git:
+      url:  https://github.com/JHM69/flutter-sound-stream.git
 ```
 
 * Dev Dependencies:

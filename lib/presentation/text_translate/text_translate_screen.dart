@@ -138,8 +138,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     _buildTransliterationHints(),
                     Obx(
                       () => _textTranslationController
-                                  .isTranslateCompleted.value ||
-                              _hiveDBInstance.get(isStreamingPreferred)
+                              .isTranslateCompleted.value
                           ? ASRAndTTSActions(
                               textToCopy: _textTranslationController
                                   .sourceLangTextController.text

@@ -369,9 +369,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             ),
           ),
           MicButton(
-            isRecordingStarted:
-                _voiceTextTransController.micButtonStatus.value ==
-                    MicButtonStatus.pressed,
+            micButtonStatus: _voiceTextTransController.micButtonStatus.value,
             showLanguage: false,
             onMicButtonTap: (isPressed) {
               micButtonActions(startMicRecording: isPressed);
@@ -399,7 +397,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   void _onSourceTextChanged(String newText) {
     _voiceTextTransController.sourceTextCharLimit.value = newText.length;
     _voiceTextTransController.isTranslateCompleted.value = false;
-    _voiceTextTransController.ttsResponse = null;
     _voiceTextTransController.targetLangTextController.clear();
     if (_voiceTextTransController.playerController.playerState ==
         PlayerState.playing) _voiceTextTransController.stopPlayer();
@@ -526,7 +523,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
   bool isRecordingStarted() {
     return _hiveDBInstance.get(isStreamingPreferred)
-        ? _socketIOClient.isMicConnected.value
+        ? _socketIOClient.isMicConnected.value &&
+            _voiceTextTransController.micButtonStatus.value ==
+                MicButtonStatus.pressed
         : _voiceTextTransController.micButtonStatus.value ==
             MicButtonStatus.pressed;
   }
