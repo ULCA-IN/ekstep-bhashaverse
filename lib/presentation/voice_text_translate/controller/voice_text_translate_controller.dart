@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -9,9 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:mic_stream/mic_stream.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sound_stream/sound_stream.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:vibration/vibration.dart';
 
@@ -25,6 +22,7 @@ import '../../../services/socket_io_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/file_helper.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
 import '../../../utils/screen_util/screen_util.dart';
@@ -56,35 +54,31 @@ class VoiceTextTranslateController extends GetxController {
       targetOutputText = ''.obs,
       sourceLangTTSPath = ''.obs,
       targetLangTTSPath = ''.obs;
-  dynamic ttsResponse;
   String? sourceLangASRPath = '', transliterationModelToUse = '';
   RxInt maxDuration = 0.obs,
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
-  File? ttsAudioFile;
   RxList transliterationWordHints = [].obs;
-  String currentlyTypedWordForTransliteration = '';
+  String currentlyTypedWordForTransliteration = '', lastFinalOutput = '';
   Rx<MicButtonStatus> micButtonStatus = Rx(MicButtonStatus.released);
-  DateTime? recordingStartTime;
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
       targetSpeakerStatus = Rx(SpeakerStatus.disabled);
-  int samplingRate = 16000, lastOffsetOfCursor = 0;
-  late SocketIOClient _socketIOClient;
-  late Directory appDirectory;
 
+  List<int> recordedData = [];
+  final RecorderStream _recorder = RecorderStream();
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
+  final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
+  late PlayerController playerController;
+  StreamSubscription<Uint8List>? micStreamSubscription;
+  DateTime? recordingStartTime;
+  int samplingRate = 16000, lastOffsetOfCursor = 0;
+  late Worker streamingResponseListener,
+      socketIOErrorListener,
+      socketConnectionListener;
+
+  late SocketIOClient _socketIOClient;
 
   late final Box _hiveDBInstance;
-
-  final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
-
-  late PlayerController playerController;
-
-  StreamSubscription<Uint8List>? micStreamSubscription;
-
-  int silenceSize = 20;
-
-  late Worker streamingResponseListener, socketIOErrorListener;
 
   @override
   void onInit() {
@@ -93,10 +87,16 @@ class VoiceTextTranslateController extends GetxController {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _recorder.initialize();
     playerController = PlayerController();
+
+//  Connectiviry listener
+
     Connectivity().onConnectivityChanged.listen(
           (newConnectivity) => updateSamplingRate(newConnectivity),
         );
+
+// Audio player listener
 
     playerController.onCompletion.listen((event) {
       sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -106,9 +106,6 @@ class VoiceTextTranslateController extends GetxController {
     playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
     });
-
-    sourceLangTextController
-        .addListener(clearTransliterationHintsIfCursorMoved);
 
     playerController.onPlayerStateChanged.listen((_) {
       switch (playerController.playerState) {
@@ -127,6 +124,17 @@ class VoiceTextTranslateController extends GetxController {
       }
     });
 
+// Transliteration listener
+
+    sourceLangTextController
+        .addListener(clearTransliterationHintsIfCursorMoved);
+
+    transliterationHintsScrollController.addListener(() {
+      isScrolledTransliterationHints.value = true;
+    });
+
+// Stopwatch listener for mic recording time
+
     stopWatchTimer.rawTime.listen((event) {
       if (micButtonStatus.value == MicButtonStatus.pressed &&
           (event + 1) >= recordingMaxTimeLimit) {
@@ -136,25 +144,40 @@ class VoiceTextTranslateController extends GetxController {
       }
     });
 
-    transliterationHintsScrollController.addListener(() {
-      isScrolledTransliterationHints.value = true;
-    });
+// Init method call
+
     super.onInit();
-    streamingResponseListener =
-        ever(_socketIOClient.socketResponseText, (socketResponseText) {
-      sourceLangTextController.text = socketResponseText;
-      if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
-      if (!_socketIOClient.isMicConnected.value) {
-        streamingResponseListener.dispose();
-      } else {
+
+// Socket IO connection listeners
+
+    socketConnectionListener =
+        ever(_socketIOClient.isMicConnected, (isConnected) async {
+      if (isConnected) {
         stopWatchTimer.onStartTimer();
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
+// Socket IO response listeners
+
+    streamingResponseListener =
+        ever(_socketIOClient.socketResponse, (response) async {
+      await displaySocketIOResponse(response);
+      if (!isRecordedViaMic.value) isRecordedViaMic.value = true;
+      if (!_socketIOClient.isMicConnected.value) {
+        isRecordedViaMic.value = true;
+        sourceSpeakerStatus.value = SpeakerStatus.stopped;
+        sourceLangASRPath =
+            await saveStreamAudioToFile(recordedData, samplingRate);
+      }
+    }, condition: () => _socketIOClient.isMicConnected.value);
+
+// Socket IO error listeners
+
     socketIOErrorListener = ever(_socketIOClient.hasError, (isAborted) {
-      if (isAborted) {
+      if (isAborted && micButtonStatus.value == MicButtonStatus.pressed) {
         micButtonStatus.value = MicButtonStatus.released;
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(
+            message: _socketIOClient.socketError ?? somethingWentWrong.tr);
       }
     }, condition: !_socketIOClient.isConnected());
   }
@@ -165,6 +188,7 @@ class VoiceTextTranslateController extends GetxController {
         .removeListener(clearTransliterationHintsIfCursorMoved);
     streamingResponseListener.dispose();
     socketIOErrorListener.dispose();
+    socketConnectionListener.dispose();
     _socketIOClient.disconnect();
     sourceLangTextController.dispose();
     targetLangTextController.dispose();
@@ -174,30 +198,30 @@ class VoiceTextTranslateController extends GetxController {
   }
 
   void getSourceTargetLangFromDB() {
-    String? _selectedSourceLanguage =
+    String? selectedSourceLanguage =
         _hiveDBInstance.get(preferredSourceLanguage);
 
-    if (_selectedSourceLanguage == null || _selectedSourceLanguage.isEmpty) {
-      _selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
+    if (selectedSourceLanguage == null || selectedSourceLanguage.isEmpty) {
+      selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
     if (_languageModelController.sourceTargetLanguageMap.keys
         .toList()
-        .contains(_selectedSourceLanguage)) {
-      selectedSourceLanguageCode.value = _selectedSourceLanguage ?? '';
+        .contains(selectedSourceLanguage)) {
+      selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
       }
     }
 
-    String? _selectedTargetLanguage =
+    String? selectedTargetLanguage =
         _hiveDBInstance.get(preferredTargetLanguage);
-    if (_selectedTargetLanguage != null &&
-        _selectedTargetLanguage.isNotEmpty &&
+    if (selectedTargetLanguage != null &&
+        selectedTargetLanguage.isNotEmpty &&
         _languageModelController.sourceTargetLanguageMap.keys
             .toList()
-            .contains(_selectedTargetLanguage)) {
-      selectedTargetLanguageCode.value = _selectedTargetLanguage;
+            .contains(selectedTargetLanguage)) {
+      selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }
 
@@ -272,64 +296,28 @@ class VoiceTextTranslateController extends GetxController {
                   srcLanguage: selectedSourceLanguageCode.value,
                   targetLanguage: selectedTargetLanguageCode.value,
                   preferredGender:
-                      _hiveDBInstance.get(preferredVoiceAssistantGender))
+                      _hiveDBInstance.get(preferredVoiceAssistantGender)),
+              {'responseFrequencyInSecs': 1}
             ],
             isDataToSend: true,
           );
 
-          MicStream.microphone(
-                  audioSource: AudioSource.DEFAULT,
-                  sampleRate: 16000,
-                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
-                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
-              .then((stream) {
-            List<int> checkSilenceList = List.generate(silenceSize, (i) => 0);
-            micStreamSubscription = stream?.listen((value) {
-              double meanSquared = meanSquare(value.buffer.asInt8List());
-              _socketIOClient.socketEmit(
-                  emittingStatus: 'data',
-                  emittingData: [
-                    {
-                      "audio": [
-                        {"audioContent": value.sublist(0)}
-                      ]
-                    },
-                    {"response_depth": 1},
-                    false,
-                    false
-                  ],
-                  isDataToSend: true);
-
-              if (meanSquared >= 0.3) {
-                checkSilenceList.add(0);
-              }
-              if (meanSquared < 0.3) {
-                checkSilenceList.add(1);
-
-                if (checkSilenceList.length > silenceSize) {
-                  checkSilenceList = checkSilenceList
-                      .sublist(checkSilenceList.length - silenceSize);
-                }
-                int sumValue = checkSilenceList
-                    .reduce((value, element) => value + element);
-                if (sumValue == silenceSize) {
-                  _socketIOClient.socketEmit(
-                      emittingStatus: 'data',
-                      emittingData: [
-                        {
-                          "audio": [
-                            {"audioContent": value.sublist(0)}
-                          ]
-                        },
-                        {"response_depth": 2},
-                        true,
-                        false
-                      ],
-                      isDataToSend: true);
-                  checkSilenceList.clear();
-                }
-              }
-            });
+          _recorder.start();
+          micStreamSubscription = _recorder.audioStream.listen((value) {
+            _socketIOClient.socketEmit(
+                emittingStatus: 'data',
+                emittingData: [
+                  {
+                    "audio": [
+                      {"audioContent": value.sublist(0)}
+                    ]
+                  },
+                  {"responseTaskSequenceDepth": 2},
+                  false,
+                  false
+                ],
+                isDataToSend: true);
+            recordedData.addAll(value.sublist(0));
           });
         } else {
           stopWatchTimer.onStartTimer();
@@ -364,13 +352,13 @@ class VoiceTextTranslateController extends GetxController {
             emittingStatus: 'data',
             emittingData: [
               null,
-              {"response_depth": 2},
+              {"responseTaskSequenceDepth": 2},
               true,
               true
             ],
             isDataToSend: true);
+        micButtonStatus.value = MicButtonStatus.loading;
       }
-      _socketIOClient.disconnect();
     } else {
       if (await _voiceRecorder.isVoiceRecording()) {
         String? base64EncodedAudioContent =
@@ -531,28 +519,16 @@ class VoiceTextTranslateController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
-        ttsResponse = taskResponse.pipelineResponse
+        dynamic ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio[0]['audioContent'];
 
         // Save TTS audio to file
         if (ttsResponse != null) {
-          Uint8List? fileAsBytes = base64Decode(ttsResponse);
-          Directory appDocDir = await getApplicationDocumentsDirectory();
-          String recordingPath = '${appDocDir.path}/$recordingFolderName';
-          if (!await Directory(recordingPath).exists()) {
-            Directory(recordingPath).create();
-          }
-
-          String ttsFilePath =
-              '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
+          String ttsFilePath = await createTTSAudioFIle(ttsResponse);
           isTargetLanguage
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
-          ttsAudioFile = File(ttsFilePath);
-          if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-            await ttsAudioFile?.writeAsBytes(fileAsBytes);
-          }
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
           return;
@@ -569,58 +545,8 @@ class VoiceTextTranslateController extends GetxController {
     );
   }
 
-  void playStopTTSOutput(bool isPlayingSource) async {
-    if (playerController.playerState.isPlaying) {
-      await stopPlayer();
-      return;
-    }
-
-    String? audioPath = '';
-    if (isPlayingSource && isRecordedViaMic.value) {
-      audioPath = sourceLangASRPath;
-    } else {
-      if (isPlayingSource) {
-        if (sourceLangTTSPath.value.isEmpty) {
-          if (!await isNetworkConnected()) {
-            showDefaultSnackbar(message: errorNoInternetTitle.tr);
-            return;
-          }
-          sourceSpeakerStatus.value = SpeakerStatus.loading;
-          await getComputeResTTS(
-            sourceText: sourceLangTextController.text,
-            languageCode: selectedSourceLanguageCode.value,
-            isTargetLanguage: false,
-          );
-        }
-        audioPath = sourceLangTTSPath.value;
-        sourceSpeakerStatus.value = SpeakerStatus.playing;
-      } else {
-        if (targetLangTTSPath.value.isEmpty) {
-          if (!await isNetworkConnected()) {
-            showDefaultSnackbar(message: errorNoInternetTitle.tr);
-            return;
-          }
-          targetSpeakerStatus.value = SpeakerStatus.loading;
-          await getComputeResTTS(
-            sourceText: targetOutputText.value,
-            languageCode: selectedTargetLanguageCode.value,
-            isTargetLanguage: true,
-          );
-        }
-        audioPath = targetLangTTSPath.value;
-        targetSpeakerStatus.value = SpeakerStatus.playing;
-      }
-    }
-
-    if (audioPath != null && audioPath.isNotEmpty) {
-      isPlayingSource
-          ? sourceSpeakerStatus.value = SpeakerStatus.playing
-          : targetSpeakerStatus.value = SpeakerStatus.playing;
-
-      await preparePlayerAndWaveforms(audioPath,
-          isRecordedAudio: isRecordedViaMic.value,
-          isTargetLanguage: !isPlayingSource);
-    }
+  bool isTransliterationEnabled() {
+    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
   }
 
   void setModelForTransliteration() {
@@ -634,41 +560,17 @@ class VoiceTextTranslateController extends GetxController {
     currentlyTypedWordForTransliteration = '';
   }
 
-  Future<void> resetAllValues() async {
-    sourceLangTextController.clear();
-    targetLangTextController.clear();
-    isTranslateCompleted.value = false;
-    isRecordedViaMic.value = false;
-    sourceTextCharLimit.value = 0;
-    ttsResponse = null;
-    maxDuration.value = 0;
-    currentDuration.value = 0;
-    sourceLangASRPath = '';
-    await stopPlayer();
-    sourceSpeakerStatus.value = SpeakerStatus.disabled;
-    targetSpeakerStatus.value = SpeakerStatus.disabled;
-    targetOutputText.value = '';
-    sourceLangASRPath = '';
-    sourceLangTTSPath.value = '';
-    targetLangTTSPath.value = '';
-    isSourceShareLoading.value = false;
-    isTargetShareLoading.value = false;
-    if (isTransliterationEnabled()) {
-      setModelForTransliteration();
-      clearTransliterationHints();
-    }
-  }
-
   Future<void> preparePlayerAndWaveforms(
     String filePath, {
     required bool isRecordedAudio,
     required bool isTargetLanguage,
   }) async {
     await stopPlayer();
-    if (isTargetLanguage)
+    if (isTargetLanguage) {
       targetSpeakerStatus.value = SpeakerStatus.playing;
-    else
+    } else {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
+    }
     await playerController.preparePlayer(
         path: filePath,
         noOfSamples: WaveformStyle.getDefaultPlayerStyle(
@@ -686,11 +588,6 @@ class VoiceTextTranslateController extends GetxController {
           );
   }
 
-  disposePlayer() async {
-    await stopPlayer();
-    playerController.dispose();
-  }
-
   Future<void> stopPlayer() async {
     if (playerController.playerState.isPlaying ||
         playerController.playerState == PlayerState.paused) {
@@ -700,10 +597,6 @@ class VoiceTextTranslateController extends GetxController {
     sourceSpeakerStatus.value = SpeakerStatus.stopped;
   }
 
-  bool isTransliterationEnabled() {
-    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
-  }
-
   void clearTransliterationHintsIfCursorMoved() {
     int difference =
         lastOffsetOfCursor - sourceLangTextController.selection.base.offset;
@@ -711,21 +604,6 @@ class VoiceTextTranslateController extends GetxController {
       clearTransliterationHints();
     }
     lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
-  }
-
-  void connectToSocket() {
-    if (_socketIOClient.isConnected()) {
-      _socketIOClient.disconnect();
-    }
-    _socketIOClient.socketConnect();
-  }
-
-  double meanSquare(Int8List value) {
-    var sqrValue = 0;
-    for (int indValue in value) {
-      sqrValue = indValue * indValue;
-    }
-    return (sqrValue / value.length) * 1000;
   }
 
   void shareAudioFile({required bool isSourceLang}) async {
@@ -781,6 +659,57 @@ class VoiceTextTranslateController extends GetxController {
     }
   }
 
+  void connectToSocket() {
+    if (_socketIOClient.isConnected()) {
+      _socketIOClient.disconnect();
+    }
+    _socketIOClient.socketConnect();
+  }
+
+  Future<void> displaySocketIOResponse(response) async {
+    if (response != null) {
+      //  used for get ASR
+      sourceLangTextController.text =
+          response[0]['pipelineResponse']?[0]['output']?[0]['source'] ?? '';
+
+      // used for get Translation
+      if ((response[0]['pipelineResponse'].length ?? 0) > 1) {
+        String targetText =
+            response[0]['pipelineResponse'][1]['output']?[0]['target'] ?? '';
+        targetLangTextController.text = targetText;
+        targetOutputText.value = targetText;
+
+        //  used for get TTS
+        if ((response[0]['pipelineResponse'].length ?? 0) > 2) {
+          String ttsResponse =
+              response[0]['pipelineResponse'][2]['audio'][0]['audioContent'];
+          isTranslateCompleted.value = true;
+          isLoading.value = false;
+          sourceLangTTSPath.value = '';
+          targetLangTTSPath.value = '';
+          sourceSpeakerStatus.value = SpeakerStatus.stopped;
+          targetSpeakerStatus.value = SpeakerStatus.stopped;
+          if (ttsResponse.isNotEmpty) {
+            targetLangTTSPath.value = '';
+            String ttsFilePath = await createTTSAudioFIle(ttsResponse);
+            targetLangTTSPath.value = ttsFilePath;
+          }
+          // disconnect socket io after final response received
+          micButtonStatus.value = MicButtonStatus.released;
+          _socketIOClient.disconnect();
+        }
+      }
+    }
+  }
+
+  void updateSamplingRate(ConnectivityResult newConnectivity) {
+    if (newConnectivity == ConnectivityResult.mobile) {
+      samplingRate = 8000;
+    } else {
+      samplingRate = 16000;
+    }
+  }
+
   Future<void> vibrateDevice() async {
     await Vibration.cancel();
     if (await Vibration.hasVibrator() ?? false) {
@@ -792,11 +721,89 @@ class VoiceTextTranslateController extends GetxController {
     }
   }
 
-  void updateSamplingRate(ConnectivityResult newConnectivity) {
-    if (newConnectivity == ConnectivityResult.mobile) {
-      samplingRate = 8000;
-    } else {
-      samplingRate = 16000;
+  void playStopTTSOutput(bool isPlayingSource) async {
+    if (playerController.playerState.isPlaying) {
+      await stopPlayer();
+      return;
     }
+
+    String? audioPath = '';
+
+    if (isPlayingSource && isRecordedViaMic.value) {
+      audioPath = sourceLangASRPath;
+    } else {
+      if (isPlayingSource) {
+        if (sourceLangTTSPath.value.isEmpty) {
+          if (!await isNetworkConnected()) {
+            showDefaultSnackbar(message: errorNoInternetTitle.tr);
+            return;
+          }
+          sourceSpeakerStatus.value = SpeakerStatus.loading;
+          await getComputeResTTS(
+            sourceText: sourceLangTextController.text,
+            languageCode: selectedSourceLanguageCode.value,
+            isTargetLanguage: false,
+          );
+        }
+        audioPath = sourceLangTTSPath.value;
+        sourceSpeakerStatus.value = SpeakerStatus.playing;
+      } else {
+        if (targetLangTTSPath.value.isEmpty) {
+          if (!await isNetworkConnected()) {
+            showDefaultSnackbar(message: errorNoInternetTitle.tr);
+            return;
+          }
+          targetSpeakerStatus.value = SpeakerStatus.loading;
+          await getComputeResTTS(
+            sourceText: targetOutputText.value,
+            languageCode: selectedTargetLanguageCode.value,
+            isTargetLanguage: true,
+          );
+        }
+        audioPath = targetLangTTSPath.value;
+        targetSpeakerStatus.value = SpeakerStatus.playing;
+      }
+    }
+
+    if (audioPath != null && audioPath.isNotEmpty) {
+      isPlayingSource
+          ? sourceSpeakerStatus.value = SpeakerStatus.playing
+          : targetSpeakerStatus.value = SpeakerStatus.playing;
+
+      await preparePlayerAndWaveforms(audioPath,
+          isRecordedAudio: isPlayingSource && isRecordedViaMic.value,
+          isTargetLanguage: !isPlayingSource);
+    }
+  }
+
+  Future<void> resetAllValues() async {
+    sourceLangTextController.clear();
+    targetLangTextController.clear();
+    isTranslateCompleted.value = false;
+    isRecordedViaMic.value = false;
+    sourceTextCharLimit.value = 0;
+    maxDuration.value = 0;
+    currentDuration.value = 0;
+    sourceLangASRPath = '';
+    await stopPlayer();
+    sourceSpeakerStatus.value = SpeakerStatus.disabled;
+    targetSpeakerStatus.value = SpeakerStatus.disabled;
+    targetOutputText.value = '';
+    sourceLangASRPath = '';
+    sourceLangTTSPath.value = '';
+    targetLangTTSPath.value = '';
+    recordedData = [];
+    isSourceShareLoading.value = false;
+    isTargetShareLoading.value = false;
+    _socketIOClient.disconnect();
+    if (isTransliterationEnabled()) {
+      setModelForTransliteration();
+      clearTransliterationHints();
+    }
+  }
+
+  disposePlayer() async {
+    await stopPlayer();
+    playerController.dispose();
   }
 }
