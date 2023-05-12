@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../common/controller/language_model_controller.dart';
@@ -17,6 +14,7 @@ import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/file_helper.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
@@ -298,22 +296,10 @@ class TextTranslateController extends GetxController {
 
         // Save TTS audio to file
         if (ttsResponse != null) {
-          Uint8List? fileAsBytes = base64Decode(ttsResponse);
-          Directory appDocDir = await getApplicationDocumentsDirectory();
-          String recordingPath = '${appDocDir.path}/$recordingFolderName';
-          if (!await Directory(recordingPath).exists()) {
-            Directory(recordingPath).create();
-          }
-
-          String ttsFilePath =
-              '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav';
+          String ttsFilePath = await createTTSAudioFIle(ttsResponse);
           isTargetLanguage
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
-          ttsAudioFile = File(ttsFilePath);
-          if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-            await ttsAudioFile?.writeAsBytes(fileAsBytes);
-          }
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
           return;
