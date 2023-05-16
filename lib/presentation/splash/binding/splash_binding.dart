@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../common/controller/feedback_controller.dart';
 import '../../../common/controller/language_model_controller.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
@@ -15,5 +16,6 @@ class SplashBinding extends Bindings {
     Get.put(LanguageModelController());
     Get.put(SocketIOClient());
     Get.put(SplashController());
+    Get.put(FeedbackController(), permanent: true);
   }
 }
