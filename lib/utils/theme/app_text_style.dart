@@ -45,6 +45,12 @@ TextStyle regular18Secondary(BuildContext context) => TextStyle(
       color: context.appTheme.secondaryTextColor,
     );
 
+TextStyle semibold18(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 18.toFont,
+      color: context.appTheme.primaryTextColor,
+    );
+
 TextStyle semibold22(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w600,
       fontSize: 22.toFont,
