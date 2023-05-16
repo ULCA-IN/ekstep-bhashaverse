@@ -9,6 +9,7 @@ import 'package:lottie/lottie.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/common_app_bar.dart';
+import '../../common/widgets/feedback_bottom_sheet.dart';
 import '../../common/widgets/mic_button.dart';
 import '../../common/widgets/text_field_with_actions.dart';
 import '../../common/widgets/transliteration_hints.dart';
@@ -145,7 +146,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
-          showTranslateButton: true,
+          isSourceInput: true,
+          expandFeedbackIcon:
+              _voiceTextTransController.expandFeedbackIcon.value,
           showASRTTSActionButtons:
               _voiceTextTransController.isTranslateCompleted.value,
           isReadOnly: false,
@@ -158,6 +161,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _voiceTextTransController.playStopTTSOutput(true),
           onFileShare: () =>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
+          onFeedbackButtonTap: () {
+            showFeedbackBottomSheet(
+              context: context,
+            );
+          },
           playerController: _voiceTextTransController.playerController,
           speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
           rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
@@ -182,8 +190,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
             bottomBorderRadius: textFieldRadius,
-            showTranslateButton: false,
+            isSourceInput: false,
             showASRTTSActionButtons: true,
+            expandFeedbackIcon: false,
             isReadOnly: true,
             isShareButtonLoading:
                 _voiceTextTransController.isTargetShareLoading.value,

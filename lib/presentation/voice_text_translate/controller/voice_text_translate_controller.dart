@@ -47,7 +47,8 @@ class VoiceTextTranslateController extends GetxController {
       isScrolledTransliterationHints = false.obs,
       isRecordedViaMic = false.obs,
       isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs;
+      isTargetShareLoading = false.obs,
+      expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
       selectedTargetLanguageCode = ''.obs,
       targetOutputText = ''.obs,
@@ -463,6 +464,8 @@ class VoiceTextTranslateController extends GetxController {
         targetLangTextController.text = targetOutputText.value;
         isTranslateCompleted.value = true;
         isLoading.value = false;
+        Future.delayed(const Duration(seconds: 3))
+            .then((value) => expandFeedbackIcon.value = false);
         if (clearSourceTTS) sourceLangTTSPath.value = '';
         targetLangTTSPath.value = '';
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -670,6 +673,8 @@ class VoiceTextTranslateController extends GetxController {
               response[0]['pipelineResponse'][2]['audio'][0]['audioContent'];
           isTranslateCompleted.value = true;
           isLoading.value = false;
+          Future.delayed(const Duration(seconds: 3))
+              .then((value) => expandFeedbackIcon.value = false);
           sourceLangTTSPath.value = '';
           targetLangTTSPath.value = '';
           sourceSpeakerStatus.value = SpeakerStatus.stopped;
