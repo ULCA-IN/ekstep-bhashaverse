@@ -17,6 +17,7 @@ import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
+import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
@@ -266,7 +267,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               () {
                 String selectedSourceLanguage = _voiceTextTransController
                         .selectedSourceLanguageCode.value.isNotEmpty
-                    ? _voiceTextTransController.getSelectedSourceLanguageName()
+                    ? APIConstants.getLanNameInAppLang(_voiceTextTransController
+                        .selectedSourceLanguageCode.value)
                     : kTranslateSourceTitle.tr;
                 return AutoSizeText(
                   selectedSourceLanguage,
@@ -334,7 +336,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               () {
                 String selectedTargetLanguage = _voiceTextTransController
                         .selectedTargetLanguageCode.value.isNotEmpty
-                    ? _voiceTextTransController.getSelectedTargetLanguageName()
+                    ? APIConstants.getLanNameInAppLang(_voiceTextTransController
+                        .selectedTargetLanguageCode.value)
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,

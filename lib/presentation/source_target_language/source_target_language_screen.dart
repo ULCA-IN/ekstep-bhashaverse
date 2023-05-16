@@ -67,7 +67,7 @@ class _SourceTargetLanguageScreenState
                         return Obx(
                           () {
                             return LanguageSelectionWidget(
-                              title: getLangNameInAppLanguage(
+                              title: APIConstants.getLanNameInAppLang(
                                   _languageSelectionController
                                       .getLanguageList()[index]),
                               subTitle: getNativeNameOfLanguage(
@@ -177,14 +177,14 @@ class _SourceTargetLanguageScreenState
               getNativeNameOfLanguage(languageCode)
                   .toLowerCase()
                   .contains(searchString.toLowerCase()) ||
-              getLangNameInAppLanguage(languageCode).contains(searchString);
+              APIConstants.getLanNameInAppLang(languageCode)
+                  .contains(searchString);
         },
       ).toList();
       _languageSelectionController.setLanguageList(searchedLanguageList);
       _languageSelectionController.setSelectedLanguageIndex(null);
       for (var i = 0; i < searchedLanguageList.length; i++) {
-        if (searchedLanguageList[i][APIConstants.kLanguageCode] ==
-            Get.locale?.languageCode) {
+        if (searchedLanguageList[i] == Get.arguments[selectedLanguage]) {
           _languageSelectionController.setSelectedLanguageIndex(i);
         }
       }
@@ -202,13 +202,6 @@ class _SourceTargetLanguageScreenState
           _languageSelectionController.getLanguageList().indexWhere(
               (element) => element == Get.arguments[selectedLanguage]));
     }
-  }
-
-  String getLangNameInAppLanguage(String languageCode) {
-    return APIConstants.getLanguageCodeOrName(
-        value: languageCode,
-        returnWhat: LanguageMap.languageNameInAppLanguage,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }
 
   String getNativeNameOfLanguage(String languageCode) {

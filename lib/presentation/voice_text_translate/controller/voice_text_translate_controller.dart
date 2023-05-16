@@ -14,7 +14,6 @@ import 'package:vibration/vibration.dart';
 
 import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/speaker_status.dart';
-import '../../../enums/language_enum.dart';
 import '../../../enums/mic_button_status.dart';
 import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
@@ -246,7 +245,7 @@ class VoiceTextTranslateController extends GetxController {
       } else {
         showDefaultSnackbar(
             message:
-                '${getSelectedTargetLanguageName()} - ${getSelectedSourceLanguageName()} ${translationNotPossible.tr}');
+                '${APIConstants.getLanNameInAppLang(selectedTargetLanguageCode.value)} - ${APIConstants.getLanNameInAppLang(selectedSourceLanguageCode.value)} ${translationNotPossible.tr}');
       }
     } else {
       showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
@@ -256,20 +255,6 @@ class VoiceTextTranslateController extends GetxController {
   bool isSourceAndTargetLangSelected() =>
       selectedSourceLanguageCode.value.isNotEmpty &&
       selectedTargetLanguageCode.value.isNotEmpty;
-
-  String getSelectedSourceLanguageName() {
-    return APIConstants.getLanguageCodeOrName(
-        value: selectedSourceLanguageCode.value,
-        returnWhat: LanguageMap.languageNameInAppLanguage,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-  }
-
-  String getSelectedTargetLanguageName() {
-    return APIConstants.getLanguageCodeOrName(
-        value: selectedTargetLanguageCode.value,
-        returnWhat: LanguageMap.languageNameInAppLanguage,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
-  }
 
   void startVoiceRecording() async {
     await PermissionHandler.requestPermissions().then((isPermissionGranted) {
