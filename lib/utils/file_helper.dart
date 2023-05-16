@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -11,7 +10,7 @@ Future<String> saveStreamAudioToFile(List<int> data, int sampleRate) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String recordingPath = '${appDocDir.path}/$recordingFolderName';
   if (!await Directory(recordingPath).exists()) {
-    Directory(recordingPath).create();
+    Directory(recordingPath).create(recursive: true);
   }
 
   String ttsFilePath =
@@ -20,7 +19,7 @@ Future<String> saveStreamAudioToFile(List<int> data, int sampleRate) async {
   File audioFile = File(ttsFilePath);
 
   if (!await audioFile.exists()) {
-    await audioFile.create();
+    await audioFile.create(recursive: true);
   }
 
   var channels = 1;
@@ -81,7 +80,7 @@ Future<String> createTTSAudioFIle(
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String recordingPath = '${appDocDir.path}/$recordingFolderName';
   if (!await Directory(recordingPath).exists()) {
-    Directory(recordingPath).create();
+    Directory(recordingPath).create(recursive: true);
   }
 
   String ttsFilePath =
@@ -89,7 +88,7 @@ Future<String> createTTSAudioFIle(
 
   File ttsAudioFile = File(ttsFilePath);
   if (!await ttsAudioFile.exists()) {
-    await ttsAudioFile.create();
+    await ttsAudioFile.create(recursive: true);
   }
   await ttsAudioFile.writeAsBytes(fileAsBytes);
   return ttsFilePath;
