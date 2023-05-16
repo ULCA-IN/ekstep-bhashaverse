@@ -14,6 +14,7 @@ import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
+import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/screen_util/screen_util.dart';
@@ -203,7 +204,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
             child: Obx(() {
               String selectedSourceLanguage = _translationController
                       .selectedSourceLanguageCode.value.isNotEmpty
-                  ? _translationController.getSelectedSourceLanguageName()
+                  ? APIConstants.getLanNameInAppLang(
+                      _translationController.selectedSourceLanguageCode.value)
                   : kTranslateSourceTitle.tr;
               return MicButton(
                 micButtonStatus: _translationController.currentMic.value ==
@@ -274,7 +276,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
             child: Obx(() {
               String selectedTargetLanguage = _translationController
                       .selectedTargetLanguageCode.value.isNotEmpty
-                  ? _translationController.getSelectedTargetLanguageName()
+                  ? APIConstants.getLanNameInAppLang(
+                      _translationController.selectedTargetLanguageCode.value)
                   : kTranslateTargetTitle.tr;
               return MicButton(
                 micButtonStatus: _translationController.currentMic.value ==

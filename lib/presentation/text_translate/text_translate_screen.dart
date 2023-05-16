@@ -414,7 +414,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               () {
                 String selectedSourceLanguage = _textTranslationController
                         .selectedSourceLanguageCode.value.isNotEmpty
-                    ? APIConstants.getLanguageNameFromCode(
+                    ? APIConstants.getLanNameInAppLang(
                         _textTranslationController
                             .selectedSourceLanguageCode.value)
                     : kTranslateSourceTitle.tr;
@@ -483,7 +483,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               () {
                 String selectedTargetLanguage = _textTranslationController
                         .selectedTargetLanguageCode.value.isNotEmpty
-                    ? APIConstants.getLanguageNameFromCode(
+                    ? APIConstants.getLanNameInAppLang(
                         _textTranslationController
                             .selectedTargetLanguageCode.value)
                     : kTranslateTargetTitle.tr;
