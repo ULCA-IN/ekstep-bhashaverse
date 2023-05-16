@@ -78,6 +78,7 @@ const iconSound = 'assets/images/common_icon/icon_sound.svg';
 const iconStopPlayback = 'assets/images/common_icon/icon_stop_playback.svg';
 const iconMicStop = 'assets/images/common_icon/icon_mic_stop.svg';
 const iconDownArrow = 'assets/images/common_icon/icon_down_arrow.svg';
+const iconLikeDislike = 'assets/images/common_icon/icon_like_dislike.svg';
 const animationHomeLoading =
     'assets/animation/lottie_animation/animation_home_loading.json';
 const animationLoadingLine =
