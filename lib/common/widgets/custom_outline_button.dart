@@ -11,13 +11,16 @@ class CustomOutlineButton extends StatelessWidget {
     this.title,
     this.icon,
     this.isDisabled = false,
+    this.showBoarder = true,
+    this.backgroundColor,
     required this.onTap,
   }) : super(key: key);
 
   final String? title;
   final String? icon;
   final Function onTap;
-  final bool isDisabled;
+  final bool isDisabled, showBoarder;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +32,16 @@ class CustomOutlineButton extends StatelessWidget {
               ? Colors.transparent
               : context.appTheme.highlightedBGColor.withOpacity(0.2),
         ),
-        backgroundColor:
-            MaterialStateProperty.all(context.appTheme.normalTextFeildColor),
+        backgroundColor: MaterialStateProperty.all(
+            backgroundColor ?? context.appTheme.normalTextFeildColor),
         side: MaterialStateProperty.resolveWith((state) {
-          return BorderSide(
-            color: isDisabled
-                ? context.appTheme.titleTextColor
-                : context.appTheme.highlightedBGColor,
-          );
+          return showBoarder
+              ? BorderSide(
+                  color: isDisabled
+                      ? context.appTheme.titleTextColor
+                      : context.appTheme.highlightedBGColor,
+                )
+              : BorderSide.none;
         }),
         shape: MaterialStateProperty.all(RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
