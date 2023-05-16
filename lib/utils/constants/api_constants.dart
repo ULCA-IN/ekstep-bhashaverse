@@ -1,5 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
+import 'package:get/get.dart';
+
 import '../../enums/language_enum.dart';
 import '../../models/task_sequence_response_model.dart';
 import 'language_map_translated.dart';
@@ -401,9 +403,17 @@ class APIConstants {
   }
 
   static String getLanguageNameFromCode(String languageCode) {
-    return APIConstants.getLanguageCodeOrName(
+    return getLanguageCodeOrName(
         value: languageCode,
         returnWhat: LanguageMap.languageNameInAppLanguage,
-        lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+        lang_code_map: LANGUAGE_CODE_MAP);
+  }
+
+  static String getLanNameInAppLang(String languageCode) {
+    return getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: LANGUAGE_CODE_MAP,
+        langCode: Get.locale?.languageCode);
   }
 }
