@@ -9,7 +9,6 @@ import 'package:lottie/lottie.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
 import '../../common/widgets/common_app_bar.dart';
-import '../../common/widgets/feedback_bottom_sheet.dart';
 import '../../common/widgets/mic_button.dart';
 import '../../common/widgets/text_field_with_actions.dart';
 import '../../common/widgets/transliteration_hints.dart';
@@ -26,6 +25,7 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
+import '../feedback/feedback_bottom_sheet.dart';
 import 'controller/voice_text_translate_controller.dart';
 
 class VoiceTextTranslateScreen extends StatefulWidget {

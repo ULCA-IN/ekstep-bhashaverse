@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
 
-import '../../../common/controller/feedback_controller.dart';
 import '../../../common/controller/language_model_controller.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
+import '../../feedback/controller/feedback_controller.dart';
 import '../controller/splash_controller.dart';
 
 class SplashBinding extends Bindings {
