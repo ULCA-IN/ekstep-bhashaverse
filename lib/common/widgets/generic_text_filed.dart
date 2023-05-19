@@ -9,15 +9,21 @@ class GenericTextField extends StatelessWidget {
   const GenericTextField({
     super.key,
     required TextEditingController controller,
+    FocusNode? focusNode,
     int lines = 1,
     String hintText = '',
+    final Function(String value)? onChange,
   })  : _controller = controller,
+        _focusNode = focusNode,
         _lines = lines,
-        _hintText = hintText;
+        _hintText = hintText,
+        _onChange = onChange;
 
   final TextEditingController _controller;
+  final FocusNode? _focusNode;
   final int _lines;
   final String _hintText;
+  final Function(String value)? _onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +35,7 @@ class GenericTextField extends StatelessWidget {
       autocorrect: false,
       textInputAction: TextInputAction.done,
       minLines: _lines,
+      focusNode: _focusNode,
       decoration: InputDecoration(
         hintText: _hintText,
         hintStyle:
@@ -44,6 +51,7 @@ class GenericTextField extends StatelessWidget {
             AppEdgeInsets.instance.symmetric(vertical: 5, horizontal: 12),
         filled: true,
       ),
+      onChanged: _onChange,
     );
   }
 }
