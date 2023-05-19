@@ -29,6 +29,7 @@ class TransliterationHints extends StatelessWidget {
     return SizedBox(
       height: _showScrollIcon ? 85.toHeight : 50.toHeight,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: _showScrollIcon ? 6.toHeight : null),
           if (_showScrollIcon)
