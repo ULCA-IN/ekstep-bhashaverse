@@ -10,13 +10,15 @@ class CommonAppBar extends StatelessWidget {
     super.key,
     required String title,
     bool showBackButton = true,
+    showLogo = true,
     VoidCallback? onBackPress,
   })  : _title = title,
         _showBackButton = showBackButton,
-        _onBackPress = onBackPress;
+        _onBackPress = onBackPress,
+        _showLogo = showLogo;
 
   final VoidCallback? _onBackPress;
-  final bool _showBackButton;
+  final bool _showBackButton, _showLogo;
   final String _title;
 
   @override
@@ -41,11 +43,13 @@ class CommonAppBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                imgAppLogoSmall,
-                height: 30.toHeight,
-                width: 30.toWidth,
-              ),
+              _showLogo
+                  ? Image.asset(
+                      imgAppLogoSmall,
+                      height: 30.toHeight,
+                      width: 30.toWidth,
+                    )
+                  : const SizedBox.shrink(),
               SizedBox(
                 width: 8.toWidth,
               ),
