@@ -90,13 +90,6 @@ final Map<String, String> en = {
   errorNoInternetTitle: 'No Internet Connection',
   errorNoInternetSubTitle: 'Please check your internet and try again',
   feedback: 'Feedback',
-  feedbackBottomsheetTitle: 'Are you satisfied with this translation?',
-  feedbackBottomsheetSubtitle:
-      'Your feedback will be used to help improve the product',
-  rateSpeehToText: 'Rate Speech to Text Quality',
-  rateTranslationText: 'Rate Translated Text Quality',
-  rateTranslatedSpeechText: 'Rate Translated Speech Quality',
-  suggestAndEdit: 'Suggest and edit',
   writeReviewHere: 'Write your review here',
   submit: 'Submit',
 };
