@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../presentation/conversation/binding/conversation_binding.dart';
 import '../presentation/conversation/conversation_screen.dart';
+import '../presentation/feedback/binding/feedback_binding.dart';
+import '../presentation/feedback/feedback_screen.dart';
 import '../presentation/home/binding/home_binding.dart';
 import '../presentation/home/home_screen.dart';
 import '../presentation/source_target_language/binding/source_target_language_binding.dart';
@@ -32,6 +34,7 @@ class AppRoutes {
   static String voiceTextTranslationRoute = '/voice_text_translation_route';
   static String languageSelectionRoute = '/language_selection_route';
   static String settingsRoute = '/settingsRoute';
+  static String feedbackRoute = '/feedbackRoute';
 
   static List<GetPage> pages = [
     GetPage(
@@ -83,6 +86,11 @@ class AppRoutes {
       name: settingsRoute,
       page: () => const SettingsScreen(),
       binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: feedbackRoute,
+      page: () => const FeedbackScreen(),
+      binding: FeedbackBinding(),
     ),
   ];
 }
