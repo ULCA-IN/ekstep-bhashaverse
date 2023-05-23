@@ -112,20 +112,20 @@ class ASRAndTTSActions extends StatelessWidget {
         SizedBox(width: 8.toWidth),
         _speakerStatus != SpeakerStatus.playing
             ? _showFeedbackIcon
-                ? AnimatedContainer(
-                    duration: const Duration(milliseconds: 450),
-                    curve: Curves.fastOutSlowIn,
-                    decoration: BoxDecoration(
-                        color: _expandFeedbackIcon
-                            ? context.appTheme.textFieldBorderColor
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(14)),
-                    padding: AppEdgeInsets.instance
-                        .symmetric(vertical: 6, horizontal: 15),
-                    child: GestureDetector(
-                      onTap: _onFeedbackButtonTap != null
-                          ? () => _onFeedbackButtonTap!()
-                          : null,
+                ? GestureDetector(
+                    onTap: _onFeedbackButtonTap != null
+                        ? () => _onFeedbackButtonTap!()
+                        : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 450),
+                      curve: Curves.fastOutSlowIn,
+                      decoration: BoxDecoration(
+                          color: _expandFeedbackIcon
+                              ? context.appTheme.textFieldBorderColor
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(14)),
+                      padding: AppEdgeInsets.instance
+                          .symmetric(vertical: 6, horizontal: 15),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
