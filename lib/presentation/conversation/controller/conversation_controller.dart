@@ -407,7 +407,6 @@ class ConversationController extends GetxController {
             sourceText: targetOutputText,
             languageCode: targetLangCode,
             isTargetLanguage: true,
-            // shouldPlayAudio: true
           );
         } else {
           targetLangTextController.text = sourceOutputText;
@@ -419,7 +418,6 @@ class ConversationController extends GetxController {
             sourceText: targetOutputText,
             languageCode: targetLangCode,
             isTargetLanguage: false,
-            // shouldPlayAudio: true
           );
         }
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -479,24 +477,10 @@ class ConversationController extends GetxController {
 
         // Save and Play TTS audio
         if (ttsResponse != null) {
-          /* Uint8List? fileAsBytes = base64Decode(ttsResponse);
-          Directory appDocDir = await getApplicationDocumentsDirectory();
-          String recordingPath = '${appDocDir.path}/$recordingFolderName';
-          if (!await Directory(recordingPath).exists()) {
-            Directory(recordingPath).create();
-          }
-
-          String ttsFilePath =
-              '$recordingPath/$defaultTTSPlayName${DateTime.now().millisecondsSinceEpoch}.wav'; */
-
           String ttsFilePath = await createTTSAudioFIle(ttsResponse);
           isTargetLanguage
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
-          /*  ttsAudioFile = File(ttsFilePath);
-          if (ttsAudioFile != null && !await ttsAudioFile!.exists()) {
-            await ttsAudioFile?.writeAsBytes(fileAsBytes);
-          } */
           isLoading.value = false;
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
