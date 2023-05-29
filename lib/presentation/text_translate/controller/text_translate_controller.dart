@@ -106,30 +106,30 @@ class TextTranslateController extends GetxController {
   }
 
   void getSourceTargetLangFromDB() {
-    String? _selectedSourceLanguage =
+    String? selectedSourceLanguage =
         _hiveDBInstance.get(preferredSourceLanguage);
 
-    if (_selectedSourceLanguage == null || _selectedSourceLanguage.isEmpty) {
-      _selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
+    if (selectedSourceLanguage == null || selectedSourceLanguage.isEmpty) {
+      selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
     if (_languageModelController.sourceTargetLanguageMap.keys
         .toList()
-        .contains(_selectedSourceLanguage)) {
-      selectedSourceLanguageCode.value = _selectedSourceLanguage ?? '';
+        .contains(selectedSourceLanguage)) {
+      selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
       }
     }
 
-    String? _selectedTargetLanguage =
+    String? selectedTargetLanguage =
         _hiveDBInstance.get(preferredTargetLanguage);
-    if (_selectedTargetLanguage != null &&
-        _selectedTargetLanguage.isNotEmpty &&
+    if (selectedTargetLanguage != null &&
+        selectedTargetLanguage.isNotEmpty &&
         _languageModelController.sourceTargetLanguageMap.keys
             .toList()
-            .contains(_selectedTargetLanguage)) {
-      selectedTargetLanguageCode.value = _selectedTargetLanguage;
+            .contains(selectedTargetLanguage)) {
+      selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }
 
@@ -463,10 +463,11 @@ class TextTranslateController extends GetxController {
     required bool isTargetLanguage,
   }) async {
     await stopPlayer();
-    if (isTargetLanguage)
+    if (isTargetLanguage) {
       targetSpeakerStatus.value = SpeakerStatus.playing;
-    else
+    } else {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
+    }
     await playerController.preparePlayer(
         path: filePath,
         noOfSamples: WaveformStyle.getDefaultPlayerStyle(

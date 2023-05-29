@@ -8,11 +8,11 @@ class WaveformStyle {
   static PlayerWaveStyle getDefaultPlayerStyle({
     required bool isRecordedAudio,
   }) {
-    final _appTheme =
+    final appTheme =
         Provider.of<AppThemeProvider>(Get.context!, listen: false).theme;
     return PlayerWaveStyle(
-        fixedWaveColor: _appTheme.primaryColor.withOpacity(0.3),
-        liveWaveColor: _appTheme.primaryColor,
+        fixedWaveColor: appTheme.primaryColor.withOpacity(0.3),
+        liveWaveColor: appTheme.primaryColor,
         scaleFactor: isRecordedAudio ? 200 : 70,
         waveThickness: 2);
   }

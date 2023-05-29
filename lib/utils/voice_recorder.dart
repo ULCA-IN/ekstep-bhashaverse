@@ -67,8 +67,8 @@ class VoiceRecorder {
     Directory? appDocDir = await getApplicationDocumentsDirectory();
     final rootDir = Directory('${appDocDir.path}/$recordingFolderName');
     if (await rootDir.exists()) {
-      Stream<FileSystemEntity> _stream = rootDir.list(recursive: true);
-      _stream.listen((event) async {
+      Stream<FileSystemEntity> stream = rootDir.list(recursive: true);
+      stream.listen((event) async {
         if (event is File) {
           await event.delete();
         }
