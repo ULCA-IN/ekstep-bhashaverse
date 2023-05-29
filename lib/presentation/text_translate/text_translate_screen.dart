@@ -209,9 +209,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         if (_textTranslationController.playerController.playerState ==
             PlayerState.playing) _textTranslationController.stopPlayer();
         if (_textTranslationController.targetSpeakerStatus.value !=
-            SpeakerStatus.disabled)
+            SpeakerStatus.disabled) {
           _textTranslationController.targetSpeakerStatus.value =
               SpeakerStatus.disabled;
+        }
 
         if (newText.length > oldSourceText.length) {
           if (_textTranslationController.isTransliterationEnabled()) {
@@ -257,19 +258,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   }
 
   Widget _buildTargetLangInput() {
-    return Container(
+    return SizedBox(
       height: (ScreenUtil.screenHeight * 0.46) -
           ScreenUtil.statusBarHeight -
           ScreenUtil.bottomBarHeightPx,
-      // decoration: BoxDecoration(
-      //   color: context.appTheme.hightlitedTextFeildColor,
-      //   borderRadius: const BorderRadius.all(
-      //     Radius.circular(textFieldRadius),
-      //   ),
-      //   border: Border.all(
-      //     color: context.appTheme.highlightedBorderColor,
-      //   ),
-      // ),
       child: Obx(
         () => TextFieldWithActions(
           textController: _textTranslationController.targetLangTextController,
@@ -310,7 +302,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             showScrollIcon: false,
             isScrollArrowVisible: false,
             onSelected: (hintText) => replaceTranslietrationHint(hintText))
-        : SizedBox.shrink());
+        : const SizedBox.shrink());
   }
 
   Widget _buildLimitCountAndTranslateButton() {
@@ -408,7 +400,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
               () {
@@ -467,8 +459,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_textTranslationController
                       .sourceLangTextController.text.isNotEmpty &&
-                  await isNetworkConnected())
+                  await isNetworkConnected()) {
                 _textTranslationController.getComputeResponseASRTrans();
+              }
             }
           },
           child: Container(
@@ -477,7 +470,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
               () {
@@ -503,15 +496,16 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
   Widget _buildLoadingAnimation() {
     return Obx(() {
-      if (_textTranslationController.isLoading.value)
+      if (_textTranslationController.isLoading.value) {
         return LottieAnimation(
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _textTranslationController.isLoading.value
                 ? kHomeLoadingAnimationText.tr
                 : kTranslationLoadingAnimationText.tr);
-      else
+      } else {
         return const SizedBox.shrink();
+      }
     });
   }
 
@@ -530,10 +524,11 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   String getWordFromCursorPosition(String text, int cursorPosition) {
     int? startingPosition = getStartingIndexOfWord(text, cursorPosition);
     int endPosition = getEndIndexOfWord(text, startingPosition ?? 0);
-    if (startingPosition != null)
+    if (startingPosition != null) {
       return text.substring(startingPosition, endPosition);
-    else
+    } else {
       return '';
+    }
   }
 
   int? getStartingIndexOfWord(String text, int cursorPosition) {

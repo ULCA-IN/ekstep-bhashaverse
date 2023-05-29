@@ -346,15 +346,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildLoadingAnimation() {
     return Obx(() {
-      if (_translationController.isLoading.value)
+      if (_translationController.isLoading.value) {
         return LottieAnimation(
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _translationController.isLoading.value
                 ? kHomeLoadingAnimationText.tr
                 : kTranslationLoadingAnimationText.tr);
-      else
+      } else {
         return const SizedBox.shrink();
+      }
     });
   }
 

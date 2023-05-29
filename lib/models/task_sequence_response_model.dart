@@ -12,33 +12,33 @@ class TaskSequenceResponse {
     if (json['languages'] != null) {
       languages = <Languages>[];
       json['languages'].forEach((v) {
-        languages!.add(new Languages.fromJson(v));
+        languages!.add(Languages.fromJson(v));
       });
     }
     if (json['pipelineResponseConfig'] != null) {
       pipelineResponseConfig = <PipelineResponseConfig>[];
       json['pipelineResponseConfig'].forEach((v) {
-        pipelineResponseConfig!.add(new PipelineResponseConfig.fromJson(v));
+        pipelineResponseConfig!.add(PipelineResponseConfig.fromJson(v));
       });
     }
     pipelineInferenceAPIEndPoint = json['pipelineInferenceAPIEndPoint'] != null
-        ? new PipelineInferenceAPIEndPoint.fromJson(
+        ? PipelineInferenceAPIEndPoint.fromJson(
             json['pipelineInferenceAPIEndPoint'])
         : null;
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    if (this.languages != null) {
-      data['languages'] = this.languages!.map((v) => v.toJson()).toList();
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    if (languages != null) {
+      data['languages'] = languages!.map((v) => v.toJson()).toList();
     }
-    if (this.pipelineResponseConfig != null) {
+    if (pipelineResponseConfig != null) {
       data['pipelineResponseConfig'] =
-          this.pipelineResponseConfig!.map((v) => v.toJson()).toList();
+          pipelineResponseConfig!.map((v) => v.toJson()).toList();
     }
-    if (this.pipelineInferenceAPIEndPoint != null) {
+    if (pipelineInferenceAPIEndPoint != null) {
       data['pipelineInferenceAPIEndPoint'] =
-          this.pipelineInferenceAPIEndPoint!.toJson();
+          pipelineInferenceAPIEndPoint!.toJson();
     }
     return data;
   }
@@ -56,9 +56,9 @@ class Languages {
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['sourceLanguage'] = this.sourceLanguage;
-    data['targetLanguageList'] = this.targetLanguageList;
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['sourceLanguage'] = sourceLanguage;
+    data['targetLanguageList'] = targetLanguageList;
     return data;
   }
 }
@@ -74,16 +74,16 @@ class PipelineResponseConfig {
     if (json['config'] != null) {
       config = <Config>[];
       json['config'].forEach((v) {
-        config!.add(new Config.fromJson(v));
+        config!.add(Config.fromJson(v));
       });
     }
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['taskType'] = this.taskType;
-    if (this.config != null) {
-      data['config'] = this.config!.map((v) => v.toJson()).toList();
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['taskType'] = taskType;
+    if (config != null) {
+      data['config'] = config!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -113,14 +113,14 @@ class Config {
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['serviceId'] = this.serviceId;
-    data['modelId'] = this.modelId;
-    if (this.language != null) {
-      data['language'] = this.language!.toJson();
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['serviceId'] = serviceId;
+    data['modelId'] = modelId;
+    if (language != null) {
+      data['language'] = language!.toJson();
     }
-    data['domain'] = this.domain;
-    data['supportedVoices'] = this.supportedVoices;
+    data['domain'] = domain;
+    data['supportedVoices'] = supportedVoices;
     return data;
   }
 }
@@ -137,9 +137,9 @@ class Language {
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['sourceLanguage'] = this.sourceLanguage;
-    data['targetLanguage'] = this.targetLanguage;
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['sourceLanguage'] = sourceLanguage;
+    data['targetLanguage'] = targetLanguage;
     return data;
   }
 }
@@ -159,20 +159,20 @@ class PipelineInferenceAPIEndPoint {
   PipelineInferenceAPIEndPoint.fromJson(Map<dynamic, dynamic> json) {
     callbackUrl = json['callbackUrl'];
     inferenceApiKey = json['inferenceApiKey'] != null
-        ? new InferenceApiKey.fromJson(json['inferenceApiKey'])
+        ? InferenceApiKey.fromJson(json['inferenceApiKey'])
         : null;
     isMultilingualEnabled = json['isMultilingualEnabled'];
     isSyncApi = json['isSyncApi'];
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['callbackUrl'] = this.callbackUrl;
-    if (this.inferenceApiKey != null) {
-      data['inferenceApiKey'] = this.inferenceApiKey!.toJson();
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['callbackUrl'] = callbackUrl;
+    if (inferenceApiKey != null) {
+      data['inferenceApiKey'] = inferenceApiKey!.toJson();
     }
-    data['isMultilingualEnabled'] = this.isMultilingualEnabled;
-    data['isSyncApi'] = this.isSyncApi;
+    data['isMultilingualEnabled'] = isMultilingualEnabled;
+    data['isSyncApi'] = isSyncApi;
     return data;
   }
 }
@@ -189,9 +189,9 @@ class InferenceApiKey {
   }
 
   Map<dynamic, dynamic> toJson() {
-    final Map<dynamic, dynamic> data = new Map<dynamic, dynamic>();
-    data['name'] = this.name;
-    data['value'] = this.value;
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['name'] = name;
+    data['value'] = value;
     return data;
   }
 }

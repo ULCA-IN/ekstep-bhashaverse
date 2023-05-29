@@ -13,7 +13,7 @@ ThemeData lightMaterialThemeData() {
   return ThemeData(
     textTheme: GoogleFonts.latoTextTheme(),
     primaryColor: _AppColors.primaryColor,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: _AppColors.primaryColor,
     ),
     appBarTheme: const AppBarTheme(
@@ -38,7 +38,7 @@ ThemeData darkMaterialThemeData() {
   return ThemeData(
     textTheme: GoogleFonts.latoTextTheme(),
     primaryColor: _AppColors.primaryDarkColor,
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: _AppColors.primaryDarkColor,
     ),
     appBarTheme: const AppBarTheme(

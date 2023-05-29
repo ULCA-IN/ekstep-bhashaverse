@@ -61,7 +61,7 @@ class ASRAndTTSActions extends StatelessWidget {
                       ? SizedBox(
                           height: 24.toWidth,
                           width: 24.toWidth,
-                          child: CustomCircularLoading(),
+                          child: const CustomCircularLoading(),
                         )
                       : SvgPicture.asset(
                           iconShare,
@@ -156,7 +156,7 @@ class ASRAndTTSActions extends StatelessWidget {
               height: 24.toWidth,
               width: 24.toWidth,
               child: _speakerStatus == SpeakerStatus.loading
-                  ? CustomCircularLoading()
+                  ? const CustomCircularLoading()
                   : SvgPicture.asset(
                       _speakerStatus == SpeakerStatus.playing
                           ? iconStopPlayback

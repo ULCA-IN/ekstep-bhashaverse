@@ -12,7 +12,7 @@ class NoInternetController extends GetxController {
   void onInit() async {
     shouldShowDialog = !await isNetworkConnected();
     if (shouldShowDialog) {
-      Get.dialog(NoInternetScreen(),
+      Get.dialog(const NoInternetScreen(),
           barrierDismissible: false, useSafeArea: false);
       shouldShowDialog = false;
     }
@@ -20,9 +20,10 @@ class NoInternetController extends GetxController {
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
       if (result == ConnectivityResult.none) {
-        if (shouldShowDialog)
-          Get.dialog(NoInternetScreen(),
+        if (shouldShowDialog) {
+          Get.dialog(const NoInternetScreen(),
               barrierDismissible: false, useSafeArea: false);
+        }
         shouldShowDialog = false;
       } else if (!shouldShowDialog) {
         Get.back();
