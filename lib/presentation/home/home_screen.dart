@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                   Stack(
                     children: [
-                      Center(
+                      const Center(
                         child: BhashiniTitle(),
                       ),
                       Positioned(
@@ -116,15 +116,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
           Obx(() {
-            if (_homeController.isLoading.value)
+            if (_homeController.isLoading.value) {
               return LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
                   footerText: _homeController.isLoading.value
                       ? kHomeLoadingAnimationText.tr
                       : kTranslationLoadingAnimationText.tr);
-            else
+            } else {
               return const SizedBox.shrink();
+            }
           })
         ],
       ),

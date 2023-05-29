@@ -212,7 +212,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     .isScrolledTransliterationHints.value &&
                 _voiceTextTransController.transliterationWordHints.isNotEmpty,
             onSelected: (hintText) => replaceTranslietrationHint(hintText))
-        : SizedBox.shrink());
+        : const SizedBox.shrink());
   }
 
   Widget _buildSourceTargetLangButtons() {
@@ -261,7 +261,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
               () {
@@ -319,9 +319,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                   preferredTargetLanguage, selectedTargetLangCode);
               if (_voiceTextTransController
                       .sourceLangTextController.text.isNotEmpty &&
-                  await isNetworkConnected())
+                  await isNetworkConnected()) {
                 _voiceTextTransController.getComputeResponseASRTrans(
                     isRecorded: false, clearSourceTTS: false);
+              }
             }
           },
           child: Container(
@@ -330,7 +331,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: const BorderRadius.all(Radius.circular(8)),
             ),
             child: Obx(
               () {
@@ -385,15 +386,16 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
 
   Widget _buildLoadingAnimation() {
     return Obx(() {
-      if (_voiceTextTransController.isLoading.value)
+      if (_voiceTextTransController.isLoading.value) {
         return LottieAnimation(
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _voiceTextTransController.isLoading.value
                 ? kHomeLoadingAnimationText.tr
                 : kTranslationLoadingAnimationText.tr);
-      else
+      } else {
         return const SizedBox.shrink();
+      }
     });
   }
 
@@ -404,9 +406,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     if (_voiceTextTransController.playerController.playerState ==
         PlayerState.playing) _voiceTextTransController.stopPlayer();
     if (_voiceTextTransController.targetSpeakerStatus.value !=
-        SpeakerStatus.disabled)
+        SpeakerStatus.disabled) {
       _voiceTextTransController.targetSpeakerStatus.value =
           SpeakerStatus.disabled;
+    }
 
     if (newText.length > oldSourceText.length) {
       if (_voiceTextTransController.isTransliterationEnabled()) {
@@ -415,10 +418,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         String sourceText =
             _voiceTextTransController.sourceLangTextController.text;
         if (sourceText.trim().isNotEmpty &&
-            sourceText[cursorPosition - 1] != ' ')
+            sourceText[cursorPosition - 1] != ' ') {
           getTransliterationHints(
               getWordFromCursorPosition(sourceText, cursorPosition));
-        else if (sourceText.trim().isNotEmpty &&
+        } else if (sourceText.trim().isNotEmpty &&
             _voiceTextTransController.transliterationWordHints.isNotEmpty) {
           String wordTOReplace =
               _voiceTextTransController.transliterationWordHints.first;
@@ -497,10 +500,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   String getWordFromCursorPosition(String text, int cursorPosition) {
     int? startingPosition = getStartingIndexOfWord(text, cursorPosition);
     int endPosition = getEndIndexOfWord(text, startingPosition ?? 0);
-    if (startingPosition != null)
+    if (startingPosition != null) {
       return text.substring(startingPosition, endPosition);
-    else
+    } else {
       return '';
+    }
   }
 
   int? getStartingIndexOfWord(String text, int cursorPosition) {
