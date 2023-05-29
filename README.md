@@ -36,7 +36,7 @@ name: bhashaverse
   freezed_annotation: ^2.2.0
   json_serializable: ^6.5.4
   flutter_svg: ^1.1.6
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.4
   avatar_glow: ^2.0.2
   lottie: ^2.1.0
   share_plus: ^6.3.0
@@ -48,7 +48,7 @@ name: bhashaverse
   stop_watch_timer: ^2.0.0
   sound_stream:
     git:
-      url:  https://github.com/JHM69/flutter-sound-stream.git
+      url: https://github.com/JHM69/flutter-sound-stream.git
 ```
 
 * Dev Dependencies:
