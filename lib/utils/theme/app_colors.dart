@@ -24,7 +24,7 @@ class _AppColors {
   static const Color lilyGrey = Color(0xFFECF8F1);
   static const Color magicMint = Color(0xFFB0E3C9);
   static const Color honeydew = Color(0xFFF5FAF5);
-  static const Color white = Color(0xFFFFFFFFF);
+  static const Color white = Color(0xFFFFFFFF);
   static const Color jaguarBlack = Color(0xFF1A1926);
   static const Color jaguarBlue = Color(0xFF252431);
   static const Color bastilleBlack = Color(0xFF2A2935);
