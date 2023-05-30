@@ -80,6 +80,9 @@ class VoiceTextTranslateController extends GetxController {
 
   late final Box _hiveDBInstance;
 
+  // for sending payload in feedback API
+  Map<String, dynamic> lastComputeRequest = {};
+
   @override
   void onInit() {
     _dhruvaapiClient = Get.find();
@@ -429,6 +432,8 @@ class VoiceTextTranslateController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
         samplingRate: samplingRate);
 
+    lastComputeRequest = asrPayloadToSend;
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -495,6 +500,9 @@ class VoiceTextTranslateController extends GetxController {
         inputData: sourceText,
         ttsServiceID: ttsServiceId,
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
+
+    lastComputeRequest['pipelineTasks']
+        .addAll(asrPayloadToSend['pipelineTasks']);
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
