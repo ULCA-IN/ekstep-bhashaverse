@@ -25,7 +25,6 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
-import '../feedback/feedback_bottom_sheet.dart';
 import 'controller/voice_text_translate_controller.dart';
 
 class VoiceTextTranslateScreen extends StatefulWidget {
@@ -146,7 +145,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
-          isSourceInput: true,
           expandFeedbackIcon:
               _voiceTextTransController.expandFeedbackIcon.value,
           showASRTTSActionButtons:
@@ -162,9 +160,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           onFileShare: () =>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
           onFeedbackButtonTap: () {
-            showFeedbackBottomSheet(
-              context: context,
-            );
+            Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+              'requestPayload': _voiceTextTransController.lastComputeRequest
+            });
           },
           playerController: _voiceTextTransController.playerController,
           speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
@@ -190,8 +188,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
             bottomBorderRadius: textFieldRadius,
-            isSourceInput: false,
+            showTranslateButton: false,
             showASRTTSActionButtons: true,
+            showFeedbackIcon: false,
             expandFeedbackIcon: false,
             isReadOnly: true,
             isShareButtonLoading:
