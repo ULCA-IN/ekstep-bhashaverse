@@ -1,12 +1,14 @@
 class TaskSequenceResponse {
   List<Languages>? languages;
   List<PipelineResponseConfig>? pipelineResponseConfig;
+  String? feedbackUrl;
   PipelineInferenceAPIEndPoint? pipelineInferenceAPIEndPoint;
 
   TaskSequenceResponse(
-      {this.languages,
-      this.pipelineResponseConfig,
-      this.pipelineInferenceAPIEndPoint});
+      {languages,
+      pipelineResponseConfig,
+      feedbackUrl,
+      pipelineInferenceAPIEndPoint});
 
   TaskSequenceResponse.fromJson(Map<dynamic, dynamic> json) {
     if (json['languages'] != null) {
@@ -21,6 +23,7 @@ class TaskSequenceResponse {
         pipelineResponseConfig!.add(PipelineResponseConfig.fromJson(v));
       });
     }
+    feedbackUrl = json['feedbackUrl'];
     pipelineInferenceAPIEndPoint = json['pipelineInferenceAPIEndPoint'] != null
         ? PipelineInferenceAPIEndPoint.fromJson(
             json['pipelineInferenceAPIEndPoint'])
@@ -36,6 +39,7 @@ class TaskSequenceResponse {
       data['pipelineResponseConfig'] =
           pipelineResponseConfig!.map((v) => v.toJson()).toList();
     }
+    data['feedbackUrl'] = feedbackUrl;
     if (pipelineInferenceAPIEndPoint != null) {
       data['pipelineInferenceAPIEndPoint'] =
           pipelineInferenceAPIEndPoint!.toJson();
@@ -48,7 +52,7 @@ class Languages {
   String? sourceLanguage;
   List<dynamic>? targetLanguageList;
 
-  Languages({this.sourceLanguage, this.targetLanguageList});
+  Languages({sourceLanguage, targetLanguageList});
 
   Languages.fromJson(Map<dynamic, dynamic> json) {
     sourceLanguage = json['sourceLanguage'];
@@ -67,7 +71,7 @@ class PipelineResponseConfig {
   String? taskType;
   List<Config>? config;
 
-  PipelineResponseConfig({this.taskType, this.config});
+  PipelineResponseConfig({taskType, config});
 
   PipelineResponseConfig.fromJson(Map<dynamic, dynamic> json) {
     taskType = json['taskType'];
@@ -96,12 +100,7 @@ class Config {
   List<dynamic>? domain;
   List<dynamic>? supportedVoices;
 
-  Config(
-      {this.serviceId,
-      this.modelId,
-      this.language,
-      this.domain,
-      this.supportedVoices});
+  Config({serviceId, modelId, language, domain, supportedVoices});
 
   Config.fromJson(Map<dynamic, dynamic> json) {
     serviceId = json['serviceId'];
@@ -129,7 +128,7 @@ class Language {
   String? sourceLanguage;
   String? targetLanguage;
 
-  Language({this.sourceLanguage, this.targetLanguage});
+  Language({sourceLanguage, targetLanguage});
 
   Language.fromJson(Map<dynamic, dynamic> json) {
     sourceLanguage = json['sourceLanguage'];
@@ -151,10 +150,7 @@ class PipelineInferenceAPIEndPoint {
   bool? isSyncApi;
 
   PipelineInferenceAPIEndPoint(
-      {this.callbackUrl,
-      this.inferenceApiKey,
-      this.isMultilingualEnabled,
-      this.isSyncApi});
+      {callbackUrl, inferenceApiKey, isMultilingualEnabled, isSyncApi});
 
   PipelineInferenceAPIEndPoint.fromJson(Map<dynamic, dynamic> json) {
     callbackUrl = json['callbackUrl'];
@@ -181,7 +177,7 @@ class InferenceApiKey {
   String? name;
   String? value;
 
-  InferenceApiKey({this.name, this.value});
+  InferenceApiKey({name, value});
 
   InferenceApiKey.fromJson(Map<dynamic, dynamic> json) {
     name = json['name'];
