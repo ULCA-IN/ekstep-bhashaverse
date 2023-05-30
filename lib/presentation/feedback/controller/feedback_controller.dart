@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
+import '../../../localization/localization_keys.dart';
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../common/controller/language_model_controller.dart';
+import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
 
 class FeedbackController extends GetxController {
-  RxBool getDetailedFeedback = false.obs,
-      showSpeechToTextEditor = false.obs,
-      showTranslationEditor = false.obs;
+  RxBool getDetailedFeedback = false.obs;
 
   RxDouble ovarralFeedback = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
@@ -34,6 +34,30 @@ class FeedbackController extends GetxController {
     _dhruvaapiClient = DHRUVAAPIClient.getAPIClientInstance();
     _hiveDBInstance = Hive.box(hiveDBName);
     super.onInit();
+    DateTime? feedbackCacheTime =
+        _hiveDBInstance.get(feedbackCacheLastUpdatedKey);
+    dynamic feedbackResponseFromCache = _hiveDBInstance.get(feedbackCacheKey);
+
+    if (feedbackCacheTime != null &&
+        feedbackResponseFromCache != null &&
+        feedbackCacheTime.isAfter(DateTime.now())) {
+      // load data from cache
+      feedbackReqResponse = feedbackResponseFromCache;
+      getFeedbackQuestions();
+    } else {
+      isLoading.value = true;
+      // clear cache and get new data
+      _hiveDBInstance.put(configCacheLastUpdatedKey, null);
+      _hiveDBInstance.put(feedbackCacheKey, null);
+      isNetworkConnected().then((isConnected) {
+        if (isConnected) {
+          getFeedbackPipelines();
+        } else {
+          isLoading.value = false;
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+        }
+      });
+    }
   }
 
   @override
@@ -49,7 +73,7 @@ class FeedbackController extends GetxController {
 
   Future<List<String>> getTransliterationOutput(String sourceText) async {
     String? appLanguageCode = Get.locale?.languageCode;
-    if (appLanguageCode == null || appLanguageCode == 'en') {
+    if (appLanguageCode == null || appLanguageCode == defaultLangCode) {
       return [];
     }
     transliterationModelToUse = _languageModelController
@@ -85,7 +109,6 @@ class FeedbackController extends GetxController {
   }
 
   Future<void> getFeedbackPipelines() async {
-    isLoading.value = true;
     Map<String, dynamic> requestConfig = {
       "feedbackLanguage": "en",
       "supportedTasks": ["asr", "translation", "tts"]
@@ -94,40 +117,9 @@ class FeedbackController extends GetxController {
         requestPayload: requestConfig);
     languageRequestResponse.when(
       success: ((dynamic response) async {
+        await addfeedbackResponseInCache(response);
         feedbackReqResponse = response;
-        if (response['taskFeedback'] != null &&
-            response['taskFeedback'] is List) {
-          for (var taskFeedback in response['taskFeedback']) {
-            List<GranularFeedback> granularFeedbacks = [];
-            if (taskFeedback['granularFeedback'] != null &&
-                taskFeedback['granularFeedback'].isNotEmpty) {
-              for (var granularFeedback in taskFeedback['granularFeedback']) {
-                granularFeedbacks.add(GranularFeedback(
-                  question: granularFeedback['question'],
-                  mainRating: 0,
-                  supportedFeedbackTypes:
-                      granularFeedback['supportedFeedbackTypes'],
-                  parameters: granularFeedback['parameters'] != null
-                      ? granularFeedback['parameters']
-                          .map((parameter) =>
-                              Parameter(paramName: parameter, paramRating: 0))
-                          .toList()
-                      : [],
-                ));
-              }
-            }
-            feedbackTypeModels.add(FeedbackTypeModel(
-                    taskType: taskFeedback['taskType'],
-                    question: taskFeedback['commonFeedback'].length > 0
-                        ? taskFeedback['commonFeedback'][0]['question']
-                        : '',
-                    textController: TextEditingController(),
-                    focusNode: FocusNode(),
-                    taskRating: 0.0.obs,
-                    granularFeedbacks: granularFeedbacks)
-                .obs);
-          }
-        }
+        getFeedbackQuestions();
         isLoading.value = false;
       }),
       failure: (error) {
@@ -135,6 +127,53 @@ class FeedbackController extends GetxController {
             message: error.message ?? APIConstants.kErrorMessageGenericError);
         isLoading.value = false;
       },
+    );
+  }
+
+  void getFeedbackQuestions() {
+    if (feedbackReqResponse['taskFeedback'] != null &&
+        feedbackReqResponse['taskFeedback'] is List) {
+      for (var taskFeedback in feedbackReqResponse['taskFeedback']) {
+        List<GranularFeedback> granularFeedbacks = [];
+        if (taskFeedback['granularFeedback'] != null &&
+            taskFeedback['granularFeedback'].isNotEmpty) {
+          for (var granularFeedback in taskFeedback['granularFeedback']) {
+            granularFeedbacks.add(GranularFeedback(
+              question: granularFeedback['question'],
+              mainRating: 0,
+              supportedFeedbackTypes:
+                  granularFeedback['supportedFeedbackTypes'],
+              parameters: granularFeedback['parameters'] != null
+                  ? granularFeedback['parameters']
+                      .map((parameter) =>
+                          Parameter(paramName: parameter, paramRating: 0))
+                      .toList()
+                  : [],
+            ));
+          }
+        }
+        feedbackTypeModels.add(FeedbackTypeModel(
+                taskType: taskFeedback['taskType'],
+                question: taskFeedback['commonFeedback'].length > 0
+                    ? taskFeedback['commonFeedback'][0]['question']
+                    : '',
+                textController: TextEditingController(),
+                focusNode: FocusNode(),
+                taskRating: 0.0.obs,
+                isExpanded: false.obs,
+                granularFeedbacks: granularFeedbacks)
+            .obs);
+      }
+    }
+  }
+
+  Future<void> addfeedbackResponseInCache(responseData) async {
+    await _hiveDBInstance.put(feedbackCacheKey, responseData);
+    await _hiveDBInstance.put(
+      feedbackCacheLastUpdatedKey,
+      DateTime.now().add(
+        const Duration(days: 1),
+      ),
     );
   }
 }

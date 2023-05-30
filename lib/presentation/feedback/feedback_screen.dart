@@ -33,9 +33,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   final FocusNode _generalFeedbackFocusNode = FocusNode();
 
+  Map<String, dynamic>? computePayload = {};
+
   @override
   void initState() {
-    _feedbackController.getFeedbackPipelines();
+    computePayload = Get.arguments['requestPayload'];
     super.initState();
   }
 
@@ -48,7 +50,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ? LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
-                  footerText: '')
+                  footerText: loading.tr)
               : Stack(
                   children: [
                     SingleChildScrollView(
@@ -109,8 +111,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           focusNode: _generalFeedbackFocusNode,
           lines: 5,
           hintText: writeReviewHere.tr,
-          onChange: (V) => _onTextChanged(
-              _generalFeedbackController, _feedbackController.oldSourceText),
+          onChange: (V) {
+            _onTextChanged(
+                _generalFeedbackController, _feedbackController.oldSourceText);
+          },
         ),
         SizedBox(height: 18.toHeight),
       ],
@@ -124,22 +128,22 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             _feedbackController.ovarralFeedback.value != 0.0,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ..._feedbackController.feedbackTypeModels.value.map((taskFeedback) {
-            return Obx(
-              () => RatingWidget(
-                title: taskFeedback.value.question,
-                rating: taskFeedback.value.taskRating.value,
-                expandWidget: taskFeedback.value.taskRating.value < 4 &&
-                    taskFeedback.value.taskRating.value != 0,
-                textController: taskFeedback.value.textController,
-                focusNode: taskFeedback.value.focusNode,
-                granularFeedbackList: taskFeedback.value.granularFeedbacks,
-                onRatingChanged: (value) =>
-                    taskFeedback.value.taskRating.value = value,
-                onTextChanged: (v) => _onTextChanged(
-                    taskFeedback.value.textController,
-                    _feedbackController.oldSourceText),
-              ),
-            );
+            List<dynamic> taskList = computePayload?['pipelineTasks'];
+            bool? isTaskAvailable = taskList.firstWhereOrNull((element) =>
+                    element['taskType'] == taskFeedback.value.taskType) !=
+                null;
+            return isTaskAvailable
+                ? Obx(
+                    () => RatingWidget(
+                      feedbackTypeModel: taskFeedback.value,
+                      onRatingChanged: (value) =>
+                          taskFeedback.value.taskRating.value = value,
+                      onTextChanged: (v) => _onTextChanged(
+                          taskFeedback.value.textController,
+                          _feedbackController.oldSourceText),
+                    ),
+                  )
+                : const SizedBox.shrink();
           })
         ]),
       ),
@@ -160,8 +164,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 onButtonTap: () {
                   _feedbackController.getDetailedFeedback.value = false;
                   _feedbackController.ovarralFeedback.value = 0;
-                  _feedbackController.showSpeechToTextEditor.value = false;
-                  _feedbackController.showTranslationEditor.value = false;
+                  Map<String, dynamic> submissionPayload = {};
+                  submissionPayload['feedbackTimeStamp'] = DateTime.timestamp();
+                  submissionPayload['feedbackLanguage'] =
+                      Get.locale?.languageCode ?? defaultLangCode;
                   Get.back();
                 },
               ),
@@ -184,13 +190,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     showScrollIcon: false,
                     isScrollArrowVisible: false,
                     onSelected: (hintText) {
-                      for (var taskFeedback
-                          in _feedbackController.feedbackTypeModels) {
-                        if (taskFeedback.value.focusNode.hasFocus) {
-                          replaceWordWithHint(
-                              taskFeedback.value.textController, hintText);
-                          _feedbackController.transliterationHints.clear();
-                          return;
+                      if (_generalFeedbackFocusNode.hasFocus) {
+                        replaceWordWithHint(
+                            _generalFeedbackController, hintText);
+                        _feedbackController.transliterationHints.clear();
+                      } else {
+                        for (var taskFeedback
+                            in _feedbackController.feedbackTypeModels) {
+                          if (taskFeedback.value.focusNode.hasFocus) {
+                            replaceWordWithHint(
+                                taskFeedback.value.textController, hintText);
+                            _feedbackController.transliterationHints.clear();
+                            return;
+                          }
                         }
                       }
                       _feedbackController.transliterationHints.clear();
