@@ -28,7 +28,6 @@ class _SettingsScreenState extends State<SettingsScreen>
   late SettingsController _settingsController;
   late AnimationController _controller;
   late Animation<double> _animation;
-  Duration defaultAnimationTime = const Duration(milliseconds: 300);
 
   @override
   void initState() {
