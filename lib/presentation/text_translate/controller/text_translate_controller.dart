@@ -36,7 +36,8 @@ class TextTranslateController extends GetxController {
       isKeyboardVisible = false.obs,
       isScrolledTransliterationHints = false.obs,
       isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs;
+      isTargetShareLoading = false.obs,
+      expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
       sourceLangTTSPath = ''.obs,
       targetLangTTSPath = ''.obs,
@@ -56,6 +57,9 @@ class TextTranslateController extends GetxController {
   late Directory appDirectory;
   late final Box _hiveDBInstance;
   late PlayerController playerController;
+
+  // for sending payload in feedback API
+  Map<String, dynamic> lastComputeRequest = {};
 
   @override
   void onInit() {
@@ -232,6 +236,8 @@ class TextTranslateController extends GetxController {
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
+    lastComputeRequest = asrPayloadToSend;
+
     response.when(
       success: (taskResponse) async {
         targetOutputText.value = taskResponse.pipelineResponse
@@ -249,6 +255,8 @@ class TextTranslateController extends GetxController {
         targetLangTextController.text = targetOutputText.value;
         isTranslateCompleted.value = true;
         isLoading.value = false;
+        Future.delayed(const Duration(seconds: 3))
+            .then((value) => expandFeedbackIcon.value = false);
         sourceLangTTSPath.value = '';
         targetLangTTSPath.value = '';
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -287,6 +295,9 @@ class TextTranslateController extends GetxController {
         authorizationValue: _languageModelController.taskSequenceResponse
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
+
+    lastComputeRequest['pipelineTasks']
+        .addAll(asrPayloadToSend['pipelineTasks']);
 
     await response.when(
       success: (taskResponse) async {
@@ -501,6 +512,6 @@ class TextTranslateController extends GetxController {
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true) &&
-        selectedSourceLanguageCode.value != 'en';
+        selectedSourceLanguageCode.value != defaultLangCode;
   }
 }

@@ -160,8 +160,19 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                               onMusicPlayOrStop: () =>
                                   _textTranslationController
                                       .playStopTTSOutput(true),
+                              expandFeedbackIcon: _textTranslationController
+                                  .expandFeedbackIcon.value,
+                              showFeedbackIcon: true,
                               onFileShare: () => _textTranslationController
                                   .shareAudioFile(isSourceLang: true),
+                              onFeedbackButtonTap: () {
+                                Get.toNamed(AppRoutes.feedbackRoute,
+                                    arguments: {
+                                      'requestPayload':
+                                          _textTranslationController
+                                              .lastComputeRequest
+                                    });
+                              },
                               playerController:
                                   _textTranslationController.playerController,
                               speakerStatus: _textTranslationController
@@ -276,6 +287,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           showTranslateButton: false,
           showASRTTSActionButtons: true,
           isReadOnly: true,
+          showFeedbackIcon: false,
+          expandFeedbackIcon: false,
           isShareButtonLoading:
               _textTranslationController.isTargetShareLoading.value,
           textToCopy: _textTranslationController.targetOutputText.value,
@@ -296,7 +309,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ? TransliterationHints(
             scrollController:
                 _textTranslationController.transliterationHintsScrollController,
-            // need to send with .toList() because of GetX observation issue
             transliterationHints:
                 _textTranslationController.transliterationWordHints.toList(),
             showScrollIcon: false,
