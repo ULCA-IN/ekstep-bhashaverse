@@ -7,6 +7,7 @@ class FeedbackTypeModel {
   final TextEditingController textController;
   final FocusNode focusNode;
   RxDouble taskRating;
+  RxBool isExpanded;
   final List<GranularFeedback> granularFeedbacks;
 
   FeedbackTypeModel({
@@ -15,6 +16,7 @@ class FeedbackTypeModel {
     required this.textController,
     required this.focusNode,
     required this.taskRating,
+    required this.isExpanded,
     required this.granularFeedbacks,
   });
 }
