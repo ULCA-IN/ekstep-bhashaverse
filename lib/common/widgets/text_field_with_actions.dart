@@ -32,11 +32,12 @@ class TextFieldWithActions extends StatelessWidget {
     required SpeakerStatus speakerStatus,
     required Function onMusicPlayOrStop,
     required Function onFileShare,
+    bool showFeedbackIcon = true,
     required bool expandFeedbackIcon,
     String? hintText,
     int sourceCharLength = 0,
     bool showMicButton = false,
-    bool isSourceInput = true,
+    bool showTranslateButton = true,
     Stream<int>? rawTimeStream,
     Function? onChanged,
     Function? onSubmitted,
@@ -56,7 +57,7 @@ class TextFieldWithActions extends StatelessWidget {
         _showMicButton = showMicButton,
         _isReadOnly = isReadOnly,
         _isShareButtonLoading = isShareButtonLoading,
-        _isSourceInput = isSourceInput,
+        _showTranslateButton = showTranslateButton,
         _showASRTTSActionButtons = showASRTTSActionButtons,
         _topBorderRadius = topBorderRadius,
         _bottomBorderRadius = bottomBorderRadius,
@@ -66,6 +67,7 @@ class TextFieldWithActions extends StatelessWidget {
         _onTranslateButtonTap = onTranslateButtonTap,
         _onFileShare = onFileShare,
         _expandFeedbackIcon = expandFeedbackIcon,
+        _showFeedbackIcon = showFeedbackIcon,
         _playerController = playerController,
         _speakerStatus = speakerStatus,
         _rawTimeStream = rawTimeStream,
@@ -80,10 +82,11 @@ class TextFieldWithActions extends StatelessWidget {
   final bool _isRecordedAudio,
       _showMicButton,
       _showASRTTSActionButtons,
-      _isSourceInput,
+      _showTranslateButton,
       _isReadOnly,
       _isShareButtonLoading,
-      _expandFeedbackIcon;
+      _expandFeedbackIcon,
+      _showFeedbackIcon;
   final double _topBorderRadius, _bottomBorderRadius;
   final Color _backgroundColor, _borderColor;
   final Function _onMusicPlayOrStop, _onFileShare;
@@ -153,7 +156,7 @@ class TextFieldWithActions extends StatelessWidget {
                     totalDuration: DateTImeUtils().getTimeFromMilliseconds(
                         timeInMillisecond: _totalDuration),
                     isRecordedAudio: _isRecordedAudio,
-                    showFeedbackIcon: _isSourceInput,
+                    showFeedbackIcon: _showFeedbackIcon,
                     expandFeedbackIcon: _expandFeedbackIcon,
                     isShareButtonLoading: _isShareButtonLoading,
                     playerController: _playerController,
@@ -169,7 +172,7 @@ class TextFieldWithActions extends StatelessWidget {
                         sourceCharLength: _sourceCharLength,
                         rawTimeStream: _rawTimeStream,
                       ),
-                      if (_isSourceInput)
+                      if (_showTranslateButton)
                         CustomOutlineButton(
                           title: _translateButtonTitle,
                           isDisabled: _sourceCharLength > textCharMaxLength,
