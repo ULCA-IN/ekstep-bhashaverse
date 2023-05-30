@@ -92,3 +92,4 @@ const String errorNoInternetSubTitle = 'errorNoInternetSubTitle';
 const String feedback = 'feedback';
 const String writeReviewHere = 'writeReviewHere';
 const String submit = 'submit';
+const String loading = 'loading';

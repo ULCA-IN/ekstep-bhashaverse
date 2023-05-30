@@ -92,4 +92,5 @@ final Map<String, String> en = {
   feedback: 'Feedback',
   writeReviewHere: 'Write your review here',
   submit: 'Submit',
+  loading: 'Loading',
 };
