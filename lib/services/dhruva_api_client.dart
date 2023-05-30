@@ -84,6 +84,33 @@ class DHRUVAAPIClient {
       return Result.failure(AppException(somethingWentWrong.tr));
     }
   }
+
+  Future<Result<AppException, dynamic>> sendFeedbackRequest(
+      {required requestPayload}) async {
+    Dio dio = Dio(BaseOptions(
+        baseUrl: APIConstants.FEEDBACK_BASE_URL_DEV,
+        connectTimeout: 80000,
+        receiveTimeout: 50000,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+        }));
+    try {
+      var response = await dio.post(
+        APIConstants.FEEDBACK_REQ_URL,
+        data: requestPayload,
+      );
+      if (response.data == null) {
+        return Result.failure(AppException(somethingWentWrong.tr));
+      }
+      return Result.success(response.data);
+    } on DioError catch (error) {
+      return Result.failure(
+          AppException(NetworkError(error).getErrorModel().errorMessage));
+    } on Exception catch (_) {
+      return Result.failure(AppException(somethingWentWrong.tr));
+    }
+  }
 }
 
 class AuthKeyHeaderInterceptor extends Interceptor {
