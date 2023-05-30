@@ -1,92 +1,172 @@
+import 'dart:math' show pi;
+
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 import '../../../common/widgets/generic_text_filed.dart';
 import '../../../models/feedback_type_model.dart';
+import '../../../utils/constants/app_constants.dart';
 import '../../../utils/theme/app_text_style.dart';
 import '../../../utils/theme/app_theme_provider.dart';
 import '../../../utils/screen_util/screen_util.dart';
 
-class RatingWidget extends StatelessWidget {
+class RatingWidget extends StatefulWidget {
   const RatingWidget({
     super.key,
-    required String title,
-    required double rating,
-    required bool expandWidget,
-    TextEditingController? textController,
-    FocusNode? focusNode,
-    required List<GranularFeedback> granularFeedbackList,
-    Function(double value)? onRatingChanged,
-    Function(String value)? onTextChanged,
-  })  : _title = title,
-        _rating = rating,
-        _expandWidget = expandWidget,
-        _textController = textController,
-        _focusNode = focusNode,
-        _granularFeedbackList = granularFeedbackList,
-        _onRatingChanged = onRatingChanged,
-        _onTextChanged = onTextChanged;
+    required this.feedbackTypeModel,
+    this.onTextChanged,
+    this.onRatingChanged,
+  });
 
-  final String _title;
-  final double _rating;
-  final bool _expandWidget;
-  final TextEditingController? _textController;
-  final FocusNode? _focusNode;
-  final List<GranularFeedback> _granularFeedbackList;
-  final Function(double value)? _onRatingChanged;
-  final Function(String value)? _onTextChanged;
+  final FeedbackTypeModel feedbackTypeModel;
+  final Function(double value)? onRatingChanged;
+  final Function(String value)? onTextChanged;
+
+  @override
+  State<RatingWidget> createState() => _RatingWidgetState();
+}
+
+class _RatingWidgetState extends State<RatingWidget>
+    with SingleTickerProviderStateMixin {
+  // late FeedbackController _feedbackController;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    // _feedbackController = Get.find();
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: defaultAnimationTime,
+    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: pi,
+    ).animate(_controller);
+    ScreenUtil().init();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            _title,
-            style: semibold18(context),
-          ),
-        ),
-        SizedBox(height: 12.toHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            RatingBar(
-              filledIcon: Icons.star,
-              emptyIcon: Icons.star_border,
-              filledColor: context.appTheme.primaryColor,
-              onRatingChanged: _onRatingChanged,
-              initialRating: _rating,
-              maxRating: 5,
-              alignment: Alignment.center,
-            ),
-          ],
-        ),
-        SizedBox(height: _expandWidget ? 12.toHeight : 0),
-        Visibility(
-          visible: _expandWidget,
-          child: Column(
+        GestureDetector(
+          onTap: () {
+            widget.feedbackTypeModel.isExpanded.value =
+                !widget.feedbackTypeModel.isExpanded.value;
+            widget.feedbackTypeModel.isExpanded.value
+                ? _controller.forward()
+                : _controller.reverse();
+          },
+          child: Row(
             children: [
-              GenericTextField(
-                controller: _textController ?? TextEditingController(),
-                focusNode: _focusNode,
-                onChange: _onTextChanged,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    widget.feedbackTypeModel.question,
+                    style: semibold18(context),
+                  ),
+                ),
               ),
-              ..._granularFeedbackList.map((feedback) {
-                return feedback.supportedFeedbackTypes.contains('rating')
-                    ? DepthRatings(
-                        question: feedback.question,
-                        rating: feedback.mainRating,
-                        isRating:
-                            feedback.supportedFeedbackTypes.contains('rating'),
-                      )
-                    : const SizedBox.shrink();
-              })
+              AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..rotateZ(
+                          _animation.value,
+                        ),
+                      child: SvgPicture.asset(iconArrowDown,
+                          color: context.appTheme.highlightedTextColor),
+                    );
+                  }),
             ],
           ),
         ),
-        SizedBox(height: 10.toHeight),
+        Obx(
+          () => AnimatedSwitcher(
+            duration: defaultAnimationTime,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: widget.feedbackTypeModel.isExpanded.value
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: 12.toHeight),
+                      Obx(
+                        () => RatingBar(
+                          filledIcon: Icons.star,
+                          emptyIcon: Icons.star_border,
+                          filledColor: context.appTheme.primaryColor,
+                          onRatingChanged: widget.onRatingChanged,
+                          initialRating:
+                              widget.feedbackTypeModel.taskRating.value,
+                          maxRating: 5,
+                          alignment: Alignment.centerLeft,
+                        ),
+                      ),
+                      Obx(
+                        () => Visibility(
+                          visible: widget.feedbackTypeModel.taskRating.value <
+                                  4 &&
+                              widget.feedbackTypeModel.taskRating.value != 0,
+                          // widget._showTaskQuestions,
+                          child: Column(
+                            children: [
+                              SizedBox(height: 12.toHeight),
+                              GenericTextField(
+                                controller:
+                                    widget.feedbackTypeModel.textController,
+                                focusNode: widget.feedbackTypeModel.focusNode,
+                                onChange: widget.onTextChanged,
+                              ),
+                              ...widget.feedbackTypeModel.granularFeedbacks
+                                  .map((feedback) {
+                                return feedback.supportedFeedbackTypes
+                                            .contains('rating') ||
+                                        feedback.supportedFeedbackTypes
+                                            .contains('rating-list')
+                                    ? DepthRatings(
+                                        question: feedback.question,
+                                        rating: feedback.mainRating,
+                                        isRating: feedback
+                                            .supportedFeedbackTypes
+                                            .contains('rating'),
+                                        depthRatings: feedback
+                                                .supportedFeedbackTypes
+                                                .contains('rating-list')
+                                            ? feedback.parameters
+                                                .map((parameter) {
+                                                return DepthRatings(
+                                                  question: parameter.paramName,
+                                                  rating: parameter.paramRating,
+                                                  isRating: true,
+                                                );
+                                              }).toList()
+                                            : null,
+                                      )
+                                    : const SizedBox.shrink();
+                              })
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.toHeight),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ),
         const Divider(),
         SizedBox(height: 18.toHeight),
       ],
@@ -100,13 +180,16 @@ class DepthRatings extends StatelessWidget {
     required String question,
     required bool isRating,
     double? rating,
+    List<DepthRatings>? depthRatings,
   })  : _question = question,
         _rating = rating,
-        _isRating = isRating;
+        _isRating = isRating,
+        _depthRatings = depthRatings;
 
   final String _question;
   final double? _rating;
   final bool _isRating;
+  final List<DepthRatings>? _depthRatings;
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +198,8 @@ class DepthRatings extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_depthRatings != null && _depthRatings!.isNotEmpty)
+            const Divider(),
           Text(
             _question,
             style: regular16(context),
@@ -128,6 +213,13 @@ class DepthRatings extends StatelessWidget {
               initialRating: _rating ?? 0,
               maxRating: 5,
               onRatingChanged: (p0) {},
+            ),
+          if (_depthRatings != null && _depthRatings!.isNotEmpty)
+            Column(
+              children: [
+                ..._depthRatings!.map((e) => e),
+                const Divider(),
+              ],
             ),
         ],
       ),
