@@ -183,7 +183,7 @@ class ASRAndTTSActions extends StatelessWidget {
                 ),
               ),
         SizedBox(width: 12.toWidth),
-        Spacer(),
+        const Spacer(),
         InkWell(
           onTap: () {
             if (_speakerStatus != SpeakerStatus.disabled) {
