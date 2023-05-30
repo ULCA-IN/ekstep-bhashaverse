@@ -42,7 +42,8 @@ class ConversationController extends GetxController {
   bool isMicPermissionGranted = false;
   RxBool isLoading = false.obs,
       isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs;
+      isTargetShareLoading = false.obs,
+      expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
       selectedTargetLanguageCode = ''.obs,
       sourceOutputText = ''.obs,
@@ -76,6 +77,10 @@ class ConversationController extends GetxController {
   late SocketIOClient _socketIOClient;
 
   late final Box _hiveDBInstance;
+
+  // for sending payload in feedback API
+  Map<String, dynamic> lastComputeRequest = {};
+
   @override
   void onInit() {
     _dhruvaapiClient = Get.find();
@@ -361,6 +366,8 @@ class ConversationController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
         samplingRate: samplingRate);
 
+    lastComputeRequest = asrPayloadToSend;
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -469,6 +476,9 @@ class ConversationController extends GetxController {
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
+    lastComputeRequest['pipelineTasks']
+        .addAll(asrPayloadToSend['pipelineTasks']);
+
     response.when(
       success: (taskResponse) async {
         ttsResponse = taskResponse.pipelineResponse
@@ -482,6 +492,8 @@ class ConversationController extends GetxController {
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
           isLoading.value = false;
+          Future.delayed(const Duration(seconds: 3))
+              .then((value) => expandFeedbackIcon.value = false);
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
           return;

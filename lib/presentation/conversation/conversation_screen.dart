@@ -122,6 +122,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
             bottomBorderRadius: 0,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
+            showFeedbackIcon:
+                _translationController.isTranslateCompleted.value &&
+                    _translationController.currentMic.value ==
+                        CurrentlySelectedMic.source,
+            expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
             isReadOnly: true,
             isShareButtonLoading:
                 _translationController.isTargetShareLoading.value,
@@ -130,6 +135,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 _translationController.playStopTTSOutput(true),
             onFileShare: () =>
                 _translationController.shareAudioFile(isSourceLang: true),
+            onFeedbackButtonTap: () {
+              Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+                'requestPayload': _translationController.lastComputeRequest
+              });
+            },
             playerController: _translationController.playerController,
             speakerStatus: _translationController.sourceSpeakerStatus.value,
             rawTimeStream: _translationController.stopWatchTimer.rawTime,
@@ -164,6 +174,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
             topBorderRadius: 0,
             bottomBorderRadius: textFieldRadius,
             showTranslateButton: false,
+            showFeedbackIcon:
+                _translationController.isTranslateCompleted.value &&
+                    _translationController.currentMic.value ==
+                        CurrentlySelectedMic.target,
+            expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
             showASRTTSActionButtons: true,
             isReadOnly: true,
             isShareButtonLoading:
