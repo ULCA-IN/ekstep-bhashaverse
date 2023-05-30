@@ -8,6 +8,8 @@ const tapAndHoldMinDuration = 600;
 const keyboardHideDuration = Duration(milliseconds: 200);
 const textCharMaxLength = 500;
 const recordingMaxTimeLimit = 30000;
+const defaultLangCode = 'en';
+const defaultCountry = 'in';
 
 // Database name and keys
 const hiveDBName = 'db_bhashini';

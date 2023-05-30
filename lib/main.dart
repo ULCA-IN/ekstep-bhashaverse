@@ -108,7 +108,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       translations: AppLocalization(),
       locale: Locale(appLocale),
-      fallbackLocale: const Locale('en', 'US'),
+      fallbackLocale: const Locale(defaultLangCode, defaultCountry),
       themeMode: context.appThemeMode,
       theme: lightMaterialThemeData(),
       darkTheme: darkMaterialThemeData(),

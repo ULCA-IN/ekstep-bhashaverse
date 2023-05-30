@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../models/search_model.dart';
 import '../../models/task_sequence_response_model.dart';
 import '../../utils/constants/api_constants.dart';
+import '../../utils/constants/app_constants.dart';
 
 class LanguageModelController extends GetxController {
   final SplayTreeMap<String, SplayTreeSet<String>> sourceTargetLanguageMap =
@@ -55,7 +56,7 @@ class LanguageModelController extends GetxController {
           in availableTransliterationModels!.data) {
         //using English as source language for now
         if (eachAvailableTransliterationModelData.languages[0].sourceLanguage ==
-                'en' &&
+                defaultLangCode &&
             eachAvailableTransliterationModelData.languages[0].targetLanguage ==
                 languageCode) {
           if (!availableSubmittersList.contains(
@@ -94,7 +95,7 @@ class LanguageModelController extends GetxController {
             in availableTransliterationModels!.data) {
           if (eachAvailableTransliterationModelData
                       .languages[0].sourceLanguage ==
-                  'en' &&
+                  defaultLangCode &&
               eachAvailableTransliterationModelData
                       .languages[0].targetLanguage ==
                   languageCode) {
