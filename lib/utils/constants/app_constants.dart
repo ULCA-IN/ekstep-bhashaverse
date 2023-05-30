@@ -10,6 +10,7 @@ const textCharMaxLength = 500;
 const recordingMaxTimeLimit = 30000;
 const defaultLangCode = 'en';
 const defaultCountry = 'in';
+const defaultAnimationTime = Duration(milliseconds: 300);
 
 // Database name and keys
 const hiveDBName = 'db_bhashini';
@@ -22,6 +23,8 @@ const preferredSourceLanguage = 'preferred_source_language';
 const preferredTargetLanguage = 'preferred_target_language';
 const configCacheKey = 'config_cache_key';
 const configCacheLastUpdatedKey = 'config_cache_key_last_updated_key';
+const feedbackCacheKey = 'feedback_cache_key';
+const feedbackCacheLastUpdatedKey = 'feedback_cache_key_last_updated_key';
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
