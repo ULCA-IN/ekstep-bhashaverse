@@ -25,18 +25,35 @@ class FeedbackController extends GetxController {
   late DHRUVAAPIClient _dhruvaapiClient;
   late LanguageModelController _languageModelController;
   final transliterationHints = RxList([]);
-  late final Box _hiveDBInstance;
+  Box? _hiveDBInstance;
+  Map<String, dynamic>? computePayload = {},
+      computeResponse = {},
+      suggestedOutput = {};
 
   @override
   void onInit() {
+    (Get.arguments['requestPayload'] as Map<String, dynamic>)
+        .forEach((key, value) {
+      computePayload?[key] = value;
+    });
+
+    (Get.arguments['requestResponse'] as Map<String, dynamic>)
+        .forEach((key, value) {
+      suggestedOutput?[key] = value;
+      computeResponse?[key] = value;
+    });
+
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _dhruvaapiClient = DHRUVAAPIClient.getAPIClientInstance();
-    _hiveDBInstance = Hive.box(hiveDBName);
+    if (_hiveDBInstance == null || !_hiveDBInstance!.isOpen) {
+      _hiveDBInstance = Hive.box(hiveDBName);
+    }
+
     super.onInit();
     DateTime? feedbackCacheTime =
-        _hiveDBInstance.get(feedbackCacheLastUpdatedKey);
-    dynamic feedbackResponseFromCache = _hiveDBInstance.get(feedbackCacheKey);
+        _hiveDBInstance?.get(feedbackCacheLastUpdatedKey);
+    dynamic feedbackResponseFromCache = _hiveDBInstance?.get(feedbackCacheKey);
 
     if (feedbackCacheTime != null &&
         feedbackResponseFromCache != null &&
@@ -47,8 +64,8 @@ class FeedbackController extends GetxController {
     } else {
       isLoading.value = true;
       // clear cache and get new data
-      _hiveDBInstance.put(configCacheLastUpdatedKey, null);
-      _hiveDBInstance.put(feedbackCacheKey, null);
+      _hiveDBInstance?.put(configCacheLastUpdatedKey, null);
+      _hiveDBInstance?.put(feedbackCacheKey, null);
       isNetworkConnected().then((isConnected) {
         if (isConnected) {
           getFeedbackPipelines();
@@ -63,12 +80,15 @@ class FeedbackController extends GetxController {
   @override
   void onClose() {
     feedbackTypeModels.clear();
+    computePayload?.clear();
+    computeResponse?.clear();
+    suggestedOutput?.clear();
     transliterationHints.clear();
     super.onClose();
   }
 
   bool isTransliterationEnabled() {
-    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
+    return _hiveDBInstance?.get(enableTransliteration, defaultValue: true);
   }
 
   Future<List<String>> getTransliterationOutput(String sourceText) async {
@@ -140,26 +160,40 @@ class FeedbackController extends GetxController {
           for (var granularFeedback in taskFeedback['granularFeedback']) {
             granularFeedbacks.add(GranularFeedback(
               question: granularFeedback['question'],
-              mainRating: 0,
+              mainRating: null,
               supportedFeedbackTypes:
                   granularFeedback['supportedFeedbackTypes'],
               parameters: granularFeedback['parameters'] != null
                   ? granularFeedback['parameters']
                       .map((parameter) =>
-                          Parameter(paramName: parameter, paramRating: 0))
+                          Parameter(paramName: parameter, paramRating: null))
                       .toList()
                   : [],
             ));
           }
         }
+
+        Map<String, dynamic>? task = (suggestedOutput?['pipelineResponse']
+                as List<dynamic>)
+            .firstWhereOrNull((e) => e['taskType'] == taskFeedback['taskType']);
+        String pipelineTaskValue = '';
+        switch (task?['taskType']) {
+          case 'asr':
+            pipelineTaskValue = task?['output'][0]['source'];
+            break;
+          case 'translation':
+            pipelineTaskValue = task?['output'][0]['target'];
+            break;
+        }
+
         feedbackTypeModels.add(FeedbackTypeModel(
                 taskType: taskFeedback['taskType'],
                 question: taskFeedback['commonFeedback'].length > 0
                     ? taskFeedback['commonFeedback'][0]['question']
                     : '',
-                textController: TextEditingController(),
+                textController: TextEditingController(text: pipelineTaskValue),
                 focusNode: FocusNode(),
-                taskRating: 0.0.obs,
+                taskRating: Rxn<double>(),
                 isExpanded: false.obs,
                 granularFeedbacks: granularFeedbacks)
             .obs);
@@ -168,8 +202,8 @@ class FeedbackController extends GetxController {
   }
 
   Future<void> addfeedbackResponseInCache(responseData) async {
-    await _hiveDBInstance.put(feedbackCacheKey, responseData);
-    await _hiveDBInstance.put(
+    await _hiveDBInstance?.put(feedbackCacheKey, responseData);
+    await _hiveDBInstance?.put(
       feedbackCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
