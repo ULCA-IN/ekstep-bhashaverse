@@ -190,38 +190,61 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
                   for (var task
                       in _feedbackController.feedbackTypeModels.value) {
-                    taskFeedback.add({
-                      "taskType": task.value.taskType,
-                      "commonFeedback": [
-                        {
-                          "question": task.value.question,
-                          "feedbackType": "rating",
-                          "rating": task.value.taskRating.value,
-                        }
-                      ],
-                      "granularFeedback":
-                          task.value.granularFeedbacks.map((granualFeedback) {
-                        bool isRating = granualFeedback.supportedFeedbackTypes
-                            .contains("rating");
-                        return {
-                          "question": granualFeedback.question,
+                    if (task.value.taskRating.value != null) {
+                      List<Map<String, dynamic>> granualFeedback = [];
+
+                      for (var feedback in task.value.granularFeedbacks) {
+                        bool isRating =
+                            feedback.supportedFeedbackTypes.contains("rating");
+
+                        Map<String, dynamic> question = {
+                          "question": feedback.question,
                           "feedbackType": isRating ? "rating" : "rating-list",
-                          if (isRating)
-                            "rating": granualFeedback.mainRating
-                          else
-                            "rating-list":
-                                granualFeedback.parameters.map((parameter) {
-                              return {
+                        };
+
+                        if (isRating && feedback.mainRating != null) {
+                          question["rating"] = feedback.mainRating;
+                        } else {
+                          List<Map<String, dynamic>> parameters = [];
+
+                          for (var parameter in feedback.parameters) {
+                            if (parameter.paramRating != null) {
+                              Map<String, dynamic> singleParameter = {
                                 "parameterName": parameter.paramName,
                                 "rating": parameter.paramRating,
                               };
-                            }).toList()
-                        };
-                      }).toList()
-                    });
+                              parameters.add(singleParameter);
+                            }
+                          }
+
+                          if (parameters.isNotEmpty) {
+                            question["rating-list"] = parameters;
+                          }
+                        }
+                        if (question["rating"] != null ||
+                            question["rating-list"] != null) {
+                          granualFeedback.add(question);
+                        }
+                      }
+
+                      taskFeedback.add({
+                        "taskType": task.value.taskType,
+                        "commonFeedback": [
+                          {
+                            "question": task.value.question,
+                            "feedbackType": "rating",
+                            "rating": task.value.taskRating.value,
+                          }
+                        ],
+                        if (granualFeedback.isNotEmpty)
+                          "granularFeedback": granualFeedback,
+                      });
+                    }
                   }
 
-                  submissionPayload['taskFeedback'] = taskFeedback;
+                  if (taskFeedback.isNotEmpty) {
+                    submissionPayload['taskFeedback'] = taskFeedback;
+                  }
 
                   _feedbackController.getDetailedFeedback.value = false;
                   _feedbackController.ovarralFeedback.value = 0;
