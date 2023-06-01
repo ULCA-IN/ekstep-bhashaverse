@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../localization/localization_keys.dart';
+import '../../models/feedback_type_model.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/screen_util/screen_util.dart';
 import '../../utils/string_helper.dart';
@@ -26,18 +27,16 @@ class FeedbackScreen extends StatefulWidget {
 }
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
-  final FeedbackController _feedbackController = Get.find();
+  late final FeedbackController _feedbackController;
 
   final TextEditingController _generalFeedbackController =
       TextEditingController();
 
   final FocusNode _generalFeedbackFocusNode = FocusNode();
 
-  Map<String, dynamic>? computePayload = {};
-
   @override
   void initState() {
-    computePayload = Get.arguments['requestPayload'];
+    _feedbackController = Get.find();
     super.initState();
   }
 
@@ -128,7 +127,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             _feedbackController.ovarralFeedback.value != 0.0,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ..._feedbackController.feedbackTypeModels.value.map((taskFeedback) {
-            List<dynamic> taskList = computePayload?['pipelineTasks'];
+            List<dynamic> taskList =
+                _feedbackController.computePayload?['pipelineTasks'];
             bool? isTaskAvailable = taskList.firstWhereOrNull((element) =>
                     element['taskType'] == taskFeedback.value.taskType) !=
                 null;
@@ -140,7 +140,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           taskFeedback.value.taskRating.value = value,
                       onTextChanged: (v) => _onTextChanged(
                           taskFeedback.value.textController,
-                          _feedbackController.oldSourceText),
+                          _feedbackController.oldSourceText,
+                          taskFeedback: taskFeedback.value),
                     ),
                   )
                 : const SizedBox.shrink();
@@ -162,12 +163,69 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 backgroundColor: context.appTheme.primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
-                  _feedbackController.getDetailedFeedback.value = false;
-                  _feedbackController.ovarralFeedback.value = 0;
                   Map<String, dynamic> submissionPayload = {};
-                  submissionPayload['feedbackTimeStamp'] = DateTime.timestamp();
+                  submissionPayload['feedbackTimeStamp'] =
+                      DateTime.timestamp().millisecondsSinceEpoch;
                   submissionPayload['feedbackLanguage'] =
                       Get.locale?.languageCode ?? defaultLangCode;
+                  submissionPayload['pipelineInput'] =
+                      _feedbackController.computePayload;
+                  submissionPayload['pipelineOutput'] =
+                      _feedbackController.computeResponse;
+                  submissionPayload['suggestedPipelineOutput'] =
+                      _feedbackController.suggestedOutput;
+                  submissionPayload['pipelineFeedback'] = {
+                    'commonFeedback': [
+                      {
+                        'question': _feedbackController
+                                .feedbackReqResponse['pipelineFeedback']
+                            ['commonFeedback'][0]['question'],
+                        "feedbackType": "rating",
+                        "rating": _feedbackController.ovarralFeedback.value
+                      }
+                    ]
+                  };
+
+                  List<Map<String, dynamic>> taskFeedback = [];
+
+                  for (var task
+                      in _feedbackController.feedbackTypeModels.value) {
+                    taskFeedback.add({
+                      "taskType": task.value.taskType,
+                      "commonFeedback": [
+                        {
+                          "question": task.value.question,
+                          "feedbackType": "rating",
+                          "rating": task.value.taskRating.value,
+                        }
+                      ],
+                      "granularFeedback":
+                          task.value.granularFeedbacks.map((granualFeedback) {
+                        bool isRating = granualFeedback.supportedFeedbackTypes
+                            .contains("rating");
+                        return {
+                          "question": granualFeedback.question,
+                          "feedbackType": isRating ? "rating" : "rating-list",
+                          if (isRating)
+                            "rating": granualFeedback.mainRating
+                          else
+                            "rating-list":
+                                granualFeedback.parameters.map((parameter) {
+                              return {
+                                "parameterName": parameter.paramName,
+                                "rating": parameter.paramRating,
+                              };
+                            }).toList()
+                        };
+                      }).toList()
+                    });
+                  }
+
+                  submissionPayload['taskFeedback'] = taskFeedback;
+
+                  _feedbackController.getDetailedFeedback.value = false;
+                  _feedbackController.ovarralFeedback.value = 0;
+
                   Get.back();
                 },
               ),
@@ -213,7 +271,29 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         : const SizedBox.shrink();
   }
 
-  void _onTextChanged(TextEditingController controller, oldText) {
+  void _onTextChanged(
+    TextEditingController controller,
+    oldText, {
+    FeedbackTypeModel? taskFeedback,
+  }) {
+// update suggested payload
+
+    if (taskFeedback != null) {
+      Map<String, dynamic>? task = (_feedbackController
+              .suggestedOutput?['pipelineResponse'] as List<dynamic>)
+          .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
+
+      switch (task?['taskType']) {
+        case 'asr':
+          task?['output'][0]['source'] = controller.text;
+          break;
+        case 'translation':
+          task?['output'][0]['target'] = controller.text;
+          break;
+      }
+    }
+
+    // get transliteration
     if (controller.text.length > oldText.length) {
       if (_feedbackController.isTransliterationEnabled()) {
         int cursorPosition = controller.selection.base.offset;
