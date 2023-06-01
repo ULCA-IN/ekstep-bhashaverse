@@ -6,7 +6,7 @@ class FeedbackTypeModel {
   final String question;
   final TextEditingController textController;
   final FocusNode focusNode;
-  RxDouble taskRating;
+  Rxn<double> taskRating;
   RxBool isExpanded;
   final List<GranularFeedback> granularFeedbacks;
 
@@ -24,7 +24,7 @@ class FeedbackTypeModel {
 class GranularFeedback {
   final String question;
   final List<dynamic> supportedFeedbackTypes;
-  final double mainRating;
+  final double? mainRating;
   final List<dynamic> parameters;
 
   GranularFeedback({
@@ -37,7 +37,7 @@ class GranularFeedback {
 
 class Parameter {
   final String paramName;
-  final double paramRating;
+  final double? paramRating;
 
   Parameter({
     required this.paramName,
