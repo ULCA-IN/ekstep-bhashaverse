@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -161,7 +163,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
           onFeedbackButtonTap: () {
             Get.toNamed(AppRoutes.feedbackRoute, arguments: {
-              'requestPayload': _voiceTextTransController.lastComputeRequest
+              'requestPayload': json.decode(
+                  json.encode(_voiceTextTransController.lastComputeRequest)),
+              'requestResponse': json.decode(
+                  json.encode(_voiceTextTransController.lastComputeResponse))
             });
           },
           playerController: _voiceTextTransController.playerController,
