@@ -483,7 +483,8 @@ class ConversationController extends GetxController {
       success: (taskResponse) async {
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
-            .audio[0]['audioContent'];
+            .audio?[0]
+            .audioContent;
 
         // Save and Play TTS audio
         if (ttsResponse != null) {

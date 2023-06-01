@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -82,6 +83,7 @@ class VoiceTextTranslateController extends GetxController {
 
   // for sending payload in feedback API
   Map<String, dynamic> lastComputeRequest = {};
+  Map<String, dynamic> lastComputeResponse = {};
 
   @override
   void onInit() {
@@ -442,9 +444,10 @@ class VoiceTextTranslateController extends GetxController {
         authorizationValue: _languageModelController.taskSequenceResponse
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
-
+    json.encode(asrPayloadToSend);
     response.when(
       success: (taskResponse) async {
+        lastComputeResponse = taskResponse.toJson();
         if (isRecorded) {
           sourceLangTextController.text = taskResponse.pipelineResponse
                   ?.firstWhere((element) => element.taskType == 'asr')
@@ -515,9 +518,12 @@ class VoiceTextTranslateController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
+        lastComputeResponse['pipelineResponse']
+            .addAll(taskResponse.toJson()['pipelineResponse']);
         dynamic ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
-            .audio[0]['audioContent'];
+            .audio?[0]
+            .audioContent;
 
         // Save TTS audio to file
         if (ttsResponse != null) {
@@ -793,6 +799,8 @@ class VoiceTextTranslateController extends GetxController {
     recordedData = [];
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
     _socketIOClient.disconnect();
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
