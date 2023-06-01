@@ -110,14 +110,15 @@ class _RatingWidgetState extends State<RatingWidget>
                           filledColor: context.appTheme.primaryColor,
                           onRatingChanged: widget.onRatingChanged,
                           initialRating:
-                              widget.feedbackTypeModel.taskRating.value,
+                              widget.feedbackTypeModel.taskRating.value ?? 0.0,
                           maxRating: 5,
                           alignment: Alignment.centerLeft,
                         ),
                       ),
                       Obx(
                         () => Visibility(
-                          visible: widget.feedbackTypeModel.taskRating.value <
+                          visible: (widget.feedbackTypeModel.taskRating.value ??
+                                      0.0) <
                                   4 &&
                               widget.feedbackTypeModel.taskRating.value != 0,
                           // widget._showTaskQuestions,
