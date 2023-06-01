@@ -24,7 +24,7 @@ class FeedbackTypeModel {
 class GranularFeedback {
   final String question;
   final List<dynamic> supportedFeedbackTypes;
-  final double? mainRating;
+  double? mainRating;
   final List<dynamic> parameters;
 
   GranularFeedback({
@@ -37,7 +37,7 @@ class GranularFeedback {
 
 class Parameter {
   final String paramName;
-  final double? paramRating;
+  double? paramRating;
 
   Parameter({
     required this.paramName,
