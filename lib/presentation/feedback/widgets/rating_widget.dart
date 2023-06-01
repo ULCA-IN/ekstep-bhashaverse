@@ -30,7 +30,6 @@ class RatingWidget extends StatefulWidget {
 
 class _RatingWidgetState extends State<RatingWidget>
     with SingleTickerProviderStateMixin {
-  // late FeedbackController _feedbackController;
   late AnimationController _controller;
   late Animation<double> _animation;
 
@@ -143,6 +142,8 @@ class _RatingWidgetState extends State<RatingWidget>
                                         isRating: feedback
                                             .supportedFeedbackTypes
                                             .contains('rating'),
+                                        onRatingChanged: (value) =>
+                                            feedback.mainRating = value,
                                         depthRatings: feedback
                                                 .supportedFeedbackTypes
                                                 .contains('rating-list')
@@ -152,6 +153,10 @@ class _RatingWidgetState extends State<RatingWidget>
                                                   question: parameter.paramName,
                                                   rating: parameter.paramRating,
                                                   isRating: true,
+                                                  onRatingChanged: (value) {
+                                                    parameter.paramRating =
+                                                        value;
+                                                  },
                                                 );
                                               }).toList()
                                             : null,
@@ -181,16 +186,19 @@ class DepthRatings extends StatelessWidget {
     required String question,
     required bool isRating,
     double? rating,
+    required Function(double value) onRatingChanged,
     List<DepthRatings>? depthRatings,
   })  : _question = question,
         _rating = rating,
         _isRating = isRating,
-        _depthRatings = depthRatings;
+        _depthRatings = depthRatings,
+        _onRatingChanged = onRatingChanged;
 
   final String _question;
   final double? _rating;
   final bool _isRating;
   final List<DepthRatings>? _depthRatings;
+  final Function(double value) _onRatingChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +221,9 @@ class DepthRatings extends StatelessWidget {
               filledColor: context.appTheme.primaryColor,
               initialRating: _rating ?? 0,
               maxRating: 5,
-              onRatingChanged: (p0) {},
+              onRatingChanged: (value) {
+                _onRatingChanged(value);
+              },
             ),
           if (_depthRatings != null && _depthRatings!.isNotEmpty)
             Column(
