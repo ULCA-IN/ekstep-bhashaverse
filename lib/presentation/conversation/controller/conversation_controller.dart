@@ -80,6 +80,7 @@ class ConversationController extends GetxController {
 
   // for sending payload in feedback API
   Map<String, dynamic> lastComputeRequest = {};
+  Map<String, dynamic> lastComputeResponse = {};
 
   @override
   void onInit() {
@@ -379,6 +380,7 @@ class ConversationController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
+        lastComputeResponse = taskResponse.toJson();
         String targetOutputText = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
@@ -481,6 +483,8 @@ class ConversationController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
+        lastComputeResponse['pipelineResponse']
+            .addAll(taskResponse.toJson()['pipelineResponse']);
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio?[0]
@@ -739,6 +743,8 @@ class ConversationController extends GetxController {
     base64EncodedAudioContent = null;
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
   }
 
   disposePlayer() async {

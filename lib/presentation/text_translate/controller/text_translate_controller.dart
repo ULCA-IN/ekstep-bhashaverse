@@ -58,8 +58,9 @@ class TextTranslateController extends GetxController {
   late final Box _hiveDBInstance;
   late PlayerController playerController;
 
-  // for sending payload in feedback API
+// for sending payload in feedback API
   Map<String, dynamic> lastComputeRequest = {};
+  Map<String, dynamic> lastComputeResponse = {};
 
   @override
   void onInit() {
@@ -240,6 +241,7 @@ class TextTranslateController extends GetxController {
 
     response.when(
       success: (taskResponse) async {
+        lastComputeResponse = taskResponse.toJson();
         targetOutputText.value = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
@@ -301,6 +303,8 @@ class TextTranslateController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
+        lastComputeResponse['pipelineResponse']
+            .addAll(taskResponse.toJson()['pipelineResponse']);
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio?[0]
@@ -463,6 +467,8 @@ class TextTranslateController extends GetxController {
     targetOutputText.value = '';
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
     if (isTransliterationEnabled()) {
       setModelForTransliteration();
       clearTransliterationHints();

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -137,7 +139,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 _translationController.shareAudioFile(isSourceLang: true),
             onFeedbackButtonTap: () {
               Get.toNamed(AppRoutes.feedbackRoute, arguments: {
-                'requestPayload': _translationController.lastComputeRequest
+                // Fixes Dart shallow copy issue:
+                'requestPayload': json.decode(
+                    json.encode(_translationController.lastComputeRequest)),
+                'requestResponse': json.decode(
+                    json.encode(_translationController.lastComputeResponse))
               });
             },
             playerController: _translationController.playerController,
@@ -154,46 +160,55 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
-            textController: _translationController.targetLangTextController,
-            focusNode: FocusNode(),
-            backgroundColor: context.appTheme.normalTextFeildColor,
-            borderColor: context.appTheme.disabledBGColor,
-            hintText: isCurrentlyRecording()
-                ? _translationController.currentMic.value ==
-                        CurrentlySelectedMic.target
-                    ? kListeningHintText.tr
-                    : ''
-                : _translationController.micButtonStatus.value ==
-                        MicButtonStatus.pressed
-                    ? connecting.tr
-                    : converseHintText.tr,
-            translateButtonTitle: kTranslate.tr,
-            currentDuration: _translationController.currentDuration.value,
-            totalDuration: _translationController.maxDuration.value,
-            isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
-            topBorderRadius: 0,
-            bottomBorderRadius: textFieldRadius,
-            showTranslateButton: false,
-            showFeedbackIcon:
-                _translationController.isTranslateCompleted.value &&
-                    _translationController.currentMic.value ==
-                        CurrentlySelectedMic.target,
-            expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
-            showASRTTSActionButtons: true,
-            isReadOnly: true,
-            isShareButtonLoading:
-                _translationController.isSourceShareLoading.value,
-            textToCopy: _translationController.targetOutputText.value,
-            onFileShare: () =>
-                _translationController.shareAudioFile(isSourceLang: false),
-            onMusicPlayOrStop: () =>
-                _translationController.playStopTTSOutput(false),
-            playerController: _translationController.playerController,
-            speakerStatus: _translationController.targetSpeakerStatus.value,
-            rawTimeStream: _translationController.stopWatchTimer.rawTime,
-            showMicButton: isCurrentlyRecording() &&
-                _translationController.currentMic.value ==
-                    CurrentlySelectedMic.target),
+          textController: _translationController.targetLangTextController,
+          focusNode: FocusNode(),
+          backgroundColor: context.appTheme.normalTextFeildColor,
+          borderColor: context.appTheme.disabledBGColor,
+          hintText: isCurrentlyRecording()
+              ? _translationController.currentMic.value ==
+                      CurrentlySelectedMic.target
+                  ? kListeningHintText.tr
+                  : ''
+              : _translationController.micButtonStatus.value ==
+                      MicButtonStatus.pressed
+                  ? connecting.tr
+                  : converseHintText.tr,
+          translateButtonTitle: kTranslate.tr,
+          currentDuration: _translationController.currentDuration.value,
+          totalDuration: _translationController.maxDuration.value,
+          isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
+          topBorderRadius: 0,
+          bottomBorderRadius: textFieldRadius,
+          showTranslateButton: false,
+          showFeedbackIcon: _translationController.isTranslateCompleted.value &&
+              _translationController.currentMic.value ==
+                  CurrentlySelectedMic.target,
+          expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
+          showASRTTSActionButtons: true,
+          isReadOnly: true,
+          isShareButtonLoading:
+              _translationController.isSourceShareLoading.value,
+          textToCopy: _translationController.targetOutputText.value,
+          onFileShare: () =>
+              _translationController.shareAudioFile(isSourceLang: false),
+          onMusicPlayOrStop: () =>
+              _translationController.playStopTTSOutput(false),
+          playerController: _translationController.playerController,
+          speakerStatus: _translationController.targetSpeakerStatus.value,
+          rawTimeStream: _translationController.stopWatchTimer.rawTime,
+          showMicButton: isCurrentlyRecording() &&
+              _translationController.currentMic.value ==
+                  CurrentlySelectedMic.target,
+          onFeedbackButtonTap: () {
+            Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+              // Fixes Dart shallow copy issue:
+              'requestPayload': json.decode(
+                  json.encode(_translationController.lastComputeRequest)),
+              'requestResponse': json.decode(
+                  json.encode(_translationController.lastComputeResponse))
+            });
+          },
+        ),
       ),
     );
   }

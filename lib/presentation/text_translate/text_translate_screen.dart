@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -168,9 +170,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                               onFeedbackButtonTap: () {
                                 Get.toNamed(AppRoutes.feedbackRoute,
                                     arguments: {
-                                      'requestPayload':
+                                      // Fixes Dart shallow copy issue:
+                                      'requestPayload': json.decode(json.encode(
                                           _textTranslationController
-                                              .lastComputeRequest
+                                              .lastComputeRequest)),
+                                      'requestResponse': json.decode(
+                                          json.encode(_textTranslationController
+                                              .lastComputeResponse))
                                     });
                               },
                               playerController:
