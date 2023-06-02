@@ -116,7 +116,9 @@ class _RatingWidgetState extends State<RatingWidget>
                       ),
                       Obx(
                         () => Visibility(
-                          visible: (widget.feedbackTypeModel.taskRating.value ??
+                          visible: widget.feedbackTypeModel.taskRating.value !=
+                                  null &&
+                              (widget.feedbackTypeModel.taskRating.value ??
                                       0.0) <
                                   4 &&
                               widget.feedbackTypeModel.taskRating.value != 0,
@@ -124,12 +126,15 @@ class _RatingWidgetState extends State<RatingWidget>
                           child: Column(
                             children: [
                               SizedBox(height: 12.toHeight),
-                              GenericTextField(
-                                controller:
-                                    widget.feedbackTypeModel.textController,
-                                focusNode: widget.feedbackTypeModel.focusNode,
-                                onChange: widget.onTextChanged,
-                              ),
+                              if (widget.feedbackTypeModel.taskType == 'asr' ||
+                                  widget.feedbackTypeModel.taskType ==
+                                      'translation')
+                                GenericTextField(
+                                  controller:
+                                      widget.feedbackTypeModel.textController,
+                                  focusNode: widget.feedbackTypeModel.focusNode,
+                                  onChange: widget.onTextChanged,
+                                ),
                               ...widget.feedbackTypeModel.granularFeedbacks
                                   .map((feedback) {
                                 return feedback.supportedFeedbackTypes
