@@ -163,6 +163,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
           onFeedbackButtonTap: () {
             Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+              // Fixes Dart shallow copy issue:
               'requestPayload': json.decode(
                   json.encode(_voiceTextTransController.lastComputeRequest)),
               'requestResponse': json.decode(
