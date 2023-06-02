@@ -15,7 +15,6 @@ import '../../utils/theme/app_text_style.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import 'controller/feedback_controller.dart';
 import '../../common/widgets/custom_elevated_button.dart';
-import '../../common/widgets/generic_text_filed.dart';
 import '../../common/widgets/transliteration_hints.dart';
 import 'widgets/rating_widget.dart';
 
@@ -28,11 +27,6 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   late final FeedbackController _feedbackController;
-
-  final TextEditingController _generalFeedbackController =
-      TextEditingController();
-
-  final FocusNode _generalFeedbackFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -103,16 +97,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           alignment: Alignment.center,
         ),
         SizedBox(height: 18.toHeight),
-        GenericTextField(
-          controller: _generalFeedbackController,
-          focusNode: _generalFeedbackFocusNode,
-          lines: 5,
-          hintText: writeReviewHere.tr,
-          onChange: (V) {
-            _onTextChanged(
-                _generalFeedbackController, _feedbackController.oldSourceText);
-          },
-        ),
         SizedBox(height: 18.toHeight),
       ],
     );
@@ -271,25 +255,20 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     showScrollIcon: false,
                     isScrollArrowVisible: false,
                     onSelected: (hintText) {
-                      if (_generalFeedbackFocusNode.hasFocus) {
-                        replaceWordWithHint(
-                            _generalFeedbackController, hintText);
-                        _feedbackController.transliterationHints.clear();
-                      } else {
-                        for (var taskFeedback
-                            in _feedbackController.feedbackTypeModels) {
-                          if (taskFeedback.value.focusNode.hasFocus) {
-                            replaceWordWithHint(
-                                taskFeedback.value.textController, hintText);
+                      for (var taskFeedback
+                          in _feedbackController.feedbackTypeModels) {
+                        if (taskFeedback.value.focusNode.hasFocus) {
+                          replaceWordWithHint(
+                              taskFeedback.value.textController, hintText);
 
-                            replaceSuggestedTextInPayload(taskFeedback.value,
-                                taskFeedback.value.textController);
+                          replaceSuggestedTextInPayload(taskFeedback.value,
+                              taskFeedback.value.textController);
 
-                            _feedbackController.transliterationHints.clear();
-                            return;
-                          }
+                          _feedbackController.transliterationHints.clear();
+                          return;
                         }
                       }
+
                       _feedbackController.transliterationHints.clear();
                     }),
               );
