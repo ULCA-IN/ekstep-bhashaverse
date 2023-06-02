@@ -112,43 +112,50 @@ class ASRAndTTSActions extends StatelessWidget {
         SizedBox(width: 8.toWidth),
         _speakerStatus != SpeakerStatus.playing
             ? _showFeedbackIcon
-                ? GestureDetector(
-                    onTap: _onFeedbackButtonTap != null
-                        ? () => _onFeedbackButtonTap!()
-                        : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 450),
-                      curve: Curves.fastOutSlowIn,
-                      decoration: BoxDecoration(
-                          color: _expandFeedbackIcon
-                              ? context.appTheme.textFieldBorderColor
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(14)),
-                      padding: AppEdgeInsets.instance
-                          .symmetric(vertical: 6, horizontal: 15),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(iconLikeDislike),
-                          AnimatedCrossFade(
+                ? Expanded(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _onFeedbackButtonTap != null
+                              ? () => _onFeedbackButtonTap!()
+                              : null,
+                          child: AnimatedContainer(
                             duration: const Duration(milliseconds: 450),
-                            firstChild: Row(
+                            curve: Curves.fastOutSlowIn,
+                            decoration: BoxDecoration(
+                                color: _expandFeedbackIcon
+                                    ? context.appTheme.textFieldBorderColor
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(14)),
+                            padding: AppEdgeInsets.instance
+                                .symmetric(vertical: 6, horizontal: 15),
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SizedBox(width: 8.toWidth),
-                                Text(feedback.tr),
+                                SvgPicture.asset(iconLikeDislike),
+                                AnimatedCrossFade(
+                                  duration: const Duration(milliseconds: 450),
+                                  firstChild: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(width: 8.toWidth),
+                                      Text(feedback.tr),
+                                    ],
+                                  ),
+                                  secondChild: const SizedBox.shrink(),
+                                  crossFadeState: _expandFeedbackIcon
+                                      ? CrossFadeState.showFirst
+                                      : CrossFadeState.showSecond,
+                                ),
                               ],
                             ),
-                            secondChild: const SizedBox.shrink(),
-                            crossFadeState: _expandFeedbackIcon
-                                ? CrossFadeState.showFirst
-                                : CrossFadeState.showSecond,
                           ),
-                        ],
-                      ),
+                        ),
+                        const Spacer()
+                      ],
                     ),
                   )
-                : const SizedBox.shrink()
+                : const Spacer()
             : Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -183,7 +190,6 @@ class ASRAndTTSActions extends StatelessWidget {
                 ),
               ),
         SizedBox(width: 12.toWidth),
-        const Spacer(),
         InkWell(
           onTap: () {
             if (_speakerStatus != SpeakerStatus.disabled) {
