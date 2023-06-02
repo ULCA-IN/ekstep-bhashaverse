@@ -154,103 +154,104 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Obx _buildSubmitButton(BuildContext context) {
     return Obx(
       () => !_feedbackController.isLoading.value
-          ? Padding(
-              padding: AppEdgeInsets.instance
-                  .symmetric(vertical: 16, horizontal: 8.0),
-              child: CustomElevetedButton(
-                buttonText: submit.tr,
-                textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
-                backgroundColor: context.appTheme.primaryColor,
-                borderRadius: 16,
-                onButtonTap: () {
-                  Map<String, dynamic> submissionPayload = {};
-                  submissionPayload['feedbackTimeStamp'] =
-                      DateTime.timestamp().millisecondsSinceEpoch;
-                  submissionPayload['feedbackLanguage'] =
-                      Get.locale?.languageCode ?? defaultLangCode;
-                  submissionPayload['pipelineInput'] =
-                      _feedbackController.computePayload;
-                  submissionPayload['pipelineOutput'] =
-                      _feedbackController.computeResponse;
-                  submissionPayload['suggestedPipelineOutput'] =
-                      _feedbackController.suggestedOutput;
-                  submissionPayload['pipelineFeedback'] = {
-                    'commonFeedback': [
-                      {
-                        'question': _feedbackController
-                                .feedbackReqResponse['pipelineFeedback']
-                            ['commonFeedback'][0]['question'],
-                        "feedbackType": "rating",
-                        "rating": _feedbackController.ovarralFeedback.value
-                      }
-                    ]
-                  };
+          ? SafeArea(
+              child: Padding(
+                padding: AppEdgeInsets.instance.all(16.0),
+                child: CustomElevetedButton(
+                  buttonText: submit.tr,
+                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
+                  backgroundColor: context.appTheme.primaryColor,
+                  borderRadius: 16,
+                  onButtonTap: () {
+                    Map<String, dynamic> submissionPayload = {};
+                    submissionPayload['feedbackTimeStamp'] =
+                        DateTime.timestamp().millisecondsSinceEpoch;
+                    submissionPayload['feedbackLanguage'] =
+                        Get.locale?.languageCode ?? defaultLangCode;
+                    submissionPayload['pipelineInput'] =
+                        _feedbackController.computePayload;
+                    submissionPayload['pipelineOutput'] =
+                        _feedbackController.computeResponse;
+                    submissionPayload['suggestedPipelineOutput'] =
+                        _feedbackController.suggestedOutput;
+                    submissionPayload['pipelineFeedback'] = {
+                      'commonFeedback': [
+                        {
+                          'question': _feedbackController
+                                  .feedbackReqResponse['pipelineFeedback']
+                              ['commonFeedback'][0]['question'],
+                          "feedbackType": "rating",
+                          "rating": _feedbackController.ovarralFeedback.value
+                        }
+                      ]
+                    };
 
-                  List<Map<String, dynamic>> taskFeedback = [];
+                    List<Map<String, dynamic>> taskFeedback = [];
 
-                  for (var task
-                      in _feedbackController.feedbackTypeModels.value) {
-                    if (task.value.taskRating.value != null) {
-                      List<Map<String, dynamic>> granualFeedback = [];
+                    for (var task
+                        in _feedbackController.feedbackTypeModels.value) {
+                      if (task.value.taskRating.value != null) {
+                        List<Map<String, dynamic>> granualFeedback = [];
 
-                      for (var feedback in task.value.granularFeedbacks) {
-                        bool isRating =
-                            feedback.supportedFeedbackTypes.contains("rating");
+                        for (var feedback in task.value.granularFeedbacks) {
+                          bool isRating = feedback.supportedFeedbackTypes
+                              .contains("rating");
 
-                        Map<String, dynamic> question = {
-                          "question": feedback.question,
-                          "feedbackType": isRating ? "rating" : "rating-list",
-                        };
+                          Map<String, dynamic> question = {
+                            "question": feedback.question,
+                            "feedbackType": isRating ? "rating" : "rating-list",
+                          };
 
-                        if (isRating && feedback.mainRating != null) {
-                          question["rating"] = feedback.mainRating;
-                        } else {
-                          List<Map<String, dynamic>> parameters = [];
+                          if (isRating && feedback.mainRating != null) {
+                            question["rating"] = feedback.mainRating;
+                          } else {
+                            List<Map<String, dynamic>> parameters = [];
 
-                          for (var parameter in feedback.parameters) {
-                            if (parameter.paramRating != null) {
-                              Map<String, dynamic> singleParameter = {
-                                "parameterName": parameter.paramName,
-                                "rating": parameter.paramRating,
-                              };
-                              parameters.add(singleParameter);
+                            for (var parameter in feedback.parameters) {
+                              if (parameter.paramRating != null) {
+                                Map<String, dynamic> singleParameter = {
+                                  "parameterName": parameter.paramName,
+                                  "rating": parameter.paramRating,
+                                };
+                                parameters.add(singleParameter);
+                              }
+                            }
+
+                            if (parameters.isNotEmpty) {
+                              question["rating-list"] = parameters;
                             }
                           }
-
-                          if (parameters.isNotEmpty) {
-                            question["rating-list"] = parameters;
+                          if (question["rating"] != null ||
+                              question["rating-list"] != null) {
+                            granualFeedback.add(question);
                           }
                         }
-                        if (question["rating"] != null ||
-                            question["rating-list"] != null) {
-                          granualFeedback.add(question);
-                        }
+
+                        taskFeedback.add({
+                          "taskType": task.value.taskType,
+                          "commonFeedback": [
+                            {
+                              "question": task.value.question,
+                              "feedbackType": "rating",
+                              "rating": task.value.taskRating.value,
+                            }
+                          ],
+                          if (granualFeedback.isNotEmpty)
+                            "granularFeedback": granualFeedback,
+                        });
                       }
-
-                      taskFeedback.add({
-                        "taskType": task.value.taskType,
-                        "commonFeedback": [
-                          {
-                            "question": task.value.question,
-                            "feedbackType": "rating",
-                            "rating": task.value.taskRating.value,
-                          }
-                        ],
-                        if (granualFeedback.isNotEmpty)
-                          "granularFeedback": granualFeedback,
-                      });
                     }
-                  }
 
-                  if (taskFeedback.isNotEmpty) {
-                    submissionPayload['taskFeedback'] = taskFeedback;
-                  }
+                    if (taskFeedback.isNotEmpty) {
+                      submissionPayload['taskFeedback'] = taskFeedback;
+                    }
 
-                  _feedbackController.getDetailedFeedback.value = false;
-                  _feedbackController.ovarralFeedback.value = 0;
+                    _feedbackController.getDetailedFeedback.value = false;
+                    _feedbackController.ovarralFeedback.value = 0;
 
-                  Get.back();
-                },
+                    Get.back();
+                  },
+                ),
               ),
             )
           : const SizedBox.shrink(),
