@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -45,7 +47,12 @@ class FeedbackController extends GetxController {
         json.decode(json.encode(Get.arguments['requestResponse']));
 
     (responseCopyForSuggestedRes).forEach((key, value) {
-      suggestedOutput?[key] = value;
+      suggestedOutput?[key] = [];
+      for (Map<String, dynamic> task in value) {
+        if (task['taskType'] != 'tts') {
+          suggestedOutput?[key].add(task);
+        }
+      }
     });
 
     Map<String, dynamic> responseCopyForComputeRes =
@@ -161,6 +168,27 @@ class FeedbackController extends GetxController {
     );
   }
 
+  Future<void> submitFeedbackPayload() async {
+    var feedbackSubmitResponse = await _dhruvaapiClient.submitFeedback(
+      url: _languageModelController.taskSequenceResponse.feedbackUrl,
+      authorizationKey: _languageModelController.taskSequenceResponse
+          .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+      authorizationValue: _languageModelController.taskSequenceResponse
+          .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
+      requestPayload: createFeedbackSubmitPayload(),
+    );
+    feedbackSubmitResponse.when(
+      success: ((dynamic response) async {
+        showDefaultSnackbar(message: response['message']);
+      }),
+      failure: (error) {
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        isLoading.value = false;
+      },
+    );
+  }
+
   void getFeedbackQuestions() {
     if (feedbackReqResponse['taskFeedback'] != null &&
         feedbackReqResponse['taskFeedback'] is List) {
@@ -196,14 +224,19 @@ class FeedbackController extends GetxController {
             pipelineTaskValue = task?['output'][0]['target'];
             break;
         }
-
+        TextEditingController feedbackTextController =
+            TextEditingController(text: pipelineTaskValue);
+        FocusNode feedbackFocusNode = FocusNode();
+        feedbackFocusNode.addListener(() {
+          oldSourceText = feedbackTextController.text;
+        });
         feedbackTypeModels.add(FeedbackTypeModel(
                 taskType: taskFeedback['taskType'],
                 question: taskFeedback['commonFeedback'].length > 0
                     ? taskFeedback['commonFeedback'][0]['question']
                     : '',
-                textController: TextEditingController(text: pipelineTaskValue),
-                focusNode: FocusNode(),
+                textController: feedbackTextController,
+                focusNode: feedbackFocusNode,
                 taskRating: Rxn<double>(),
                 isExpanded: false.obs,
                 granularFeedbacks: granularFeedbacks)
@@ -220,5 +253,119 @@ class FeedbackController extends GetxController {
         const Duration(days: 1),
       ),
     );
+  }
+
+  Map<String, dynamic> createFeedbackSubmitPayload() {
+    Map<String, dynamic> submissionPayload = {};
+    submissionPayload['feedbackTimeStamp'] =
+        DateTime.timestamp().millisecondsSinceEpoch;
+    submissionPayload['feedbackLanguage'] =
+        Get.locale?.languageCode ?? defaultLangCode;
+    submissionPayload['pipelineInput'] = computePayload;
+    submissionPayload['pipelineOutput'] = computeResponse;
+
+    // Suggested Output
+
+    bool isUserSuggesgedOutput = false;
+
+    for (Map<String, dynamic> task in suggestedOutput?['pipelineResponse']) {
+      if (task['taskType'] == "asr") {
+        String? outputTextSource = (computeResponse?['pipelineResponse']
+                    as List<dynamic>)
+                .firstWhere((e) => e['taskType'] == task['taskType'])['output']
+            [0]['source'];
+        String? userSuggestedOutputText = task['output'][0]['source'];
+        isUserSuggesgedOutput = outputTextSource != userSuggestedOutputText;
+      }
+      if (!isUserSuggesgedOutput && task['taskType'] == "translation") {
+        String outputTextSource = (computeResponse?['pipelineResponse']
+                    as List<dynamic>)
+                .firstWhere((e) => e['taskType'] == task['taskType'])['output']
+            [0]['target'];
+        String userSuggestedOutputText = task['output'][0]['target'];
+        isUserSuggesgedOutput = outputTextSource != userSuggestedOutputText;
+      }
+    }
+    if (isUserSuggesgedOutput) {
+      submissionPayload['suggestedPipelineOutput'] = suggestedOutput;
+    }
+
+    // Pipeline Feedback
+
+    submissionPayload['pipelineFeedback'] = {
+      'commonFeedback': [
+        {
+          'question': feedbackReqResponse['pipelineFeedback']['commonFeedback']
+              [0]['question'],
+          "feedbackType": "rating",
+          "rating": ovarralFeedback.value
+        }
+      ]
+    };
+
+    // Task Feedback
+
+    List<Map<String, dynamic>> taskFeedback = [];
+
+    for (var task in feedbackTypeModels.value) {
+      if (task.value.taskRating.value != null) {
+        // Granular Feedback
+
+        List<Map<String, dynamic>> granularFeedback = [];
+
+        for (var feedback in task.value.granularFeedbacks) {
+          bool isRating = feedback.supportedFeedbackTypes.contains("rating");
+
+          // Granular Feedback Rating questions
+
+          Map<String, dynamic> question = {
+            "question": feedback.question,
+            "feedbackType": isRating ? "rating" : "rating-list",
+          };
+
+          if (isRating && feedback.mainRating != null) {
+            question["rating"] = feedback.mainRating;
+          } else {
+            // Granular Feedback questions parameter
+
+            List<Map<String, dynamic>> parameters = [];
+
+            for (var parameter in feedback.parameters) {
+              if (parameter.paramRating != null) {
+                Map<String, dynamic> singleParameter = {
+                  "parameterName": parameter.paramName,
+                  "rating": parameter.paramRating,
+                };
+                parameters.add(singleParameter);
+              }
+            }
+
+            if (parameters.isNotEmpty) {
+              question["rating-list"] = parameters;
+            }
+          }
+          if (question["rating"] != null || question["rating-list"] != null) {
+            granularFeedback.add(question);
+          }
+        }
+
+        taskFeedback.add({
+          "taskType": task.value.taskType,
+          "commonFeedback": [
+            {
+              "question": task.value.question,
+              "feedbackType": "rating",
+              "rating": task.value.taskRating.value,
+            }
+          ],
+          if (granularFeedback.isNotEmpty) "granularFeedback": granularFeedback,
+        });
+      }
+    }
+
+    if (taskFeedback.isNotEmpty) {
+      submissionPayload['taskFeedback'] = taskFeedback;
+    }
+    return submissionPayload;
   }
 }
