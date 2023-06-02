@@ -93,4 +93,5 @@ final Map<String, String> en = {
   writeReviewHere: 'Write your review here',
   submit: 'Submit',
   loading: 'Loading',
+  errorGiveRating: 'Please give a rating',
 };
