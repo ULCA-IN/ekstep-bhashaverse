@@ -9,7 +9,9 @@ import '../../common/widgets/common_app_bar.dart';
 import '../../localization/localization_keys.dart';
 import '../../models/feedback_type_model.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/remove_glow_effect.dart';
 import '../../utils/screen_util/screen_util.dart';
+import '../../utils/snackbar_utils.dart';
 import '../../utils/string_helper.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/theme/app_theme_provider.dart';
@@ -46,22 +48,26 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   footerText: loading.tr)
               : Stack(
                   children: [
-                    SingleChildScrollView(
-                      child: Padding(
-                        padding: AppEdgeInsets.instance
-                            .symmetric(vertical: 8, horizontal: 22),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 16.toHeight),
-                            CommonAppBar(
-                              title: feedback.tr,
-                              showLogo: false,
-                              onBackPress: () => Get.back(),
-                            ),
-                            SizedBox(height: 60.toHeight),
-                            _buildCommonFeedback(context),
-                            _buildTaskFeedback(),
-                          ],
+                    ScrollConfiguration(
+                      behavior: RemoveScrollingGlowEffect(),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: AppEdgeInsets.instance
+                              .symmetric(vertical: 8, horizontal: 22),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 16.toHeight),
+                              CommonAppBar(
+                                title: feedback.tr,
+                                showLogo: false,
+                                onBackPress: () => Get.back(),
+                              ),
+                              SizedBox(height: 60.toHeight),
+                              _buildCommonFeedback(context),
+                              SizedBox(height: 18.toHeight),
+                              _buildTaskFeedback(),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -90,14 +96,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           filledIcon: Icons.star,
           emptyIcon: Icons.star_border,
           filledColor: context.appTheme.primaryColor,
-          onRatingChanged: (value) =>
-              _feedbackController.ovarralFeedback.value = value,
+          onRatingChanged: (value) {
+            _feedbackController.ovarralFeedback.value = value;
+            for (var task in _feedbackController.feedbackTypeModels.value) {
+              task.value.taskRating.value = null;
+            }
+          },
           initialRating: 0,
           maxRating: 5,
           alignment: Alignment.center,
         ),
-        SizedBox(height: 18.toHeight),
-        SizedBox(height: 18.toHeight),
       ],
     );
   }
@@ -122,7 +130,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           taskFeedback.value.taskRating.value = value,
                       onTextChanged: (v) => _onTextChanged(
                           taskFeedback.value.textController,
-                          _feedbackController.oldSourceText,
                           taskFeedback: taskFeedback.value),
                     ),
                   )
@@ -133,7 +140,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     );
   }
 
-  Obx _buildSubmitButton(BuildContext context) {
+  Widget _buildSubmitButton(BuildContext context) {
     return Obx(
       () => !_feedbackController.isLoading.value
           ? SafeArea(
@@ -145,93 +152,14 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
-                    Map<String, dynamic> submissionPayload = {};
-                    submissionPayload['feedbackTimeStamp'] =
-                        DateTime.timestamp().millisecondsSinceEpoch;
-                    submissionPayload['feedbackLanguage'] =
-                        Get.locale?.languageCode ?? defaultLangCode;
-                    submissionPayload['pipelineInput'] =
-                        _feedbackController.computePayload;
-                    submissionPayload['pipelineOutput'] =
-                        _feedbackController.computeResponse;
-                    submissionPayload['suggestedPipelineOutput'] =
-                        _feedbackController.suggestedOutput;
-                    submissionPayload['pipelineFeedback'] = {
-                      'commonFeedback': [
-                        {
-                          'question': _feedbackController
-                                  .feedbackReqResponse['pipelineFeedback']
-                              ['commonFeedback'][0]['question'],
-                          "feedbackType": "rating",
-                          "rating": _feedbackController.ovarralFeedback.value
-                        }
-                      ]
-                    };
-
-                    List<Map<String, dynamic>> taskFeedback = [];
-
-                    for (var task
-                        in _feedbackController.feedbackTypeModels.value) {
-                      if (task.value.taskRating.value != null) {
-                        List<Map<String, dynamic>> granualFeedback = [];
-
-                        for (var feedback in task.value.granularFeedbacks) {
-                          bool isRating = feedback.supportedFeedbackTypes
-                              .contains("rating");
-
-                          Map<String, dynamic> question = {
-                            "question": feedback.question,
-                            "feedbackType": isRating ? "rating" : "rating-list",
-                          };
-
-                          if (isRating && feedback.mainRating != null) {
-                            question["rating"] = feedback.mainRating;
-                          } else {
-                            List<Map<String, dynamic>> parameters = [];
-
-                            for (var parameter in feedback.parameters) {
-                              if (parameter.paramRating != null) {
-                                Map<String, dynamic> singleParameter = {
-                                  "parameterName": parameter.paramName,
-                                  "rating": parameter.paramRating,
-                                };
-                                parameters.add(singleParameter);
-                              }
-                            }
-
-                            if (parameters.isNotEmpty) {
-                              question["rating-list"] = parameters;
-                            }
-                          }
-                          if (question["rating"] != null ||
-                              question["rating-list"] != null) {
-                            granualFeedback.add(question);
-                          }
-                        }
-
-                        taskFeedback.add({
-                          "taskType": task.value.taskType,
-                          "commonFeedback": [
-                            {
-                              "question": task.value.question,
-                              "feedbackType": "rating",
-                              "rating": task.value.taskRating.value,
-                            }
-                          ],
-                          if (granualFeedback.isNotEmpty)
-                            "granularFeedback": granualFeedback,
-                        });
-                      }
+                    if (_feedbackController.ovarralFeedback.value > 0) {
+                      _feedbackController.getDetailedFeedback.value = false;
+                      _feedbackController.ovarralFeedback.value = 0;
+                      _feedbackController.submitFeedbackPayload();
+                      Get.back();
+                    } else {
+                      showDefaultSnackbar(message: errorGiveRating.tr);
                     }
-
-                    if (taskFeedback.isNotEmpty) {
-                      submissionPayload['taskFeedback'] = taskFeedback;
-                    }
-
-                    _feedbackController.getDetailedFeedback.value = false;
-                    _feedbackController.ovarralFeedback.value = 0;
-
-                    Get.back();
                   },
                 ),
               ),
@@ -278,24 +206,24 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   void _onTextChanged(
-    TextEditingController controller,
-    String oldText, {
+    TextEditingController controller, {
     FeedbackTypeModel? taskFeedback,
   }) {
     String languageCode = '';
-// update suggested payload and get language code
 
     if (taskFeedback != null) {
+      // get language code for transliteration
       Map<String, dynamic>? task = (_feedbackController
               .suggestedOutput?['pipelineResponse'] as List<dynamic>)
           .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
-
       languageCode = getLanguageCodeFromPayload(task);
+
+      // update suggestion payload
       replaceSuggestedTextInPayload(taskFeedback, controller);
     }
 
     // get transliteration
-    if (controller.text.length > oldText.length) {
+    if (controller.text.length > _feedbackController.oldSourceText.length) {
       if (_feedbackController.isTransliterationEnabled()) {
         int cursorPosition = controller.selection.base.offset;
         String sourceText = controller.text;
@@ -319,7 +247,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         _feedbackController.transliterationHints.clear();
       }
     }
-    oldText = controller.text;
+    _feedbackController.oldSourceText = controller.text;
   }
 
   void replaceSuggestedTextInPayload(
