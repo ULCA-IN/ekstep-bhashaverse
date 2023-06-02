@@ -53,23 +53,21 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               : Stack(
                   children: [
                     SingleChildScrollView(
-                      child: Obx(
-                        () => Padding(
-                          padding: AppEdgeInsets.instance
-                              .symmetric(vertical: 8, horizontal: 22),
-                          child: Column(
-                            children: [
-                              SizedBox(height: 16.toHeight),
-                              CommonAppBar(
-                                title: feedback.tr,
-                                showLogo: false,
-                                onBackPress: () => Get.back(),
-                              ),
-                              SizedBox(height: 60.toHeight),
-                              _buildCommonFeedback(context),
-                              _buildTaskFeedback(),
-                            ],
-                          ),
+                      child: Padding(
+                        padding: AppEdgeInsets.instance
+                            .symmetric(vertical: 8, horizontal: 22),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 16.toHeight),
+                            CommonAppBar(
+                              title: feedback.tr,
+                              showLogo: false,
+                              onBackPress: () => Get.back(),
+                            ),
+                            SizedBox(height: 60.toHeight),
+                            _buildCommonFeedback(context),
+                            _buildTaskFeedback(),
+                          ],
                         ),
                       ),
                     ),
@@ -100,7 +98,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           filledColor: context.appTheme.primaryColor,
           onRatingChanged: (value) =>
               _feedbackController.ovarralFeedback.value = value,
-          initialRating: _feedbackController.ovarralFeedback.value,
+          initialRating: 0,
           maxRating: 5,
           alignment: Alignment.center,
         ),
@@ -259,7 +257,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   Widget _buildTransliterationHints() {
-    return MediaQuery.of(context).viewInsets.bottom != 0
+    return MediaQuery.of(context).viewInsets.bottom != 0 &&
+            _feedbackController.transliterationHints.value.isNotEmpty
         ? Obx(
             () {
               return Container(
@@ -282,6 +281,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           if (taskFeedback.value.focusNode.hasFocus) {
                             replaceWordWithHint(
                                 taskFeedback.value.textController, hintText);
+
+                            replaceSuggestedTextInPayload(taskFeedback.value,
+                                taskFeedback.value.textController);
+
                             _feedbackController.transliterationHints.clear();
                             return;
                           }
@@ -297,24 +300,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   void _onTextChanged(
     TextEditingController controller,
-    oldText, {
+    String oldText, {
     FeedbackTypeModel? taskFeedback,
   }) {
-// update suggested payload
+    String languageCode = '';
+// update suggested payload and get language code
 
     if (taskFeedback != null) {
       Map<String, dynamic>? task = (_feedbackController
               .suggestedOutput?['pipelineResponse'] as List<dynamic>)
           .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
 
-      switch (task?['taskType']) {
-        case 'asr':
-          task?['output'][0]['source'] = controller.text;
-          break;
-        case 'translation':
-          task?['output'][0]['target'] = controller.text;
-          break;
-      }
+      languageCode = getLanguageCodeFromPayload(task);
+      replaceSuggestedTextInPayload(taskFeedback, controller);
     }
 
     // get transliteration
@@ -325,12 +323,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         if (sourceText.trim().isNotEmpty &&
             sourceText[cursorPosition - 1] != ' ') {
           getTransliterationHints(
-              getWordFromCursorPosition(sourceText, cursorPosition));
+              getWordFromCursorPosition(sourceText, cursorPosition),
+              languageCode);
         } else if (sourceText.trim().isNotEmpty &&
             _feedbackController.transliterationHints.isNotEmpty) {
           String wordTOReplace = _feedbackController.transliterationHints.first;
           replaceWordWithHint(controller, wordTOReplace);
           _feedbackController.transliterationHints.clear();
+          if (taskFeedback != null) {
+            replaceSuggestedTextInPayload(taskFeedback, controller);
+          }
         } else if (_feedbackController.transliterationHints.isNotEmpty) {
           _feedbackController.transliterationHints.clear();
         }
@@ -341,12 +343,42 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     oldText = controller.text;
   }
 
-  void getTransliterationHints(String newText) {
+  void replaceSuggestedTextInPayload(
+    FeedbackTypeModel taskFeedback,
+    TextEditingController controller,
+  ) {
+    Map<String, dynamic>? task = (_feedbackController
+            .suggestedOutput?['pipelineResponse'] as List<dynamic>)
+        .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
+
+    switch (task?['taskType']) {
+      case 'asr':
+        task?['output'][0]['source'] = controller.text;
+        break;
+      case 'translation':
+        task?['output'][0]['target'] = controller.text;
+        break;
+    }
+  }
+
+  String getLanguageCodeFromPayload(Map<String, dynamic>? task) {
+    String languageCode = '';
+
+    String languageType =
+        task?['taskType'] == 'asr' ? 'sourceLanguage' : 'targetLanguage';
+    languageCode =
+        (_feedbackController.computePayload?['pipelineTasks'] as List<dynamic>)
+                .firstWhereOrNull(
+                    (e) => e['taskType'] == task?['taskType'])['config']
+            ['language'][languageType];
+
+    return languageCode;
+  }
+
+  void getTransliterationHints(String newText, String languageCode) {
     String wordToSend = newText.split(" ").last;
     if (wordToSend.isNotEmpty) {
-      if (Get.locale?.languageCode != null) {
-        _feedbackController.getTransliterationOutput(wordToSend);
-      }
+      _feedbackController.getTransliterationOutput(wordToSend, languageCode);
     } else {
       _feedbackController.transliterationHints.clear();
     }
