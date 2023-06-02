@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -37,9 +39,19 @@ class FeedbackController extends GetxController {
       computePayload?[key] = value;
     });
 
-    (Get.arguments['requestResponse'] as Map<String, dynamic>)
-        .forEach((key, value) {
+    // Fixes Dart shallow copy issue:
+
+    Map<String, dynamic> responseCopyForSuggestedRes =
+        json.decode(json.encode(Get.arguments['requestResponse']));
+
+    (responseCopyForSuggestedRes).forEach((key, value) {
       suggestedOutput?[key] = value;
+    });
+
+    Map<String, dynamic> responseCopyForComputeRes =
+        json.decode(json.encode(Get.arguments['requestResponse']));
+
+    (responseCopyForComputeRes).forEach((key, value) {
       computeResponse?[key] = value;
     });
 
@@ -91,16 +103,15 @@ class FeedbackController extends GetxController {
     return _hiveDBInstance?.get(enableTransliteration, defaultValue: true);
   }
 
-  Future<List<String>> getTransliterationOutput(String sourceText) async {
-    String? appLanguageCode = Get.locale?.languageCode;
-    if (appLanguageCode == null || appLanguageCode == defaultLangCode) {
+  Future<List<String>> getTransliterationOutput(
+      String sourceText, String languageCode) async {
+    if (languageCode == defaultLangCode) {
       return [];
     }
     transliterationModelToUse = _languageModelController
-            .getAvailableTransliterationModelsForLanguage(appLanguageCode) ??
+            .getAvailableTransliterationModelsForLanguage(languageCode) ??
         '';
     if (transliterationModelToUse.isEmpty) {
-      // clearTransliterationHints();
       return [];
     }
     var transliterationPayloadToSend = {};
