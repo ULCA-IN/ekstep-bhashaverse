@@ -312,40 +312,41 @@ class FeedbackController extends GetxController {
         // Granular Feedback
 
         List<Map<String, dynamic>> granularFeedback = [];
+        if (task.value.taskRating.value! < 4) {
+          for (var feedback in task.value.granularFeedbacks) {
+            bool isRating = feedback.supportedFeedbackTypes.contains("rating");
 
-        for (var feedback in task.value.granularFeedbacks) {
-          bool isRating = feedback.supportedFeedbackTypes.contains("rating");
+            // Granular Feedback Rating questions
 
-          // Granular Feedback Rating questions
+            Map<String, dynamic> question = {
+              "question": feedback.question,
+              "feedbackType": isRating ? "rating" : "rating-list",
+            };
 
-          Map<String, dynamic> question = {
-            "question": feedback.question,
-            "feedbackType": isRating ? "rating" : "rating-list",
-          };
+            if (isRating && feedback.mainRating != null) {
+              question["rating"] = feedback.mainRating;
+            } else {
+              // Granular Feedback questions parameter
 
-          if (isRating && feedback.mainRating != null) {
-            question["rating"] = feedback.mainRating;
-          } else {
-            // Granular Feedback questions parameter
+              List<Map<String, dynamic>> parameters = [];
 
-            List<Map<String, dynamic>> parameters = [];
+              for (var parameter in feedback.parameters) {
+                if (parameter.paramRating != null) {
+                  Map<String, dynamic> singleParameter = {
+                    "parameterName": parameter.paramName,
+                    "rating": parameter.paramRating,
+                  };
+                  parameters.add(singleParameter);
+                }
+              }
 
-            for (var parameter in feedback.parameters) {
-              if (parameter.paramRating != null) {
-                Map<String, dynamic> singleParameter = {
-                  "parameterName": parameter.paramName,
-                  "rating": parameter.paramRating,
-                };
-                parameters.add(singleParameter);
+              if (parameters.isNotEmpty) {
+                question["rating-list"] = parameters;
               }
             }
-
-            if (parameters.isNotEmpty) {
-              question["rating-list"] = parameters;
+            if (question["rating"] != null || question["rating-list"] != null) {
+              granularFeedback.add(question);
             }
-          }
-          if (question["rating"] != null || question["rating-list"] != null) {
-            granularFeedback.add(question);
           }
         }
 

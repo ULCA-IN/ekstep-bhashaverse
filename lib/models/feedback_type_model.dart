@@ -8,7 +8,7 @@ class FeedbackTypeModel {
   final FocusNode focusNode;
   Rxn<double> taskRating;
   RxBool isExpanded;
-  final List<GranularFeedback> granularFeedbacks;
+  List<GranularFeedback> granularFeedbacks;
 
   FeedbackTypeModel({
     required this.taskType,
