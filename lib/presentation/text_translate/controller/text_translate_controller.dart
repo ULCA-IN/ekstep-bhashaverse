@@ -298,13 +298,22 @@ class TextTranslateController extends GetxController {
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
+    if (lastComputeRequest['pipelineTasks'] != null &&
+        lastComputeRequest['pipelineTasks'].isNotEmpty) {
+      (lastComputeRequest['pipelineTasks'])
+          .removeWhere((element) => element['taskType'] == 'tts');
+    }
+
     lastComputeRequest['pipelineTasks']
         .addAll(asrPayloadToSend['pipelineTasks']);
 
     await response.when(
       success: (taskResponse) async {
         lastComputeResponse['pipelineResponse']
+            .removeWhere((element) => element['taskType'] == 'tts');
+        lastComputeResponse['pipelineResponse']
             .addAll(taskResponse.toJson()['pipelineResponse']);
+
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
             .audio?[0]
