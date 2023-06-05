@@ -431,7 +431,6 @@ class ConversationController extends GetxController {
         }
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
-        playStopTTSOutput(currentMic.value != CurrentlySelectedMic.source);
         isTranslateCompleted.value = true;
       },
       failure: (error) {
@@ -497,6 +496,7 @@ class ConversationController extends GetxController {
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
           isLoading.value = false;
+          playStopTTSOutput(!isTargetLanguage);
           Future.delayed(const Duration(seconds: 3))
               .then((value) => expandFeedbackIcon.value = false);
         } else {
