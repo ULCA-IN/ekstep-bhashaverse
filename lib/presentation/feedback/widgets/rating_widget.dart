@@ -158,6 +158,7 @@ class _RatingWidgetState extends State<RatingWidget>
                                                   question: parameter.paramName,
                                                   rating: parameter.paramRating,
                                                   isRating: true,
+                                                  showAsRow: true,
                                                   onRatingChanged: (value) {
                                                     parameter.paramRating =
                                                         value;
@@ -190,23 +191,36 @@ class DepthRatings extends StatelessWidget {
     super.key,
     required String question,
     required bool isRating,
+    showAsRow = false,
     double? rating,
     required Function(double value) onRatingChanged,
     List<DepthRatings>? depthRatings,
   })  : _question = question,
         _rating = rating,
         _isRating = isRating,
+        _showAsRow = showAsRow,
         _depthRatings = depthRatings,
         _onRatingChanged = onRatingChanged;
 
   final String _question;
   final double? _rating;
-  final bool _isRating;
+  final bool _isRating, _showAsRow;
   final List<DepthRatings>? _depthRatings;
   final Function(double value) _onRatingChanged;
 
   @override
   Widget build(BuildContext context) {
+    Widget question() => Text(_question, style: regular16(context));
+    Widget ratingBar() => RatingBar(
+          filledIcon: Icons.star,
+          emptyIcon: Icons.star_border,
+          filledColor: context.appTheme.primaryColor,
+          initialRating: _rating ?? 0,
+          maxRating: 5,
+          onRatingChanged: (value) {
+            _onRatingChanged(value);
+          },
+        );
     return Padding(
       padding: AppEdgeInsets.instance.all(8),
       child: Column(
@@ -214,22 +228,22 @@ class DepthRatings extends StatelessWidget {
         children: [
           if (_depthRatings != null && _depthRatings!.isNotEmpty)
             const Divider(),
-          Text(
-            _question,
-            style: regular16(context),
-          ),
-          SizedBox(height: 14.toHeight),
-          if (_isRating)
-            RatingBar(
-              filledIcon: Icons.star,
-              emptyIcon: Icons.star_border,
-              filledColor: context.appTheme.primaryColor,
-              initialRating: _rating ?? 0,
-              maxRating: 5,
-              onRatingChanged: (value) {
-                _onRatingChanged(value);
-              },
-            ),
+          _showAsRow
+              ? Row(
+                  children: [
+                    Expanded(child: question()),
+                    SizedBox(width: 8.toWidth),
+                    if (_isRating) ratingBar()
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    question(),
+                    SizedBox(height: 14.toHeight),
+                    if (_isRating) ratingBar()
+                  ],
+                ),
           if (_depthRatings != null && _depthRatings!.isNotEmpty)
             Column(
               children: [
