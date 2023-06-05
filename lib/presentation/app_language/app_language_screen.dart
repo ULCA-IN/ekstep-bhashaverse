@@ -165,8 +165,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       ),
       child: TextFormField(
         cursorColor: context.appTheme.secondaryTextColor,
-        style: regular16(context).copyWith(
-            fontSize: 18.toFont, color: context.appTheme.primaryTextColor),
+        style: regular16(context).copyWith(fontSize: 18.toFont),
         decoration: InputDecoration(
           contentPadding: AppEdgeInsets.instance.all(0),
           border: InputBorder.none,

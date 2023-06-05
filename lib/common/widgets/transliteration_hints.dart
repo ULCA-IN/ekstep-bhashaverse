@@ -68,8 +68,7 @@ class TransliterationHints extends StatelessWidget {
                           ),
                           child: Text(
                             hintText,
-                            style: regular16(context).copyWith(
-                                color: context.appTheme.primaryTextColor),
+                            style: regular16(context),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,

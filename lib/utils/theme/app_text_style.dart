@@ -30,7 +30,7 @@ TextStyle light16(BuildContext context) => TextStyle(
 TextStyle regular16(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w500,
       fontSize: 16.toFont,
-      color: context.appTheme.secondaryTextColor,
+      color: context.appTheme.primaryTextColor,
     );
 
 TextStyle regular18Primary(BuildContext context) => TextStyle(
