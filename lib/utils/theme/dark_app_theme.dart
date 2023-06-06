@@ -92,4 +92,16 @@ class DarkAppTheme implements AppTheme {
 
   @override
   Color get splashScreenBGColor => _AppColors.jaguarBlack;
+
+  @override
+  Color get feedbackIconColor => _AppColors.seaGreen;
+
+  @override
+  Color get feedbackIconClosedColor => _AppColors.silverTree;
+
+  @override
+  Color get feedbackTextColor => _AppColors.darkSpringGreen;
+
+  @override
+  Color get feedbackBGColor => _AppColors.whiteIce;
 }

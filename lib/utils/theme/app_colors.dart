@@ -30,4 +30,8 @@ class _AppColors {
   static const Color bastilleBlack = Color(0xFF2A2935);
   static const Color haitiBlack = Color(0xFF2C2B37);
   static const Color whiteLilac = Color(0xFFFAF8FC);
+  static const Color seaGreen = Color(0xFF318A5E);
+  static const Color darkSpringGreen = Color(0xFF28714D);
+  static const Color whiteIce = Color(0xFFD2EFE0);
+  static const Color silverTree = Color(0xFF6CCB9C);
 }
