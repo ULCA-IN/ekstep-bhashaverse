@@ -98,7 +98,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           emptyIcon: Icons.star_border,
           filledColor: context.appTheme.primaryColor,
           onRatingChanged: (value) {
-            _feedbackController.ovarralFeedback.value = value;
+            _feedbackController.mainRating.value = value;
             for (var task in _feedbackController.feedbackTypeModels.value) {
               task.value.taskRating.value = null;
             }
@@ -114,8 +114,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Obx _buildTaskFeedback() {
     return Obx(
       () => Visibility(
-        visible: _feedbackController.ovarralFeedback.value < 4 &&
-            _feedbackController.ovarralFeedback.value != 0.0,
+        visible: _feedbackController.mainRating.value < 4 &&
+            _feedbackController.mainRating.value != 0.0,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ..._feedbackController.feedbackTypeModels.value.map((taskFeedback) {
             List<dynamic> taskList =
@@ -153,8 +153,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
-                    if (_feedbackController.ovarralFeedback.value > 0) {
-                      _feedbackController.ovarralFeedback.value = 0;
+                    if (_feedbackController.mainRating.value > 0) {
+                      _feedbackController.mainRating.value = 0;
                       _feedbackController.submitFeedbackPayload();
                       Get.back();
                     } else {

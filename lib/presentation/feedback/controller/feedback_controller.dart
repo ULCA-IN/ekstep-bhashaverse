@@ -17,7 +17,7 @@ import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
 
 class FeedbackController extends GetxController {
-  RxDouble ovarralFeedback = 0.0.obs;
+  RxDouble mainRating = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
   RxBool isLoading = false.obs;
   String transliterationModelToUse = '', oldSourceText = '';
@@ -153,7 +153,7 @@ class FeedbackController extends GetxController {
         requestPayload: requestConfig);
     languageRequestResponse.when(
       success: ((dynamic response) async {
-        await addfeedbackResponseInCache(response);
+        await addFeedbackResponseInCache(response);
         feedbackReqResponse = response;
         getFeedbackQuestions();
         isLoading.value = false;
@@ -243,7 +243,7 @@ class FeedbackController extends GetxController {
     }
   }
 
-  Future<void> addfeedbackResponseInCache(responseData) async {
+  Future<void> addFeedbackResponseInCache(responseData) async {
     await _hiveDBInstance?.put(feedbackCacheKey, responseData);
     await _hiveDBInstance?.put(
       feedbackCacheLastUpdatedKey,
@@ -264,7 +264,7 @@ class FeedbackController extends GetxController {
 
     // Suggested Output
 
-    bool isUserSuggesgedOutput = false;
+    bool isUserSuggestedOutput = false;
 
     for (Map<String, dynamic> task in suggestedOutput?['pipelineResponse']) {
       if (task['taskType'] == "asr") {
@@ -273,18 +273,18 @@ class FeedbackController extends GetxController {
                 .firstWhere((e) => e['taskType'] == task['taskType'])['output']
             [0]['source'];
         String? userSuggestedOutputText = task['output'][0]['source'];
-        isUserSuggesgedOutput = outputTextSource != userSuggestedOutputText;
+        isUserSuggestedOutput = outputTextSource != userSuggestedOutputText;
       }
-      if (!isUserSuggesgedOutput && task['taskType'] == "translation") {
+      if (!isUserSuggestedOutput && task['taskType'] == "translation") {
         String outputTextSource = (computeResponse?['pipelineResponse']
                     as List<dynamic>)
                 .firstWhere((e) => e['taskType'] == task['taskType'])['output']
             [0]['target'];
         String userSuggestedOutputText = task['output'][0]['target'];
-        isUserSuggesgedOutput = outputTextSource != userSuggestedOutputText;
+        isUserSuggestedOutput = outputTextSource != userSuggestedOutputText;
       }
     }
-    if (isUserSuggesgedOutput) {
+    if (isUserSuggestedOutput) {
       submissionPayload['suggestedPipelineOutput'] = suggestedOutput;
     }
 
@@ -296,7 +296,7 @@ class FeedbackController extends GetxController {
           'question': feedbackReqResponse['pipelineFeedback']['commonFeedback']
               [0]['question'],
           "feedbackType": "rating",
-          "rating": ovarralFeedback.value
+          "rating": mainRating.value
         }
       ]
     };
