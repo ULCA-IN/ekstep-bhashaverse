@@ -120,26 +120,37 @@ class ASRAndTTSActions extends StatelessWidget {
                               ? () => _onFeedbackButtonTap!()
                               : null,
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 450),
+                            duration: feedbackButtonCloseTime,
                             curve: Curves.fastOutSlowIn,
                             decoration: BoxDecoration(
                                 color: _expandFeedbackIcon
-                                    ? context.appTheme.textFieldBorderColor
+                                    ? context.appTheme.feedbackBGColor
                                     : Colors.transparent,
-                                borderRadius: BorderRadius.circular(14)),
+                                borderRadius: BorderRadius.circular(20)),
                             padding: AppEdgeInsets.instance
                                 .symmetric(vertical: 6, horizontal: 15),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SvgPicture.asset(iconLikeDislike),
+                                SvgPicture.asset(
+                                  iconLikeDislike,
+                                  color: _expandFeedbackIcon
+                                      ? context.appTheme.feedbackIconColor
+                                      : context
+                                          .appTheme.feedbackIconClosedColor,
+                                ),
                                 AnimatedCrossFade(
-                                  duration: const Duration(milliseconds: 450),
+                                  duration: feedbackButtonCloseTime,
                                   firstChild: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       SizedBox(width: 8.toWidth),
-                                      Text(feedback.tr),
+                                      Text(
+                                        feedback.tr,
+                                        style: regular16(context).copyWith(
+                                            color: context
+                                                .appTheme.feedbackTextColor),
+                                      ),
                                     ],
                                   ),
                                   secondChild: const SizedBox.shrink(),
