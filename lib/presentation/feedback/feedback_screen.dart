@@ -39,6 +39,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
         child: Obx(
           () => _feedbackController.isLoading.value
