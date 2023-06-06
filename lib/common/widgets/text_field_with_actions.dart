@@ -32,6 +32,8 @@ class TextFieldWithActions extends StatelessWidget {
     required SpeakerStatus speakerStatus,
     required Function onMusicPlayOrStop,
     required Function onFileShare,
+    bool showFeedbackIcon = true,
+    required bool expandFeedbackIcon,
     String? hintText,
     int sourceCharLength = 0,
     bool showMicButton = false,
@@ -40,6 +42,7 @@ class TextFieldWithActions extends StatelessWidget {
     Function? onChanged,
     Function? onSubmitted,
     Function? onTranslateButtonTap,
+    Function? onFeedbackButtonTap,
   })  : _textController = textController,
         _focusNode = focusNode,
         _hintText = hintText,
@@ -63,9 +66,12 @@ class TextFieldWithActions extends StatelessWidget {
         _onMusicPlayOrStop = onMusicPlayOrStop,
         _onTranslateButtonTap = onTranslateButtonTap,
         _onFileShare = onFileShare,
+        _expandFeedbackIcon = expandFeedbackIcon,
+        _showFeedbackIcon = showFeedbackIcon,
         _playerController = playerController,
         _speakerStatus = speakerStatus,
-        _rawTimeStream = rawTimeStream;
+        _rawTimeStream = rawTimeStream,
+        _onFeedbackButtonTap = onFeedbackButtonTap;
 
   final TextEditingController _textController;
   final FocusNode _focusNode;
@@ -78,11 +84,16 @@ class TextFieldWithActions extends StatelessWidget {
       _showASRTTSActionButtons,
       _showTranslateButton,
       _isReadOnly,
-      _isShareButtonLoading;
+      _isShareButtonLoading,
+      _expandFeedbackIcon,
+      _showFeedbackIcon;
   final double _topBorderRadius, _bottomBorderRadius;
   final Color _backgroundColor, _borderColor;
   final Function _onMusicPlayOrStop, _onFileShare;
-  final Function? _onTranslateButtonTap, _onChanged, _onSubmitted;
+  final Function? _onTranslateButtonTap,
+      _onChanged,
+      _onSubmitted,
+      _onFeedbackButtonTap;
 
   final PlayerController _playerController;
   final SpeakerStatus _speakerStatus;
@@ -145,12 +156,14 @@ class TextFieldWithActions extends StatelessWidget {
                     totalDuration: DateTImeUtils().getTimeFromMilliseconds(
                         timeInMillisecond: _totalDuration),
                     isRecordedAudio: _isRecordedAudio,
+                    showFeedbackIcon: _showFeedbackIcon,
+                    expandFeedbackIcon: _expandFeedbackIcon,
                     isShareButtonLoading: _isShareButtonLoading,
                     playerController: _playerController,
                     speakerStatus: _speakerStatus,
                     onMusicPlayOrStop: () => _onMusicPlayOrStop(),
                     onFileShare: () => _onFileShare(),
-                  )
+                    onFeedbackButtonTap: _onFeedbackButtonTap)
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

@@ -92,4 +92,16 @@ class LightAppTheme implements AppTheme {
 
   @override
   Color get splashScreenBGColor => _AppColors.bisqueOrangeColor;
+
+  @override
+  Color get feedbackIconColor => _AppColors.seaGreen;
+
+  @override
+  Color get feedbackIconClosedColor => _AppColors.seaGreen;
+
+  @override
+  Color get feedbackTextColor => _AppColors.darkSpringGreen;
+
+  @override
+  Color get feedbackBGColor => _AppColors.whiteIce;
 }

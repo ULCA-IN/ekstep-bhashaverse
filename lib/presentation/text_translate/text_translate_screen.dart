@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -160,8 +162,23 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                               onMusicPlayOrStop: () =>
                                   _textTranslationController
                                       .playStopTTSOutput(true),
+                              expandFeedbackIcon: _textTranslationController
+                                  .expandFeedbackIcon.value,
+                              showFeedbackIcon: true,
                               onFileShare: () => _textTranslationController
                                   .shareAudioFile(isSourceLang: true),
+                              onFeedbackButtonTap: () {
+                                Get.toNamed(AppRoutes.feedbackRoute,
+                                    arguments: {
+                                      // Fixes Dart shallow copy issue:
+                                      'requestPayload': json.decode(json.encode(
+                                          _textTranslationController
+                                              .lastComputeRequest)),
+                                      'requestResponse': json.decode(
+                                          json.encode(_textTranslationController
+                                              .lastComputeResponse))
+                                    });
+                              },
                               playerController:
                                   _textTranslationController.playerController,
                               speakerStatus: _textTranslationController
@@ -276,6 +293,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           showTranslateButton: false,
           showASRTTSActionButtons: true,
           isReadOnly: true,
+          showFeedbackIcon: false,
+          expandFeedbackIcon: false,
           isShareButtonLoading:
               _textTranslationController.isTargetShareLoading.value,
           textToCopy: _textTranslationController.targetOutputText.value,
@@ -296,7 +315,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ? TransliterationHints(
             scrollController:
                 _textTranslationController.transliterationHintsScrollController,
-            // need to send with .toList() because of GetX observation issue
             transliterationHints:
                 _textTranslationController.transliterationWordHints.toList(),
             showScrollIcon: false,

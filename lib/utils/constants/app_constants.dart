@@ -8,6 +8,10 @@ const tapAndHoldMinDuration = 600;
 const keyboardHideDuration = Duration(milliseconds: 200);
 const textCharMaxLength = 500;
 const recordingMaxTimeLimit = 30000;
+const defaultLangCode = 'en';
+const defaultCountry = 'in';
+const defaultAnimationTime = Duration(milliseconds: 300);
+const feedbackButtonCloseTime = Duration(milliseconds: 450);
 
 // Database name and keys
 const hiveDBName = 'db_bhashini';
@@ -20,6 +24,8 @@ const preferredSourceLanguage = 'preferred_source_language';
 const preferredTargetLanguage = 'preferred_target_language';
 const configCacheKey = 'config_cache_key';
 const configCacheLastUpdatedKey = 'config_cache_key_last_updated_key';
+const feedbackCacheKey = 'feedback_cache_key';
+const feedbackCacheLastUpdatedKey = 'feedback_cache_key_last_updated_key';
 
 // App Assets
 const imgAppLogoSmall = 'assets/images/img_app_logo_small.webp';
@@ -78,6 +84,7 @@ const iconSound = 'assets/images/common_icon/icon_sound.svg';
 const iconStopPlayback = 'assets/images/common_icon/icon_stop_playback.svg';
 const iconMicStop = 'assets/images/common_icon/icon_mic_stop.svg';
 const iconDownArrow = 'assets/images/common_icon/icon_down_arrow.svg';
+const iconLikeDislike = 'assets/images/common_icon/icon_like_dislike.svg';
 const animationHomeLoading =
     'assets/animation/lottie_animation/animation_home_loading.json';
 const animationLoadingLine =

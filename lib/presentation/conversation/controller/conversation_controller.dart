@@ -42,7 +42,8 @@ class ConversationController extends GetxController {
   bool isMicPermissionGranted = false;
   RxBool isLoading = false.obs,
       isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs;
+      isTargetShareLoading = false.obs,
+      expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
       selectedTargetLanguageCode = ''.obs,
       sourceOutputText = ''.obs,
@@ -76,6 +77,11 @@ class ConversationController extends GetxController {
   late SocketIOClient _socketIOClient;
 
   late final Box _hiveDBInstance;
+
+  // for sending payload in feedback API
+  Map<String, dynamic> lastComputeRequest = {};
+  Map<String, dynamic> lastComputeResponse = {};
+
   @override
   void onInit() {
     _dhruvaapiClient = Get.find();
@@ -361,6 +367,8 @@ class ConversationController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
         samplingRate: samplingRate);
 
+    lastComputeRequest = asrPayloadToSend;
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -372,6 +380,7 @@ class ConversationController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
+        lastComputeResponse = taskResponse.toJson();
         String targetOutputText = taskResponse.pipelineResponse
                 ?.firstWhere((element) => element.taskType == 'translation')
                 .output
@@ -422,7 +431,6 @@ class ConversationController extends GetxController {
         }
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         targetSpeakerStatus.value = SpeakerStatus.stopped;
-        playStopTTSOutput(currentMic.value != CurrentlySelectedMic.source);
         isTranslateCompleted.value = true;
       },
       failure: (error) {
@@ -469,11 +477,17 @@ class ConversationController extends GetxController {
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
+    lastComputeRequest['pipelineTasks']
+        .addAll(asrPayloadToSend['pipelineTasks']);
+
     response.when(
       success: (taskResponse) async {
+        lastComputeResponse['pipelineResponse']
+            .addAll(taskResponse.toJson()['pipelineResponse']);
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
-            .audio[0]['audioContent'];
+            .audio?[0]
+            .audioContent;
 
         // Save and Play TTS audio
         if (ttsResponse != null) {
@@ -482,6 +496,9 @@ class ConversationController extends GetxController {
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
           isLoading.value = false;
+          playStopTTSOutput(!isTargetLanguage);
+          Future.delayed(const Duration(seconds: 3))
+              .then((value) => expandFeedbackIcon.value = false);
         } else {
           showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
           return;
@@ -726,6 +743,8 @@ class ConversationController extends GetxController {
     base64EncodedAudioContent = null;
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
   }
 
   disposePlayer() async {

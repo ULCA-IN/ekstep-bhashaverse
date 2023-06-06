@@ -34,7 +34,8 @@ class SettingsController extends GetxController {
 
   void getPreferredLanguage() {
     preferredLanguage.value = APIConstants.getLanguageCodeOrName(
-        value: _hiveDBInstance.get(preferredAppLocale, defaultValue: 'en'),
+        value: _hiveDBInstance.get(preferredAppLocale,
+            defaultValue: defaultLangCode),
         returnWhat: LanguageMap.nativeName,
         lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
   }

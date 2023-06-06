@@ -34,4 +34,9 @@ abstract class AppTheme {
   Color get disabledIconOutlineColor;
   Color get highlightedBorderColor;
   Color get speackerColor;
+
+  Color get feedbackIconColor;
+  Color get feedbackTextColor;
+  Color get feedbackBGColor;
+  Color get feedbackIconClosedColor;
 }

@@ -88,5 +88,10 @@ final Map<String, String> en = {
   converseHintText: 'Press mic to begin conversation',
   textTranslateHintText: 'Start typing to begin',
   errorNoInternetTitle: 'No Internet Connection',
-  errorNoInternetSubTitle: 'Please check your internet and try again'
+  errorNoInternetSubTitle: 'Please check your internet and try again',
+  feedback: 'Feedback',
+  writeReviewHere: 'Write your review here',
+  submit: 'Submit',
+  loading: 'Loading',
+  errorGiveRating: 'Please give a rating',
 };

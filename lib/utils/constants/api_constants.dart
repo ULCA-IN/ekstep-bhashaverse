@@ -14,12 +14,16 @@ class APIConstants {
   static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
+  static const String FEEDBACK_BASE_URL_DEV =
+      "https://dev-auth.ulcacontrib.org/ulca/mdms";
+
   static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
   static const String TRANSLITERATION_REQ_URL = '/v0/model/compute';
   static const String ASR_REQ_URL = '/asr/v1/model/compute';
   static const String TRANS_REQ_URL = '/v0/model/compute';
   static const String TTS_REQ_URL = '/v0/model/compute';
+  static const String FEEDBACK_REQ_URL = '/v0/pipelineQuestions';
 
   static const int kApiUnknownErrorCode = 0;
   static const int kApiCanceledCode = -1;

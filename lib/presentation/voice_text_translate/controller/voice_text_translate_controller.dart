@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -47,7 +48,8 @@ class VoiceTextTranslateController extends GetxController {
       isScrolledTransliterationHints = false.obs,
       isRecordedViaMic = false.obs,
       isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs;
+      isTargetShareLoading = false.obs,
+      expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
       selectedTargetLanguageCode = ''.obs,
       targetOutputText = ''.obs,
@@ -78,6 +80,10 @@ class VoiceTextTranslateController extends GetxController {
   late SocketIOClient _socketIOClient;
 
   late final Box _hiveDBInstance;
+
+  // for sending payload in feedback API
+  Map<String, dynamic> lastComputeRequest = {};
+  Map<String, dynamic> lastComputeResponse = {};
 
   @override
   void onInit() {
@@ -428,6 +434,8 @@ class VoiceTextTranslateController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
         samplingRate: samplingRate);
 
+    lastComputeRequest = asrPayloadToSend;
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -436,9 +444,10 @@ class VoiceTextTranslateController extends GetxController {
         authorizationValue: _languageModelController.taskSequenceResponse
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
-
+    json.encode(asrPayloadToSend);
     response.when(
       success: (taskResponse) async {
+        lastComputeResponse = taskResponse.toJson();
         if (isRecorded) {
           sourceLangTextController.text = taskResponse.pipelineResponse
                   ?.firstWhere((element) => element.taskType == 'asr')
@@ -463,6 +472,8 @@ class VoiceTextTranslateController extends GetxController {
         targetLangTextController.text = targetOutputText.value;
         isTranslateCompleted.value = true;
         isLoading.value = false;
+        Future.delayed(const Duration(seconds: 3))
+            .then((value) => expandFeedbackIcon.value = false);
         if (clearSourceTTS) sourceLangTTSPath.value = '';
         targetLangTTSPath.value = '';
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -493,6 +504,9 @@ class VoiceTextTranslateController extends GetxController {
         ttsServiceID: ttsServiceId,
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
 
+    lastComputeRequest['pipelineTasks']
+        .addAll(asrPayloadToSend['pipelineTasks']);
+
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
             .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
@@ -504,9 +518,12 @@ class VoiceTextTranslateController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
+        lastComputeResponse['pipelineResponse']
+            .addAll(taskResponse.toJson()['pipelineResponse']);
         dynamic ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')
-            .audio[0]['audioContent'];
+            .audio?[0]
+            .audioContent;
 
         // Save TTS audio to file
         if (ttsResponse != null) {
@@ -670,6 +687,8 @@ class VoiceTextTranslateController extends GetxController {
               response[0]['pipelineResponse'][2]['audio'][0]['audioContent'];
           isTranslateCompleted.value = true;
           isLoading.value = false;
+          Future.delayed(const Duration(seconds: 3))
+              .then((value) => expandFeedbackIcon.value = false);
           sourceLangTTSPath.value = '';
           targetLangTTSPath.value = '';
           sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -780,6 +799,8 @@ class VoiceTextTranslateController extends GetxController {
     recordedData = [];
     isSourceShareLoading.value = false;
     isTargetShareLoading.value = false;
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
     _socketIOClient.disconnect();
     if (isTransliterationEnabled()) {
       setModelForTransliteration();

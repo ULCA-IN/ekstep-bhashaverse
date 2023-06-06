@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +147,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
-          showTranslateButton: true,
+          expandFeedbackIcon:
+              _voiceTextTransController.expandFeedbackIcon.value,
           showASRTTSActionButtons:
               _voiceTextTransController.isTranslateCompleted.value,
           isReadOnly: false,
@@ -158,6 +161,15 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _voiceTextTransController.playStopTTSOutput(true),
           onFileShare: () =>
               _voiceTextTransController.shareAudioFile(isSourceLang: true),
+          onFeedbackButtonTap: () {
+            Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+              // Fixes Dart shallow copy issue:
+              'requestPayload': json.decode(
+                  json.encode(_voiceTextTransController.lastComputeRequest)),
+              'requestResponse': json.decode(
+                  json.encode(_voiceTextTransController.lastComputeResponse))
+            });
+          },
           playerController: _voiceTextTransController.playerController,
           speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
           rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
@@ -184,6 +196,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             bottomBorderRadius: textFieldRadius,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
+            showFeedbackIcon: false,
+            expandFeedbackIcon: false,
             isReadOnly: true,
             isShareButtonLoading:
                 _voiceTextTransController.isTargetShareLoading.value,
