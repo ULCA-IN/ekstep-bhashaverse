@@ -57,7 +57,7 @@ class ASRAndTTSActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Visibility(
           visible: _speakerStatus != SpeakerStatus.playing,
