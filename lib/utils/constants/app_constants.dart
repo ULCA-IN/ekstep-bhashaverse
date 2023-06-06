@@ -11,6 +11,7 @@ const recordingMaxTimeLimit = 30000;
 const defaultLangCode = 'en';
 const defaultCountry = 'in';
 const defaultAnimationTime = Duration(milliseconds: 300);
+const feedbackButtonCloseTime = Duration(milliseconds: 450);
 
 // Database name and keys
 const hiveDBName = 'db_bhashini';
