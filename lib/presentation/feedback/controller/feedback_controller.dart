@@ -17,8 +17,6 @@ import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
 
 class FeedbackController extends GetxController {
-  RxBool getDetailedFeedback = false.obs;
-
   RxDouble ovarralFeedback = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
   RxBool isLoading = false.obs;

@@ -153,7 +153,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   borderRadius: 16,
                   onButtonTap: () {
                     if (_feedbackController.ovarralFeedback.value > 0) {
-                      _feedbackController.getDetailedFeedback.value = false;
                       _feedbackController.ovarralFeedback.value = 0;
                       _feedbackController.submitFeedbackPayload();
                       Get.back();
