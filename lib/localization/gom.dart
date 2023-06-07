@@ -1,6 +1,6 @@
 import 'localization_keys.dart';
 
-final Map<String, String> kok = {
+final Map<String, String> gom = {
   appName: 'भाशावर्स',
   selectAppLanguage: 'एपाची भास वेंचात',
   youCanAlwaysChange: 'तुमी हें जाय तेन्ना सेटिंग्सांत बदलूंक शकतात',
