@@ -137,52 +137,39 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     SizedBox(height: 12.toHeight),
                     _buildTransliterationHints(),
                     Obx(
-                      () => _textTranslationController
-                              .isTranslateCompleted.value
-                          ? ASRAndTTSActions(
-                              textToCopy: _textTranslationController
-                                  .sourceLangTextController.text
-                                  .trim(),
-                              isRecordedAudio: false,
-                              expandFeedbackIcon: _textTranslationController
-                                  .expandFeedbackIcon.value,
-                              showFeedbackIcon: true,
-                              //  uncomment when TTS feature added
-                              //  isShareButtonLoading: _textTranslationController
-                              //     .isSourceShareLoading.value,
-                              // onMusicPlayOrStop: () =>
-                              //     _textTranslationController
-                              //         .playStopTTSOutput(true),
-                              // currentDuration: DateTImeUtils()
-                              //     .getTimeFromMilliseconds(
-                              //         timeInMillisecond:
-                              //             _textTranslationController
-                              //                 .currentDuration.value),
-                              // totalDuration: DateTImeUtils()
-                              //     .getTimeFromMilliseconds(
-                              //         timeInMillisecond:
-                              //             _textTranslationController
-                              //                 .maxDuration.value),
-                              // onFileShare: () => _textTranslationController
-                              //     .shareAudioFile(isSourceLang: true),
-                              onFeedbackButtonTap: () {
-                                Get.toNamed(AppRoutes.feedbackRoute,
-                                    arguments: {
-                                      // Fixes Dart shallow copy issue:
-                                      'requestPayload': json.decode(json.encode(
-                                          _textTranslationController
-                                              .lastComputeRequest)),
-                                      'requestResponse': json.decode(
-                                          json.encode(_textTranslationController
-                                              .lastComputeResponse))
-                                    });
-                              },
-                              // TODO: unhide when TTS feature added
-                              // playerController:
-                              //     _textTranslationController.playerController,
-                              speakerStatus: SpeakerStatus.hidden,
-                            )
-                          : _buildLimitCountAndTranslateButton(),
+                      () =>
+                          _textTranslationController.isTranslateCompleted.value
+                              ? ASRAndTTSActions(
+                                  textToCopy: _textTranslationController
+                                      .sourceLangTextController.text
+                                      .trim(),
+                                  isRecordedAudio: false,
+                                  expandFeedbackIcon: _textTranslationController
+                                      .expandFeedbackIcon.value,
+                                  showFeedbackIcon: false,
+                                  //  uncomment when TTS feature added
+                                  //  isShareButtonLoading: _textTranslationController
+                                  //     .isSourceShareLoading.value,
+                                  // onMusicPlayOrStop: () =>
+                                  //     _textTranslationController
+                                  //         .playStopTTSOutput(true),
+                                  // currentDuration: DateTImeUtils()
+                                  //     .getTimeFromMilliseconds(
+                                  //         timeInMillisecond:
+                                  //             _textTranslationController
+                                  //                 .currentDuration.value),
+                                  // totalDuration: DateTImeUtils()
+                                  //     .getTimeFromMilliseconds(
+                                  //         timeInMillisecond:
+                                  //             _textTranslationController
+                                  //                 .maxDuration.value),
+                                  // onFileShare: () => _textTranslationController
+                                  //     .shareAudioFile(isSourceLang: true),
+                                  // playerController:
+                                  //     _textTranslationController.playerController,
+                                  speakerStatus: SpeakerStatus.hidden,
+                                )
+                              : _buildLimitCountAndTranslateButton(),
                     ),
                   ],
                 ),
@@ -290,12 +277,21 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           showTranslateButton: false,
           showASRTTSActionButtons: true,
           isReadOnly: true,
-          showFeedbackIcon: false,
+          showFeedbackIcon:
+              _textTranslationController.isTranslateCompleted.value,
           expandFeedbackIcon: false,
-
           textToCopy: _textTranslationController.targetOutputText.value,
           speakerStatus: SpeakerStatus.hidden,
           showMicButton: false,
+          onFeedbackButtonTap: () {
+            Get.toNamed(AppRoutes.feedbackRoute, arguments: {
+              // Fixes Dart shallow copy issue:
+              'requestPayload': json.decode(
+                  json.encode(_textTranslationController.lastComputeRequest)),
+              'requestResponse': json.decode(
+                  json.encode(_textTranslationController.lastComputeResponse))
+            });
+          },
           // isShareButtonLoading:
           //     _textTranslationController.isTargetShareLoading.value,
           //      currentDuration: _textTranslationController.currentDuration.value,
