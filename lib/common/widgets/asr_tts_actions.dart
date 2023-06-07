@@ -63,26 +63,29 @@ class ASRAndTTSActions extends StatelessWidget {
           visible: _speakerStatus != SpeakerStatus.playing,
           child: Row(
             children: [
-              InkWell(
-                onTap: () async {
-                  if (_onFileShare != null) _onFileShare!();
-                },
-                child: Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: _isShareButtonLoading
-                      ? SizedBox(
-                          height: 24.toWidth,
-                          width: 24.toWidth,
-                          child: const CustomCircularLoading(),
-                        )
-                      : SvgPicture.asset(
-                          iconShare,
-                          height: 24.toWidth,
-                          width: 24.toWidth,
-                          color: _textToCopy.isNotEmpty
-                              ? context.appTheme.disabledTextColor
-                              : context.appTheme.disabledIconOutlineColor,
-                        ),
+              Visibility(
+                visible: _speakerStatus != SpeakerStatus.hidden,
+                child: InkWell(
+                  onTap: () async {
+                    if (_onFileShare != null) _onFileShare!();
+                  },
+                  child: Padding(
+                    padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                    child: _isShareButtonLoading
+                        ? SizedBox(
+                            height: 24.toWidth,
+                            width: 24.toWidth,
+                            child: const CustomCircularLoading(),
+                          )
+                        : SvgPicture.asset(
+                            iconShare,
+                            height: 24.toWidth,
+                            width: 24.toWidth,
+                            color: _textToCopy.isNotEmpty
+                                ? context.appTheme.disabledTextColor
+                                : context.appTheme.disabledIconOutlineColor,
+                          ),
+                  ),
                 ),
               ),
               SizedBox(width: 12.toWidth),
