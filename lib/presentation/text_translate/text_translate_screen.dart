@@ -144,8 +144,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                       .sourceLangTextController.text
                                       .trim(),
                                   isRecordedAudio: false,
-                                  expandFeedbackIcon: _textTranslationController
-                                      .expandFeedbackIcon.value,
+                                  expandFeedbackIcon: false,
                                   showFeedbackIcon: false,
                                   //  uncomment when TTS feature added
                                   //  isShareButtonLoading: _textTranslationController
@@ -279,7 +278,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           isReadOnly: true,
           showFeedbackIcon:
               _textTranslationController.isTranslateCompleted.value,
-          expandFeedbackIcon: false,
+          expandFeedbackIcon:
+              _textTranslationController.expandFeedbackIcon.value,
           textToCopy: _textTranslationController.targetOutputText.value,
           speakerStatus: SpeakerStatus.hidden,
           showMicButton: false,
