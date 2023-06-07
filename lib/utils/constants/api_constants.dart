@@ -122,6 +122,7 @@ class APIConstants {
     required String srcLanguage,
     required String preferredGender,
     required String inputData,
+    required int samplingRate,
     String? ttsServiceID,
   }) {
     var computeRequestToSend = {
@@ -131,7 +132,8 @@ class APIConstants {
           "config": {
             "language": {"sourceLanguage": srcLanguage},
             "serviceId": ttsServiceID ?? "",
-            "gender": preferredGender
+            "gender": preferredGender,
+            "samplingRate": samplingRate
           }
         }
       ],
