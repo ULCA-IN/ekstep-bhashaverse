@@ -93,6 +93,10 @@ class ConversationController extends GetxController {
 
     //  Connectiviry listener
 
+    Connectivity().checkConnectivity().then((newConnectivity) {
+      updateSamplingRate(newConnectivity);
+    });
+
     Connectivity().onConnectivityChanged.listen(
           (newConnectivity) => updateSamplingRate(newConnectivity),
         );
