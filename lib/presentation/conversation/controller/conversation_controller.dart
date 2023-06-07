@@ -463,10 +463,12 @@ class ConversationController extends GetxController {
         '';
 
     var asrPayloadToSend = APIConstants.createComputePayloadTTS(
-        srcLanguage: languageCode,
-        inputData: sourceText,
-        ttsServiceID: ttsServiceId,
-        preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
+      srcLanguage: languageCode,
+      inputData: sourceText,
+      ttsServiceID: ttsServiceId,
+      preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
+      samplingRate: samplingRate,
+    );
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
