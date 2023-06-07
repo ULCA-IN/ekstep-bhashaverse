@@ -22,8 +22,17 @@ const preferredAppTheme = 'preferred_app_theme';
 const isStreamingPreferred = 'is_streaming_preferred';
 const preferredSourceLanguage = 'preferred_source_language';
 const preferredTargetLanguage = 'preferred_target_language';
+
+const preferredSourceLangTextScreen = 'preferred_source_lang_text_screen';
+const preferredTargetLangTextScreen = 'preferred_target_lang_text_screen';
+
 const configCacheKey = 'config_cache_key';
 const configCacheLastUpdatedKey = 'config_cache_key_last_updated_key';
+
+const transConfigCacheKey = 'trans_config_cache_key';
+const transConfigCacheLastUpdatedKey =
+    'trans_config_cache_key_last_updated_key';
+
 const feedbackCacheKey = 'feedback_cache_key';
 const feedbackCacheLastUpdatedKey = 'feedback_cache_key_last_updated_key';
 
