@@ -1,14 +1,20 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
-import '../utils/constants/api_constants.dart';
-import '../utils/environment/streaming_api_key_env.dart';
+import '../common/controller/language_model_controller.dart';
 
 class SocketIOClient extends GetxService {
   Socket? _socket;
   RxBool isMicConnected = false.obs, hasError = false.obs;
   String? socketError;
   Rx<dynamic> socketResponse = Rx(null);
+  late LanguageModelController _languageModelController;
+
+  @override
+  void onInit() {
+    _languageModelController = Get.find();
+    super.onInit();
+  }
 
   void socketEmit(
       {required String emittingStatus,
@@ -23,12 +29,22 @@ class SocketIOClient extends GetxService {
     hasError.value = false;
     socketError = null;
     _socket = io(
-        APIConstants.ULCA_CONFIG_API_STREAMING_URL,
+        _languageModelController.taskSequenceResponse
+            .pipelineInferenceSocketAPIEndPoint?.callbackUrl,
         OptionBuilder()
             .setTransports(['websocket', 'polling'])
             .disableAutoConnect()
             .setAuth({
-              APIConstants.kAuthorizationKeyStreaming: streamingAPIKey,
+              _languageModelController
+                      .taskSequenceResponse
+                      .pipelineInferenceSocketAPIEndPoint
+                      ?.inferenceApiKey
+                      ?.name:
+                  _languageModelController
+                      .taskSequenceResponse
+                      .pipelineInferenceSocketAPIEndPoint
+                      ?.inferenceApiKey
+                      ?.value,
             })
             .build());
 
