@@ -22,7 +22,7 @@ List<String> languagesCodeList = [
   'brx',
   'mni',
   'ks',
-  'kok',
+  'gom',
   'sd',
   'sat',
 ];

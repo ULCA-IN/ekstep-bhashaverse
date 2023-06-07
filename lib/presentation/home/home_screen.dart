@@ -116,11 +116,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
           Obx(() {
-            if (_homeController.isLoading.value) {
+            if (_homeController.isMainConfigCallLoading.value ||
+                _homeController.isTransConfigCallLoading.value) {
               return LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
-                  footerText: _homeController.isLoading.value
+                  footerText: _homeController.isMainConfigCallLoading.value ||
+                          _homeController.isTransConfigCallLoading.value
                       ? kHomeLoadingAnimationText.tr
                       : kTranslationLoadingAnimationText.tr);
             } else {

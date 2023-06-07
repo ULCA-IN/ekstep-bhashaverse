@@ -20,18 +20,18 @@ class TextFieldWithActions extends StatelessWidget {
     required String textToCopy,
     required Color backgroundColor,
     required Color borderColor,
-    required int currentDuration,
-    required int totalDuration,
     required bool isRecordedAudio,
     required bool isReadOnly,
-    required bool isShareButtonLoading,
     required bool showASRTTSActionButtons,
     required double topBorderRadius,
     required double bottomBorderRadius,
-    required PlayerController playerController,
     required SpeakerStatus speakerStatus,
-    required Function onMusicPlayOrStop,
-    required Function onFileShare,
+    bool isShareButtonLoading = false,
+    int? currentDuration,
+    int? totalDuration,
+    PlayerController? playerController,
+    Function? onMusicPlayOrStop,
+    Function? onFileShare,
     bool showFeedbackIcon = true,
     required bool expandFeedbackIcon,
     String? hintText,
@@ -78,7 +78,8 @@ class TextFieldWithActions extends StatelessWidget {
   final String? _translateButtonTitle;
   final String _textToCopy;
   final String? _hintText;
-  final int _currentDuration, _totalDuration, _sourceCharLength;
+  final int _sourceCharLength;
+  final int? _currentDuration, _totalDuration;
   final bool _isRecordedAudio,
       _showMicButton,
       _showASRTTSActionButtons,
@@ -89,13 +90,13 @@ class TextFieldWithActions extends StatelessWidget {
       _showFeedbackIcon;
   final double _topBorderRadius, _bottomBorderRadius;
   final Color _backgroundColor, _borderColor;
-  final Function _onMusicPlayOrStop, _onFileShare;
+  final Function? _onMusicPlayOrStop, _onFileShare;
   final Function? _onTranslateButtonTap,
       _onChanged,
       _onSubmitted,
       _onFeedbackButtonTap;
 
-  final PlayerController _playerController;
+  final PlayerController? _playerController;
   final SpeakerStatus _speakerStatus;
   final Stream<int>? _rawTimeStream;
 
@@ -151,18 +152,22 @@ class TextFieldWithActions extends StatelessWidget {
             _showASRTTSActionButtons && !_showMicButton
                 ? ASRAndTTSActions(
                     textToCopy: _textToCopy,
-                    currentDuration: DateTImeUtils().getTimeFromMilliseconds(
-                        timeInMillisecond: _currentDuration),
-                    totalDuration: DateTImeUtils().getTimeFromMilliseconds(
-                        timeInMillisecond: _totalDuration),
+                    currentDuration: _currentDuration != null
+                        ? DateTImeUtils().getTimeFromMilliseconds(
+                            timeInMillisecond: _currentDuration!)
+                        : '',
+                    totalDuration: _totalDuration != null
+                        ? DateTImeUtils().getTimeFromMilliseconds(
+                            timeInMillisecond: _totalDuration!)
+                        : '',
                     isRecordedAudio: _isRecordedAudio,
                     showFeedbackIcon: _showFeedbackIcon,
                     expandFeedbackIcon: _expandFeedbackIcon,
                     isShareButtonLoading: _isShareButtonLoading,
                     playerController: _playerController,
                     speakerStatus: _speakerStatus,
-                    onMusicPlayOrStop: () => _onMusicPlayOrStop(),
-                    onFileShare: () => _onFileShare(),
+                    onMusicPlayOrStop: _onMusicPlayOrStop,
+                    onFileShare: _onFileShare,
                     onFeedbackButtonTap: _onFeedbackButtonTap)
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

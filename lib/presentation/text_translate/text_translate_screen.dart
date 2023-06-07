@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -24,7 +23,6 @@ import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
-import '../../utils/date_time_utils.dart';
 import 'controller/text_translate_controller.dart';
 
 class TextTranslateScreen extends StatefulWidget {
@@ -145,28 +143,28 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                               textToCopy: _textTranslationController
                                   .sourceLangTextController.text
                                   .trim(),
-                              currentDuration: DateTImeUtils()
-                                  .getTimeFromMilliseconds(
-                                      timeInMillisecond:
-                                          _textTranslationController
-                                              .currentDuration.value),
-                              totalDuration: DateTImeUtils()
-                                  .getTimeFromMilliseconds(
-                                      timeInMillisecond:
-                                          _textTranslationController
-                                              .maxDuration.value),
-                              isRecordedAudio:
-                                  !_hiveDBInstance.get(isStreamingPreferred),
-                              isShareButtonLoading: _textTranslationController
-                                  .isSourceShareLoading.value,
-                              onMusicPlayOrStop: () =>
-                                  _textTranslationController
-                                      .playStopTTSOutput(true),
+                              isRecordedAudio: false,
                               expandFeedbackIcon: _textTranslationController
                                   .expandFeedbackIcon.value,
                               showFeedbackIcon: true,
-                              onFileShare: () => _textTranslationController
-                                  .shareAudioFile(isSourceLang: true),
+                              //  uncomment when TTS feature added
+                              //  isShareButtonLoading: _textTranslationController
+                              //     .isSourceShareLoading.value,
+                              // onMusicPlayOrStop: () =>
+                              //     _textTranslationController
+                              //         .playStopTTSOutput(true),
+                              // currentDuration: DateTImeUtils()
+                              //     .getTimeFromMilliseconds(
+                              //         timeInMillisecond:
+                              //             _textTranslationController
+                              //                 .currentDuration.value),
+                              // totalDuration: DateTImeUtils()
+                              //     .getTimeFromMilliseconds(
+                              //         timeInMillisecond:
+                              //             _textTranslationController
+                              //                 .maxDuration.value),
+                              // onFileShare: () => _textTranslationController
+                              //     .shareAudioFile(isSourceLang: true),
                               onFeedbackButtonTap: () {
                                 Get.toNamed(AppRoutes.feedbackRoute,
                                     arguments: {
@@ -179,10 +177,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                               .lastComputeResponse))
                                     });
                               },
-                              playerController:
-                                  _textTranslationController.playerController,
-                              speakerStatus: _textTranslationController
-                                  .sourceSpeakerStatus.value,
+                              // TODO: unhide when TTS feature added
+                              // playerController:
+                              //     _textTranslationController.playerController,
+                              speakerStatus: SpeakerStatus.hidden,
                             )
                           : _buildLimitCountAndTranslateButton(),
                     ),
@@ -221,15 +219,15 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       onChanged: (newText) {
         _textTranslationController.sourceTextCharLimit.value = newText.length;
         _textTranslationController.isTranslateCompleted.value = false;
-        _textTranslationController.ttsResponse = null;
         _textTranslationController.targetLangTextController.clear();
+        /* _textTranslationController.ttsResponse = null;
         if (_textTranslationController.playerController.playerState ==
             PlayerState.playing) _textTranslationController.stopPlayer();
         if (_textTranslationController.targetSpeakerStatus.value !=
             SpeakerStatus.disabled) {
           _textTranslationController.targetSpeakerStatus.value =
               SpeakerStatus.disabled;
-        }
+        } */
 
         if (newText.length > oldSourceText.length) {
           if (_textTranslationController.isTransliterationEnabled()) {
@@ -285,8 +283,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           focusNode: _targetLangFocusNode,
           backgroundColor: context.appTheme.hightlitedTextFeildColor,
           borderColor: context.appTheme.textFieldBorderColor,
-          currentDuration: _textTranslationController.currentDuration.value,
-          totalDuration: _textTranslationController.maxDuration.value,
+
           isRecordedAudio: false,
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 16,
@@ -295,16 +292,19 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           isReadOnly: true,
           showFeedbackIcon: false,
           expandFeedbackIcon: false,
-          isShareButtonLoading:
-              _textTranslationController.isTargetShareLoading.value,
+
           textToCopy: _textTranslationController.targetOutputText.value,
-          onMusicPlayOrStop: () =>
-              _textTranslationController.playStopTTSOutput(false),
-          onFileShare: () =>
-              _textTranslationController.shareAudioFile(isSourceLang: false),
-          playerController: _textTranslationController.playerController,
-          speakerStatus: _textTranslationController.targetSpeakerStatus.value,
+          speakerStatus: SpeakerStatus.hidden,
           showMicButton: false,
+          // isShareButtonLoading:
+          //     _textTranslationController.isTargetShareLoading.value,
+          //      currentDuration: _textTranslationController.currentDuration.value,
+          // totalDuration: _textTranslationController.maxDuration.value,
+          // onMusicPlayOrStop: () =>
+          //     _textTranslationController.playStopTTSOutput(false),
+          // onFileShare: () =>
+          //     _textTranslationController.shareAudioFile(isSourceLang: false),
+          // playerController: _textTranslationController.playerController,
         ),
       ),
     );
@@ -354,8 +354,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return;
               }
 
-              _textTranslationController.sourceLangTTSPath.value = '';
-              _textTranslationController.targetLangTTSPath.value = '';
+              // _textTranslationController.sourceLangTTSPath.value = '';
+              // _textTranslationController.targetLangTTSPath.value = '';
 
               if (_textTranslationController
                   .sourceLangTextController.text.isEmpty) {
@@ -384,7 +384,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             _targetLangFocusNode.unfocus();
 
             List<dynamic> sourceLanguageList =
-                _languageModelController.sourceTargetLanguageMap.keys.toList();
+                _languageModelController.translationLanguageMap.keys.toList();
 
             dynamic selectedSourceLangCode =
                 await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
@@ -397,16 +397,16 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _textTranslationController.selectedSourceLanguageCode.value =
                   selectedSourceLangCode;
               _hiveDBInstance.put(
-                  preferredSourceLanguage, selectedSourceLangCode);
+                  preferredSourceLangTextScreen, selectedSourceLangCode);
               String selectedTargetLangCode =
                   _textTranslationController.selectedTargetLanguageCode.value;
               if (selectedTargetLangCode.isNotEmpty) {
                 if (!_languageModelController
-                    .sourceTargetLanguageMap[selectedSourceLangCode]!
+                    .translationLanguageMap[selectedSourceLangCode]!
                     .contains(selectedTargetLangCode)) {
                   _textTranslationController.selectedTargetLanguageCode.value =
                       '';
-                  _hiveDBInstance.put(preferredTargetLanguage, null);
+                  _hiveDBInstance.put(preferredTargetLangTextScreen, null);
                 }
               }
               await _textTranslationController.resetAllValues();
@@ -459,7 +459,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             }
 
             List<dynamic> targetLanguageList = _languageModelController
-                .sourceTargetLanguageMap[_textTranslationController
+                .translationLanguageMap[_textTranslationController
                     .selectedSourceLanguageCode.value]!
                 .toList();
 
@@ -474,7 +474,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _textTranslationController.selectedTargetLanguageCode.value =
                   selectedTargetLangCode;
               _hiveDBInstance.put(
-                  preferredTargetLanguage, selectedTargetLangCode);
+                  preferredTargetLangTextScreen, selectedTargetLangCode);
               if (_textTranslationController
                       .sourceLangTextController.text.isNotEmpty &&
                   await isNetworkConnected()) {

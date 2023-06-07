@@ -45,25 +45,27 @@ class LanguageSelectionWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Text(
-                title,
-                style: light16(context).copyWith(
-                  fontSize: 20.toFont,
-                  fontWeight: FontWeight.w500,
+            if (title.isNotEmpty)
+              FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  title,
+                  style: light16(context).copyWith(
+                    fontSize: 20.toFont,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
             SizedBox(height: 4.toHeight),
-            FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Text(
-                subTitle,
-                style: light16(context)
-                    .copyWith(color: context.appTheme.secondaryTextColor),
+            if (subTitle.isNotEmpty)
+              FittedBox(
+                fit: BoxFit.fitWidth,
+                child: Text(
+                  subTitle,
+                  style: light16(context)
+                      .copyWith(color: context.appTheme.secondaryTextColor),
+                ),
               ),
-            ),
           ],
         ),
       ),

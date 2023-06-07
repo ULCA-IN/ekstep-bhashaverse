@@ -57,11 +57,17 @@ class APIConstants {
       'UnAuthorized. Please login again';
 
   // Payload for available Languages request
+
+  static const String kTaskType = "taskType";
+  static const String kASR = "asr";
+  static const String kTranslation = "translation";
+  static const String kTTS = "tts";
+
   static var payloadForLanguageConfig = {
     "pipelineTasks": [
-      {"taskType": "asr"},
-      {"taskType": "translation"},
-      {"taskType": "tts"}
+      {kTaskType: kASR},
+      {kTaskType: kTranslation},
+      {kTaskType: kTTS}
     ],
     "pipelineRequestConfig": {"pipelineId": "64392f96daac500b55c543cd"}
   };
@@ -321,13 +327,13 @@ class APIConstants {
       //   kLanguageCode: languagesCodeList[19],
       //   kEnglishName: 'Rajasthani'
       // },
-      // {
-      //   kNativeName: 'Bodo',
-      //   kLanguageCode: languagesCodeList[20],
-      //   kEnglishName: 'Bodo'
-      // },
       {
-        kNativeName: 'মানিপুরি',
+        kNativeName: 'बड़ो',
+        kLanguageCode: languagesCodeList[20],
+        kEnglishName: 'Bodo'
+      },
+      {
+        kNativeName: 'ꯃꯩꯇꯩꯂꯣꯟ',
         kLanguageCode: languagesCodeList[21],
         kEnglishName: 'Manipuri'
       },
