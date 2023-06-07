@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
@@ -122,10 +123,11 @@ class HomeController extends GetxController {
 
   Future<void> getAvailableLangTranslation() async {
     isTransConfigCallLoading.value = true;
-    Map<String, dynamic> transPayload = APIConstants.payloadForLanguageConfig;
-    (transPayload['pipelineTasks'] as List<Map<String, dynamic>>).removeWhere(
-        (element) =>
-            element[APIConstants.kTaskType] != APIConstants.kTranslation);
+    Map<String, dynamic> transPayload =
+        json.decode(json.encode(APIConstants.payloadForLanguageConfig));
+
+    (transPayload['pipelineTasks'])
+        .removeWhere((element) => element['taskType'] != 'translation');
     var languageRequestResponse =
         await _dhruvaapiClient.getTaskSequence(requestPayload: transPayload);
     languageRequestResponse.when(
