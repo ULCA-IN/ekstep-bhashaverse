@@ -9,8 +9,7 @@ import 'language_map_translated.dart';
 class APIConstants {
   static const String ULCA_CONFIG_API_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis/v0';
-  static const String ULCA_CONFIG_API_STREAMING_URL =
-      'wss://api.dhruva.ai4bharat.org';
+
   static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
