@@ -1,24 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../common/controller/language_model_controller.dart';
-import '../../../enums/speaker_status.dart';
 import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
-import '../../../utils/file_helper.dart';
-import '../../../utils/network_utils.dart';
-import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
-import '../../../utils/waveform_style.dart';
 
 class TextTranslateController extends GetxController {
   TextEditingController sourceLangTextController = TextEditingController(),
@@ -35,28 +27,32 @@ class TextTranslateController extends GetxController {
       isLoading = false.obs,
       isKeyboardVisible = false.obs,
       isScrolledTransliterationHints = false.obs,
-      isSourceShareLoading = false.obs,
-      isTargetShareLoading = false.obs,
       expandFeedbackIcon = true.obs;
   RxString selectedSourceLanguageCode = ''.obs,
-      sourceLangTTSPath = ''.obs,
-      targetLangTTSPath = ''.obs,
       targetOutputText = ''.obs,
       selectedTargetLanguageCode = ''.obs;
   String? transliterationModelToUse = '';
   String currentlyTypedWordForTransliteration = '';
-  RxInt maxDuration = 0.obs,
-      currentDuration = 0.obs,
-      sourceTextCharLimit = 0.obs;
+  RxInt sourceTextCharLimit = 0.obs;
   RxList transliterationWordHints = [].obs;
   int lastOffsetOfCursor = 0;
-  File? ttsAudioFile;
-  dynamic ttsResponse;
-  Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
-      targetSpeakerStatus = Rx(SpeakerStatus.disabled);
-  late Directory appDirectory;
+
+  // uncomment when TTS work
+
+  // RxBool isSourceShareLoading = false.obs, isTargetShareLoading = false.obs;
+
+  // RxInt maxDuration = 0.obs, currentDuration = 0.obs;
+
+  // RxString sourceLangTTSPath = ''.obs, targetLangTTSPath = ''.obs;
+
+  //  File? ttsAudioFile;
+  // dynamic ttsResponse;
+  // Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
+  //     targetSpeakerStatus = Rx(SpeakerStatus.disabled);
+  // late Directory appDirectory;
+  // late PlayerController playerController;
+
   late final Box _hiveDBInstance;
-  late PlayerController playerController;
 
 // for sending payload in feedback API
   Map<String, dynamic> lastComputeRequest = {};
@@ -68,12 +64,12 @@ class TextTranslateController extends GetxController {
     _transliterationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    playerController = PlayerController();
+    // playerController = PlayerController();
 
     sourceLangTextController
         .addListener(clearTransliterationHintsIfCursorMoved);
 
-    playerController.onCurrentDurationChanged.listen((duration) {
+    /* playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
     });
 
@@ -92,7 +88,7 @@ class TextTranslateController extends GetxController {
           break;
         default:
       }
-    });
+    }); */
 
     transliterationHintsScrollController.addListener(() {
       isScrolledTransliterationHints.value = true;
@@ -106,19 +102,19 @@ class TextTranslateController extends GetxController {
         .removeListener(clearTransliterationHintsIfCursorMoved);
     sourceLangTextController.dispose();
     targetLangTextController.dispose();
-    await disposePlayer();
+    // await disposePlayer();
     super.onClose();
   }
 
   void getSourceTargetLangFromDB() {
     String? selectedSourceLanguage =
-        _hiveDBInstance.get(preferredSourceLanguage);
+        _hiveDBInstance.get(preferredSourceLangTextScreen);
 
     if (selectedSourceLanguage == null || selectedSourceLanguage.isEmpty) {
       selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
-    if (_languageModelController.sourceTargetLanguageMap.keys
+    if (_languageModelController.translationLanguageMap.keys
         .toList()
         .contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
@@ -128,10 +124,10 @@ class TextTranslateController extends GetxController {
     }
 
     String? selectedTargetLanguage =
-        _hiveDBInstance.get(preferredTargetLanguage);
+        _hiveDBInstance.get(preferredTargetLangTextScreen);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        _languageModelController.sourceTargetLanguageMap.keys
+        _languageModelController.translationLanguageMap.keys
             .toList()
             .contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
@@ -140,21 +136,21 @@ class TextTranslateController extends GetxController {
 
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
-      if (_languageModelController.sourceTargetLanguageMap.keys
+      if (_languageModelController.translationLanguageMap.keys
               .contains(selectedTargetLanguageCode.value) &&
           _languageModelController
-                  .sourceTargetLanguageMap[selectedTargetLanguageCode.value] !=
+                  .translationLanguageMap[selectedTargetLanguageCode.value] !=
               null &&
           _languageModelController
-              .sourceTargetLanguageMap[selectedTargetLanguageCode.value]!
+              .translationLanguageMap[selectedTargetLanguageCode.value]!
               .contains(selectedSourceLanguageCode.value)) {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;
         _hiveDBInstance.put(
-            preferredSourceLanguage, selectedSourceLanguageCode.value);
+            preferredSourceLangTextScreen, selectedSourceLanguageCode.value);
         _hiveDBInstance.put(
-            preferredTargetLanguage, selectedTargetLanguageCode.value);
+            preferredTargetLangTextScreen, selectedTargetLanguageCode.value);
         resetAllValues();
       } else {
         String sourceLanguage = APIConstants.getLanguageNameFromCode(
@@ -214,7 +210,7 @@ class TextTranslateController extends GetxController {
     String translationServiceId = '';
 
     translationServiceId = APIConstants.getTaskTypeServiceID(
-            _languageModelController.taskSequenceResponse,
+            _languageModelController.translationConfigResponse,
             'translation',
             selectedSourceLanguageCode.value,
             selectedTargetLanguageCode.value) ??
@@ -229,11 +225,11 @@ class TextTranslateController extends GetxController {
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender));
 
     var response = await _dhruvaapiClient.sendComputeRequest(
-        baseUrl: _languageModelController
-            .taskSequenceResponse.pipelineInferenceAPIEndPoint?.callbackUrl,
-        authorizationKey: _languageModelController.taskSequenceResponse
+        baseUrl: _languageModelController.translationConfigResponse
+            .pipelineInferenceAPIEndPoint?.callbackUrl,
+        authorizationKey: _languageModelController.translationConfigResponse
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
-        authorizationValue: _languageModelController.taskSequenceResponse
+        authorizationValue: _languageModelController.translationConfigResponse
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
@@ -259,10 +255,10 @@ class TextTranslateController extends GetxController {
         isLoading.value = false;
         Future.delayed(const Duration(seconds: 3))
             .then((value) => expandFeedbackIcon.value = false);
-        sourceLangTTSPath.value = '';
-        targetLangTTSPath.value = '';
-        sourceSpeakerStatus.value = SpeakerStatus.stopped;
-        targetSpeakerStatus.value = SpeakerStatus.stopped;
+        // sourceLangTTSPath.value = '';
+        // targetLangTTSPath.value = '';
+        // sourceSpeakerStatus.value = SpeakerStatus.stopped;
+        // targetSpeakerStatus.value = SpeakerStatus.stopped;
       },
       failure: (error) {
         isLoading.value = false;
@@ -272,7 +268,9 @@ class TextTranslateController extends GetxController {
     );
   }
 
-  Future<void> getComputeResTTS({
+  // Uncomment when TTS work
+
+  /* Future<void> getComputeResTTS({
     required String sourceText,
     required String languageCode,
     required bool isTargetLanguage,
@@ -339,9 +337,9 @@ class TextTranslateController extends GetxController {
         return;
       },
     );
-  }
-
-  void playStopTTSOutput(bool isPlayingSource) async {
+  } 
+  
+   void playStopTTSOutput(bool isPlayingSource) async {
     if (playerController.playerState.isPlaying) {
       await stopPlayer();
       return;
@@ -389,12 +387,12 @@ class TextTranslateController extends GetxController {
       await preparePlayerAndWaveforms(audioPath,
           isRecordedAudio: false, isTargetLanguage: !isPlayingSource);
     }
-  }
+  } 
 
-  void shareAudioFile({required bool isSourceLang}) async {
+   void shareAudioFile({required bool isSourceLang}) async {
     if (isTranslateCompleted.value) {
-      String? audioPathToShare =
-          isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value;
+       String? audioPathToShare =
+          isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value; 
 
       if (audioPathToShare.isEmpty) {
         if (!await isNetworkConnected()) {
@@ -427,7 +425,7 @@ class TextTranslateController extends GetxController {
             isSourceLang ? sourceLangTTSPath.value : targetLangTTSPath.value;
         isSourceLang
             ? isSourceShareLoading.value = false
-            : isTargetShareLoading.value = false;
+            : isTargetShareLoading.value = false; 
       }
 
       await Share.shareXFiles(
@@ -439,51 +437,7 @@ class TextTranslateController extends GetxController {
       showDefaultSnackbar(message: noAudioFoundToShare.tr);
     }
   }
-
-  void setModelForTransliteration() {
-    transliterationModelToUse =
-        _languageModelController.getAvailableTransliterationModelsForLanguage(
-            selectedSourceLanguageCode.value);
-  }
-
-  void clearTransliterationHintsIfCursorMoved() {
-    int difference =
-        lastOffsetOfCursor - sourceLangTextController.selection.base.offset;
-    if (difference > 0 || difference < -1) {
-      clearTransliterationHints();
-    }
-    lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
-  }
-
-  void clearTransliterationHints() {
-    transliterationWordHints.clear();
-    currentlyTypedWordForTransliteration = '';
-  }
-
-  Future<void> resetAllValues() async {
-    sourceLangTextController.clear();
-    targetLangTextController.clear();
-    isTranslateCompleted.value = false;
-    sourceTextCharLimit.value = 0;
-    ttsResponse = null;
-    maxDuration.value = 0;
-    currentDuration.value = 0;
-    await stopPlayer();
-    sourceSpeakerStatus.value = SpeakerStatus.disabled;
-    targetSpeakerStatus.value = SpeakerStatus.disabled;
-    sourceLangTTSPath.value = '';
-    targetLangTTSPath.value = '';
-    targetOutputText.value = '';
-    isSourceShareLoading.value = false;
-    isTargetShareLoading.value = false;
-    lastComputeRequest.clear();
-    lastComputeResponse.clear();
-    if (isTransliterationEnabled()) {
-      setModelForTransliteration();
-      clearTransliterationHints();
-    }
-  }
-
+  
   Future<void> preparePlayerAndWaveforms(
     String filePath, {
     required bool isRecordedAudio,
@@ -524,6 +478,52 @@ class TextTranslateController extends GetxController {
   Future<void> disposePlayer() async {
     await stopPlayer();
     playerController.dispose();
+  }
+  
+  */
+
+  void setModelForTransliteration() {
+    transliterationModelToUse =
+        _languageModelController.getAvailableTransliterationModelsForLanguage(
+            selectedSourceLanguageCode.value);
+  }
+
+  void clearTransliterationHintsIfCursorMoved() {
+    int difference =
+        lastOffsetOfCursor - sourceLangTextController.selection.base.offset;
+    if (difference > 0 || difference < -1) {
+      clearTransliterationHints();
+    }
+    lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
+  }
+
+  void clearTransliterationHints() {
+    transliterationWordHints.clear();
+    currentlyTypedWordForTransliteration = '';
+  }
+
+  Future<void> resetAllValues() async {
+    sourceLangTextController.clear();
+    targetLangTextController.clear();
+    isTranslateCompleted.value = false;
+    sourceTextCharLimit.value = 0;
+    // maxDuration.value = 0;
+    // currentDuration.value = 0;
+    // ttsResponse = null;
+    // await stopPlayer();
+    // sourceSpeakerStatus.value = SpeakerStatus.disabled;
+    // targetSpeakerStatus.value = SpeakerStatus.disabled;
+    // sourceLangTTSPath.value = '';
+    // targetLangTTSPath.value = '';
+    // isSourceShareLoading.value = false;
+    // isTargetShareLoading.value = false;
+    targetOutputText.value = '';
+    lastComputeRequest.clear();
+    lastComputeResponse.clear();
+    if (isTransliterationEnabled()) {
+      setModelForTransliteration();
+      clearTransliterationHints();
+    }
   }
 
   bool isTransliterationEnabled() {

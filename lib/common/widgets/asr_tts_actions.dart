@@ -18,16 +18,16 @@ class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
     required String textToCopy,
-    required PlayerController playerController,
     required bool isRecordedAudio,
     required bool expandFeedbackIcon,
     required bool showFeedbackIcon,
-    required bool isShareButtonLoading,
-    required String currentDuration,
-    required String totalDuration,
     required SpeakerStatus speakerStatus,
-    required Function onMusicPlayOrStop,
-    required Function onFileShare,
+    bool isShareButtonLoading = false,
+    String? currentDuration,
+    String? totalDuration,
+    Function? onMusicPlayOrStop,
+    Function? onFileShare,
+    PlayerController? playerController,
     Function? onFeedbackButtonTap,
   })  : _textToCopy = textToCopy,
         _playerController = playerController,
@@ -47,12 +47,12 @@ class ASRAndTTSActions extends StatelessWidget {
       _expandFeedbackIcon,
       _showFeedbackIcon;
   final String _textToCopy;
-  final PlayerController _playerController;
-  final String _currentDuration;
-  final String _totalDuration;
+  final PlayerController? _playerController;
+  final String? _currentDuration;
+  final String? _totalDuration;
   final SpeakerStatus _speakerStatus;
-  final Function _onAudioPlayOrStop, _onFileShare;
-  final Function? _onFeedbackButtonTap;
+  final Function? _onFileShare;
+  final Function? _onAudioPlayOrStop, _onFeedbackButtonTap;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,9 @@ class ASRAndTTSActions extends StatelessWidget {
           child: Row(
             children: [
               InkWell(
-                onTap: () async => _onFileShare(),
+                onTap: () async {
+                  if (_onFileShare != null) _onFileShare!();
+                },
                 child: Padding(
                   padding: AppEdgeInsets.instance.symmetric(vertical: 8),
                   child: _isShareButtonLoading
@@ -174,7 +176,7 @@ class ASRAndTTSActions extends StatelessWidget {
                     AudioFileWaveforms(
                       size: Size(WaveformStyle.getDefaultWidth,
                           WaveformStyle.getDefaultHeight),
-                      playerController: _playerController,
+                      playerController: _playerController ?? PlayerController(),
                       waveformType: WaveformType.fitWidth,
                       playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
                         isRecordedAudio: _isRecordedAudio,
@@ -186,11 +188,11 @@ class ASRAndTTSActions extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(_currentDuration,
+                          Text(_currentDuration ?? '',
                               style: regular12(context).copyWith(
                                   color: context.appTheme.titleTextColor),
                               textAlign: TextAlign.start),
-                          Text(_totalDuration,
+                          Text(_totalDuration ?? '',
                               style: regular12(context).copyWith(
                                   color: context.appTheme.titleTextColor),
                               textAlign: TextAlign.end),
@@ -201,35 +203,38 @@ class ASRAndTTSActions extends StatelessWidget {
                 ),
               ),
         SizedBox(width: 12.toWidth),
-        InkWell(
-          onTap: () {
-            if (_speakerStatus != SpeakerStatus.disabled) {
-              _onAudioPlayOrStop();
-            } else {
-              showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _speakerStatus != SpeakerStatus.disabled
-                  ? context.appTheme.buttonSelectedColor
-                  : context.appTheme.speackerColor,
-            ),
-            padding: AppEdgeInsets.instance.all(8),
-            child: SizedBox(
-              height: 24.toWidth,
-              width: 24.toWidth,
-              child: _speakerStatus == SpeakerStatus.loading
-                  ? const CustomCircularLoading()
-                  : SvgPicture.asset(
-                      _speakerStatus == SpeakerStatus.playing
-                          ? iconStopPlayback
-                          : iconSound,
-                      color: _speakerStatus != SpeakerStatus.disabled
-                          ? context.appTheme.iconOutlineColor
-                          : context.appTheme.disabledIconOutlineColor,
-                    ),
+        Visibility(
+          visible: _speakerStatus != SpeakerStatus.hidden,
+          child: InkWell(
+            onTap: () {
+              if (_speakerStatus != SpeakerStatus.disabled) {
+                if (_onAudioPlayOrStop != null) _onAudioPlayOrStop!();
+              } else {
+                showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _speakerStatus != SpeakerStatus.disabled
+                    ? context.appTheme.buttonSelectedColor
+                    : context.appTheme.speackerColor,
+              ),
+              padding: AppEdgeInsets.instance.all(8),
+              child: SizedBox(
+                height: 24.toWidth,
+                width: 24.toWidth,
+                child: _speakerStatus == SpeakerStatus.loading
+                    ? const CustomCircularLoading()
+                    : SvgPicture.asset(
+                        _speakerStatus == SpeakerStatus.playing
+                            ? iconStopPlayback
+                            : iconSound,
+                        color: _speakerStatus != SpeakerStatus.disabled
+                            ? context.appTheme.iconOutlineColor
+                            : context.appTheme.disabledIconOutlineColor,
+                      ),
+              ),
             ),
           ),
         ),
