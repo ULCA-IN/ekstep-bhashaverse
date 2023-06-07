@@ -3,6 +3,7 @@ class TaskSequenceResponse {
   List<PipelineResponseConfig>? pipelineResponseConfig;
   String? feedbackUrl;
   PipelineInferenceAPIEndPoint? pipelineInferenceAPIEndPoint;
+  PipelineInferenceSocketAPIEndPoint? pipelineInferenceSocketAPIEndPoint;
 
   TaskSequenceResponse(
       {languages,
@@ -28,6 +29,11 @@ class TaskSequenceResponse {
         ? PipelineInferenceAPIEndPoint.fromJson(
             json['pipelineInferenceAPIEndPoint'])
         : null;
+    pipelineInferenceSocketAPIEndPoint =
+        json['pipelineInferenceSocketEndPoint'] != null
+            ? PipelineInferenceSocketAPIEndPoint.fromJson(
+                json['pipelineInferenceSocketEndPoint'])
+            : null;
   }
 
   Map<dynamic, dynamic> toJson() {
@@ -188,6 +194,36 @@ class InferenceApiKey {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
     data['name'] = name;
     data['value'] = value;
+    return data;
+  }
+}
+
+class PipelineInferenceSocketAPIEndPoint {
+  String? callbackUrl;
+  InferenceApiKey? inferenceApiKey;
+  bool? isMultilingualEnabled;
+  bool? isSyncApi;
+
+  PipelineInferenceSocketAPIEndPoint(
+      {callbackUrl, inferenceApiKey, isMultilingualEnabled, isSyncApi});
+
+  PipelineInferenceSocketAPIEndPoint.fromJson(Map<dynamic, dynamic> json) {
+    callbackUrl = json['callbackUrl'];
+    inferenceApiKey = json['inferenceApiKey'] != null
+        ? InferenceApiKey.fromJson(json['inferenceApiKey'])
+        : null;
+    isMultilingualEnabled = json['isMultilingualEnabled'];
+    isSyncApi = json['isSyncApi'];
+  }
+
+  Map<dynamic, dynamic> toJson() {
+    final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
+    data['callbackUrl'] = callbackUrl;
+    if (inferenceApiKey != null) {
+      data['inferenceApiKey'] = inferenceApiKey!.toJson();
+    }
+    data['isMultilingualEnabled'] = isMultilingualEnabled;
+    data['isSyncApi'] = isSyncApi;
     return data;
   }
 }
