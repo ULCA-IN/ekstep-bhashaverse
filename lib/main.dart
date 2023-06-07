@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
 
     // Streaming vs Batch model preference
     if (hiveDBInstance.get(isStreamingPreferred) == null) {
-      hiveDBInstance.put(isStreamingPreferred, true);
+      hiveDBInstance.put(isStreamingPreferred, false);
     }
   }
 
