@@ -15,12 +15,14 @@ import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
 
 class HomeController extends GetxController {
-  RxBool isLoading = false.obs, isKeyboardVisible = false.obs;
+  RxBool isMainConfigCallLoading = false.obs,
+      isTransConfigCallLoading = false.obs,
+      isKeyboardVisible = false.obs;
 
   late DHRUVAAPIClient _dhruvaapiClient;
   late TransliterationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
-  late StreamSubscription<ConnectivityResult> subscription;
+  StreamSubscription<ConnectivityResult>? subscription;
   late final Box _hiveDBInstance;
 
   @override
@@ -29,6 +31,8 @@ class HomeController extends GetxController {
     _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+
+    // Get main config call response from cache
 
     DateTime? configCacheTime = _hiveDBInstance.get(configCacheLastUpdatedKey);
     dynamic taskSequenceResponse = _hiveDBInstance.get(configCacheKey);
@@ -40,51 +44,100 @@ class HomeController extends GetxController {
       _languageModelController.setTaskSequenceResponse(
           TaskSequenceResponse.fromJson(taskSequenceResponse));
       _languageModelController.populateLanguagePairs();
-      isNetworkConnected().then((isConnected) {
-        if (isConnected) getTransliterationModels();
-      });
     } else {
       // clear cache and get new data
       _hiveDBInstance.put(configCacheLastUpdatedKey, null);
       _hiveDBInstance.put(configCacheKey, null);
       isNetworkConnected().then((isConnected) {
         if (isConnected) {
-          fetchConfigData();
+          getAvailableLanguagesInTask();
         } else {
           showDefaultSnackbar(message: errorNoInternetTitle.tr);
         }
       });
-      listenNetworkChange();
+      if (subscription == null) listenNetworkChange();
     }
+
+    // Get translation config call response from cache
+
+    DateTime? transConfigCacheTime =
+        _hiveDBInstance.get(transConfigCacheLastUpdatedKey);
+    dynamic transTaskSequenceResponse =
+        _hiveDBInstance.get(transConfigCacheKey);
+
+    if (transConfigCacheTime != null &&
+        transTaskSequenceResponse != null &&
+        transConfigCacheTime.isAfter(DateTime.now())) {
+      // load data from cache
+      _languageModelController.setTranslationConfigResponse(
+          TaskSequenceResponse.fromJson(transTaskSequenceResponse));
+      _languageModelController.populateTranslationLanguagePairs();
+    } else {
+      // clear cache and get new data
+      _hiveDBInstance.put(transConfigCacheLastUpdatedKey, null);
+      _hiveDBInstance.put(transConfigCacheKey, null);
+      isNetworkConnected().then((isConnected) {
+        if (isConnected) {
+          getAvailableLangTranslation();
+        } else {
+          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+        }
+      });
+      if (subscription == null) listenNetworkChange();
+    }
+
+    isNetworkConnected().then((isConnected) {
+      if (isConnected) {
+        getTransliterationModels();
+      }
+    });
 
     super.onInit();
   }
 
   @override
   void onClose() {
-    subscription.cancel();
+    subscription?.cancel();
     super.onClose();
   }
 
-  void fetchConfigData() {
-    isLoading.value = true;
-    getAvailableLanguagesInTask().then((_) {
-      getTransliterationModels().then((_) {
-        isLoading.value = false;
-      });
-    });
-  }
-
   Future<void> getAvailableLanguagesInTask() async {
+    isMainConfigCallLoading.value = true;
     var languageRequestResponse = await _dhruvaapiClient.getTaskSequence(
         requestPayload: APIConstants.payloadForLanguageConfig);
     languageRequestResponse.when(
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController.setTaskSequenceResponse(taskSequenceResponse);
-        await addConfigResponseInCache(taskSequenceResponse.toJson());
+        await addMainConfigResponseInCache(taskSequenceResponse.toJson());
         _languageModelController.populateLanguagePairs();
+        isMainConfigCallLoading.value = false;
       }),
       failure: (error) {
+        isMainConfigCallLoading.value = false;
+        showDefaultSnackbar(
+            message: error.message ?? APIConstants.kErrorMessageGenericError);
+      },
+    );
+  }
+
+  Future<void> getAvailableLangTranslation() async {
+    isTransConfigCallLoading.value = true;
+    Map<String, dynamic> transPayload = APIConstants.payloadForLanguageConfig;
+    (transPayload['pipelineTasks'] as List<Map<String, dynamic>>).removeWhere(
+        (element) =>
+            element[APIConstants.kTaskType] != APIConstants.kTranslation);
+    var languageRequestResponse =
+        await _dhruvaapiClient.getTaskSequence(requestPayload: transPayload);
+    languageRequestResponse.when(
+      success: ((TaskSequenceResponse taskSequenceResponse) async {
+        _languageModelController
+            .setTranslationConfigResponse(taskSequenceResponse);
+        await addTransConfigResponseInCache(taskSequenceResponse.toJson());
+        _languageModelController.populateTranslationLanguagePairs();
+        isTransConfigCallLoading.value = false;
+      }),
+      failure: (error) {
+        isTransConfigCallLoading.value = false;
         showDefaultSnackbar(
             message: error.message ?? APIConstants.kErrorMessageGenericError);
       },
@@ -122,17 +175,27 @@ class HomeController extends GetxController {
       if (result != ConnectivityResult.none &&
           result != ConnectivityResult.vpn) {
         if (_languageModelController.sourceTargetLanguageMap.isEmpty &&
-            !isLoading.value) {
-          fetchConfigData();
+            !isMainConfigCallLoading.value) {
+          getAvailableLanguagesInTask();
         }
       }
     });
   }
 
-  Future<void> addConfigResponseInCache(responseData) async {
+  Future<void> addMainConfigResponseInCache(responseData) async {
     await _hiveDBInstance.put(configCacheKey, responseData);
     await _hiveDBInstance.put(
       configCacheLastUpdatedKey,
+      DateTime.now().add(
+        const Duration(days: 1),
+      ),
+    );
+  }
+
+  Future<void> addTransConfigResponseInCache(responseData) async {
+    await _hiveDBInstance.put(transConfigCacheKey, responseData);
+    await _hiveDBInstance.put(
+      transConfigCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
       ),
