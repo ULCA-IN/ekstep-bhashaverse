@@ -126,73 +126,68 @@ class _SettingsScreenState extends State<SettingsScreen>
                   SizedBox(height: 24.toHeight),
                   Obx(
                     () => _expandableSettingHeading(
-                      height: _settingsController.isAdvanceMenuOpened.value
-                          ? 130.toHeight
-                          : 60.toHeight,
-                      icon: AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return Transform(
-                              alignment: Alignment.center,
-                              transform: Matrix4.identity()
-                                ..rotateZ(
-                                  _animation.value,
+                        title: advanceSettings.tr,
+                        onTitleClick: () {
+                          _settingsController.isAdvanceMenuOpened.value =
+                              !_settingsController.isAdvanceMenuOpened.value;
+                          _settingsController.isAdvanceMenuOpened.value
+                              ? _controller.forward()
+                              : _controller.reverse();
+                        },
+                        child: AnimatedCrossFade(
+                          duration: defaultAnimationTime,
+                          crossFadeState:
+                              _settingsController.isAdvanceMenuOpened.value
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                          firstChild: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Flexible(child: Divider()),
+                              Flexible(
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      realTimeResponse.tr,
+                                      style: regular18Primary(context).copyWith(
+                                        fontSize: 18.toFont,
+                                        color:
+                                            context.appTheme.primaryTextColor,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Obx(
+                                      () => CupertinoSwitch(
+                                        value: _settingsController
+                                            .isStreamingEnabled.value,
+                                        activeColor: context
+                                            .appTheme.highlightedBorderColor,
+                                        trackColor:
+                                            context.appTheme.disabledBGColor,
+                                        onChanged: (value) {
+                                          _settingsController
+                                              .changeStreamingPref(value);
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              child: SvgPicture.asset(iconArrowDown,
-                                  color: context.appTheme.highlightedTextColor),
-                            );
-                          }),
-                      title: advanceSettings.tr,
-                      onTitleClick: () {
-                        _settingsController.isAdvanceMenuOpened.value =
-                            !_settingsController.isAdvanceMenuOpened.value;
-                        _settingsController.isAdvanceMenuOpened.value
-                            ? _controller.forward()
-                            : _controller.reverse();
-                      },
-                      child: AnimatedOpacity(
-                        opacity: _settingsController.isAdvanceMenuOpened.value
-                            ? 1
-                            : 0,
-                        duration: defaultAnimationTime,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(child: SizedBox(height: 8.toHeight)),
-                            const Flexible(child: Divider()),
-                            Flexible(child: SizedBox(height: 14.toHeight)),
-                            Flexible(
-                              child: Row(
-                                children: [
-                                  Text(
-                                    s2sStreaming.tr,
-                                    style: regular18Primary(context).copyWith(
-                                      fontSize: 18.toFont,
-                                      color: context.appTheme.primaryTextColor,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Obx(
-                                    () => CupertinoSwitch(
-                                      value: _settingsController
-                                          .isStreamingEnabled.value,
-                                      activeColor: context
-                                          .appTheme.highlightedBorderColor,
-                                      trackColor:
-                                          context.appTheme.disabledBGColor,
-                                      onChanged: (value) {
-                                        _settingsController
-                                            .changeStreamingPref(value);
-                                      },
-                                    ),
-                                  ),
-                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                              SizedBox(height: 14.toHeight),
+                              Text(
+                                _settingsController.isAdvanceMenuOpened.value
+                                    ? realTimeResponseInfo.tr
+                                    : '',
+                                style: light16(context).copyWith(
+                                  fontSize: 14.toFont,
+                                  color: context.appTheme.highlightedTextColor,
+                                ),
+                              ),
+                              SizedBox(height: 14.toHeight),
+                            ],
+                          ),
+                          secondChild: const SizedBox.shrink(),
+                        )),
                   ),
                 ],
               ),
@@ -261,15 +256,12 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _expandableSettingHeading({
     required String title,
-    required Widget icon,
     Widget? child,
-    double? height,
     required Function onTitleClick,
   }) {
     return AnimatedContainer(
       duration: defaultAnimationTime,
       padding: AppEdgeInsets.instance.only(top: 16, left: 16, right: 16),
-      height: height,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -278,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
           color: context.appTheme.cardBGColor),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
             onTap: () => onTitleClick(),
@@ -292,10 +284,23 @@ class _SettingsScreenState extends State<SettingsScreen>
                   ),
                 ),
                 const Spacer(),
-                icon,
+                AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..rotateZ(
+                            _animation.value,
+                          ),
+                        child: SvgPicture.asset(iconArrowDown,
+                            color: context.appTheme.highlightedTextColor),
+                      );
+                    }),
               ],
             ),
           ),
+          SizedBox(height: 18.toHeight),
           if (child != null) Flexible(child: child),
         ],
       ),
