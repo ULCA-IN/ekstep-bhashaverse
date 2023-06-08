@@ -125,15 +125,33 @@ class _RatingWidgetState extends State<RatingWidget>
                           // widget._showTaskQuestions,
                           child: Column(
                             children: [
-                              SizedBox(height: 12.toHeight),
+                              SizedBox(height: 20.toHeight),
                               if (widget.feedbackTypeModel.taskType == 'asr' ||
                                   widget.feedbackTypeModel.taskType ==
                                       'translation')
-                                GenericTextField(
-                                  controller:
-                                      widget.feedbackTypeModel.textController,
-                                  focusNode: widget.feedbackTypeModel.focusNode,
-                                  onChange: widget.onTextChanged,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (widget.feedbackTypeModel
+                                            .suggestedOutputTitle !=
+                                        null)
+                                      Text(
+                                        widget.feedbackTypeModel
+                                            .suggestedOutputTitle!,
+                                        style: semibold16(context).copyWith(
+                                            color: context
+                                                .appTheme.secondaryTextColor,
+                                            height: 1.5),
+                                      ),
+                                    SizedBox(height: 14.toHeight),
+                                    GenericTextField(
+                                      controller: widget
+                                          .feedbackTypeModel.textController,
+                                      focusNode:
+                                          widget.feedbackTypeModel.focusNode,
+                                      onChange: widget.onTextChanged,
+                                    ),
+                                  ],
                                 ),
                               ...widget.feedbackTypeModel.granularFeedbacks
                                   .map((feedback) {

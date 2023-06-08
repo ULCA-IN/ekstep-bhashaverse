@@ -94,4 +94,8 @@ final Map<String, String> en = {
   submit: 'Submit',
   loading: 'Loading',
   errorGiveRating: 'Please give a rating',
+  suggestedOutputTextASR:
+      'If speech was not recognized properly, please edit it below:',
+  suggestedOutputTextTranslate:
+      'If translation was not correct, please edit it below:'
 };

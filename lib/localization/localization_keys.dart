@@ -94,3 +94,5 @@ const String writeReviewHere = 'writeReviewHere';
 const String submit = 'submit';
 const String loading = 'loading';
 const String errorGiveRating = 'errorGiveRating';
+const String suggestedOutputTextASR = 'suggestedOutputTextASR';
+const String suggestedOutputTextTranslate = 'suggestedOutputTextTranslate';
