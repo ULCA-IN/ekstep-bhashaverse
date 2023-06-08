@@ -383,7 +383,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _translationController.isLoading.value
-                ? kHomeLoadingAnimationText.tr
+                ? computeCallLoadingText.tr
                 : kTranslationLoadingAnimationText.tr);
       } else {
         return const SizedBox.shrink();

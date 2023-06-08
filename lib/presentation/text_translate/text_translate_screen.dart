@@ -515,7 +515,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _textTranslationController.isLoading.value
-                ? kHomeLoadingAnimationText.tr
+                ? computeCallLoadingText.tr
                 : kTranslationLoadingAnimationText.tr);
       } else {
         return const SizedBox.shrink();

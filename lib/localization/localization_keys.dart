@@ -98,3 +98,4 @@ const String suggestedOutputTextASR = 'suggestedOutputTextASR';
 const String suggestedOutputTextTranslate = 'suggestedOutputTextTranslate';
 const String realTimeResponse = 'realTimeResponse';
 const String realTimeResponseInfo = 'realTimeResponseInfo';
+const String computeCallLoadingText = 'computeCallLoadingText';
