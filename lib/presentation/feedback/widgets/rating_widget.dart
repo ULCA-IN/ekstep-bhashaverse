@@ -138,7 +138,10 @@ class _RatingWidgetState extends State<RatingWidget>
                                       Text(
                                         widget.feedbackTypeModel
                                             .suggestedOutputTitle!,
-                                        style: semibold16(context),
+                                        style: semibold16(context).copyWith(
+                                            color: context
+                                                .appTheme.secondaryTextColor,
+                                            height: 1.5),
                                       ),
                                     SizedBox(height: 14.toHeight),
                                     GenericTextField(
