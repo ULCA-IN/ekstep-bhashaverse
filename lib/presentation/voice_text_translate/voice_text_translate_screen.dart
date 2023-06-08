@@ -406,7 +406,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _voiceTextTransController.isLoading.value
-                ? kHomeLoadingAnimationText.tr
+                ? computeCallLoadingText.tr
                 : kTranslationLoadingAnimationText.tr);
       } else {
         return const SizedBox.shrink();
