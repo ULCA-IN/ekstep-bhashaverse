@@ -97,5 +97,8 @@ final Map<String, String> en = {
   suggestedOutputTextASR:
       'If speech was not recognized properly, please edit it below:',
   suggestedOutputTextTranslate:
-      'If translation was not correct, please edit it below:'
+      'If translation was not correct, please edit it below:',
+  realTimeResponse: 'Real Time Response',
+  realTimeResponseInfo:
+      'With this switched On, Transcriptions and Translations response can be obtained in real-time.'
 };
