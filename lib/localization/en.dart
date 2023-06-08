@@ -100,5 +100,6 @@ final Map<String, String> en = {
       'If translation was not correct, please edit it below:',
   realTimeResponse: 'Real Time Response',
   realTimeResponseInfo:
-      'With this switched On, Transcriptions and Translations response can be obtained in real-time.'
+      'With this switched On, Transcriptions and Translations response can be obtained in real-time.',
+  computeCallLoadingText: 'Hold on, we are generating the output'
 };
