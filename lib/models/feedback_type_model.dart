@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 class FeedbackTypeModel {
   final String taskType;
   final String question;
+  final String? suggestedOutputTitle;
   final TextEditingController textController;
   final FocusNode focusNode;
   Rxn<double> taskRating;
@@ -18,6 +19,7 @@ class FeedbackTypeModel {
     required this.taskRating,
     required this.isExpanded,
     required this.granularFeedbacks,
+    this.suggestedOutputTitle,
   });
 }
 
