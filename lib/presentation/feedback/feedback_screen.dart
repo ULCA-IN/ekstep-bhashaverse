@@ -63,7 +63,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                 showLogo: false,
                                 onBackPress: () => Get.back(),
                               ),
-                              SizedBox(height: 60.toHeight),
+                              SizedBox(height: 50.toHeight),
                               _buildCommonFeedback(context),
                               SizedBox(height: 18.toHeight),
                               _buildTaskFeedback(),

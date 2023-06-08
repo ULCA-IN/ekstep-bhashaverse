@@ -122,7 +122,6 @@ class _RatingWidgetState extends State<RatingWidget>
                                       0.0) <
                                   4 &&
                               widget.feedbackTypeModel.taskRating.value != 0,
-                          // widget._showTaskQuestions,
                           child: Column(
                             children: [
                               SizedBox(height: 20.toHeight),
@@ -198,7 +197,7 @@ class _RatingWidgetState extends State<RatingWidget>
           ),
         ),
         const Divider(),
-        SizedBox(height: 18.toHeight),
+        SizedBox(height: 20.toHeight),
       ],
     );
   }
@@ -257,6 +256,7 @@ class DepthRatings extends StatelessWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: 8.toHeight),
                     question(),
                     SizedBox(height: 14.toHeight),
                     if (_isRating) ratingBar()
