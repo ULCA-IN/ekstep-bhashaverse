@@ -50,6 +50,10 @@ class TaskSequenceResponse {
       data['pipelineInferenceAPIEndPoint'] =
           pipelineInferenceAPIEndPoint!.toJson();
     }
+    if (pipelineInferenceSocketAPIEndPoint != null) {
+      data['pipelineInferenceSocketEndPoint'] =
+          pipelineInferenceSocketAPIEndPoint!.toJson();
+    }
     return data;
   }
 }
