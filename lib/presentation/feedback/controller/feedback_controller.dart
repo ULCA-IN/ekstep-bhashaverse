@@ -214,12 +214,15 @@ class FeedbackController extends GetxController {
                 as List<dynamic>)
             .firstWhereOrNull((e) => e['taskType'] == taskFeedback['taskType']);
         String pipelineTaskValue = '';
+        String? suggestedOutputTitle;
         switch (task?['taskType']) {
           case 'asr':
             pipelineTaskValue = task?['output'][0]['source'];
+            suggestedOutputTitle = suggestedOutputTextASR.tr;
             break;
           case 'translation':
             pipelineTaskValue = task?['output'][0]['target'];
+            suggestedOutputTitle = suggestedOutputTextTranslate.tr;
             break;
         }
         TextEditingController feedbackTextController =
@@ -233,6 +236,7 @@ class FeedbackController extends GetxController {
                 question: taskFeedback['commonFeedback'].length > 0
                     ? taskFeedback['commonFeedback'][0]['question']
                     : '',
+                suggestedOutputTitle: suggestedOutputTitle,
                 textController: feedbackTextController,
                 focusNode: feedbackFocusNode,
                 taskRating: Rxn<double>(),
