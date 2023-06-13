@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
@@ -27,12 +27,12 @@ class TransliterationHints extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: _showScrollIcon ? 85.toHeight : 50.toHeight,
+      height: _showScrollIcon ? 85.w : 50.w,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: _showScrollIcon ? 6.toHeight : null),
+          SizedBox(height: _showScrollIcon ? 6.w : null),
           if (_showScrollIcon)
             _isScrollArrowVisible
                 ? Align(
@@ -40,10 +40,10 @@ class TransliterationHints extends StatelessWidget {
                     child: Icon(
                       Icons.arrow_forward_outlined,
                       color: Colors.grey.shade400,
-                      size: 22.toHeight,
+                      size: 22.w,
                     ),
                   )
-                : SizedBox(height: 22.toHeight),
+                : SizedBox(height: 22.w),
           SingleChildScrollView(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -58,13 +58,13 @@ class TransliterationHints extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                           color: context.appTheme.lightBGColor,
                         ),
-                        margin: AppEdgeInsets.instance.all(4),
-                        padding: AppEdgeInsets.instance
-                            .symmetric(vertical: 4, horizontal: 6),
+                        margin: const EdgeInsets.all(4).w,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 4.h, horizontal: 6.w),
                         alignment: Alignment.center,
                         child: Container(
                           constraints: BoxConstraints(
-                            minWidth: (ScreenUtil.screenWidth / 7).toWidth,
+                            minWidth: (ScreenUtil().screenWidth / 7).w,
                           ),
                           child: Text(
                             hintText,

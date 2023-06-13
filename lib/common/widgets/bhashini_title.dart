@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_text_style.dart';
-import '../../utils/screen_util/screen_util.dart';
 
 class BhashiniTitle extends StatelessWidget {
   const BhashiniTitle({
@@ -21,16 +21,16 @@ class BhashiniTitle extends StatelessWidget {
       children: [
         Image.asset(
           imgAppLogoSmall,
-          height: 30.toHeight,
-          width: 30.toWidth,
+          height: 30.w,
+          width: 30.w,
         ),
         SizedBox(
-          width: 8.toWidth,
+          width: 8.w,
         ),
         Text(
           bhashiniTitle.tr,
           textAlign: TextAlign.center,
-          style: bold24(context),
+          style: semibold22(context),
         ),
         if (_action != null) _action!
       ],

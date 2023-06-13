@@ -1,6 +1,7 @@
-
-import '../../../utils/screen_util/screen_util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../utils/theme/app_text_style.dart';
 
 class CustomElevetedButton extends StatelessWidget {
   const CustomElevetedButton({
@@ -9,38 +10,31 @@ class CustomElevetedButton extends StatelessWidget {
     double? borderRadius,
     VoidCallback? onButtonTap,
     required String buttonText,
-    required TextStyle textStyle,
   })  : _backgroundColor = backgroundColor,
         _borderRadius = borderRadius,
         _onButtonTap = onButtonTap,
-        _buttonText = buttonText,
-        _textStyle = textStyle;
+        _buttonText = buttonText;
 
   final Color? _backgroundColor;
   final double? _borderRadius;
   final VoidCallback? _onButtonTap;
   final String _buttonText;
-  final TextStyle _textStyle;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0,
-        padding: AppEdgeInsets.instance.symmetric(vertical: 14),
+        padding: EdgeInsets.symmetric(vertical: 10.h),
         backgroundColor: _backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(_borderRadius?.toWidth ?? 16.toWidth),
+          borderRadius: BorderRadius.circular(_borderRadius?.w ?? 16.w),
         ),
       ),
       onPressed: _onButtonTap,
-      child: SizedBox(
-        height: 24.toHeight,
-        child: Text(
-          _buttonText,
-          style: _textStyle,
-        ),
+      child: Text(
+        _buttonText,
+        style: regular18Primary(context),
       ),
     );
   }

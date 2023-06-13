@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/theme/app_theme_provider.dart';
 
@@ -47,8 +47,7 @@ class GenericTextField extends StatelessWidget {
             ),
             borderSide: BorderSide.none),
         counterText: '',
-        contentPadding:
-            AppEdgeInsets.instance.symmetric(vertical: 5, horizontal: 12),
+        contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
         filled: true,
       ),
       onChanged: _onChange,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_text_style.dart';
 
 class CommonAppBar extends StatelessWidget {
@@ -32,7 +32,7 @@ class CommonAppBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               onTap: _onBackPress,
               child: Padding(
-                padding: AppEdgeInsets.instance.all(8.0),
+                padding: const EdgeInsets.all(8.0).w,
                 child: SvgPicture.asset(
                   iconPrevious,
                 ),
@@ -46,12 +46,12 @@ class CommonAppBar extends StatelessWidget {
               _showLogo
                   ? Image.asset(
                       imgAppLogoSmall,
-                      height: 30.toHeight,
-                      width: 30.toWidth,
+                      height: 30.w,
+                      width: 30.w,
                     )
                   : const SizedBox.shrink(),
               SizedBox(
-                width: 8.toWidth,
+                width: 8.w,
               ),
               Text(
                 _title,

@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -70,17 +70,17 @@ class ASRAndTTSActions extends StatelessWidget {
                     if (_onFileShare != null) _onFileShare!();
                   },
                   child: Padding(
-                    padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
                     child: _isShareButtonLoading
                         ? SizedBox(
-                            height: 24.toWidth,
-                            width: 24.toWidth,
+                            height: 22.w,
+                            width: 22.w,
                             child: const CustomCircularLoading(),
                           )
                         : SvgPicture.asset(
                             iconShare,
-                            height: 24.toWidth,
-                            width: 24.toWidth,
+                            height: 22.w,
+                            width: 22.w,
                             color: _textToCopy.isNotEmpty
                                 ? context.appTheme.disabledTextColor
                                 : context.appTheme.disabledIconOutlineColor,
@@ -88,7 +88,7 @@ class ASRAndTTSActions extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 12.toWidth),
+              SizedBox(width: 12.w),
               InkWell(
                 onTap: () async {
                   if (_textToCopy.isEmpty) {
@@ -100,11 +100,11 @@ class ASRAndTTSActions extends StatelessWidget {
                   }
                 },
                 child: Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
                   child: SvgPicture.asset(
                     iconCopy,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
+                    height: 22.w,
+                    width: 22.w,
                     color: _textToCopy.isNotEmpty
                         ? context.appTheme.disabledTextColor
                         : context.appTheme.disabledIconOutlineColor,
@@ -114,7 +114,7 @@ class ASRAndTTSActions extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(width: 8.toWidth),
+        SizedBox(width: 8.w),
         _speakerStatus != SpeakerStatus.playing
             ? _showFeedbackIcon
                 ? Expanded(
@@ -132,8 +132,8 @@ class ASRAndTTSActions extends StatelessWidget {
                                     ? context.appTheme.feedbackBGColor
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(20)),
-                            padding: AppEdgeInsets.instance
-                                .symmetric(vertical: 6, horizontal: 15),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 6.h, horizontal: 15.w),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -149,7 +149,7 @@ class ASRAndTTSActions extends StatelessWidget {
                                   firstChild: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SizedBox(width: 8.toWidth),
+                                      SizedBox(width: 8.w),
                                       Text(
                                         feedback.tr,
                                         style: regular16(context).copyWith(
@@ -185,7 +185,7 @@ class ASRAndTTSActions extends StatelessWidget {
                         isRecordedAudio: _isRecordedAudio,
                       ),
                     ),
-                    SizedBox(width: 8.toWidth),
+                    SizedBox(width: 8.w),
                     SizedBox(
                       width: WaveformStyle.getDefaultWidth,
                       child: Row(
@@ -205,7 +205,7 @@ class ASRAndTTSActions extends StatelessWidget {
                   ],
                 ),
               ),
-        SizedBox(width: 12.toWidth),
+        SizedBox(width: 12.w),
         Visibility(
           visible: _speakerStatus != SpeakerStatus.hidden,
           child: InkWell(
@@ -223,10 +223,10 @@ class ASRAndTTSActions extends StatelessWidget {
                     ? context.appTheme.buttonSelectedColor
                     : context.appTheme.speackerColor,
               ),
-              padding: AppEdgeInsets.instance.all(8),
+              padding: const EdgeInsets.all(8).w,
               child: SizedBox(
-                height: 24.toWidth,
-                width: 24.toWidth,
+                height: 24.w,
+                width: 24.w,
                 child: _speakerStatus == SpeakerStatus.loading
                     ? const CustomCircularLoading()
                     : SvgPicture.asset(

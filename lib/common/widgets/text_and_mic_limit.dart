@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
@@ -40,31 +40,27 @@ class TextAndMicLimit extends StatelessWidget {
                     color: context.appTheme.warningColor,
                   ),
                 ),
-                SizedBox(width: 4.toWidth),
-                Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 0),
-                  child: StreamBuilder<int>(
-                    stream: _rawTimeStream,
-                    initialData: 0,
-                    builder: (context, snap) {
-                      final value = snap.data;
-                      final displayTime = StopWatchTimer.getDisplayTime(
-                          recordingMaxTimeLimit - (value ?? 0),
-                          hours: false,
-                          minute: false,
-                          milliSecond: true);
-                      return Text(
-                        '-$displayTime',
-                        style: regular14Title(context).copyWith(
-                            color: (recordingMaxTimeLimit - (value ?? 0)) >=
-                                    5000
-                                ? context.appTheme.titleTextColor
-                                : (recordingMaxTimeLimit - (value ?? 0)) >= 2000
-                                    ? context.appTheme.warningColor
-                                    : context.appTheme.errorColor),
-                      );
-                    },
-                  ),
+                SizedBox(width: 4.w),
+                StreamBuilder<int>(
+                  stream: _rawTimeStream,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(
+                        recordingMaxTimeLimit - (value ?? 0),
+                        hours: false,
+                        minute: false,
+                        milliSecond: true);
+                    return Text(
+                      '-$displayTime',
+                      style: regular14Title(context).copyWith(
+                          color: (recordingMaxTimeLimit - (value ?? 0)) >= 5000
+                              ? context.appTheme.titleTextColor
+                              : (recordingMaxTimeLimit - (value ?? 0)) >= 2000
+                                  ? context.appTheme.warningColor
+                                  : context.appTheme.errorColor),
+                    );
+                  },
                 ),
               ],
             )
