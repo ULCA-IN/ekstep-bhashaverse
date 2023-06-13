@@ -22,7 +22,7 @@ import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -57,7 +57,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _voiceTextTransController.getSourceTargetLangFromDB();
     WidgetsBinding.instance.addObserver(this);
 
-    ScreenUtil().init();
     super.initState();
   }
 
@@ -84,12 +83,12 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         children: [
           SafeArea(
             child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
                 children: [
-                  SizedBox(height: 18.toHeight),
+                  SizedBox(height: 18.w),
                   CommonAppBar(title: voice.tr, onBackPress: () => Get.back()),
-                  SizedBox(height: 24.toHeight),
+                  SizedBox(height: 24.w),
                   Expanded(
                     child: Column(
                       children: [
@@ -99,7 +98,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                                   ? const SizedBox.shrink()
                                   : _buildSourceTargetLangButtons(),
                         ),
-                        SizedBox(height: 20.toHeight),
+                        SizedBox(height: 20.w),
                         _buildSourceTextField(),
                         _buildTargetTextField(),
                       ],
@@ -108,7 +107,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                   SizedBox(
                       height: _voiceTextTransController.isKeyboardVisible.value
                           ? 0
-                          : 8.toHeight),
+                          : 8.w),
                   _buildTransliterationHints(),
                   Obx(
                     () => _voiceTextTransController.isKeyboardVisible.value
@@ -271,8 +270,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
+            width: ScreenUtil.defaultSize.width / 2.8,
+            height: 50.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -288,8 +287,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
-                  style:
-                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
+                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
                 );
               },
             ),
@@ -301,8 +299,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
-            height: 32.toHeight,
-            width: 32.toWidth,
+            height: 32.w,
+            width: 32.w,
           ),
         ),
         InkWell(
@@ -341,8 +339,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
+            width: ScreenUtil.defaultSize.width / 2.8,
+            height: 50.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -357,8 +355,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
-                  style:
-                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
+                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
                   maxLines: 2,
                 );
               },
@@ -379,7 +376,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             opacity: isRecordingStarted() ? 1 : 0,
             duration: const Duration(milliseconds: 600),
             child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: LottieBuilder.asset(
                 animationStaticWaveForRecording,
                 fit: BoxFit.cover,

@@ -19,7 +19,7 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -48,8 +48,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     _hiveDBInstance = Hive.box(hiveDBName);
     _textTranslationController.getSourceTargetLangFromDB();
     WidgetsBinding.instance.addObserver(this);
-
-    ScreenUtil().init();
     super.initState();
   }
 
@@ -77,23 +75,23 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
-                padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
                   children: [
                     Column(
                       children: [
-                        SizedBox(height: 18.toHeight),
+                        SizedBox(height: 18.w),
                         CommonAppBar(
                             title: text.tr, onBackPress: () => Get.back()),
-                        SizedBox(height: 24.toHeight),
+                        SizedBox(height: 24.w),
                         _buildSourceTargetLangButtons(),
-                        SizedBox(height: 18.toHeight),
+                        SizedBox(height: 18.w),
                         _buildTargetLangInput(),
                         SizedBox(
                             height: _textTranslationController
                                     .isKeyboardVisible.value
                                 ? 0
-                                : 8.toHeight),
+                                : 8.w),
                       ],
                     ),
                   ],
@@ -117,8 +115,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: ScreenUtil.screenHeight * 0.34,
-              margin: AppEdgeInsets.instance.all(18),
+              height: ScreenUtil().screenHeight * 0.34,
+              margin: const EdgeInsets.all(18).w,
               decoration: BoxDecoration(
                 color: context.appTheme.normalTextFeildColor,
                 borderRadius:
@@ -128,13 +126,12 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 ),
               ),
               child: Padding(
-                padding: AppEdgeInsets.instance
-                    .symmetric(vertical: 8, horizontal: 16),
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Obx(() => Flexible(child: _buildSourceLangTextField())),
-                    SizedBox(height: 12.toHeight),
+                    SizedBox(height: 12.w),
                     _buildTransliterationHints(),
                     Obx(
                       () =>
@@ -260,9 +257,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
   Widget _buildTargetLangInput() {
     return SizedBox(
-      height: (ScreenUtil.screenHeight * 0.46) -
-          ScreenUtil.statusBarHeight -
-          ScreenUtil.bottomBarHeightPx,
+      height: (ScreenUtil().screenHeight) * 0.43 -
+          ScreenUtil().statusBarHeight -
+          (View.of(context).padding.bottom / (ScreenUtil().pixelRatio ?? 0)),
       child: Obx(
         () => TextFieldWithActions(
           textController: _textTranslationController.targetLangTextController,
@@ -409,8 +406,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
+            width: ScreenUtil.defaultSize.width / 2.8,
+            height: 50.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -427,8 +424,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
-                  style:
-                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
+                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
                 );
               },
             ),
@@ -440,8 +436,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
-            height: 32.toHeight,
-            width: 32.toWidth,
+            height: 32.w,
+            width: 32.w,
           ),
         ),
         InkWell(
@@ -479,8 +475,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.screenWidth / 2.8,
-            height: 50.toHeight,
+            width: ScreenUtil.defaultSize.width / 2.8,
+            height: 50.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -496,8 +492,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
-                  style:
-                      regular18Secondary(context).copyWith(fontSize: 16.toFont),
+                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
                   maxLines: 2,
                 );
               },
