@@ -2,6 +2,7 @@ import 'dart:math' show pi;
 
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
@@ -10,7 +11,6 @@ import '../../../models/feedback_type_model.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/theme/app_text_style.dart';
 import '../../../utils/theme/app_theme_provider.dart';
-import '../../../utils/screen_util/screen_util.dart';
 
 class RatingWidget extends StatefulWidget {
   const RatingWidget({
@@ -45,7 +45,6 @@ class _RatingWidgetState extends State<RatingWidget>
       begin: 0.0,
       end: pi,
     ).animate(_controller);
-    ScreenUtil().init();
   }
 
   @override
@@ -101,7 +100,7 @@ class _RatingWidgetState extends State<RatingWidget>
                 ? Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(height: 12.toHeight),
+                      SizedBox(height: 12.w),
                       Obx(
                         () => RatingBar(
                           filledIcon: Icons.star,
@@ -124,7 +123,7 @@ class _RatingWidgetState extends State<RatingWidget>
                               widget.feedbackTypeModel.taskRating.value != 0,
                           child: Column(
                             children: [
-                              SizedBox(height: 20.toHeight),
+                              SizedBox(height: 20.w),
                               if (widget.feedbackTypeModel.taskType == 'asr' ||
                                   widget.feedbackTypeModel.taskType ==
                                       'translation')
@@ -142,7 +141,7 @@ class _RatingWidgetState extends State<RatingWidget>
                                                 .appTheme.secondaryTextColor,
                                             height: 1.5),
                                       ),
-                                    SizedBox(height: 14.toHeight),
+                                    SizedBox(height: 14.w),
                                     GenericTextField(
                                       controller: widget
                                           .feedbackTypeModel.textController,
@@ -190,14 +189,14 @@ class _RatingWidgetState extends State<RatingWidget>
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.toHeight),
+                      SizedBox(height: 10.w),
                     ],
                   )
                 : const SizedBox.shrink(),
           ),
         ),
         const Divider(),
-        SizedBox(height: 20.toHeight),
+        SizedBox(height: 20.w),
       ],
     );
   }
@@ -239,7 +238,7 @@ class DepthRatings extends StatelessWidget {
           },
         );
     return Padding(
-      padding: AppEdgeInsets.instance.all(8),
+      padding: const EdgeInsets.all(8).w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -249,16 +248,16 @@ class DepthRatings extends StatelessWidget {
               ? Row(
                   children: [
                     Expanded(child: question()),
-                    SizedBox(width: 8.toWidth),
+                    SizedBox(width: 8.w),
                     if (_isRating) ratingBar()
                   ],
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 8.toHeight),
+                    SizedBox(height: 8.w),
                     question(),
-                    SizedBox(height: 14.toHeight),
+                    SizedBox(height: 14.w),
                     if (_isRating) ratingBar()
                   ],
                 ),
