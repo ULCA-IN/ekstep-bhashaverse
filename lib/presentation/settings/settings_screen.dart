@@ -11,7 +11,7 @@ import '../../enums/gender_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
@@ -42,7 +42,6 @@ class _SettingsScreenState extends State<SettingsScreen>
       begin: 0.0,
       end: pi,
     ).animate(_controller);
-    ScreenUtil().init();
   }
 
   @override
@@ -60,21 +59,21 @@ class _SettingsScreenState extends State<SettingsScreen>
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 14.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 16.toHeight),
+                  SizedBox(height: 16.w),
                   CommonAppBar(
                       title: kSettings.tr,
                       onBackPress: () async => _onWillPop()),
-                  SizedBox(height: 48.toHeight),
+                  SizedBox(height: 48.w),
                   _settingHeading(
                     action: _popupMenuBuilder(),
                     title: appTheme.tr,
                     subtitle: appInterfaceWillChange.tr,
                   ),
-                  SizedBox(height: 24.toHeight),
+                  SizedBox(height: 24.w),
                   Obx(
                     () => InkWell(
                       onTap: () {
@@ -93,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               style: light16(context).copyWith(
                                   color: context.appTheme.highlightedTextColor),
                             ),
-                            SizedBox(width: 8.toWidth),
+                            SizedBox(width: 8.w),
                             RotatedBox(
                               quarterTurns: 3,
                               child: SvgPicture.asset(iconArrowDown,
@@ -106,9 +105,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: 24.toHeight),
+                  SizedBox(height: 24.w),
                   _voiceAssistantTileWidget(),
-                  SizedBox(height: 24.toHeight),
+                  SizedBox(height: 24.w),
                   _settingHeading(
                     action: Obx(
                       () => CupertinoSwitch(
@@ -123,10 +122,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                     title: transLiteration.tr,
                     subtitle: transLiterationWillInitiateWord.tr,
                   ),
-                  SizedBox(height: 24.toHeight),
+                  SizedBox(height: 24.w),
                   Obx(
                     () => _expandableSettingHeading(
                         title: advanceSettings.tr,
+                        isExpanded:
+                            _settingsController.isAdvanceMenuOpened.value,
                         onTitleClick: () {
                           _settingsController.isAdvanceMenuOpened.value =
                               !_settingsController.isAdvanceMenuOpened.value;
@@ -142,6 +143,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   : CrossFadeState.showSecond,
                           firstChild: Column(
                             mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Flexible(child: Divider()),
                               Flexible(
@@ -150,7 +152,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     Text(
                                       realTimeResponse.tr,
                                       style: regular18Primary(context).copyWith(
-                                        fontSize: 18.toFont,
+                                        fontSize: 18.sp,
                                         color:
                                             context.appTheme.primaryTextColor,
                                       ),
@@ -173,17 +175,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 14.toHeight),
+                              SizedBox(height: 14.h),
                               Text(
                                 _settingsController.isAdvanceMenuOpened.value
                                     ? realTimeResponseInfo.tr
                                     : '',
-                                style: light16(context).copyWith(
-                                  fontSize: 14.toFont,
-                                  color: context.appTheme.highlightedTextColor,
+                                style: regular14(context).copyWith(
+                                  color: context.appTheme.secondaryTextColor,
                                 ),
                               ),
-                              SizedBox(height: 14.toHeight),
+                              SizedBox(height: 14.w),
                             ],
                           ),
                           secondChild: const SizedBox.shrink(),
@@ -207,12 +208,12 @@ class _SettingsScreenState extends State<SettingsScreen>
   }) {
     return AnimatedContainer(
       duration: defaultAnimationTime,
-      padding: AppEdgeInsets.instance.all(16),
+      padding: const EdgeInsets.all(12).w,
       height: height,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            width: 1.toWidth,
+            width: 1.w,
             color: context.appTheme.containerColor,
           ),
           color: context.appTheme.cardBGColor),
@@ -224,8 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               Expanded(
                 child: Text(
                   title,
-                  style: regular18Secondary(context).copyWith(
-                    fontSize: 20.toFont,
+                  style: regular16(context).copyWith(
                     color: context.appTheme.primaryTextColor,
                   ),
                 ),
@@ -238,12 +238,11 @@ class _SettingsScreenState extends State<SettingsScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 16.toHeight),
+                SizedBox(height: 16.w),
                 Text(
                   subtitle,
-                  style: light16(context).copyWith(
-                    fontSize: 14.toFont,
-                    color: context.appTheme.highlightedTextColor,
+                  style: regular14(context).copyWith(
+                    color: context.appTheme.secondaryTextColor,
                   ),
                 ),
               ],
@@ -256,16 +255,17 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _expandableSettingHeading({
     required String title,
-    Widget? child,
     required Function onTitleClick,
+    required bool isExpanded,
+    Widget? child,
   }) {
     return AnimatedContainer(
       duration: defaultAnimationTime,
-      padding: AppEdgeInsets.instance.only(top: 16, left: 16, right: 16),
+      padding: EdgeInsets.only(top: 10.h, left: 16.w, right: 16.w),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            width: 1.toWidth,
+            width: 1.w,
             color: context.appTheme.containerColor,
           ),
           color: context.appTheme.cardBGColor),
@@ -278,8 +278,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               children: [
                 Text(
                   title,
-                  style: regular18Primary(context).copyWith(
-                    fontSize: 20.toFont,
+                  style: regular16(context).copyWith(
                     color: context.appTheme.primaryTextColor,
                   ),
                 ),
@@ -300,7 +299,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               ],
             ),
           ),
-          SizedBox(height: 18.toHeight),
+          SizedBox(height: isExpanded ? 6.h : 12.h),
           if (child != null) Flexible(child: child),
         ],
       ),
@@ -309,11 +308,11 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _voiceAssistantTileWidget() {
     return Container(
-      padding: AppEdgeInsets.instance.all(16),
+      padding: const EdgeInsets.all(12).w,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            width: 1.toWidth,
+            width: 1.w,
             color: context.appTheme.containerColor,
           ),
           color: context.appTheme.cardBGColor),
@@ -322,8 +321,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           Expanded(
             child: Text(
               voiceAssistant.tr,
-              style: regular18Secondary(context).copyWith(
-                fontSize: 20.toFont,
+              style: regular16(context).copyWith(
                 color: context.appTheme.primaryTextColor,
               ),
             ),
@@ -332,7 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             GenderEnum.male,
             male.tr,
           ),
-          SizedBox(width: 8.toWidth),
+          SizedBox(width: 8.w),
           _radioWidgetBuilder(
             GenderEnum.female,
             female.tr,
@@ -353,7 +351,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              width: 1.toWidth,
+              width: 1.w,
               color: (_settingsController.preferredVoiceAssistant.value ==
                       currentGender)
                   ? context.appTheme.highlightedBorderColor
@@ -361,8 +359,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             ),
             borderRadius: BorderRadius.circular(8),
           ),
-          padding:
-              AppEdgeInsets.instance.symmetric(horizontal: 10, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
           child: Row(
             children: <Widget>[
               Icon(
@@ -374,13 +371,11 @@ class _SettingsScreenState extends State<SettingsScreen>
                         currentGender)
                     ? context.appTheme.highlightedBorderColor
                     : context.appTheme.secondaryTextColor,
-                size: 22.toWidth,
               ),
-              SizedBox(width: 5.toWidth),
+              SizedBox(width: 5.w),
               Text(
                 title,
-                style: regular18Secondary(context).copyWith(
-                  fontSize: 16.toFont,
+                style: regular14Secondary(context).copyWith(
                   color: (_settingsController.preferredVoiceAssistant.value ==
                           currentGender)
                       ? context.appTheme.highlightedBorderColor
@@ -409,7 +404,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               style: light16(context)
                   .copyWith(color: context.appTheme.highlightedTextColor),
             ),
-            SizedBox(width: 8.toWidth),
+            SizedBox(width: 8.w),
             SvgPicture.asset(iconArrowDown,
                 color: context.appTheme.highlightedTextColor),
           ],
