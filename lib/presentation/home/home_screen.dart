@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
@@ -8,7 +9,6 @@ import '../../localization/localization_keys.dart';
 import '../../models/home_menu_model.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import 'controller/home_controller.dart';
@@ -66,12 +66,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         children: [
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0).w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 20.toHeight,
+                    height: 20.h,
                   ),
                   Stack(
                     children: [
@@ -79,25 +79,28 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         child: BhashiniTitle(),
                       ),
                       Positioned(
-                        right: 0.toWidth,
+                        right: 0,
                         child: GestureDetector(
                           onTap: () => Get.toNamed(AppRoutes.settingsRoute),
                           child: SvgPicture.asset(
                             iconSettings,
                             color: context.appTheme.primaryTextColor,
-                            width: 30.toWidth,
-                            height: 30.toHeight,
+                            width: 30,
+                            height: 30,
                           ),
                         ),
                       )
                     ],
                   ),
                   SizedBox(
-                    height: 60.toHeight,
+                    height: 60.h,
                   ),
                   Expanded(
                     child: GridView.count(
-                      crossAxisCount: 2,
+                      crossAxisCount:
+                          MediaQuery.of(context).size.shortestSide > 600
+                              ? 3
+                              : 2,
                       crossAxisSpacing: 30,
                       mainAxisSpacing: 30,
                       shrinkWrap: true,

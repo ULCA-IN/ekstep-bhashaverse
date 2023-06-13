@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
@@ -20,22 +20,22 @@ class NoInternetScreen extends StatelessWidget {
         onWillPop: () => Future.value(false),
         child: SafeArea(
             child: Padding(
-          padding: AppEdgeInsets.instance.all(16),
+          padding: const EdgeInsets.all(16).w,
           child: Column(
             children: [
-              SizedBox(height: 20.toHeight),
+              SizedBox(height: 20.w),
               CommonAppBar(title: bhashiniTitle.tr, showBackButton: false),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SvgPicture.asset(imgNoInternet),
-                    SizedBox(height: 16.toHeight),
+                    SizedBox(height: 16.w),
                     Text(
                       errorNoInternetTitle.tr,
                       style: bold24(context),
                     ),
-                    SizedBox(height: 12.toHeight),
+                    SizedBox(height: 12.w),
                     Text(
                       errorNoInternetSubTitle.tr,
                       style: regular16(context)
