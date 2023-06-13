@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
@@ -103,18 +104,22 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      onGenerateTitle: (context) => bhashiniTitle.tr,
-      debugShowCheckedModeBanner: false,
-      translations: AppLocalization(),
-      locale: Locale(appLocale),
-      fallbackLocale: const Locale(defaultLangCode, defaultCountry),
-      themeMode: context.appThemeMode,
-      theme: lightMaterialThemeData(),
-      darkTheme: darkMaterialThemeData(),
-      getPages: AppRoutes.pages,
-      initialBinding: SplashBinding(),
-      initialRoute: AppRoutes.splashRoute,
-    );
+    return ScreenUtilInit(
+        minTextAdapt: true,
+        builder: (context, child) {
+          return GetMaterialApp(
+            onGenerateTitle: (context) => bhashiniTitle.tr,
+            debugShowCheckedModeBanner: false,
+            translations: AppLocalization(),
+            locale: Locale(appLocale),
+            fallbackLocale: const Locale(defaultLangCode, defaultCountry),
+            themeMode: context.appThemeMode,
+            theme: lightMaterialThemeData(),
+            darkTheme: darkMaterialThemeData(),
+            getPages: AppRoutes.pages,
+            initialBinding: SplashBinding(),
+            initialRoute: AppRoutes.splashRoute,
+          );
+        });
   }
 }
