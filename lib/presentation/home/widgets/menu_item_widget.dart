@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/theme/app_theme_provider.dart';
 import '../../../utils/theme/app_text_style.dart';
 
@@ -36,15 +36,15 @@ class MenuItem extends StatelessWidget {
               children: [
                 Flexible(
                   child: Padding(
-                    padding: AppEdgeInsets.instance.all(16.0),
+                    padding: const EdgeInsets.all(16.0).w,
                     child: Image.asset(_image),
                   ),
                 ),
                 Text(
                   _title,
-                  style: semibold22(context),
+                  style: semibold20(context),
                 ),
-                SizedBox(height: 16.toHeight)
+                SizedBox(height: 16.h)
               ],
             ),
           ),

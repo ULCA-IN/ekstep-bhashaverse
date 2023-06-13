@@ -1,4 +1,4 @@
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -53,12 +53,12 @@ class CustomOutlineButton extends StatelessWidget {
           if (icon != null && icon!.isNotEmpty)
             SvgPicture.asset(
               icon!,
-              height: 20.toWidth,
-              width: 20.toWidth,
+              height: 20.w,
+              width: 20.w,
             ),
           if (icon != null && icon!.isNotEmpty)
             SizedBox(
-              width: 8.toWidth,
+              width: 8.w,
             ),
           if (title != null && title!.isNotEmpty)
             Text(title!,

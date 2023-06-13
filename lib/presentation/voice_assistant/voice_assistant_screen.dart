@@ -7,7 +7,7 @@ import '../../enums/gender_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/voice_assistant_controller.dart';
@@ -25,7 +25,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   @override
   void initState() {
     _voiceAssistantController = Get.find();
-    ScreenUtil().init();
+
     super.initState();
   }
 
@@ -35,22 +35,22 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
       backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
         child: Padding(
-          padding: AppEdgeInsets.instance.all(16),
+          padding: const EdgeInsets.all(16).w,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 16.toHeight),
+              SizedBox(height: 16.w),
               Text(
                 selectVoiceAssistant.tr,
                 style: semibold24(context),
               ),
-              SizedBox(height: 8.toHeight),
+              SizedBox(height: 8.w),
               Text(
                 youWillHearTheTranslationText.tr,
-                style: light16(context)
-                    .copyWith(color: context.appTheme.highlightedTextColor),
+                style: regular14(context)
+                    .copyWith(color: context.appTheme.secondaryTextColor),
               ),
-              SizedBox(height: 56.toHeight),
+              SizedBox(height: 56.w),
               Row(
                 children: [
                   _avatarWidgetBuilder(
@@ -58,7 +58,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                     imgMaleAvatar,
                     male.tr,
                   ),
-                  SizedBox(width: 10.toWidth),
+                  SizedBox(width: 10.w),
                   _avatarWidgetBuilder(
                     GenderEnum.female,
                     imgFemaleAvatar,
@@ -69,7 +69,6 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
               const Spacer(),
               CustomElevetedButton(
                 buttonText: letsTranslate.tr,
-                textStyle: semibold24(context).copyWith(fontSize: 18.toFont),
                 backgroundColor: context.appTheme.primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
@@ -78,7 +77,6 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                   Get.offAllNamed(AppRoutes.homeRoute);
                 },
               ),
-              SizedBox(height: 36.toHeight),
             ],
           ),
         ),
@@ -97,14 +95,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
           borderRadius: BorderRadius.circular(8),
           onTap: () => _voiceAssistantController.setSelectedGender(gender),
           child: Container(
-            padding: AppEdgeInsets.instance.all(22),
+            padding: const EdgeInsets.all(22).w,
             decoration: BoxDecoration(
               color: (_voiceAssistantController.getSelectedGender() == gender)
                   ? context.appTheme.lightBGColor
                   : context.appTheme.voiceAssistantBGColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                width: 1.toWidth,
+                width: 1.w,
                 color: (_voiceAssistantController.getSelectedGender() == gender)
                     ? context.appTheme.highlightedBorderColor
                     : context.appTheme.disabledBGColor,
@@ -113,13 +111,10 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             child: Column(
               children: [
                 Image.asset(avatarImage),
-                SizedBox(height: 16.toHeight),
+                SizedBox(height: 16.w),
                 Text(
                   avatarTitle,
-                  style: regular18Secondary(context).copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: context.appTheme.titleTextColor,
-                  ),
+                  style: regular18Primary(context),
                 ),
               ],
             ),

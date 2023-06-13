@@ -6,6 +6,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:share_plus/share_plus.dart';
@@ -26,7 +27,6 @@ import '../../../utils/constants/app_constants.dart';
 import '../../../utils/file_helper.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
-import '../../../utils/screen_util/screen_util.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../utils/voice_recorder.dart';
 import '../../../utils/waveform_style.dart';
@@ -560,7 +560,7 @@ class ConversationController extends GetxController {
       await Share.shareXFiles(
         [XFile(audioPathToShare)],
         sharePositionOrigin: Rect.fromLTWH(
-            0, 0, ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
+            0, 0, ScreenUtil().screenWidth, ScreenUtil().screenHeight / 2),
       );
     } else {
       showDefaultSnackbar(message: noAudioFoundToShare.tr);

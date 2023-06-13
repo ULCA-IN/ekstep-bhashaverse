@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
@@ -27,7 +27,6 @@ class _SplashScreenState extends State<SplashScreen> {
     isIntroShownAlready =
         _hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);
     super.initState();
-    ScreenUtil().init();
     Future.delayed(const Duration(seconds: 3)).then((value) {
       Get.offNamed(isIntroShownAlready
           ? AppRoutes.homeRoute
@@ -48,11 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               Image.asset(
                 imgAppLogoSmall,
-                height: 100.toHeight,
-                width: 100.toWidth,
+                height: 100.h,
+                width: 100.w,
               ),
               SizedBox(
-                height: 24.toHeight,
+                height: 24.h,
               ),
               Text(
                 bhashiniTitle.tr,

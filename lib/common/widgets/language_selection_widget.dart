@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
@@ -23,9 +23,9 @@ class LanguageSelectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70.toHeight,
-      margin: AppEdgeInsets.instance.only(right: 8, left: 8, bottom: 16),
-      padding: AppEdgeInsets.instance.only(right: 16, left: 16, top: 4),
+      height: 70.w,
+      margin: EdgeInsets.only(right: 8.w, left: 8.w, bottom: 16.h),
+      padding: EdgeInsets.only(right: 16.w, left: 16.w, top: 4.h),
       decoration: BoxDecoration(
         color: (selectedIndex != null && selectedIndex == index)
             ? context.appTheme.lightBGColor
@@ -35,9 +35,8 @@ class LanguageSelectionWidget extends StatelessWidget {
           color: (selectedIndex != null && selectedIndex == index)
               ? context.appTheme.highlightedBorderColor
               : context.appTheme.disabledBGColor,
-          width: (selectedIndex != null && selectedIndex == index)
-              ? 1.5.toWidth
-              : 1.toWidth,
+          width:
+              (selectedIndex != null && selectedIndex == index) ? 1.5.w : 1.w,
         ),
       ),
       child: InkWell(
@@ -51,12 +50,11 @@ class LanguageSelectionWidget extends StatelessWidget {
                 child: Text(
                   title,
                   style: light16(context).copyWith(
-                    fontSize: 20.toFont,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-            SizedBox(height: 4.toHeight),
+            SizedBox(height: 4.w),
             if (subTitle.isNotEmpty)
               FittedBox(
                 fit: BoxFit.fitWidth,

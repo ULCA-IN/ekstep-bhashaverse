@@ -10,7 +10,7 @@ import '../../localization/localization_keys.dart';
 import '../../models/feedback_type_model.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/string_helper.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -53,19 +53,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       behavior: RemoveScrollingGlowEffect(),
                       child: SingleChildScrollView(
                         child: Padding(
-                          padding: AppEdgeInsets.instance
-                              .symmetric(vertical: 8, horizontal: 22),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 8.h, horizontal: 22.w),
                           child: Column(
                             children: [
-                              SizedBox(height: 16.toHeight),
+                              SizedBox(height: 16.w),
                               CommonAppBar(
                                 title: feedback.tr,
                                 showLogo: false,
                                 onBackPress: () => Get.back(),
                               ),
-                              SizedBox(height: 50.toHeight),
+                              SizedBox(height: 50.w),
                               _buildCommonFeedback(context),
-                              SizedBox(height: 18.toHeight),
+                              SizedBox(height: 18.w),
                               _buildTaskFeedback(),
                             ],
                           ),
@@ -92,7 +92,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           textAlign: TextAlign.center,
           style: semibold22(context),
         ),
-        SizedBox(height: 14.toHeight),
+        SizedBox(height: 14.w),
         RatingBar(
           filledIcon: Icons.star,
           emptyIcon: Icons.star_border,
@@ -146,10 +146,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       () => !_feedbackController.isLoading.value
           ? SafeArea(
               child: Padding(
-                padding: AppEdgeInsets.instance.all(16.0),
+                padding: const EdgeInsets.all(16.0).w,
                 child: CustomElevetedButton(
                   buttonText: submit.tr,
-                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {

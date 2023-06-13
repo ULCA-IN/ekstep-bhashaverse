@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../enums/speaker_status.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/date_time_utils.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'asr_tts_actions.dart';
@@ -117,7 +117,7 @@ class TextFieldWithActions extends StatelessWidget {
       ),
       duration: const Duration(milliseconds: 500),
       child: Padding(
-        padding: AppEdgeInsets.instance.all(16),
+        padding: const EdgeInsets.all(16).w,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -134,7 +134,7 @@ class TextFieldWithActions extends StatelessWidget {
                 readOnly: _isReadOnly,
                 decoration: InputDecoration(
                   hintText: _hintText,
-                  hintStyle: regular24(context)
+                  hintStyle: regular22(context)
                       .copyWith(color: context.appTheme.hintTextColor),
                   hintMaxLines: 4,
                   border: InputBorder.none,
@@ -148,7 +148,7 @@ class TextFieldWithActions extends StatelessWidget {
                     _onSubmitted != null ? _onSubmitted!(newText) : null,
               ),
             ),
-            SizedBox(height: 6.toHeight),
+            SizedBox(height: 6.w),
             _showASRTTSActionButtons && !_showMicButton
                 ? ASRAndTTSActions(
                     textToCopy: _textToCopy,

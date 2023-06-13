@@ -10,7 +10,7 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -35,7 +35,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
     _languageSearchController = TextEditingController();
     _hiveDBInstance = Hive.box(hiveDBName);
     setSelectedLanguageFromArg();
-    ScreenUtil().init();
+
     super.initState();
   }
 
@@ -57,32 +57,34 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
         backgroundColor: context.appTheme.listingScreenBGColor,
         body: SafeArea(
           child: Padding(
-            padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16).w,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 16.toHeight),
+                SizedBox(height: 16.w),
                 Text(
                   selectAppLanguage.tr,
                   style: semibold22(context),
                 ),
-                SizedBox(height: 8.toHeight),
+                SizedBox(height: 8.w),
                 Text(
                   youCanAlwaysChange.tr,
-                  style: light16(context)
-                      .copyWith(color: context.appTheme.highlightedTextColor),
+                  style: regular14Secondary(context),
                 ),
-                SizedBox(height: 24.toHeight),
+                SizedBox(height: 24.w),
                 _textFormFieldContainer(),
-                SizedBox(height: 24.toHeight),
+                SizedBox(height: 24.w),
                 Obx(
                   () => Expanded(
                     child: ScrollConfiguration(
                       behavior: RemoveScrollingGlowEffect(),
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisSpacing: 8.toHeight,
-                          crossAxisCount: 2,
+                          mainAxisSpacing: 8.w,
+                          crossAxisCount:
+                              MediaQuery.of(context).size.shortestSide > 600
+                                  ? 3
+                                  : 2,
                           childAspectRatio: 2,
                         ),
                         itemCount:
@@ -113,10 +115,9 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.toHeight),
+                SizedBox(height: 16.w),
                 CustomElevetedButton(
                   buttonText: continueText.tr,
-                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
@@ -145,7 +146,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                     }
                   },
                 ),
-                SizedBox(height: 16.toHeight),
+                SizedBox(height: 16.w),
               ],
             ),
           ),
@@ -156,8 +157,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
 
   Widget _textFormFieldContainer() {
     return Container(
-      margin: AppEdgeInsets.instance.symmetric(horizontal: 8),
-      padding: AppEdgeInsets.instance.only(left: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 8).w,
+      padding: const EdgeInsets.only(left: 16).w,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -165,17 +166,17 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       ),
       child: TextFormField(
         cursorColor: context.appTheme.secondaryTextColor,
-        style: regular16(context).copyWith(fontSize: 18.toFont),
+        style: regular16(context).copyWith(fontSize: 18),
         decoration: InputDecoration(
-          contentPadding: AppEdgeInsets.instance.all(0),
+          contentPadding: const EdgeInsets.all(0),
           border: InputBorder.none,
           icon: Icon(
             Icons.search,
             color: context.appTheme.secondaryTextColor,
           ),
           hintText: searchLanguage.tr,
-          hintStyle: light16(context).copyWith(
-              fontSize: 18.toFont, color: context.appTheme.titleTextColor),
+          hintStyle: light16(context)
+              .copyWith(fontSize: 18, color: context.appTheme.titleTextColor),
         ),
         onChanged: ((value) => performLanguageSearch(value)),
         controller: _languageSearchController,

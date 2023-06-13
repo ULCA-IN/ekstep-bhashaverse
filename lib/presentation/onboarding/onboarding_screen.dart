@@ -7,7 +7,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
@@ -29,7 +29,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void initState() {
     super.initState();
     _onboardingController = Get.put(OnboardingController());
-    ScreenUtil().init(allowFontScaling: true);
     _pageController = PageController(initialPage: 0);
   }
 
@@ -46,14 +45,15 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
       backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: AppEdgeInsets.instance.all(16),
+          padding: const EdgeInsets.all(16).w,
           child: Obx(
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _headerWidget(),
-                SizedBox(height: 33.toHeight),
+                SizedBox(height: 16.h),
                 _pageViewBuilder(),
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
@@ -64,14 +64,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 32.toHeight),
+                SizedBox(height: 16.h),
                 CustomElevetedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)
                       ? getStarted.tr
                       : next.tr,
-                  textStyle: semibold22(context).copyWith(fontSize: 18.toFont),
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
@@ -84,7 +83,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               curve: Curves.easeInOut);
                         },
                 ),
-                SizedBox(height: 48.toHeight),
+                SizedBox(height: 20.h),
               ],
             ),
           ),
@@ -106,11 +105,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       curve: Curves.easeInOut);
                 },
           child: Container(
-            padding: AppEdgeInsets.instance.all(8),
+            padding: const EdgeInsets.all(8).w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                  width: 1.toWidth, color: context.appTheme.containerColor),
+                  width: 1.w, color: context.appTheme.containerColor),
             ),
             child: SvgPicture.asset(
               iconPrevious,
@@ -127,13 +126,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
               skip.tr,
-              style: light16(context).copyWith(
+              style: regular14(context).copyWith(
                 color: context.appTheme.highlightedBGColor,
               ),
             ),
           ),
         ),
-        SizedBox(width: 4.toWidth),
       ],
     );
   }

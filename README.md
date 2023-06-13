@@ -47,6 +47,7 @@ name: bhashaverse
   vibration: ^1.7.6
   stop_watch_timer: ^2.0.0
   custom_rating_bar: ^2.0.5
+  flutter_screenutil: ^5.8.4
   sound_stream:
     git:
       url: https://github.com/JHM69/flutter-sound-stream.git

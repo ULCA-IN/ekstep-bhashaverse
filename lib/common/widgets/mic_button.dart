@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../enums/mic_button_status.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 
@@ -50,11 +50,12 @@ class MicButton extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Padding(
-                padding: AppEdgeInsets.instance.all(
-                    _micButtonStatus == MicButtonStatus.pressed ? 28 : 20.0),
+                padding: EdgeInsets.all(
+                        _micButtonStatus == MicButtonStatus.pressed ? 23 : 16.0)
+                    .w,
                 child: SizedBox(
-                  width: 32.toWidth,
-                  height: 32.toHeight,
+                  width: 32.w,
+                  height: 32.w,
                   child: _micButtonStatus == MicButtonStatus.loading
                       ? CircularProgressIndicator(
                           color: Colors.black.withOpacity(0.7),
@@ -71,7 +72,7 @@ class MicButton extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: _showLanguage ? 10.toHeight : 0),
+        SizedBox(height: _showLanguage ? 10.w : 0),
         if (_showLanguage)
           GestureDetector(
             onTap: () => _onLanguageTap != null ? _onLanguageTap!() : null,
@@ -83,16 +84,15 @@ class MicButton extends StatelessWidget {
                   child: AutoSizeText(
                     _languageName,
                     maxLines: 2,
-                    style:
-                        regular18Primary(context).copyWith(fontSize: 16.toFont),
+                    style: regular18Primary(context).copyWith(fontSize: 16),
                   ),
                 ),
-                SizedBox(width: 6.toWidth),
+                SizedBox(width: 6.w),
                 SvgPicture.asset(
                   iconDownArrow,
                   color: context.appTheme.primaryTextColor,
-                  width: 8.toWidth,
-                  height: 8.toWidth,
+                  width: 8.w,
+                  height: 8.w,
                 )
               ],
             ),

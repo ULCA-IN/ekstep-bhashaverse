@@ -7,7 +7,7 @@ import '../../localization/localization_keys.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/source_target_language_controller.dart';
@@ -31,7 +31,7 @@ class _SourceTargetLanguageScreenState
   void initState() {
     _languageSelectionController = Get.find();
     _languageSearchController = TextEditingController();
-    ScreenUtil().init();
+
     super.initState();
     setLanguageListFromArgument();
   }
@@ -42,23 +42,26 @@ class _SourceTargetLanguageScreenState
       backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
         child: Padding(
-          padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 16.toHeight),
+              SizedBox(height: 16.w),
               _headerWidget(),
-              SizedBox(height: 24.toHeight),
+              SizedBox(height: 24.w),
               _textFormFieldContainer(),
-              SizedBox(height: 24.toHeight),
+              SizedBox(height: 24.w),
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
                   child: Obx(
                     () => GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisSpacing: 8.toHeight,
-                        crossAxisCount: 2,
+                        mainAxisSpacing: 8.w,
+                        crossAxisCount:
+                            MediaQuery.of(context).size.shortestSide > 600
+                                ? 3
+                                : 2,
                         childAspectRatio: 2,
                       ),
                       itemCount:
@@ -87,7 +90,7 @@ class _SourceTargetLanguageScreenState
                   ),
                 ),
               ),
-              SizedBox(height: 16.toHeight),
+              SizedBox(height: 16.w),
             ],
           ),
         ),
@@ -97,8 +100,8 @@ class _SourceTargetLanguageScreenState
 
   Widget _textFormFieldContainer() {
     return Container(
-      margin: AppEdgeInsets.instance.symmetric(horizontal: 8),
-      padding: AppEdgeInsets.instance.only(left: 16),
+      margin: EdgeInsets.symmetric(horizontal: 8.w),
+      padding: EdgeInsets.only(left: 16.w),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
@@ -108,15 +111,15 @@ class _SourceTargetLanguageScreenState
         cursorColor: context.appTheme.secondaryTextColor,
         style: regular18Primary(context),
         decoration: InputDecoration(
-          contentPadding: AppEdgeInsets.instance.all(0),
+          contentPadding: const EdgeInsets.all(0),
           border: InputBorder.none,
           icon: Icon(
             Icons.search,
             color: context.appTheme.secondaryTextColor,
           ),
           hintText: searchLanguage.tr,
-          hintStyle: light16(context).copyWith(
-              fontSize: 18.toFont, color: context.appTheme.titleTextColor),
+          hintStyle: light16(context)
+              .copyWith(fontSize: 18, color: context.appTheme.titleTextColor),
         ),
         onChanged: (value) {
           performLanguageSearch(value);
@@ -134,18 +137,18 @@ class _SourceTargetLanguageScreenState
           borderRadius: BorderRadius.circular(8),
           onTap: () => Get.back(),
           child: Container(
-            padding: AppEdgeInsets.instance.all(8),
+            padding: const EdgeInsets.all(8).w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                  width: 1.toWidth, color: context.appTheme.containerColor),
+                  width: 1.w, color: context.appTheme.containerColor),
             ),
             child: SvgPicture.asset(
               iconPrevious,
             ),
           ),
         ),
-        SizedBox(width: 24.toWidth),
+        SizedBox(width: 24.w),
         Text(
           Get.arguments[kIsSourceLanguage]
               ? kTranslateSourceTitle.tr

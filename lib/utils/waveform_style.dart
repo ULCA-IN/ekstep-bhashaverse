@@ -1,7 +1,7 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'screen_util/screen_util.dart';
 import 'theme/app_theme_provider.dart';
 
 class WaveformStyle {
@@ -17,6 +17,6 @@ class WaveformStyle {
         waveThickness: 2);
   }
 
-  static double getDefaultWidth = (ScreenUtil.screenWidth / 1.5);
-  static double getDefaultHeight = 40.toHeight;
+  static double getDefaultWidth = (ScreenUtil().screenWidth / 1.5);
+  static double getDefaultHeight = 40.w;
 }

@@ -19,7 +19,7 @@ import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/network_utils.dart';
-import '../../utils/screen_util/screen_util.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import 'controller/conversation_controller.dart';
@@ -45,7 +45,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _translationController.getSourceTargetLangFromDB();
-    ScreenUtil().init();
+
     super.initState();
   }
 
@@ -57,21 +57,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
         children: [
           SafeArea(
             child: Padding(
-              padding: AppEdgeInsets.instance.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16).w,
               child: Column(
                 children: [
                   SizedBox(
-                    height: 18.toHeight,
+                    height: 18.w,
                   ),
                   CommonAppBar(
                       title: converse.tr, onBackPress: () => Get.back()),
                   SizedBox(
-                    height: 24.toHeight,
+                    height: 24.w,
                   ),
                   Expanded(
                     child: Column(
                       children: [
-                        SizedBox(height: 20.toHeight),
+                        SizedBox(height: 20.w),
                         _buildSourceTextField(),
                         _buildTargetTextField(),
                       ],
@@ -80,15 +80,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   Obx(
                     () => SizedBox(
                         height: _translationController.isKeyboardVisible.value
-                            ? 12.toHeight
-                            : 30.toHeight),
+                            ? 12.w
+                            : 30.w),
                   ),
                   Obx(
                     () => _translationController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
-                  SizedBox(height: 25.toHeight),
+                  SizedBox(height: 25.w),
                 ],
               ),
             ),
@@ -217,7 +217,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildMicButton() {
     return Padding(
-      padding: AppEdgeInsets.instance.symmetric(horizontal: 14.0, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 14.0.w, vertical: 8.h),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -232,7 +232,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             ),
           ),
           Positioned(
-            left: 30,
+            left: 20,
             child: Obx(() {
               String selectedSourceLanguage = _translationController
                       .selectedSourceLanguageCode.value.isNotEmpty
@@ -304,7 +304,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             }),
           ),
           Positioned(
-            right: 30,
+            right: 20,
             child: Obx(() {
               String selectedTargetLanguage = _translationController
                       .selectedTargetLanguageCode.value.isNotEmpty
