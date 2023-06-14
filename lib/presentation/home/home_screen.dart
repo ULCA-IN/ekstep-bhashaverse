@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 20.h,
+                    height: 16.h,
                   ),
                   Stack(
                     children: [
@@ -85,15 +85,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           child: SvgPicture.asset(
                             iconSettings,
                             color: context.appTheme.primaryTextColor,
-                            width: 30,
-                            height: 30,
+                            width: 26,
+                            height: 26,
                           ),
                         ),
                       )
                     ],
                   ),
                   SizedBox(
-                    height: 60.h,
+                    height: 38.h,
                   ),
                   Expanded(
                     child: GridView.count(

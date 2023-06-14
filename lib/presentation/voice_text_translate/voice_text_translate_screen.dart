@@ -83,7 +83,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         children: [
           SafeArea(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Column(
                 children: [
                   SizedBox(height: 18.w),
@@ -270,8 +270,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.defaultSize.width / 2.8,
-            height: 50.w,
+            width: ScreenUtil.defaultSize.width / 2.6,
+            height: 40.h,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -287,7 +287,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
-                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
+                  style: secondary14(context),
                 );
               },
             ),
@@ -299,8 +299,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
-            height: 32.w,
-            width: 32.w,
+            height: 26.w,
+            width: 26.w,
           ),
         ),
         InkWell(
@@ -339,8 +339,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.defaultSize.width / 2.8,
-            height: 50.w,
+            width: ScreenUtil.defaultSize.width / 2.6,
+            height: 40.h,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -355,7 +355,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
-                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
+                  style: secondary14(context),
                   maxLines: 2,
                 );
               },
