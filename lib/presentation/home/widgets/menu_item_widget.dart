@@ -36,7 +36,7 @@ class MenuItem extends StatelessWidget {
               children: [
                 Flexible(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0).w,
+                    padding: const EdgeInsets.all(12.0).w,
                     child: Image.asset(_image),
                   ),
                 ),

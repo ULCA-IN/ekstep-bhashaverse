@@ -69,7 +69,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 SizedBox(height: 8.w),
                 Text(
                   youCanAlwaysChange.tr,
-                  style: regular14Secondary(context),
+                  style: secondary14(context),
                 ),
                 SizedBox(height: 24.w),
                 _textFormFieldContainer(),

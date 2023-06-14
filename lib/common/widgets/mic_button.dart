@@ -51,11 +51,11 @@ class MicButton extends StatelessWidget {
               ),
               child: Padding(
                 padding: EdgeInsets.all(
-                        _micButtonStatus == MicButtonStatus.pressed ? 23 : 16.0)
+                        _micButtonStatus == MicButtonStatus.pressed ? 18 : 13.0)
                     .w,
                 child: SizedBox(
-                  width: 32.w,
-                  height: 32.w,
+                  width: 28.w,
+                  height: 28.w,
                   child: _micButtonStatus == MicButtonStatus.loading
                       ? CircularProgressIndicator(
                           color: Colors.black.withOpacity(0.7),

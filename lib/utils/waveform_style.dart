@@ -17,6 +17,6 @@ class WaveformStyle {
         waveThickness: 2);
   }
 
-  static double getDefaultWidth = (ScreenUtil().screenWidth / 1.5);
+  static double getDefaultWidth = (ScreenUtil().screenWidth / 1.3);
   static double getDefaultHeight = 40.w;
 }

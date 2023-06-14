@@ -57,16 +57,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
         children: [
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16).w,
+              padding: const EdgeInsets.symmetric(horizontal: 14).w,
               child: Column(
                 children: [
                   SizedBox(
-                    height: 18.w,
+                    height: 16.h,
                   ),
                   CommonAppBar(
                       title: converse.tr, onBackPress: () => Get.back()),
                   SizedBox(
-                    height: 24.w,
+                    height: 8.h,
                   ),
                   Expanded(
                     child: Column(
@@ -80,15 +80,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   Obx(
                     () => SizedBox(
                         height: _translationController.isKeyboardVisible.value
-                            ? 12.w
-                            : 30.w),
+                            ? 12.h
+                            : 20.h),
                   ),
                   Obx(
                     () => _translationController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
-                  SizedBox(height: 25.w),
+                  SizedBox(height: 16.h),
                 ],
               ),
             ),

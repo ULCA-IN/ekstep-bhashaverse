@@ -75,7 +75,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           SingleChildScrollView(
             child: SafeArea(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 14.w),
                 child: Column(
                   children: [
                     Column(
@@ -116,7 +116,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           children: [
             Container(
               height: ScreenUtil().screenHeight * 0.34,
-              margin: const EdgeInsets.all(18).w,
+              margin: const EdgeInsets.all(14).w,
               decoration: BoxDecoration(
                 color: context.appTheme.normalTextFeildColor,
                 borderRadius:
@@ -192,7 +192,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             ? null
             : textTranslateHintText.tr,
         hintStyle:
-            regular24(context).copyWith(color: context.appTheme.hintTextColor),
+            regular22(context).copyWith(color: context.appTheme.hintTextColor),
         hintMaxLines: 4,
         border: InputBorder.none,
         isDense: true,
@@ -326,7 +326,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 _textTranslationController.sourceTextCharLimit.value;
             return Text(
               '$sourceCharLength/$textCharMaxLength',
-              style: regular14Title(context).copyWith(
+              style: regular12Title(context).copyWith(
                   color: sourceCharLength >= textCharMaxLength
                       ? context.appTheme.errorColor
                       : sourceCharLength >= textCharMaxLength - 20
@@ -406,8 +406,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.defaultSize.width / 2.8,
-            height: 50.w,
+            width: ScreenUtil.defaultSize.width / 2.6,
+            height: 40.h,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -424,7 +424,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return AutoSizeText(
                   selectedSourceLanguage,
                   maxLines: 2,
-                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
+                  style: secondary14(context),
                 );
               },
             ),
@@ -436,8 +436,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
           },
           child: SvgPicture.asset(
             iconArrowSwapHorizontal,
-            height: 32.w,
-            width: 32.w,
+            height: 26.w,
+            width: 26.w,
           ),
         ),
         InkWell(
@@ -475,8 +475,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             }
           },
           child: Container(
-            width: ScreenUtil.defaultSize.width / 2.8,
-            height: 50.w,
+            width: ScreenUtil.defaultSize.width / 2.6,
+            height: 40.h,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.appTheme.cardBGColor,
@@ -492,7 +492,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     : kTranslateTargetTitle.tr;
                 return AutoSizeText(
                   selectedTargetLanguage,
-                  style: regular18Secondary(context).copyWith(fontSize: 16.sp),
+                  style: secondary14(context),
                   maxLines: 2,
                 );
               },

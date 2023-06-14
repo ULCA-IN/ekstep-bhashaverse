@@ -63,17 +63,17 @@ class _SettingsScreenState extends State<SettingsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 16.w),
+                  SizedBox(height: 16.h),
                   CommonAppBar(
                       title: kSettings.tr,
                       onBackPress: () async => _onWillPop()),
-                  SizedBox(height: 48.w),
+                  SizedBox(height: 36.h),
                   _settingHeading(
                     action: _popupMenuBuilder(),
                     title: appTheme.tr,
                     subtitle: appInterfaceWillChange.tr,
                   ),
-                  SizedBox(height: 24.w),
+                  SizedBox(height: 20.w),
                   Obx(
                     () => InkWell(
                       onTap: () {
@@ -89,8 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                           children: [
                             Text(
                               _settingsController.preferredLanguage.value,
-                              style: light16(context).copyWith(
-                                  color: context.appTheme.highlightedTextColor),
+                              style: regular14(context),
                             ),
                             SizedBox(width: 8.w),
                             RotatedBox(
@@ -105,9 +104,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: 24.w),
+                  SizedBox(height: 20.w),
                   _voiceAssistantTileWidget(),
-                  SizedBox(height: 24.w),
+                  SizedBox(height: 20.w),
                   _settingHeading(
                     action: Obx(
                       () => CupertinoSwitch(
@@ -122,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     title: transLiteration.tr,
                     subtitle: transLiterationWillInitiateWord.tr,
                   ),
-                  SizedBox(height: 24.w),
+                  SizedBox(height: 20.w),
                   Obx(
                     () => _expandableSettingHeading(
                         title: advanceSettings.tr,
@@ -225,9 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               Expanded(
                 child: Text(
                   title,
-                  style: regular16(context).copyWith(
-                    color: context.appTheme.primaryTextColor,
-                  ),
+                  style: regular17Primary(context),
                 ),
               ),
               const Spacer(),
@@ -238,12 +235,10 @@ class _SettingsScreenState extends State<SettingsScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 16.w),
+                SizedBox(height: 14.h),
                 Text(
                   subtitle,
-                  style: regular14(context).copyWith(
-                    color: context.appTheme.secondaryTextColor,
-                  ),
+                  style: secondary13(context).copyWith(),
                 ),
               ],
             ),
@@ -375,7 +370,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               SizedBox(width: 5.w),
               Text(
                 title,
-                style: regular14Secondary(context).copyWith(
+                style: secondary14(context).copyWith(
                   color: (_settingsController.preferredVoiceAssistant.value ==
                           currentGender)
                       ? context.appTheme.highlightedBorderColor
@@ -401,8 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           children: [
             Text(
               _getThemeModeName(_settingsController.selectedThemeMode.value),
-              style: light16(context)
-                  .copyWith(color: context.appTheme.highlightedTextColor),
+              style: regular14(context),
             ),
             SizedBox(width: 8.w),
             SvgPicture.asset(iconArrowDown,

@@ -62,7 +62,7 @@ class CustomOutlineButton extends StatelessWidget {
             ),
           if (title != null && title!.isNotEmpty)
             Text(title!,
-                style: regular14(context).copyWith(
+                style: secondary12(context).copyWith(
                     color: isDisabled
                         ? context.appTheme.titleTextColor
                         : context.appTheme.highlightedBGColor)),

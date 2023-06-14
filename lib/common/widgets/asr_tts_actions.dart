@@ -56,192 +56,195 @@ class ASRAndTTSActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Visibility(
-          visible: _speakerStatus != SpeakerStatus.playing,
-          child: Row(
-            children: [
-              Visibility(
-                visible: _speakerStatus != SpeakerStatus.hidden,
-                child: InkWell(
+    return SizedBox(
+      height: 42.h,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Visibility(
+            visible: _speakerStatus != SpeakerStatus.playing,
+            child: Row(
+              children: [
+                Visibility(
+                  visible: _speakerStatus != SpeakerStatus.hidden,
+                  child: InkWell(
+                    onTap: () async {
+                      if (_onFileShare != null) _onFileShare!();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: _isShareButtonLoading
+                          ? SizedBox(
+                              height: 20.w,
+                              width: 20.w,
+                              child: const CustomCircularLoading(),
+                            )
+                          : SvgPicture.asset(
+                              iconShare,
+                              height: 20.w,
+                              width: 20.w,
+                              color: _textToCopy.isNotEmpty
+                                  ? context.appTheme.disabledTextColor
+                                  : context.appTheme.disabledIconOutlineColor,
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                InkWell(
                   onTap: () async {
-                    if (_onFileShare != null) _onFileShare!();
+                    if (_textToCopy.isEmpty) {
+                      showDefaultSnackbar(message: noTextForCopy.tr);
+                      return;
+                    } else {
+                      await Clipboard.setData(ClipboardData(text: _textToCopy));
+                      showDefaultSnackbar(message: textCopiedToClipboard.tr);
+                    }
                   },
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: _isShareButtonLoading
-                        ? SizedBox(
-                            height: 22.w,
-                            width: 22.w,
-                            child: const CustomCircularLoading(),
-                          )
-                        : SvgPicture.asset(
-                            iconShare,
-                            height: 22.w,
-                            width: 22.w,
-                            color: _textToCopy.isNotEmpty
-                                ? context.appTheme.disabledTextColor
-                                : context.appTheme.disabledIconOutlineColor,
-                          ),
+                    child: SvgPicture.asset(
+                      iconCopy,
+                      height: 20.w,
+                      width: 20.w,
+                      color: _textToCopy.isNotEmpty
+                          ? context.appTheme.disabledTextColor
+                          : context.appTheme.disabledIconOutlineColor,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 12.w),
-              InkWell(
-                onTap: () async {
-                  if (_textToCopy.isEmpty) {
-                    showDefaultSnackbar(message: noTextForCopy.tr);
-                    return;
-                  } else {
-                    await Clipboard.setData(ClipboardData(text: _textToCopy));
-                    showDefaultSnackbar(message: textCopiedToClipboard.tr);
-                  }
-                },
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
-                  child: SvgPicture.asset(
-                    iconCopy,
-                    height: 22.w,
-                    width: 22.w,
-                    color: _textToCopy.isNotEmpty
-                        ? context.appTheme.disabledTextColor
-                        : context.appTheme.disabledIconOutlineColor,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        SizedBox(width: 8.w),
-        _speakerStatus != SpeakerStatus.playing
-            ? _showFeedbackIcon
-                ? Expanded(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _onFeedbackButtonTap != null
-                              ? () => _onFeedbackButtonTap!()
-                              : null,
-                          child: AnimatedContainer(
-                            duration: feedbackButtonCloseTime,
-                            curve: Curves.fastOutSlowIn,
-                            decoration: BoxDecoration(
-                                color: _expandFeedbackIcon
-                                    ? context.appTheme.feedbackBGColor
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(20)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 6.h, horizontal: 15.w),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SvgPicture.asset(
-                                  iconLikeDislike,
+          SizedBox(width: 8.w),
+          _speakerStatus != SpeakerStatus.playing
+              ? _showFeedbackIcon
+                  ? Expanded(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _onFeedbackButtonTap != null
+                                ? () => _onFeedbackButtonTap!()
+                                : null,
+                            child: AnimatedContainer(
+                              duration: feedbackButtonCloseTime,
+                              curve: Curves.fastOutSlowIn,
+                              decoration: BoxDecoration(
                                   color: _expandFeedbackIcon
-                                      ? context.appTheme.feedbackIconColor
-                                      : context
-                                          .appTheme.feedbackIconClosedColor,
-                                ),
-                                AnimatedCrossFade(
-                                  duration: feedbackButtonCloseTime,
-                                  firstChild: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        feedback.tr,
-                                        style: regular16(context).copyWith(
-                                            color: context
-                                                .appTheme.feedbackTextColor),
-                                      ),
-                                    ],
+                                      ? context.appTheme.feedbackBGColor
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20)),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5.h, horizontal: 15.w),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SvgPicture.asset(
+                                    iconLikeDislike,
+                                    color: _expandFeedbackIcon
+                                        ? context.appTheme.feedbackIconColor
+                                        : context
+                                            .appTheme.feedbackIconClosedColor,
                                   ),
-                                  secondChild: const SizedBox.shrink(),
-                                  crossFadeState: _expandFeedbackIcon
-                                      ? CrossFadeState.showFirst
-                                      : CrossFadeState.showSecond,
-                                ),
-                              ],
+                                  AnimatedCrossFade(
+                                    duration: feedbackButtonCloseTime,
+                                    firstChild: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          feedback.tr,
+                                          style: regular14(context).copyWith(
+                                              color: context
+                                                  .appTheme.feedbackTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    secondChild: const SizedBox.shrink(),
+                                    crossFadeState: _expandFeedbackIcon
+                                        ? CrossFadeState.showFirst
+                                        : CrossFadeState.showSecond,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const Spacer()
-                      ],
-                    ),
-                  )
-                : const Spacer()
-            : Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AudioFileWaveforms(
-                      size: Size(WaveformStyle.getDefaultWidth,
-                          WaveformStyle.getDefaultHeight),
-                      playerController: _playerController ?? PlayerController(),
-                      waveformType: WaveformType.fitWidth,
-                      playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                        isRecordedAudio: _isRecordedAudio,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    SizedBox(
-                      width: WaveformStyle.getDefaultWidth,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(_currentDuration ?? '',
-                              style: regular12(context).copyWith(
-                                  color: context.appTheme.titleTextColor),
-                              textAlign: TextAlign.start),
-                          Text(_totalDuration ?? '',
-                              style: regular12(context).copyWith(
-                                  color: context.appTheme.titleTextColor),
-                              textAlign: TextAlign.end),
+                          const Spacer()
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-        SizedBox(width: 12.w),
-        Visibility(
-          visible: _speakerStatus != SpeakerStatus.hidden,
-          child: InkWell(
-            onTap: () {
-              if (_speakerStatus != SpeakerStatus.disabled) {
-                if (_onAudioPlayOrStop != null) _onAudioPlayOrStop!();
-              } else {
-                showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
-              }
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _speakerStatus != SpeakerStatus.disabled
-                    ? context.appTheme.buttonSelectedColor
-                    : context.appTheme.speackerColor,
-              ),
-              padding: const EdgeInsets.all(8).w,
-              child: SizedBox(
-                height: 24.w,
-                width: 24.w,
-                child: _speakerStatus == SpeakerStatus.loading
-                    ? const CustomCircularLoading()
-                    : SvgPicture.asset(
-                        _speakerStatus == SpeakerStatus.playing
-                            ? iconStopPlayback
-                            : iconSound,
-                        color: _speakerStatus != SpeakerStatus.disabled
-                            ? context.appTheme.iconOutlineColor
-                            : context.appTheme.disabledIconOutlineColor,
+                    )
+                  : const Spacer()
+              : Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AudioFileWaveforms(
+                        size: Size(WaveformStyle.getDefaultWidth, 25.h),
+                        playerController:
+                            _playerController ?? PlayerController(),
+                        waveformType: WaveformType.fitWidth,
+                        playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
+                          isRecordedAudio: _isRecordedAudio,
+                        ),
                       ),
+                      SizedBox(width: 8.w),
+                      SizedBox(
+                        width: WaveformStyle.getDefaultWidth,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_currentDuration ?? '',
+                                style: secondary12(context).copyWith(
+                                    color: context.appTheme.titleTextColor),
+                                textAlign: TextAlign.start),
+                            Text(_totalDuration ?? '',
+                                style: secondary12(context).copyWith(
+                                    color: context.appTheme.titleTextColor),
+                                textAlign: TextAlign.end),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          SizedBox(width: 12.w),
+          Visibility(
+            visible: _speakerStatus != SpeakerStatus.hidden,
+            child: InkWell(
+              onTap: () {
+                if (_speakerStatus != SpeakerStatus.disabled) {
+                  if (_onAudioPlayOrStop != null) _onAudioPlayOrStop!();
+                } else {
+                  showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _speakerStatus != SpeakerStatus.disabled
+                      ? context.appTheme.buttonSelectedColor
+                      : context.appTheme.speackerColor,
+                ),
+                padding: const EdgeInsets.all(6).w,
+                child: SizedBox(
+                  height: 20.w,
+                  width: 20.w,
+                  child: _speakerStatus == SpeakerStatus.loading
+                      ? const CustomCircularLoading()
+                      : SvgPicture.asset(
+                          _speakerStatus == SpeakerStatus.playing
+                              ? iconStopPlayback
+                              : iconSound,
+                          color: _speakerStatus != SpeakerStatus.disabled
+                              ? context.appTheme.iconOutlineColor
+                              : context.appTheme.disabledIconOutlineColor,
+                        ),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

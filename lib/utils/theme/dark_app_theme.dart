@@ -49,7 +49,7 @@ class DarkAppTheme implements AppTheme {
   Color get readOnlyTextColor => _AppColors.lilyGrey;
 
   @override
-  Color get secondaryTextColor => _AppColors.dolphinGray;
+  Color get secondaryTextColor => _AppColors.manateeGray;
 
   @override
   Color get titleTextColor => _AppColors.manateeGray;
