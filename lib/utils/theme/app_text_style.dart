@@ -3,9 +3,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../utils/theme/app_theme_provider.dart';
 
-TextStyle regular12(BuildContext context) => TextStyle(
+TextStyle secondary12(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w500,
       fontSize: 12.sp,
+      color: context.appTheme.highlightedTextColor,
+    );
+
+TextStyle regular12Title(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 12.sp,
+      color: context.appTheme.titleTextColor,
+    );
+
+TextStyle secondary13(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 13.sp,
       color: context.appTheme.highlightedTextColor,
     );
 
@@ -21,10 +33,16 @@ TextStyle regular14Title(BuildContext context) => TextStyle(
       color: context.appTheme.titleTextColor,
     );
 
-TextStyle regular14Secondary(BuildContext context) => TextStyle(
+TextStyle secondary14(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w500,
       fontSize: 14.sp,
       color: context.appTheme.secondaryTextColor,
+    );
+
+TextStyle semibold14(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w600,
+      fontSize: 14.sp,
+      color: context.appTheme.primaryTextColor,
     );
 
 TextStyle light16(BuildContext context) => TextStyle(
@@ -45,6 +63,12 @@ TextStyle semibold16(BuildContext context) => TextStyle(
       color: context.appTheme.primaryTextColor,
     );
 
+TextStyle regular17Primary(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 17.sp,
+      color: context.appTheme.primaryTextColor,
+    );
+
 TextStyle regular18Primary(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w500,
       fontSize: 18.sp,
@@ -60,6 +84,12 @@ TextStyle regular18Secondary(BuildContext context) => TextStyle(
 TextStyle semibold18(BuildContext context) => TextStyle(
       fontWeight: FontWeight.w600,
       fontSize: 18.sp,
+      color: context.appTheme.primaryTextColor,
+    );
+
+TextStyle regular20(BuildContext context) => TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 20.sp,
       color: context.appTheme.primaryTextColor,
     );
 
