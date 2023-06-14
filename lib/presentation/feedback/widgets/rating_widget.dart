@@ -67,7 +67,7 @@ class _RatingWidgetState extends State<RatingWidget>
                   alignment: Alignment.centerLeft,
                   child: Text(
                     widget.feedbackTypeModel.question,
-                    style: semibold18(context),
+                    style: semibold16(context),
                   ),
                 ),
               ),
@@ -136,7 +136,7 @@ class _RatingWidgetState extends State<RatingWidget>
                                       Text(
                                         widget.feedbackTypeModel
                                             .suggestedOutputTitle!,
-                                        style: semibold16(context).copyWith(
+                                        style: semibold14(context).copyWith(
                                             color: context
                                                 .appTheme.secondaryTextColor,
                                             height: 1.5),
@@ -238,7 +238,7 @@ class DepthRatings extends StatelessWidget {
           },
         );
     return Padding(
-      padding: const EdgeInsets.all(8).w,
+      padding: const EdgeInsets.all(6).w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,7 +255,7 @@ class DepthRatings extends StatelessWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 8.w),
+                    SizedBox(height: 6.w),
                     question(),
                     SizedBox(height: 14.w),
                     if (_isRating) ratingBar()

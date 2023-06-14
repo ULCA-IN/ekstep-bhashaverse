@@ -57,15 +57,15 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                               vertical: 8.h, horizontal: 22.w),
                           child: Column(
                             children: [
-                              SizedBox(height: 16.w),
+                              SizedBox(height: 4.h),
                               CommonAppBar(
                                 title: feedback.tr,
                                 showLogo: false,
                                 onBackPress: () => Get.back(),
                               ),
-                              SizedBox(height: 50.w),
+                              SizedBox(height: 45.h),
                               _buildCommonFeedback(context),
-                              SizedBox(height: 18.w),
+                              SizedBox(height: 14.h),
                               _buildTaskFeedback(),
                             ],
                           ),
@@ -90,7 +90,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           _feedbackController.feedbackReqResponse['pipelineFeedback']
               ['commonFeedback'][0]['question'],
           textAlign: TextAlign.center,
-          style: semibold22(context),
+          style: semibold20(context),
         ),
         SizedBox(height: 14.w),
         RatingBar(
@@ -146,7 +146,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       () => !_feedbackController.isLoading.value
           ? SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(16.0).w,
+                padding: const EdgeInsets.all(12.0).w,
                 child: CustomElevetedButton(
                   buttonText: submit.tr,
                   backgroundColor: context.appTheme.primaryColor,
