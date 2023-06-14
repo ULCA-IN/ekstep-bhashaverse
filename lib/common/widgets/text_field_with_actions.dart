@@ -117,7 +117,7 @@ class TextFieldWithActions extends StatelessWidget {
       ),
       duration: const Duration(milliseconds: 500),
       child: Padding(
-        padding: const EdgeInsets.all(16).w,
+        padding: const EdgeInsets.all(8).w,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -134,7 +134,7 @@ class TextFieldWithActions extends StatelessWidget {
                 readOnly: _isReadOnly,
                 decoration: InputDecoration(
                   hintText: _hintText,
-                  hintStyle: regular22(context)
+                  hintStyle: regular20(context)
                       .copyWith(color: context.appTheme.hintTextColor),
                   hintMaxLines: 4,
                   border: InputBorder.none,

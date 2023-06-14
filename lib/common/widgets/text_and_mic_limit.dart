@@ -66,7 +66,7 @@ class TextAndMicLimit extends StatelessWidget {
             )
           : Text(
               '$_sourceCharLength/$textCharMaxLength',
-              style: regular14Title(context).copyWith(
+              style: regular12Title(context).copyWith(
                   color: _sourceCharLength >= textCharMaxLength
                       ? context.appTheme.errorColor
                       : _sourceCharLength >= textCharMaxLength - 20

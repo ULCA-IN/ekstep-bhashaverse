@@ -60,15 +60,15 @@ class TransliterationHints extends StatelessWidget {
                         ),
                         margin: const EdgeInsets.all(4).w,
                         padding: EdgeInsets.symmetric(
-                            vertical: 4.h, horizontal: 6.w),
+                            vertical: 3.h, horizontal: 4.w),
                         alignment: Alignment.center,
                         child: Container(
                           constraints: BoxConstraints(
-                            minWidth: (ScreenUtil().screenWidth / 7).w,
+                            minWidth: (ScreenUtil().screenWidth / 7.3).w,
                           ),
                           child: Text(
                             hintText,
-                            style: regular16(context),
+                            style: regular14(context),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,

@@ -32,7 +32,7 @@ class CommonAppBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               onTap: _onBackPress,
               child: Padding(
-                padding: const EdgeInsets.all(8.0).w,
+                padding: const EdgeInsets.all(6.0).w,
                 child: SvgPicture.asset(
                   iconPrevious,
                 ),
@@ -55,7 +55,7 @@ class CommonAppBar extends StatelessWidget {
               ),
               Text(
                 _title,
-                style: regular24(context),
+                style: regular22(context),
                 textAlign: TextAlign.center,
               ),
             ],
