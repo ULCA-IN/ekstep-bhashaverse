@@ -1,13 +1,16 @@
+import 'dart:math' show pi;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import '../../common/widgets/language_selection_widget.dart';
 import '../../enums/language_enum.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/source_target_language_controller.dart';
@@ -20,12 +23,15 @@ class SourceTargetLanguageScreen extends StatefulWidget {
       _SourceTargetLanguageScreenState();
 }
 
-class _SourceTargetLanguageScreenState
-    extends State<SourceTargetLanguageScreen> {
+class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
+    with SingleTickerProviderStateMixin {
   late SourceTargetLanguageController _languageSelectionController;
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
   bool isUserSelectedFromSearchResult = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -34,6 +40,22 @@ class _SourceTargetLanguageScreenState
 
     super.initState();
     setLanguageListFromArgument();
+    _controller = AnimationController(
+      vsync: this,
+      duration: defaultAnimationTime,
+    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: pi,
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _languageSearchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,42 +72,175 @@ class _SourceTargetLanguageScreenState
               _headerWidget(),
               SizedBox(height: 24.w),
               _textFormFieldContainer(),
-              SizedBox(height: 24.w),
+              SizedBox(height: 20.w),
               Expanded(
                 child: ScrollConfiguration(
                   behavior: RemoveScrollingGlowEffect(),
-                  child: Obx(
-                    () => GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisSpacing: 8.w,
-                        crossAxisCount:
-                            MediaQuery.of(context).size.shortestSide > 600
-                                ? 3
-                                : 2,
-                        childAspectRatio: 2,
-                      ),
-                      itemCount:
-                          _languageSelectionController.getLanguageList().length,
-                      itemBuilder: (context, index) {
-                        return Obx(
-                          () {
-                            return LanguageSelectionWidget(
-                              title: APIConstants.getLanNameInAppLang(
-                                  _languageSelectionController
-                                      .getLanguageList()[index]),
-                              subTitle: getNativeNameOfLanguage(
-                                  _languageSelectionController
-                                      .getLanguageList()[index]),
-                              onItemTap: () => Get.back(
-                                  result: _languageSelectionController
-                                      .getLanguageList()[index]),
-                              index: index,
-                              selectedIndex: _languageSelectionController
-                                  .getSelectedLanguageIndex(),
-                            );
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          generalLanguages.tr,
+                          style: semibold18(context),
+                        ),
+                        SizedBox(height: 8.w),
+                        Text(
+                          generalLanguagesBrief.tr,
+                          style: secondary14(context),
+                        ),
+                        SizedBox(height: 16.w),
+                        Obx(
+                          () => GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              mainAxisSpacing: 0.02.sh,
+                              crossAxisSpacing: 0.02.sh,
+                              childAspectRatio: 2.3,
+                              crossAxisCount:
+                                  MediaQuery.of(context).size.shortestSide > 600
+                                      ? 3
+                                      : 2,
+                            ),
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _languageSelectionController
+                                .getLanguageListRegular()
+                                .length,
+                            itemBuilder: (context, index) {
+                              return Obx(
+                                () {
+                                  return LanguageSelectionWidget(
+                                    title: APIConstants.getLanNameInAppLang(
+                                        _languageSelectionController
+                                            .getLanguageListRegular()[index]),
+                                    subTitle: getNativeNameOfLanguage(
+                                        _languageSelectionController
+                                            .getLanguageListRegular()[index]),
+                                    onItemTap: () => Get.back(
+                                        result: _languageSelectionController
+                                            .getLanguageListRegular()[index]),
+                                    index: index,
+                                    selectedIndex: _languageSelectionController
+                                        .getSelectedRegularLangIndex(),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20.w),
+                        GestureDetector(
+                          onTap: () async {
+                            _languageSelectionController
+                                    .isAdvanceMenuOpened.value =
+                                !_languageSelectionController
+                                    .isAdvanceMenuOpened.value;
+                            if (_languageSelectionController
+                                .isAdvanceMenuOpened.value) {
+                              _controller.forward();
+                              await Future.delayed(
+                                  const Duration(milliseconds: 100));
+                              await _scrollController.animateTo(
+                                  _scrollController.position.pixels + 0.14.sh,
+                                  duration: defaultAnimationTime,
+                                  curve: Curves.easeIn);
+                            } else {
+                              _controller.reverse();
+                            }
                           },
-                        );
-                      },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      betaLanguages.tr,
+                                      style: semibold18(context),
+                                    ),
+                                    SizedBox(height: 8.w),
+                                    Text(
+                                      betaLanguagesBrief.tr,
+                                      style: secondary14(context),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 14.w),
+                              AnimatedBuilder(
+                                  animation: _controller,
+                                  builder: (context, child) {
+                                    return Transform(
+                                      alignment: Alignment.center,
+                                      transform: Matrix4.identity()
+                                        ..rotateZ(
+                                          _animation.value,
+                                        ),
+                                      child: SvgPicture.asset(iconArrowDown,
+                                          color: context
+                                              .appTheme.highlightedTextColor),
+                                    );
+                                  }),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.w),
+                        Obx(
+                          () => AnimatedContainer(
+                            duration: defaultAnimationTime,
+                            height: _languageSelectionController
+                                    .isAdvanceMenuOpened.value
+                                ? null
+                                : 0,
+                            child: Obx(
+                              () => GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  mainAxisSpacing: 0.02.sh,
+                                  crossAxisSpacing: 0.02.sh,
+                                  childAspectRatio: 2.3,
+                                  crossAxisCount:
+                                      MediaQuery.of(context).size.shortestSide >
+                                              600
+                                          ? 3
+                                          : 2,
+                                ),
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: _languageSelectionController
+                                    .getLanguageListBeta()
+                                    .length,
+                                itemBuilder: (context, index) {
+                                  return Obx(
+                                    () {
+                                      return LanguageSelectionWidget(
+                                        title: APIConstants.getLanNameInAppLang(
+                                            _languageSelectionController
+                                                .getLanguageListBeta()[index]),
+                                        subTitle: getNativeNameOfLanguage(
+                                            _languageSelectionController
+                                                .getLanguageListBeta()[index]),
+                                        onItemTap: () => Get.back(
+                                            result: _languageSelectionController
+                                                .getLanguageListBeta()[index]),
+                                        index: index,
+                                        selectedIndex:
+                                            _languageSelectionController
+                                                .getSelectedBetaLangIndex(),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -160,35 +315,34 @@ class _SourceTargetLanguageScreenState
   }
 
   void performLanguageSearch(String searchString) {
-    if (_languageSelectionController.getLanguageList().isEmpty) {
+    if (_languageSelectionController.getLanguageListRegular().isEmpty) {
       _languageSelectionController
-          .setLanguageList(Get.arguments[kLanguageList]);
+          .setLanguageListRegular(Get.arguments[kLanguageListRegular]);
     }
     if (searchString.isNotEmpty) {
       isUserSelectedFromSearchResult = true;
-      List<dynamic> tempList = _languageSelectionController.getLanguageList();
-      List<dynamic> searchedLanguageList = tempList.where(
-        (languageCode) {
-          String languageNameInEnglish = APIConstants.getLanguageCodeOrName(
-              value: languageCode,
-              returnWhat: LanguageMap.englishName,
-              lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
 
-          return languageNameInEnglish
-                  .toLowerCase()
-                  .contains(searchString.toLowerCase()) ||
-              getNativeNameOfLanguage(languageCode)
-                  .toLowerCase()
-                  .contains(searchString.toLowerCase()) ||
-              APIConstants.getLanNameInAppLang(languageCode)
-                  .contains(searchString);
-        },
-      ).toList();
-      _languageSelectionController.setLanguageList(searchedLanguageList);
-      _languageSelectionController.setSelectedLanguageIndex(null);
+      // Search in Regular languages
+      List<dynamic> tempList =
+          _languageSelectionController.getLanguageListRegular();
+      List<dynamic> searchedLanguageList =
+          getSearchedLanguageList(tempList, searchString);
+      _languageSelectionController.setLanguageListRegular(searchedLanguageList);
+      _languageSelectionController.setSelectedRegularLangIndex(null);
       for (var i = 0; i < searchedLanguageList.length; i++) {
         if (searchedLanguageList[i] == Get.arguments[selectedLanguage]) {
-          _languageSelectionController.setSelectedLanguageIndex(i);
+          _languageSelectionController.setSelectedRegularLangIndex(i);
+        }
+      }
+
+      // Search in Beta languages
+      tempList = _languageSelectionController.getLanguageListBeta();
+      searchedLanguageList = getSearchedLanguageList(tempList, searchString);
+      _languageSelectionController.setLanguageListBeta(searchedLanguageList);
+      _languageSelectionController.setSelectedBetaLangIndex(null);
+      for (var i = 0; i < searchedLanguageList.length; i++) {
+        if (searchedLanguageList[i] == Get.arguments[selectedLanguage]) {
+          _languageSelectionController.setSelectedBetaLangIndex(i);
         }
       }
     } else {
@@ -197,12 +351,43 @@ class _SourceTargetLanguageScreenState
     }
   }
 
+  List<dynamic> getSearchedLanguageList(
+      List<dynamic> languageList, String searchString) {
+    List<dynamic> searchedLanguageList = languageList.where(
+      (languageCode) {
+        String languageNameInEnglish = APIConstants.getLanguageCodeOrName(
+            value: languageCode,
+            returnWhat: LanguageMap.englishName,
+            lang_code_map: APIConstants.LANGUAGE_CODE_MAP);
+
+        return languageNameInEnglish
+                .toLowerCase()
+                .contains(searchString.toLowerCase()) ||
+            getNativeNameOfLanguage(languageCode)
+                .toLowerCase()
+                .contains(searchString.toLowerCase()) ||
+            APIConstants.getLanNameInAppLang(languageCode)
+                .contains(searchString);
+      },
+    ).toList();
+    return searchedLanguageList;
+  }
+
   void setLanguageListFromArgument() {
-    var langListArgument = Get.arguments[kLanguageList];
-    if (langListArgument != null && langListArgument.isNotEmpty) {
-      _languageSelectionController.setLanguageList(langListArgument);
-      _languageSelectionController.setSelectedLanguageIndex(
-          _languageSelectionController.getLanguageList().indexWhere(
+    var regularLangListArgument = Get.arguments[kLanguageListRegular];
+    var betaLangListArgument = Get.arguments[kLanguageListBeta];
+    if (regularLangListArgument != null && regularLangListArgument.isNotEmpty) {
+      _languageSelectionController
+          .setLanguageListRegular(regularLangListArgument);
+      _languageSelectionController.setSelectedRegularLangIndex(
+          _languageSelectionController.getLanguageListRegular().indexWhere(
+              (element) => element == Get.arguments[selectedLanguage]));
+    }
+
+    if (betaLangListArgument != null && betaLangListArgument.isNotEmpty) {
+      _languageSelectionController.setLanguageListBeta(betaLangListArgument);
+      _languageSelectionController.setSelectedBetaLangIndex(
+          _languageSelectionController.getLanguageListBeta().indexWhere(
               (element) => element == Get.arguments[selectedLanguage]));
     }
   }
