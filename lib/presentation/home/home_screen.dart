@@ -85,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           child: SvgPicture.asset(
                             iconSettings,
                             color: context.appTheme.primaryTextColor,
-                            width: 26,
-                            height: 26,
+                            width: 0.037.sh,
+                            height: 0.037.sh,
                           ),
                         ),
                       )
