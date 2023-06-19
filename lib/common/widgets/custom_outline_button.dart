@@ -48,25 +48,28 @@ class CustomOutlineButton extends StatelessWidget {
         )),
       ),
       onPressed: isDisabled ? null : () => onTap(),
-      child: Row(
-        children: [
-          if (icon != null && icon!.isNotEmpty)
-            SvgPicture.asset(
-              icon!,
-              height: 20.w,
-              width: 20.w,
-            ),
-          if (icon != null && icon!.isNotEmpty)
-            SizedBox(
-              width: 8.w,
-            ),
-          if (title != null && title!.isNotEmpty)
-            Text(title!,
-                style: secondary12(context).copyWith(
-                    color: isDisabled
-                        ? context.appTheme.titleTextColor
-                        : context.appTheme.highlightedBGColor)),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 0.01.sh),
+        child: Row(
+          children: [
+            if (icon != null && icon!.isNotEmpty)
+              SvgPicture.asset(
+                icon!,
+                height: 20.w,
+                width: 20.w,
+              ),
+            if (icon != null && icon!.isNotEmpty)
+              SizedBox(
+                width: 8.w,
+              ),
+            if (title != null && title!.isNotEmpty)
+              Text(title!,
+                  style: secondary14(context).copyWith(
+                      color: isDisabled
+                          ? context.appTheme.titleTextColor
+                          : context.appTheme.highlightedBGColor)),
+          ],
+        ),
       ),
     );
   }

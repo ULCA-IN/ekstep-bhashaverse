@@ -21,16 +21,16 @@ class BhashiniTitle extends StatelessWidget {
       children: [
         Image.asset(
           imgAppLogoSmall,
-          height: 30.w,
-          width: 30.w,
+          height: 0.05.sh,
+          width: 0.05.sh,
         ),
         SizedBox(
-          width: 8.w,
+          width: 0.01.sh,
         ),
         Text(
           bhashiniTitle.tr,
           textAlign: TextAlign.center,
-          style: semibold20(context),
+          style: semibold22(context),
         ),
         if (_action != null) _action!
       ],

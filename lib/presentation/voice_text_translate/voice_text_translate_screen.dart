@@ -233,132 +233,142 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _targetLangFocusNode.unfocus();
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              _sourceLangFocusNode.unfocus();
+              _targetLangFocusNode.unfocus();
 
-            List<dynamic> sourceLanguageList =
-                _languageModelController.sourceTargetLanguageMap.keys.toList();
+              List<dynamic> sourceLanguageList = _languageModelController
+                  .sourceTargetLanguageMap.keys
+                  .toList();
 
-            dynamic selectedSourceLangCode =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: sourceLanguageList,
-              kIsSourceLanguage: true,
-              selectedLanguage:
-                  _voiceTextTransController.selectedSourceLanguageCode.value,
-            });
-            if (selectedSourceLangCode != null) {
-              _voiceTextTransController.selectedSourceLanguageCode.value =
-                  selectedSourceLangCode;
-              _hiveDBInstance.put(
-                  preferredSourceLanguage, selectedSourceLangCode);
-              String selectedTargetLangCode =
-                  _voiceTextTransController.selectedTargetLanguageCode.value;
-              if (selectedTargetLangCode.isNotEmpty) {
-                if (!_languageModelController
-                    .sourceTargetLanguageMap[selectedSourceLangCode]!
-                    .contains(selectedTargetLangCode)) {
-                  _voiceTextTransController.selectedTargetLanguageCode.value =
-                      '';
-                  _hiveDBInstance.put(preferredTargetLanguage, null);
+              dynamic selectedSourceLangCode = await Get.toNamed(
+                  AppRoutes.languageSelectionRoute,
+                  arguments: {
+                    kLanguageList: sourceLanguageList,
+                    kIsSourceLanguage: true,
+                    selectedLanguage: _voiceTextTransController
+                        .selectedSourceLanguageCode.value,
+                  });
+              if (selectedSourceLangCode != null) {
+                _voiceTextTransController.selectedSourceLanguageCode.value =
+                    selectedSourceLangCode;
+                _hiveDBInstance.put(
+                    preferredSourceLanguage, selectedSourceLangCode);
+                String selectedTargetLangCode =
+                    _voiceTextTransController.selectedTargetLanguageCode.value;
+                if (selectedTargetLangCode.isNotEmpty) {
+                  if (!_languageModelController
+                      .sourceTargetLanguageMap[selectedSourceLangCode]!
+                      .contains(selectedTargetLangCode)) {
+                    _voiceTextTransController.selectedTargetLanguageCode.value =
+                        '';
+                    _hiveDBInstance.put(preferredTargetLanguage, null);
+                  }
+                }
+                await _voiceTextTransController.resetAllValues();
+                VoiceRecorder voiceRecorder = VoiceRecorder();
+                await voiceRecorder.clearOldRecordings();
+              }
+            },
+            child: Container(
+              height: 0.06.sh,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: context.appTheme.cardBGColor,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+              ),
+              child: Obx(
+                () {
+                  String selectedSourceLanguage = _voiceTextTransController
+                          .selectedSourceLanguageCode.value.isNotEmpty
+                      ? APIConstants.getLanNameInAppLang(
+                          _voiceTextTransController
+                              .selectedSourceLanguageCode.value)
+                      : kTranslateSourceTitle.tr;
+                  return AutoSizeText(
+                    selectedSourceLanguage,
+                    maxLines: 2,
+                    style: secondary16(context),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 0.02.sh),
+          child: GestureDetector(
+            onTap: () {
+              _voiceTextTransController.swapSourceAndTargetLanguage();
+            },
+            child: SvgPicture.asset(
+              iconArrowSwapHorizontal,
+              height: 26.w,
+              width: 26.w,
+            ),
+          ),
+        ),
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              _sourceLangFocusNode.unfocus();
+              _targetLangFocusNode.unfocus();
+              if (_voiceTextTransController
+                  .selectedSourceLanguageCode.value.isEmpty) {
+                showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
+                return;
+              }
+
+              List<dynamic> targetLanguageList = _languageModelController
+                  .sourceTargetLanguageMap[_voiceTextTransController
+                      .selectedSourceLanguageCode.value]!
+                  .toList();
+
+              dynamic selectedTargetLangCode = await Get.toNamed(
+                  AppRoutes.languageSelectionRoute,
+                  arguments: {
+                    kLanguageList: targetLanguageList,
+                    kIsSourceLanguage: false,
+                    selectedLanguage: _voiceTextTransController
+                        .selectedTargetLanguageCode.value,
+                  });
+              if (selectedTargetLangCode != null) {
+                _voiceTextTransController.selectedTargetLanguageCode.value =
+                    selectedTargetLangCode;
+                _hiveDBInstance.put(
+                    preferredTargetLanguage, selectedTargetLangCode);
+                if (_voiceTextTransController
+                        .sourceLangTextController.text.isNotEmpty &&
+                    await isNetworkConnected()) {
+                  _voiceTextTransController.getComputeResponseASRTrans(
+                      isRecorded: false, clearSourceTTS: false);
                 }
               }
-              await _voiceTextTransController.resetAllValues();
-              VoiceRecorder voiceRecorder = VoiceRecorder();
-              await voiceRecorder.clearOldRecordings();
-            }
-          },
-          child: Container(
-            width: ScreenUtil.defaultSize.width / 2.6,
-            height: 40.h,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: context.appTheme.cardBGColor,
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () {
-                String selectedSourceLanguage = _voiceTextTransController
-                        .selectedSourceLanguageCode.value.isNotEmpty
-                    ? APIConstants.getLanNameInAppLang(_voiceTextTransController
-                        .selectedSourceLanguageCode.value)
-                    : kTranslateSourceTitle.tr;
-                return AutoSizeText(
-                  selectedSourceLanguage,
-                  maxLines: 2,
-                  style: secondary14(context),
-                );
-              },
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            _voiceTextTransController.swapSourceAndTargetLanguage();
-          },
-          child: SvgPicture.asset(
-            iconArrowSwapHorizontal,
-            height: 26.w,
-            width: 26.w,
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            _sourceLangFocusNode.unfocus();
-            _targetLangFocusNode.unfocus();
-            if (_voiceTextTransController
-                .selectedSourceLanguageCode.value.isEmpty) {
-              showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
-              return;
-            }
-
-            List<dynamic> targetLanguageList = _languageModelController
-                .sourceTargetLanguageMap[
-                    _voiceTextTransController.selectedSourceLanguageCode.value]!
-                .toList();
-
-            dynamic selectedTargetLangCode =
-                await Get.toNamed(AppRoutes.languageSelectionRoute, arguments: {
-              kLanguageList: targetLanguageList,
-              kIsSourceLanguage: false,
-              selectedLanguage:
-                  _voiceTextTransController.selectedTargetLanguageCode.value,
-            });
-            if (selectedTargetLangCode != null) {
-              _voiceTextTransController.selectedTargetLanguageCode.value =
-                  selectedTargetLangCode;
-              _hiveDBInstance.put(
-                  preferredTargetLanguage, selectedTargetLangCode);
-              if (_voiceTextTransController
-                      .sourceLangTextController.text.isNotEmpty &&
-                  await isNetworkConnected()) {
-                _voiceTextTransController.getComputeResponseASRTrans(
-                    isRecorded: false, clearSourceTTS: false);
-              }
-            }
-          },
-          child: Container(
-            width: ScreenUtil.defaultSize.width / 2.6,
-            height: 40.h,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: context.appTheme.cardBGColor,
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-            ),
-            child: Obx(
-              () {
-                String selectedTargetLanguage = _voiceTextTransController
-                        .selectedTargetLanguageCode.value.isNotEmpty
-                    ? APIConstants.getLanNameInAppLang(_voiceTextTransController
-                        .selectedTargetLanguageCode.value)
-                    : kTranslateTargetTitle.tr;
-                return AutoSizeText(
-                  selectedTargetLanguage,
-                  style: secondary14(context),
-                  maxLines: 2,
-                );
-              },
+            },
+            child: Container(
+              height: 0.06.sh,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: context.appTheme.cardBGColor,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+              ),
+              child: Obx(
+                () {
+                  String selectedTargetLanguage = _voiceTextTransController
+                          .selectedTargetLanguageCode.value.isNotEmpty
+                      ? APIConstants.getLanNameInAppLang(
+                          _voiceTextTransController
+                              .selectedTargetLanguageCode.value)
+                      : kTranslateTargetTitle.tr;
+                  return AutoSizeText(
+                    selectedTargetLanguage,
+                    style: secondary16(context),
+                    maxLines: 2,
+                  );
+                },
+              ),
             ),
           ),
         ),
