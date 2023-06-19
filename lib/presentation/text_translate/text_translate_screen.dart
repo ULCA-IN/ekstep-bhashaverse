@@ -18,6 +18,7 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
@@ -39,6 +40,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
   late final Box _hiveDBInstance;
+  List<dynamic> sourceLangListRegular = [],
+      sourceLangListBeta = [],
+      targetLangListRegular = [],
+      targetLangListBeta = [];
   String oldSourceText = '';
 
   @override
@@ -47,6 +52,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _textTranslationController.getSourceTargetLangFromDB();
+    setSourceLanguageList();
+    setTargetLanguageList();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -377,13 +384,11 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _sourceLangFocusNode.unfocus();
               _targetLangFocusNode.unfocus();
 
-              List<dynamic> sourceLanguageList =
-                  _languageModelController.translationLanguageMap.keys.toList();
-
               dynamic selectedSourceLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageList: sourceLanguageList,
+                    kLanguageListRegular: sourceLangListRegular,
+                    kLanguageListBeta: sourceLangListBeta,
                     kIsSourceLanguage: true,
                     selectedLanguage: _textTranslationController
                         .selectedSourceLanguageCode.value,
@@ -416,14 +421,21 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               ),
               child: Obx(
                 () {
-                  String selectedSourceLanguage = _textTranslationController
-                          .selectedSourceLanguageCode.value.isNotEmpty
+                  String selectedSourceLangCode = _textTranslationController
+                          .selectedSourceLanguageCode.value,
+                      selectedSourceLang = "";
+
+                  selectedSourceLang = selectedSourceLangCode.isNotEmpty &&
+                          (sourceLangListRegular
+                                  .contains(selectedSourceLangCode) ||
+                              sourceLangListBeta
+                                  .contains(selectedSourceLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _textTranslationController
                               .selectedSourceLanguageCode.value)
                       : kTranslateSourceTitle.tr;
                   return AutoSizeText(
-                    selectedSourceLanguage,
+                    selectedSourceLang,
                     maxLines: 2,
                     style: secondary16(context),
                   );
@@ -456,15 +468,11 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return;
               }
 
-              List<dynamic> targetLanguageList = _languageModelController
-                  .translationLanguageMap[_textTranslationController
-                      .selectedSourceLanguageCode.value]!
-                  .toList();
-
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageList: targetLanguageList,
+                    kLanguageListRegular: targetLangListRegular,
+                    kLanguageListBeta: targetLangListBeta,
                     kIsSourceLanguage: false,
                     selectedLanguage: _textTranslationController
                         .selectedTargetLanguageCode.value,
@@ -508,6 +516,41 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ),
       ],
     );
+  }
+
+  setSourceLanguageList() {
+    sourceLangListRegular =
+        _languageModelController.translationLanguageMap.keys.toList();
+
+    for (int i = 0; i < sourceLangListRegular.length; i++) {
+      var language = sourceLangListRegular[i];
+      if (textSkipSourceLang.contains(language)) {
+        sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (textBetaSourceLang.contains(language)) {
+        sourceLangListBeta.add(sourceLangListRegular[i]);
+        sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    targetLangListRegular = _languageModelController.translationLanguageMap[
+            _textTranslationController.selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0; i < targetLangListRegular.length; i++) {
+      var language = targetLangListRegular[i];
+      if (textSkipTargetLang.contains(language)) {
+        targetLangListRegular.removeAt(i);
+        i--;
+      } else if (textBetaTargetLang.contains(language)) {
+        targetLangListBeta.add(targetLangListRegular[i]);
+        targetLangListRegular.removeAt(i);
+        i--;
+      }
+    }
   }
 
   Widget _buildLoadingAnimation() {
