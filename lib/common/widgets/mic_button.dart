@@ -84,7 +84,7 @@ class MicButton extends StatelessWidget {
                   child: AutoSizeText(
                     _languageName,
                     maxLines: 2,
-                    style: regular18Primary(context).copyWith(fontSize: 16),
+                    style: secondary16(context),
                   ),
                 ),
                 SizedBox(width: 6.w),
