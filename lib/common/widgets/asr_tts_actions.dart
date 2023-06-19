@@ -141,6 +141,8 @@ class ASRAndTTSActions extends StatelessWidget {
                                 children: [
                                   SvgPicture.asset(
                                     iconLikeDislike,
+                                    height: 20.w,
+                                    width: 20.w,
                                     color: _expandFeedbackIcon
                                         ? context.appTheme.feedbackIconColor
                                         : context
