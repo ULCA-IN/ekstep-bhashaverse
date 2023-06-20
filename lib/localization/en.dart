@@ -103,8 +103,8 @@ final Map<String, String> en = {
       'With this switched On, Transcriptions and Translations response can be obtained in real-time.',
   computeCallLoadingText: 'Hold on, we are generating the output',
   generalLanguages: 'General Languages',
-  generalLanguagesBrief: 'This languages working perfectly',
+  generalLanguagesBrief: 'These languages working perfectly',
   betaLanguages: 'Beta Languages',
   betaLanguagesBrief:
-      'This languages are still in production and may not generate proper results'
+      'These languages are still in production and may not generate proper result'
 };
