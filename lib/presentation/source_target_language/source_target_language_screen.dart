@@ -73,182 +73,190 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
               SizedBox(height: 24.w),
               _textFormFieldContainer(),
               SizedBox(height: 20.w),
-              Expanded(
-                child: ScrollConfiguration(
-                  behavior: RemoveScrollingGlowEffect(),
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          generalLanguages.tr,
-                          style: semibold18(context),
-                        ),
-                        SizedBox(height: 8.w),
-                        Text(
-                          generalLanguagesBrief.tr,
-                          style: secondary14(context),
-                        ),
-                        SizedBox(height: 16.w),
-                        Obx(
-                          () => GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              mainAxisSpacing: 0.02.sh,
-                              crossAxisSpacing: 0.02.sh,
-                              childAspectRatio: 2.3,
-                              crossAxisCount:
-                                  MediaQuery.of(context).size.shortestSide > 600
-                                      ? 3
-                                      : 2,
-                            ),
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: _languageSelectionController
-                                .getLanguageListRegular()
-                                .length,
-                            itemBuilder: (context, index) {
-                              return Obx(
-                                () {
-                                  return LanguageSelectionWidget(
-                                    title: APIConstants.getLanNameInAppLang(
-                                        _languageSelectionController
-                                            .getLanguageListRegular()[index]),
-                                    subTitle: getNativeNameOfLanguage(
-                                        _languageSelectionController
-                                            .getLanguageListRegular()[index]),
-                                    onItemTap: () => Get.back(
-                                        result: _languageSelectionController
-                                            .getLanguageListRegular()[index]),
-                                    index: index,
-                                    selectedIndex: _languageSelectionController
-                                        .getSelectedRegularLangIndex(),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 20.w),
-                        GestureDetector(
-                          onTap: () async {
-                            _languageSelectionController
-                                    .isAdvanceMenuOpened.value =
-                                !_languageSelectionController
-                                    .isAdvanceMenuOpened.value;
-                            if (_languageSelectionController
-                                .isAdvanceMenuOpened.value) {
-                              _controller.forward();
-                              await Future.delayed(
-                                  const Duration(milliseconds: 100));
-                              await _scrollController.animateTo(
-                                  _scrollController.position.pixels + 0.14.sh,
-                                  duration: defaultAnimationTime,
-                                  curve: Curves.easeIn);
-                            } else {
-                              _controller.reverse();
-                            }
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      betaLanguages.tr,
-                                      style: semibold18(context),
-                                    ),
-                                    SizedBox(height: 8.w),
-                                    Text(
-                                      betaLanguagesBrief.tr,
-                                      style: secondary14(context),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(width: 14.w),
-                              AnimatedBuilder(
-                                  animation: _controller,
-                                  builder: (context, child) {
-                                    return Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.identity()
-                                        ..rotateZ(
-                                          _animation.value,
-                                        ),
-                                      child: SvgPicture.asset(iconArrowDown,
-                                          color: context
-                                              .appTheme.highlightedTextColor),
-                                    );
-                                  }),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 16.w),
-                        Obx(
-                          () => AnimatedContainer(
-                            duration: defaultAnimationTime,
-                            height: _languageSelectionController
-                                    .isAdvanceMenuOpened.value
-                                ? null
-                                : 0,
-                            child: Obx(
-                              () => GridView.builder(
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  mainAxisSpacing: 0.02.sh,
-                                  crossAxisSpacing: 0.02.sh,
-                                  childAspectRatio: 2.3,
-                                  crossAxisCount:
-                                      MediaQuery.of(context).size.shortestSide >
-                                              600
-                                          ? 3
-                                          : 2,
-                                ),
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: _languageSelectionController
-                                    .getLanguageListBeta()
-                                    .length,
-                                itemBuilder: (context, index) {
-                                  return Obx(
-                                    () {
-                                      return LanguageSelectionWidget(
-                                        title: APIConstants.getLanNameInAppLang(
-                                            _languageSelectionController
-                                                .getLanguageListBeta()[index]),
-                                        subTitle: getNativeNameOfLanguage(
-                                            _languageSelectionController
-                                                .getLanguageListBeta()[index]),
-                                        onItemTap: () => Get.back(
-                                            result: _languageSelectionController
-                                                .getLanguageListBeta()[index]),
-                                        index: index,
-                                        selectedIndex:
-                                            _languageSelectionController
-                                                .getSelectedBetaLangIndex(),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              _buildLanguages(context),
               SizedBox(height: 16.w),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Expanded _buildLanguages(BuildContext context) {
+    return Expanded(
+      child: ScrollConfiguration(
+        behavior: RemoveScrollingGlowEffect(),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildRegularLanguageList(context),
+              _buildBetaLanguageList(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRegularLanguageList(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          generalLanguages.tr,
+          style: semibold18(context),
+        ),
+        SizedBox(height: 8.w),
+        Text(
+          generalLanguagesBrief.tr,
+          style: secondary14(context),
+        ),
+        SizedBox(height: 16.w),
+        Obx(
+          () => GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              mainAxisSpacing: 0.02.sh,
+              crossAxisSpacing: 0.02.sh,
+              childAspectRatio: 2.3,
+              crossAxisCount:
+                  MediaQuery.of(context).size.shortestSide > 600 ? 3 : 2,
+            ),
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount:
+                _languageSelectionController.getLanguageListRegular().length,
+            itemBuilder: (context, index) {
+              return Obx(
+                () {
+                  return LanguageSelectionWidget(
+                    title: APIConstants.getLanNameInAppLang(
+                        _languageSelectionController
+                            .getLanguageListRegular()[index]),
+                    subTitle: getNativeNameOfLanguage(
+                        _languageSelectionController
+                            .getLanguageListRegular()[index]),
+                    onItemTap: () => Get.back(
+                        result: _languageSelectionController
+                            .getLanguageListRegular()[index]),
+                    index: index,
+                    selectedIndex: _languageSelectionController
+                        .getSelectedRegularLangIndex(),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 20.w),
+      ],
+    );
+  }
+
+  Widget _buildBetaLanguageList(BuildContext context) {
+    return Visibility(
+      visible: _languageSelectionController.getLanguageListBeta().isNotEmpty,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              _languageSelectionController.isAdvanceMenuOpened.value =
+                  !_languageSelectionController.isAdvanceMenuOpened.value;
+              if (_languageSelectionController.isAdvanceMenuOpened.value) {
+                _controller.forward();
+                await Future.delayed(const Duration(milliseconds: 100));
+                await _scrollController.animateTo(
+                    _scrollController.position.pixels + 0.14.sh,
+                    duration: defaultAnimationTime,
+                    curve: Curves.easeIn);
+              } else {
+                _controller.reverse();
+              }
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        betaLanguages.tr,
+                        style: semibold18(context),
+                      ),
+                      SizedBox(height: 8.w),
+                      Text(
+                        betaLanguagesBrief.tr,
+                        style: secondary14(context),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..rotateZ(
+                            _animation.value,
+                          ),
+                        child: SvgPicture.asset(iconArrowDown,
+                            color: context.appTheme.highlightedTextColor),
+                      );
+                    }),
+              ],
+            ),
+          ),
+          SizedBox(height: 16.w),
+          Obx(
+            () => AnimatedContainer(
+              duration: defaultAnimationTime,
+              height: _languageSelectionController.isAdvanceMenuOpened.value
+                  ? null
+                  : 0,
+              child: Obx(
+                () => GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisSpacing: 0.02.sh,
+                    crossAxisSpacing: 0.02.sh,
+                    childAspectRatio: 2.3,
+                    crossAxisCount:
+                        MediaQuery.of(context).size.shortestSide > 600 ? 3 : 2,
+                  ),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount:
+                      _languageSelectionController.getLanguageListBeta().length,
+                  itemBuilder: (context, index) {
+                    return Obx(
+                      () {
+                        return LanguageSelectionWidget(
+                          title: APIConstants.getLanNameInAppLang(
+                              _languageSelectionController
+                                  .getLanguageListBeta()[index]),
+                          subTitle: getNativeNameOfLanguage(
+                              _languageSelectionController
+                                  .getLanguageListBeta()[index]),
+                          onItemTap: () => Get.back(
+                              result: _languageSelectionController
+                                  .getLanguageListBeta()[index]),
+                          index: index,
+                          selectedIndex: _languageSelectionController
+                              .getSelectedBetaLangIndex(),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
