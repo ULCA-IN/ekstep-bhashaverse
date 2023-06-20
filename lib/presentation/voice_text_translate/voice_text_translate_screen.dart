@@ -45,10 +45,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   late LanguageModelController _languageModelController;
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
-  List<dynamic> sourceLangListRegular = [],
-      sourceLangListBeta = [],
-      targetLangListRegular = [],
-      targetLangListBeta = [];
   String oldSourceText = '';
 
   late final Box _hiveDBInstance;
@@ -248,8 +244,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               dynamic selectedSourceLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageListRegular: sourceLangListRegular,
-                    kLanguageListBeta: sourceLangListBeta,
+                    kLanguageListRegular:
+                        _voiceTextTransController.sourceLangListRegular,
+                    kLanguageListBeta:
+                        _voiceTextTransController.sourceLangListBeta,
                     kIsSourceLanguage: true,
                     selectedLanguage: _voiceTextTransController
                         .selectedSourceLanguageCode.value,
@@ -289,9 +287,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                       selectedSourceLang = "";
 
                   selectedSourceLang = selectedSourceLangCode.isNotEmpty &&
-                          (sourceLangListRegular
+                          (_voiceTextTransController.sourceLangListRegular
                                   .contains(selectedSourceLangCode) ||
-                              sourceLangListBeta
+                              _voiceTextTransController.sourceLangListBeta
                                   .contains(selectedSourceLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
@@ -334,8 +332,10 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageListRegular: targetLangListRegular,
-                    kLanguageListBeta: targetLangListBeta,
+                    kLanguageListRegular:
+                        _voiceTextTransController.targetLangListRegular,
+                    kLanguageListBeta:
+                        _voiceTextTransController.targetLangListBeta,
                     kIsSourceLanguage: false,
                     selectedLanguage: _voiceTextTransController
                         .selectedTargetLanguageCode.value,
@@ -362,14 +362,21 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
               child: Obx(
                 () {
-                  String selectedTargetLanguage = _voiceTextTransController
-                          .selectedTargetLanguageCode.value.isNotEmpty
+                  String selectedTargetLangCode = _voiceTextTransController
+                          .selectedTargetLanguageCode.value,
+                      selectedTargetLang = "";
+
+                  selectedTargetLang = selectedTargetLangCode.isNotEmpty &&
+                          (_voiceTextTransController.targetLangListRegular
+                                  .contains(selectedTargetLangCode) ||
+                              _voiceTextTransController.targetLangListBeta
+                                  .contains(selectedTargetLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
                               .selectedTargetLanguageCode.value)
                       : kTranslateTargetTitle.tr;
                   return AutoSizeText(
-                    selectedTargetLanguage,
+                    selectedTargetLang,
                     style: secondary16(context),
                     maxLines: 2,
                   );
@@ -383,35 +390,42 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   setSourceLanguageList() {
-    sourceLangListRegular =
+    _voiceTextTransController.sourceLangListRegular =
         _languageModelController.sourceTargetLanguageMap.keys.toList();
 
-    for (int i = 0; i < sourceLangListRegular.length; i++) {
-      var language = sourceLangListRegular[i];
+    for (int i = 0;
+        i < _voiceTextTransController.sourceLangListRegular.length;
+        i++) {
+      var language = _voiceTextTransController.sourceLangListRegular[i];
       if (voiceSkipSourceLang.contains(language)) {
-        sourceLangListRegular.removeAt(i);
+        _voiceTextTransController.sourceLangListRegular.removeAt(i);
         i--;
       } else if (voiceBetaSourceLang.contains(language)) {
-        sourceLangListBeta.add(sourceLangListRegular[i]);
-        sourceLangListRegular.removeAt(i);
+        _voiceTextTransController.sourceLangListBeta
+            .add(_voiceTextTransController.sourceLangListRegular[i]);
+        _voiceTextTransController.sourceLangListRegular.removeAt(i);
         i--;
       }
     }
   }
 
   void setTargetLanguageList() {
-    targetLangListRegular = _languageModelController.sourceTargetLanguageMap[
+    _voiceTextTransController.targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[
             _voiceTextTransController.selectedSourceLanguageCode.value]!
         .toList();
 
-    for (int i = 0; i < targetLangListRegular.length; i++) {
-      var language = targetLangListRegular[i];
+    for (int i = 0;
+        i < _voiceTextTransController.targetLangListRegular.length;
+        i++) {
+      var language = _voiceTextTransController.targetLangListRegular[i];
       if (voiceSkipTargetLang.contains(language)) {
-        targetLangListRegular.removeAt(i);
+        _voiceTextTransController.targetLangListRegular.removeAt(i);
         i--;
       } else if (voiceBetaTargetLang.contains(language)) {
-        targetLangListBeta.add(targetLangListRegular[i]);
-        targetLangListRegular.removeAt(i);
+        _voiceTextTransController.targetLangListBeta
+            .add(_voiceTextTransController.targetLangListRegular[i]);
+        _voiceTextTransController.targetLangListRegular.removeAt(i);
         i--;
       }
     }

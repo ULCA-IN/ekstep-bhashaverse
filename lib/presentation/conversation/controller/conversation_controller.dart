@@ -62,6 +62,11 @@ class ConversationController extends GetxController {
   String? base64EncodedAudioContent;
   String sourceLangCode = '', targetLangCode = '';
 
+  List<dynamic> sourceLangListRegular = [],
+      sourceLangListBeta = [],
+      targetLangListRegular = [],
+      targetLangListBeta = [];
+
   List<int> recordedData = [];
   final RecorderStream _recorder = RecorderStream();
   final VoiceRecorder _voiceRecorder = VoiceRecorder();

@@ -40,10 +40,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
   late final Box _hiveDBInstance;
-  List<dynamic> sourceLangListRegular = [],
-      sourceLangListBeta = [],
-      targetLangListRegular = [],
-      targetLangListBeta = [];
   String oldSourceText = '';
 
   @override
@@ -387,8 +383,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               dynamic selectedSourceLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageListRegular: sourceLangListRegular,
-                    kLanguageListBeta: sourceLangListBeta,
+                    kLanguageListRegular:
+                        _textTranslationController.sourceLangListRegular,
+                    kLanguageListBeta:
+                        _textTranslationController.sourceLangListBeta,
                     kIsSourceLanguage: true,
                     selectedLanguage: _textTranslationController
                         .selectedSourceLanguageCode.value,
@@ -426,9 +424,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                       selectedSourceLang = "";
 
                   selectedSourceLang = selectedSourceLangCode.isNotEmpty &&
-                          (sourceLangListRegular
+                          (_textTranslationController.sourceLangListRegular
                                   .contains(selectedSourceLangCode) ||
-                              sourceLangListBeta
+                              _textTranslationController.sourceLangListBeta
                                   .contains(selectedSourceLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _textTranslationController
@@ -471,8 +469,10 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageListRegular: targetLangListRegular,
-                    kLanguageListBeta: targetLangListBeta,
+                    kLanguageListRegular:
+                        _textTranslationController.targetLangListRegular,
+                    kLanguageListBeta:
+                        _textTranslationController.targetLangListBeta,
                     kIsSourceLanguage: false,
                     selectedLanguage: _textTranslationController
                         .selectedTargetLanguageCode.value,
@@ -498,14 +498,21 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               ),
               child: Obx(
                 () {
-                  String selectedTargetLanguage = _textTranslationController
-                          .selectedTargetLanguageCode.value.isNotEmpty
+                  String selectedTargetLangCode = _textTranslationController
+                          .selectedTargetLanguageCode.value,
+                      selectedTargetLang = "";
+
+                  selectedTargetLang = selectedTargetLangCode.isNotEmpty &&
+                          (_textTranslationController.targetLangListRegular
+                                  .contains(selectedTargetLangCode) ||
+                              _textTranslationController.targetLangListBeta
+                                  .contains(selectedTargetLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _textTranslationController
                               .selectedTargetLanguageCode.value)
                       : kTranslateTargetTitle.tr;
                   return AutoSizeText(
-                    selectedTargetLanguage,
+                    selectedTargetLang,
                     style: secondary16(context),
                     maxLines: 2,
                   );
@@ -519,35 +526,42 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   }
 
   setSourceLanguageList() {
-    sourceLangListRegular =
+    _textTranslationController.sourceLangListRegular =
         _languageModelController.translationLanguageMap.keys.toList();
 
-    for (int i = 0; i < sourceLangListRegular.length; i++) {
-      var language = sourceLangListRegular[i];
+    for (int i = 0;
+        i < _textTranslationController.sourceLangListRegular.length;
+        i++) {
+      var language = _textTranslationController.sourceLangListRegular[i];
       if (textSkipSourceLang.contains(language)) {
-        sourceLangListRegular.removeAt(i);
+        _textTranslationController.sourceLangListRegular.removeAt(i);
         i--;
       } else if (textBetaSourceLang.contains(language)) {
-        sourceLangListBeta.add(sourceLangListRegular[i]);
-        sourceLangListRegular.removeAt(i);
+        _textTranslationController.sourceLangListBeta
+            .add(_textTranslationController.sourceLangListRegular[i]);
+        _textTranslationController.sourceLangListRegular.removeAt(i);
         i--;
       }
     }
   }
 
   void setTargetLanguageList() {
-    targetLangListRegular = _languageModelController.translationLanguageMap[
+    _textTranslationController.targetLangListRegular = _languageModelController
+        .translationLanguageMap[
             _textTranslationController.selectedSourceLanguageCode.value]!
         .toList();
 
-    for (int i = 0; i < targetLangListRegular.length; i++) {
-      var language = targetLangListRegular[i];
+    for (int i = 0;
+        i < _textTranslationController.targetLangListRegular.length;
+        i++) {
+      var language = _textTranslationController.targetLangListRegular[i];
       if (textSkipTargetLang.contains(language)) {
-        targetLangListRegular.removeAt(i);
+        _textTranslationController.targetLangListRegular.removeAt(i);
         i--;
       } else if (textBetaTargetLang.contains(language)) {
-        targetLangListBeta.add(targetLangListRegular[i]);
-        targetLangListRegular.removeAt(i);
+        _textTranslationController.targetLangListBeta
+            .add(_textTranslationController.targetLangListRegular[i]);
+        _textTranslationController.targetLangListRegular.removeAt(i);
         i--;
       }
     }

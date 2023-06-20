@@ -65,6 +65,11 @@ class VoiceTextTranslateController extends GetxController {
   Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
       targetSpeakerStatus = Rx(SpeakerStatus.disabled);
 
+  List<dynamic> sourceLangListRegular = [],
+      sourceLangListBeta = [],
+      targetLangListRegular = [],
+      targetLangListBeta = [];
+
   List<int> recordedData = [];
   final RecorderStream _recorder = RecorderStream();
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
@@ -235,6 +240,14 @@ class VoiceTextTranslateController extends GetxController {
   }
 
   void swapSourceAndTargetLanguage() {
+    bool isTargetLangAvailableInSourceList =
+        sourceLangListRegular.contains(selectedTargetLanguageCode.value) ||
+            sourceLangListBeta.contains(selectedTargetLanguageCode.value);
+
+    bool isSourceLangAvailableInTargetList =
+        targetLangListRegular.contains(selectedSourceLanguageCode.value) ||
+            targetLangListBeta.contains(selectedSourceLanguageCode.value);
+
     if (isSourceAndTargetLangSelected()) {
       if (_languageModelController.sourceTargetLanguageMap.keys
               .contains(selectedTargetLanguageCode.value) &&
@@ -243,7 +256,9 @@ class VoiceTextTranslateController extends GetxController {
               null &&
           _languageModelController
               .sourceTargetLanguageMap[selectedTargetLanguageCode.value]!
-              .contains(selectedSourceLanguageCode.value)) {
+              .contains(selectedSourceLanguageCode.value) &&
+          isTargetLangAvailableInSourceList &&
+          isSourceLangAvailableInTargetList) {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;

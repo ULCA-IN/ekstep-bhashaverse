@@ -36,10 +36,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   late ConversationController _translationController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
-  List<dynamic> sourceLangListRegular = [],
-      sourceLangListBeta = [],
-      targetLangListRegular = [],
-      targetLangListBeta = [];
   late final Box _hiveDBInstance;
 
   @override
@@ -244,8 +240,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   selectedSourceLang = "";
 
               selectedSourceLang = sourceLangCode.isNotEmpty &&
-                      (sourceLangListRegular.contains(sourceLangCode) ||
-                          sourceLangListBeta.contains(sourceLangCode))
+                      (_translationController.sourceLangListRegular
+                              .contains(sourceLangCode) ||
+                          _translationController.sourceLangListBeta
+                              .contains(sourceLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedSourceLanguageCode.value)
                   : kTranslateSourceTitle.tr;
@@ -268,8 +266,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   dynamic selectedSourceLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
-                        kLanguageListRegular: sourceLangListRegular,
-                        kLanguageListBeta: sourceLangListBeta,
+                        kLanguageListRegular:
+                            _translationController.sourceLangListRegular,
+                        kLanguageListBeta:
+                            _translationController.sourceLangListBeta,
                         kIsSourceLanguage: true,
                         selectedLanguage: _translationController
                             .selectedSourceLanguageCode.value,
@@ -318,8 +318,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   selectedTargetLang = "";
 
               selectedTargetLang = targetLangCode.isNotEmpty &&
-                      (sourceLangListRegular.contains(targetLangCode) ||
-                          sourceLangListBeta.contains(targetLangCode))
+                      (_translationController.targetLangListRegular
+                              .contains(targetLangCode) ||
+                          _translationController.targetLangListBeta
+                              .contains(targetLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedTargetLanguageCode.value)
                   : kTranslateTargetTitle.tr;
@@ -348,8 +350,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   dynamic selectedTargetLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
-                        kLanguageListRegular: targetLangListRegular,
-                        kLanguageListBeta: targetLangListBeta,
+                        kLanguageListRegular:
+                            _translationController.targetLangListRegular,
+                        kLanguageListBeta:
+                            _translationController.targetLangListBeta,
                         kIsSourceLanguage: false,
                         selectedLanguage: _translationController
                             .selectedTargetLanguageCode.value,
@@ -385,35 +389,42 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   setSourceLanguageList() {
-    sourceLangListRegular =
+    _translationController.sourceLangListRegular =
         _languageModelController.sourceTargetLanguageMap.keys.toList();
 
-    for (int i = 0; i < sourceLangListRegular.length; i++) {
-      var language = sourceLangListRegular[i];
+    for (int i = 0;
+        i < _translationController.sourceLangListRegular.length;
+        i++) {
+      var language = _translationController.sourceLangListRegular[i];
       if (converseSkipSourceLang.contains(language)) {
-        sourceLangListRegular.removeAt(i);
+        _translationController.sourceLangListRegular.removeAt(i);
         i--;
       } else if (converseBetaSourceLang.contains(language)) {
-        sourceLangListBeta.add(sourceLangListRegular[i]);
-        sourceLangListRegular.removeAt(i);
+        _translationController.sourceLangListBeta
+            .add(_translationController.sourceLangListRegular[i]);
+        _translationController.sourceLangListRegular.removeAt(i);
         i--;
       }
     }
   }
 
   void setTargetLanguageList() {
-    targetLangListRegular = _languageModelController.sourceTargetLanguageMap[
+    _translationController.targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[
             _translationController.selectedSourceLanguageCode.value]!
         .toList();
 
-    for (int i = 0; i < targetLangListRegular.length; i++) {
-      var language = targetLangListRegular[i];
+    for (int i = 0;
+        i < _translationController.targetLangListRegular.length;
+        i++) {
+      var language = _translationController.targetLangListRegular[i];
       if (converseSkipTargetLang.contains(language)) {
-        targetLangListRegular.removeAt(i);
+        _translationController.targetLangListRegular.removeAt(i);
         i--;
       } else if (converseBetaTargetLang.contains(language)) {
-        targetLangListBeta.add(targetLangListRegular[i]);
-        targetLangListRegular.removeAt(i);
+        _translationController.targetLangListBeta
+            .add(_translationController.targetLangListRegular[i]);
+        _translationController.targetLangListRegular.removeAt(i);
         i--;
       }
     }

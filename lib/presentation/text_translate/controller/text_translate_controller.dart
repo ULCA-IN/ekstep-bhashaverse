@@ -37,6 +37,11 @@ class TextTranslateController extends GetxController {
   RxList transliterationWordHints = [].obs;
   int lastOffsetOfCursor = 0;
 
+  List<dynamic> sourceLangListRegular = [],
+      sourceLangListBeta = [],
+      targetLangListRegular = [],
+      targetLangListBeta = [];
+
   // uncomment when TTS work
 
   // RxBool isSourceShareLoading = false.obs, isTargetShareLoading = false.obs;
@@ -136,6 +141,14 @@ class TextTranslateController extends GetxController {
 
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
+      bool isTargetLangAvailableInSourceList =
+          sourceLangListRegular.contains(selectedTargetLanguageCode.value) ||
+              sourceLangListBeta.contains(selectedTargetLanguageCode.value);
+
+      bool isSourceLangAvailableInTargetList =
+          targetLangListRegular.contains(selectedSourceLanguageCode.value) ||
+              targetLangListBeta.contains(selectedSourceLanguageCode.value);
+
       if (_languageModelController.translationLanguageMap.keys
               .contains(selectedTargetLanguageCode.value) &&
           _languageModelController
@@ -143,7 +156,9 @@ class TextTranslateController extends GetxController {
               null &&
           _languageModelController
               .translationLanguageMap[selectedTargetLanguageCode.value]!
-              .contains(selectedSourceLanguageCode.value)) {
+              .contains(selectedSourceLanguageCode.value) &&
+          isTargetLangAvailableInSourceList &&
+          isSourceLangAvailableInTargetList) {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;
