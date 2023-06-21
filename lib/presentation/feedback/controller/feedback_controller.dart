@@ -278,6 +278,13 @@ class FeedbackController extends GetxController {
             [0]['source'];
         String? userSuggestedOutputText = task['output'][0]['source'];
         isUserSuggestedOutput = outputTextSource != userSuggestedOutputText;
+
+        // update in translation as well
+        if (isUserSuggestedOutput) {
+          (suggestedOutput?['pipelineResponse'] as List<dynamic>).firstWhere(
+                  (task) => task['taskType'] == 'translation')['output'][0]
+              ['source'] = userSuggestedOutputText;
+        }
       }
       if (!isUserSuggestedOutput && task['taskType'] == "translation") {
         String outputTextSource = (computeResponse?['pipelineResponse']
