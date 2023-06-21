@@ -12,7 +12,7 @@ class _AppColors {
   static const Color brickRed = Color(0xFFD1293D);
   static const Color balticSea = Color(0xFF202330);
   static const Color dolphinGray = Color(0xFF6A6C75);
-  static const Color goastWhite = Color(0xFFF2F2F3);
+  static const Color ghostWhite = Color(0xFFF2F2F3);
   static const Color manateeGray = Color(0xFF9C9DA3);
   static const Color sassyGreen = Color(0xFFE7F3E6);
   static const Color japaneseLaurel = Color(0xFF128807);

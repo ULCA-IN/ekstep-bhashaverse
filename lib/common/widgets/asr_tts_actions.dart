@@ -225,7 +225,7 @@ class ASRAndTTSActions extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: _speakerStatus != SpeakerStatus.disabled
                       ? context.appTheme.buttonSelectedColor
-                      : context.appTheme.speackerColor,
+                      : context.appTheme.speakerColor,
                 ),
                 padding: const EdgeInsets.all(6).w,
                 child: SizedBox(
