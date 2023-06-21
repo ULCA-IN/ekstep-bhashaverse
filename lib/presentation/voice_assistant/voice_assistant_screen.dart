@@ -11,6 +11,7 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/voice_assistant_controller.dart';
+import 'data/voice_assistant_data.dart';
 
 class VoiceAssistantScreen extends StatefulWidget {
   const VoiceAssistantScreen({super.key});
@@ -55,13 +56,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 children: [
                   _avatarWidgetBuilder(
                     GenderEnum.male,
-                    imgMaleAvatar,
+                    VoiceAssistantData.maleImgWidget,
                     male.tr,
                   ),
                   SizedBox(width: 10.w),
                   _avatarWidgetBuilder(
                     GenderEnum.female,
-                    imgFemaleAvatar,
+                    VoiceAssistantData.femaleImgWidget,
                     female.tr,
                   ),
                 ],
@@ -86,7 +87,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
 
   Widget _avatarWidgetBuilder(
     GenderEnum gender,
-    String avatarImage,
+    Image avatarImage,
     String avatarTitle,
   ) {
     return Expanded(
@@ -110,7 +111,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             ),
             child: Column(
               children: [
-                Image.asset(avatarImage),
+                avatarImage,
                 SizedBox(height: 16.w),
                 Text(
                   avatarTitle,
