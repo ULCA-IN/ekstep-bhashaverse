@@ -106,7 +106,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.sourceLangTextController,
             focusNode: FocusNode(),
-            backgroundColor: context.appTheme.normalTextFeildColor,
+            backgroundColor: context.appTheme.normalTextFieldColor,
             borderColor: context.appTheme.disabledBGColor,
             hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
@@ -164,7 +164,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
           textController: _translationController.targetLangTextController,
           focusNode: FocusNode(),
-          backgroundColor: context.appTheme.normalTextFeildColor,
+          backgroundColor: context.appTheme.normalTextFieldColor,
           borderColor: context.appTheme.disabledBGColor,
           hintText: isCurrentlyRecording()
               ? _translationController.currentMic.value ==

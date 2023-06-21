@@ -117,7 +117,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                   ),
                 ),
                 SizedBox(height: 16.w),
-                CustomElevetedButton(
+                CustomElevatedButton(
                   buttonText: continueText.tr,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,

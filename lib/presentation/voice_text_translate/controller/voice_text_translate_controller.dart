@@ -100,8 +100,7 @@ class VoiceTextTranslateController extends GetxController {
     _recorder.initialize();
     playerController = PlayerController();
 
-//  Connectiviry listener
-
+//  Connectivity listener
     Connectivity()
         .checkConnectivity()
         .then((newConnectivity) => updateSamplingRate(newConnectivity));

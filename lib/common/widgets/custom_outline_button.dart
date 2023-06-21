@@ -33,7 +33,7 @@ class CustomOutlineButton extends StatelessWidget {
               : context.appTheme.highlightedBGColor.withOpacity(0.2),
         ),
         backgroundColor: MaterialStateProperty.all(
-            backgroundColor ?? context.appTheme.normalTextFeildColor),
+            backgroundColor ?? context.appTheme.normalTextFieldColor),
         side: MaterialStateProperty.resolveWith((state) {
           return showBoarder
               ? BorderSide(

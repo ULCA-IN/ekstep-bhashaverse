@@ -147,7 +147,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ? SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(12.0).w,
-                child: CustomElevetedButton(
+                child: CustomElevatedButton(
                   buttonText: submit.tr,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,

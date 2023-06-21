@@ -67,7 +67,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 ],
               ),
               const Spacer(),
-              CustomElevetedButton(
+              CustomElevatedButton(
                 buttonText: letsTranslate.tr,
                 backgroundColor: context.appTheme.primaryColor,
                 borderRadius: 16,

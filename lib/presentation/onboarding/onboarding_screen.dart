@@ -65,7 +65,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   ),
                 ),
                 SizedBox(height: 16.h),
-                CustomElevetedButton(
+                CustomElevatedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
                           _onboardingController.getOnboardingPageList().length -
                               1)
