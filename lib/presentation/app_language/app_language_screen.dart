@@ -80,12 +80,13 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                       behavior: RemoveScrollingGlowEffect(),
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          mainAxisSpacing: 8.w,
+                          mainAxisSpacing: 0.02.sh,
+                          crossAxisSpacing: 0.02.sh,
+                          childAspectRatio: 2.3,
                           crossAxisCount:
                               MediaQuery.of(context).size.shortestSide > 600
                                   ? 3
                                   : 2,
-                          childAspectRatio: 2,
                         ),
                         itemCount:
                             _appLanguageController.getAppLanguageList().length,
