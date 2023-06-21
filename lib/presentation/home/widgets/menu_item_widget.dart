@@ -8,7 +8,7 @@ class MenuItem extends StatelessWidget {
   const MenuItem({
     super.key,
     required String title,
-    required String image,
+    required Image image,
     required bool isDisabled,
     required Function onTap,
   })  : _title = title,
@@ -16,7 +16,8 @@ class MenuItem extends StatelessWidget {
         _isDisabled = isDisabled,
         _onTap = onTap;
 
-  final String _title, _image;
+  final String _title;
+  final Image _image;
   final bool _isDisabled;
   final Function _onTap;
 
@@ -37,7 +38,7 @@ class MenuItem extends StatelessWidget {
                 Flexible(
                   child: Padding(
                     padding: const EdgeInsets.all(12.0).w,
-                    child: Image.asset(_image),
+                    child: _image,
                   ),
                 ),
                 Text(

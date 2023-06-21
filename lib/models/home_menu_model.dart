@@ -1,11 +1,13 @@
+import 'package:flutter/material.dart';
+
 class HomeMenuModel {
   String name;
-  String imagePath;
+  Image imageWidget;
   bool isDisabled;
 
   HomeMenuModel({
     required this.name,
-    required this.imagePath,
+    required this.imageWidget,
     required this.isDisabled,
   });
 }
