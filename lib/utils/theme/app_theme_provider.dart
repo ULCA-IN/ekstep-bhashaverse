@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +28,8 @@ class AppThemeProvider with ChangeNotifier {
   }
 
   bool get _isSystemInDarkMode =>
-      SchedulerBinding.instance.window.platformBrightness == Brightness.dark;
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+      Brightness.dark;
 
   AppTheme get theme =>
       _appTheme ?? (_isSystemInDarkMode ? _darkTheme : _lightTheme);
