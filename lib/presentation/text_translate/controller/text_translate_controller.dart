@@ -42,20 +42,20 @@ class TextTranslateController extends GetxController {
       targetLangListRegular = [],
       targetLangListBeta = [];
 
-  // uncomment when TTS work
+  // TODO:  uncomment when TTS feature added
 
-  // RxBool isSourceShareLoading = false.obs, isTargetShareLoading = false.obs;
+  /* RxBool isSourceShareLoading = false.obs, isTargetShareLoading = false.obs;
 
-  // RxInt maxDuration = 0.obs, currentDuration = 0.obs;
+  RxInt maxDuration = 0.obs, currentDuration = 0.obs;
 
-  // RxString sourceLangTTSPath = ''.obs, targetLangTTSPath = ''.obs;
+  RxString sourceLangTTSPath = ''.obs, targetLangTTSPath = ''.obs;
 
-  //  File? ttsAudioFile;
-  // dynamic ttsResponse;
-  // Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
-  //     targetSpeakerStatus = Rx(SpeakerStatus.disabled);
-  // late Directory appDirectory;
-  // late PlayerController playerController;
+   File? ttsAudioFile;
+  dynamic ttsResponse;
+  Rx<SpeakerStatus> sourceSpeakerStatus = Rx(SpeakerStatus.disabled),
+      targetSpeakerStatus = Rx(SpeakerStatus.disabled);
+  late Directory appDirectory;
+  late PlayerController playerController; */
 
   late final Box _hiveDBInstance;
 
@@ -69,10 +69,12 @@ class TextTranslateController extends GetxController {
     _transliterationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    // playerController = PlayerController();
 
     sourceLangTextController
         .addListener(clearTransliterationHintsIfCursorMoved);
+
+    // TODO:  uncomment when TTS feature added
+    // playerController = PlayerController();
 
     /* playerController.onCurrentDurationChanged.listen((duration) {
       currentDuration.value = duration;
@@ -107,6 +109,7 @@ class TextTranslateController extends GetxController {
         .removeListener(clearTransliterationHintsIfCursorMoved);
     sourceLangTextController.dispose();
     targetLangTextController.dispose();
+    // TODO:  uncomment when TTS feature added
     // await disposePlayer();
     super.onClose();
   }
@@ -270,6 +273,8 @@ class TextTranslateController extends GetxController {
         isLoading.value = false;
         Future.delayed(const Duration(seconds: 3))
             .then((value) => expandFeedbackIcon.value = false);
+
+        // TODO:  uncomment when TTS feature added
         // sourceLangTTSPath.value = '';
         // targetLangTTSPath.value = '';
         // sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -283,7 +288,7 @@ class TextTranslateController extends GetxController {
     );
   }
 
-  // Uncomment when TTS work
+  // TODO:  uncomment when TTS feature added
 
   /* Future<void> getComputeResTTS({
     required String sourceText,
@@ -522,6 +527,7 @@ class TextTranslateController extends GetxController {
     targetLangTextController.clear();
     isTranslateCompleted.value = false;
     sourceTextCharLimit.value = 0;
+    // TODO:  uncomment when TTS feature added
     // maxDuration.value = 0;
     // currentDuration.value = 0;
     // ttsResponse = null;
