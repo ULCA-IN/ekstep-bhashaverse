@@ -55,12 +55,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   }
 
   @override
-  void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+  void didChangeDependencies() {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final newValue = bottomInset > 0.0;
     if (newValue != _textTranslationController.isKeyboardVisible.value) {
       _textTranslationController.isKeyboardVisible.value = newValue;
     }
+    super.didChangeDependencies();
   }
 
   @override
@@ -121,7 +122,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               height: ScreenUtil().screenHeight * 0.34,
               margin: const EdgeInsets.all(14).w,
               decoration: BoxDecoration(
-                color: context.appTheme.normalTextFeildColor,
+                color: context.appTheme.normalTextFieldColor,
                 borderRadius:
                     const BorderRadius.all(Radius.circular(textFieldRadius)),
                 border: Border.all(
@@ -146,26 +147,26 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                                   isRecordedAudio: false,
                                   expandFeedbackIcon: false,
                                   showFeedbackIcon: false,
-                                  //  uncomment when TTS feature added
-                                  //  isShareButtonLoading: _textTranslationController
-                                  //     .isSourceShareLoading.value,
-                                  // onMusicPlayOrStop: () =>
-                                  //     _textTranslationController
-                                  //         .playStopTTSOutput(true),
-                                  // currentDuration: DateTImeUtils()
-                                  //     .getTimeFromMilliseconds(
-                                  //         timeInMillisecond:
-                                  //             _textTranslationController
-                                  //                 .currentDuration.value),
-                                  // totalDuration: DateTImeUtils()
-                                  //     .getTimeFromMilliseconds(
-                                  //         timeInMillisecond:
-                                  //             _textTranslationController
-                                  //                 .maxDuration.value),
-                                  // onFileShare: () => _textTranslationController
-                                  //     .shareAudioFile(isSourceLang: true),
-                                  // playerController:
-                                  //     _textTranslationController.playerController,
+                                  // TODO:  uncomment when TTS feature added
+                                  /*   isShareButtonLoading: _textTranslationController
+                                      .isSourceShareLoading.value,
+                                  onMusicPlayOrStop: () =>
+                                      _textTranslationController
+                                          .playStopTTSOutput(true),
+                                  currentDuration: DateTImeUtils()
+                                      .getTimeFromMilliseconds(
+                                          timeInMillisecond:
+                                              _textTranslationController
+                                                  .currentDuration.value),
+                                  totalDuration: DateTImeUtils()
+                                      .getTimeFromMilliseconds(
+                                          timeInMillisecond:
+                                              _textTranslationController
+                                                  .maxDuration.value),
+                                  onFileShare: () => _textTranslationController
+                                      .shareAudioFile(isSourceLang: true),
+                                  playerController:
+                                      _textTranslationController.playerController, */
                                   speakerStatus: SpeakerStatus.hidden,
                                 )
                               : _buildLimitCountAndTranslateButton(),
@@ -230,7 +231,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                     .transliterationWordHints.isNotEmpty) {
               String wordTOReplace =
                   _textTranslationController.transliterationWordHints.first;
-              replaceTranslietrationHint(wordTOReplace);
+              replaceTransliterationHint(wordTOReplace);
             } else if (_textTranslationController
                 .transliterationWordHints.isNotEmpty) {
               _textTranslationController.transliterationWordHints.clear();
@@ -267,7 +268,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         () => TextFieldWithActions(
           textController: _textTranslationController.targetLangTextController,
           focusNode: _targetLangFocusNode,
-          backgroundColor: context.appTheme.hightlitedTextFeildColor,
+          backgroundColor: context.appTheme.highlightedTextFieldColor,
           borderColor: context.appTheme.textFieldBorderColor,
 
           isRecordedAudio: false,
@@ -292,15 +293,16 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                   json.encode(_textTranslationController.lastComputeResponse))
             });
           },
-          // isShareButtonLoading:
-          //     _textTranslationController.isTargetShareLoading.value,
-          //      currentDuration: _textTranslationController.currentDuration.value,
-          // totalDuration: _textTranslationController.maxDuration.value,
-          // onMusicPlayOrStop: () =>
-          //     _textTranslationController.playStopTTSOutput(false),
-          // onFileShare: () =>
-          //     _textTranslationController.shareAudioFile(isSourceLang: false),
-          // playerController: _textTranslationController.playerController,
+          // TODO:  uncomment when TTS feature added
+          /* isShareButtonLoading:
+              _textTranslationController.isTargetShareLoading.value,
+               currentDuration: _textTranslationController.currentDuration.value,
+          totalDuration: _textTranslationController.maxDuration.value,
+          onMusicPlayOrStop: () =>
+              _textTranslationController.playStopTTSOutput(false),
+          onFileShare: () =>
+              _textTranslationController.shareAudioFile(isSourceLang: false),
+          playerController: _textTranslationController.playerController, */
         ),
       ),
     );
@@ -315,7 +317,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 _textTranslationController.transliterationWordHints.toList(),
             showScrollIcon: false,
             isScrollArrowVisible: false,
-            onSelected: (hintText) => replaceTranslietrationHint(hintText))
+            onSelected: (hintText) => replaceTransliterationHint(hintText))
         : const SizedBox.shrink());
   }
 
@@ -349,7 +351,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 showDefaultSnackbar(message: errorNoInternetTitle.tr);
                 return;
               }
-
+              // TODO:  uncomment when TTS feature added
               // _textTranslationController.sourceLangTTSPath.value = '';
               // _textTranslationController.targetLangTTSPath.value = '';
 
@@ -620,7 +622,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     return endPosition + 1;
   }
 
-  void replaceTranslietrationHint(String wordTOReplace) {
+  void replaceTransliterationHint(String wordTOReplace) {
     String sourceText =
         _textTranslationController.sourceLangTextController.text;
     int cursorPosition = _textTranslationController
@@ -629,11 +631,11 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         getStartingIndexOfWord(sourceText, cursorPosition - 1);
     int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
     String firstHalf = sourceText.substring(0, startingPosition);
-    String secondtHalf =
+    String secondHalf =
         sourceText.substring(endingPosition, (sourceText.length));
 
     String newSentence =
-        '${firstHalf.trim()} $wordTOReplace ${secondtHalf.trim()}';
+        '${firstHalf.trim()} $wordTOReplace ${secondHalf.trim()}';
     _textTranslationController.sourceLangTextController.text = newSentence;
 
     _textTranslationController.sourceLangTextController.selection =

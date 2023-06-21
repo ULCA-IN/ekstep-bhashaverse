@@ -63,12 +63,13 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   @override
-  void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
+  void didChangeDependencies() {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final newValue = bottomInset > 0.0;
     if (newValue != _voiceTextTransController.isKeyboardVisible.value) {
       _voiceTextTransController.isKeyboardVisible.value = newValue;
     }
+    super.didChangeDependencies();
   }
 
   @override
@@ -132,7 +133,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         () => TextFieldWithActions(
           textController: _voiceTextTransController.sourceLangTextController,
           focusNode: _sourceLangFocusNode,
-          backgroundColor: context.appTheme.normalTextFeildColor,
+          backgroundColor: context.appTheme.normalTextFieldColor,
           borderColor: context.appTheme.disabledBGColor,
           hintText: _voiceTextTransController.isTranslateCompleted.value
               ? null
@@ -189,7 +190,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         () => TextFieldWithActions(
             textController: _voiceTextTransController.targetLangTextController,
             focusNode: _targetLangFocusNode,
-            backgroundColor: context.appTheme.normalTextFeildColor,
+            backgroundColor: context.appTheme.normalTextFieldColor,
             borderColor: context.appTheme.disabledBGColor,
             currentDuration: _voiceTextTransController.currentDuration.value,
             totalDuration: _voiceTextTransController.maxDuration.value,
@@ -227,7 +228,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             isScrollArrowVisible: !_voiceTextTransController
                     .isScrolledTransliterationHints.value &&
                 _voiceTextTransController.transliterationWordHints.isNotEmpty,
-            onSelected: (hintText) => replaceTranslietrationHint(hintText))
+            onSelected: (hintText) => replaceTransliterationHint(hintText))
         : const SizedBox.shrink());
   }
 
@@ -502,7 +503,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             _voiceTextTransController.transliterationWordHints.isNotEmpty) {
           String wordTOReplace =
               _voiceTextTransController.transliterationWordHints.first;
-          replaceTranslietrationHint(wordTOReplace);
+          replaceTransliterationHint(wordTOReplace);
         } else if (_voiceTextTransController
             .transliterationWordHints.isNotEmpty) {
           _voiceTextTransController.transliterationWordHints.clear();
@@ -515,7 +516,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     oldSourceText = newText;
   }
 
-  void replaceTranslietrationHint(String wordTOReplace) {
+  void replaceTransliterationHint(String wordTOReplace) {
     String sourceText = _voiceTextTransController.sourceLangTextController.text;
     int cursorPosition = _voiceTextTransController
         .sourceLangTextController.selection.base.offset;
@@ -523,11 +524,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         getStartingIndexOfWord(sourceText, cursorPosition - 1);
     int? endingPosition = getEndIndexOfWord(sourceText, startingPosition ?? 0);
     String firstHalf = sourceText.substring(0, startingPosition);
-    String secondtHalf =
+    String secondHalf =
         sourceText.substring(endingPosition, (sourceText.length));
 
     String newSentence =
-        '${firstHalf.trim()} $wordTOReplace ${secondtHalf.trim()}';
+        '${firstHalf.trim()} $wordTOReplace ${secondHalf.trim()}';
     _voiceTextTransController.sourceLangTextController.text = newSentence;
 
     _voiceTextTransController.sourceLangTextController.selection =
