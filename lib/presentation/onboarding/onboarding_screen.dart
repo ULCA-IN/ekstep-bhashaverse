@@ -11,6 +11,7 @@ import '../../utils/remove_glow_effect.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
+import 'data/onboarding_data.dart';
 import 'widgets/indicator.dart';
 import 'widgets/onboarding_content.dart';
 
@@ -57,7 +58,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    _onboardingController.getOnboardingPageList().length,
+                    OnboardingData.onboardingPages.length,
                     (index) => IndicatorWidget(
                       currentIndex: _onboardingController.getCurrentPageIndex(),
                       indicatorIndex: index,
@@ -67,15 +68,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 SizedBox(height: 16.h),
                 CustomElevatedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
-                          _onboardingController.getOnboardingPageList().length -
-                              1)
+                          OnboardingData.onboardingPages.length - 1)
                       ? getStarted.tr
                       : next.tr,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
-                          _onboardingController.getOnboardingPageList().length -
-                              1)
+                          OnboardingData.onboardingPages.length - 1)
                       ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
@@ -119,7 +118,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         const Spacer(),
         Visibility(
           visible: (_onboardingController.getCurrentPageIndex() ==
-                  _onboardingController.getOnboardingPageList().length - 1)
+                  OnboardingData.onboardingPages.length - 1)
               ? false
               : true,
           child: InkWell(
@@ -146,21 +145,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           onPageChanged: (index) {
             _onboardingController.setCurrentPageIndex(index);
           },
-          itemCount: _onboardingController.getOnboardingPageList().length,
+          itemCount: OnboardingData.onboardingPages.length,
           itemBuilder: (context, index) {
             return OnBoardingContentWidget(
-                imagePath: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .imagePath ??
-                    '',
-                headerText: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .headerText ??
-                    '',
-                bodyText: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .bodyText ??
-                    '');
+                image: OnboardingData.onboardingPages[index].imageWidget,
+                headerText: OnboardingData.onboardingPages[index].headerText,
+                bodyText: OnboardingData.onboardingPages[index].bodyText);
           },
         ),
       ),

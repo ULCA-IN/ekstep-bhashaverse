@@ -4,12 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../utils/theme/app_text_style.dart';
 
 class OnBoardingContentWidget extends StatelessWidget {
-  final String imagePath;
+  final Image image;
   final String headerText;
   final String bodyText;
   const OnBoardingContentWidget(
       {Key? key,
-      required this.imagePath,
+      required this.image,
       required this.headerText,
       required this.bodyText})
       : super(key: key);
@@ -29,12 +29,7 @@ class OnBoardingContentWidget extends StatelessWidget {
           bodyText,
           style: secondary14(context),
         ),
-        Expanded(
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.fitWidth,
-          ),
-        ),
+        Expanded(child: image),
       ],
     );
   }
