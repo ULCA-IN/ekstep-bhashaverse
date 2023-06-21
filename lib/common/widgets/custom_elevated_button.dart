@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../utils/theme/app_text_style.dart';
 
-class CustomElevetedButton extends StatelessWidget {
-  const CustomElevetedButton({
+class CustomElevatedButton extends StatelessWidget {
+  const CustomElevatedButton({
     super.key,
     Color? backgroundColor,
     double? borderRadius,

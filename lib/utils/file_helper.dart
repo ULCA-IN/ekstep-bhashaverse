@@ -59,7 +59,7 @@ Future<String> saveStreamAudioToFile(List<int> data, int sampleRate) async {
     (byteRate >> 24) & 0xff,
     // Uhm
     ((16 * channels) / 8).round(), 0,
-    // bitsize
+    // bitSize
     16, 0,
     // "data"
     100, 97, 116, 97,

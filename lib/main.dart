@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // This callback is called every time the system brightness changes
-    var window = WidgetsBinding.instance.window;
+    var window = WidgetsBinding.instance.platformDispatcher;
     window.onPlatformBrightnessChanged = () {
       WidgetsBinding.instance.handlePlatformBrightnessChanged();
       var brightness = window.platformBrightness;

@@ -31,6 +31,6 @@ Brightness getUserPreferredBrightness(Box hiveDBInstance) {
     case ThemeMode.dark:
       return Brightness.dark;
     case ThemeMode.system:
-      return WidgetsBinding.instance.window.platformBrightness;
+      return WidgetsBinding.instance.platformDispatcher.platformBrightness;
   }
 }

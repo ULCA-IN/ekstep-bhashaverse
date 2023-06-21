@@ -43,7 +43,7 @@ class DarkAppTheme implements AppTheme {
   Color get primaryColor => _AppColors.primaryDarkColor;
 
   @override
-  Color get primaryTextColor => _AppColors.goastWhite;
+  Color get primaryTextColor => _AppColors.ghostWhite;
 
   @override
   Color get readOnlyTextColor => _AppColors.lilyGrey;
@@ -67,10 +67,10 @@ class DarkAppTheme implements AppTheme {
   Color get cardBGColor => _AppColors.bastilleBlack;
 
   @override
-  Color get hightlitedTextFeildColor => _AppColors.magicMint.withOpacity(0.1);
+  Color get highlightedTextFieldColor => _AppColors.magicMint.withOpacity(0.1);
 
   @override
-  Color get normalTextFeildColor => _AppColors.jaguarBlue;
+  Color get normalTextFieldColor => _AppColors.jaguarBlue;
 
   @override
   Color get iconOutlineColor => _AppColors.balticSea;
@@ -85,7 +85,7 @@ class DarkAppTheme implements AppTheme {
   Color get listingScreenBGColor => _AppColors.jaguarBlack;
 
   @override
-  Color get speackerColor => _AppColors.haitiBlack;
+  Color get speakerColor => _AppColors.haitiBlack;
 
   @override
   Color get voiceAssistantBGColor => _AppColors.bastilleBlack;

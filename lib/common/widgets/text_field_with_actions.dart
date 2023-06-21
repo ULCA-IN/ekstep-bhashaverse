@@ -1,10 +1,10 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../enums/speaker_status.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/date_time_utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'asr_tts_actions.dart';

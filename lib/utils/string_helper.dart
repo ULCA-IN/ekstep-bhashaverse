@@ -7,9 +7,9 @@ void replaceWordWithHint(
   int? startingPosition = getStartingIndexOfWord(wholeText, cursorPosition - 1);
   int? endingPosition = getEndIndexOfWord(wholeText, startingPosition ?? 0);
   String firstHalf = wholeText.substring(0, startingPosition);
-  String secondtHalf = wholeText.substring(endingPosition, (wholeText.length));
+  String secondHalf = wholeText.substring(endingPosition, (wholeText.length));
 
-  String newSentence = '${firstHalf.trim()} $hint ${secondtHalf.trim()}';
+  String newSentence = '${firstHalf.trim()} $hint ${secondHalf.trim()}';
   sourceTextController.text = newSentence;
 
   sourceTextController.selection = TextSelection.fromPosition(

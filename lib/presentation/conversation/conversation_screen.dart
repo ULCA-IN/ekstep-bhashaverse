@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../animation/lottie_animation.dart';
 import '../../common/controller/language_model_controller.dart';
@@ -20,7 +21,6 @@ import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import 'controller/conversation_controller.dart';
@@ -106,7 +106,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
             textController: _translationController.sourceLangTextController,
             focusNode: FocusNode(),
-            backgroundColor: context.appTheme.normalTextFeildColor,
+            backgroundColor: context.appTheme.normalTextFieldColor,
             borderColor: context.appTheme.disabledBGColor,
             hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
@@ -164,7 +164,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         () => TextFieldWithActions(
           textController: _translationController.targetLangTextController,
           focusNode: FocusNode(),
-          backgroundColor: context.appTheme.normalTextFeildColor,
+          backgroundColor: context.appTheme.normalTextFieldColor,
           borderColor: context.appTheme.disabledBGColor,
           hintText: isCurrentlyRecording()
               ? _translationController.currentMic.value ==

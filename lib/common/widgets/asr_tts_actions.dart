@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -225,7 +225,7 @@ class ASRAndTTSActions extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: _speakerStatus != SpeakerStatus.disabled
                       ? context.appTheme.buttonSelectedColor
-                      : context.appTheme.speackerColor,
+                      : context.appTheme.speakerColor,
                 ),
                 padding: const EdgeInsets.all(6).w,
                 child: SizedBox(

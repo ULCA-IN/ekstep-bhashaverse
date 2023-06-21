@@ -3,6 +3,7 @@
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../animation/lottie_animation.dart';
 import '../../common/widgets/common_app_bar.dart';
@@ -10,7 +11,6 @@ import '../../localization/localization_keys.dart';
 import '../../models/feedback_type_model.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/string_helper.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -147,7 +147,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ? SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(12.0).w,
-                child: CustomElevetedButton(
+                child: CustomElevatedButton(
                   buttonText: submit.tr,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,

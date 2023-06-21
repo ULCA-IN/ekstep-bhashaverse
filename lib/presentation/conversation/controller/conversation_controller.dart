@@ -96,7 +96,7 @@ class ConversationController extends GetxController {
     playerController = PlayerController();
     _recorder.initialize();
 
-    //  Connectiviry listener
+    //  Connectivity listener
 
     Connectivity().checkConnectivity().then((newConnectivity) {
       updateSamplingRate(newConnectivity);

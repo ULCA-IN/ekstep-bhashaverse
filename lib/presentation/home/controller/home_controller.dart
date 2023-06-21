@@ -17,8 +17,7 @@ import '../../../utils/snackbar_utils.dart';
 
 class HomeController extends GetxController {
   RxBool isMainConfigCallLoading = false.obs,
-      isTransConfigCallLoading = false.obs,
-      isKeyboardVisible = false.obs;
+      isTransConfigCallLoading = false.obs;
 
   late DHRUVAAPIClient _dhruvaapiClient;
   late TransliterationAppAPIClient _translationAppAPIClient;

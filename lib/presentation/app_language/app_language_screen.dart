@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/custom_elevated_button.dart';
 import '../../common/widgets/language_selection_widget.dart';
@@ -10,7 +11,6 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
@@ -117,7 +117,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                   ),
                 ),
                 SizedBox(height: 16.w),
-                CustomElevetedButton(
+                CustomElevatedButton(
                   buttonText: continueText.tr,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,

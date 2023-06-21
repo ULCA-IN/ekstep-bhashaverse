@@ -10,7 +10,7 @@ class LightAppTheme implements AppTheme {
   Color get buttonSelectedColor => _AppColors.tangerineOrangeColor;
 
   @override
-  Color get containerColor => _AppColors.goastWhite;
+  Color get containerColor => _AppColors.ghostWhite;
 
   @override
   Color get disabledBGColor => _AppColors.americanSilver;
@@ -67,10 +67,10 @@ class LightAppTheme implements AppTheme {
   Color get cardBGColor => _AppColors.white;
 
   @override
-  Color get hightlitedTextFeildColor => _AppColors.lilyGrey;
+  Color get highlightedTextFieldColor => _AppColors.lilyGrey;
 
   @override
-  Color get normalTextFeildColor => _AppColors.white;
+  Color get normalTextFieldColor => _AppColors.white;
 
   @override
   Color get iconOutlineColor => _AppColors.balticSea;
@@ -85,7 +85,7 @@ class LightAppTheme implements AppTheme {
   Color get listingScreenBGColor => _AppColors.white;
 
   @override
-  Color get speackerColor => _AppColors.goastWhite;
+  Color get speakerColor => _AppColors.ghostWhite;
 
   @override
   Color get voiceAssistantBGColor => _AppColors.white;

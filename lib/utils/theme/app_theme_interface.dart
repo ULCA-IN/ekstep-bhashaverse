@@ -27,13 +27,13 @@ abstract class AppTheme {
   Color get transliterationTextColor;
   Color get readOnlyTextColor;
   Color get textFieldBorderColor;
-  Color get hightlitedTextFeildColor;
-  Color get normalTextFeildColor;
+  Color get highlightedTextFieldColor;
+  Color get normalTextFieldColor;
 
   Color get iconOutlineColor;
   Color get disabledIconOutlineColor;
   Color get highlightedBorderColor;
-  Color get speackerColor;
+  Color get speakerColor;
 
   Color get feedbackIconColor;
   Color get feedbackTextColor;
