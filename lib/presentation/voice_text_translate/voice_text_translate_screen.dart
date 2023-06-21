@@ -21,6 +21,7 @@ import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
@@ -55,8 +56,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _voiceTextTransController.getSourceTargetLangFromDB();
+    setSourceLanguageList();
+    setTargetLanguageList();
     WidgetsBinding.instance.addObserver(this);
-
     super.initState();
   }
 
@@ -239,14 +241,13 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _sourceLangFocusNode.unfocus();
               _targetLangFocusNode.unfocus();
 
-              List<dynamic> sourceLanguageList = _languageModelController
-                  .sourceTargetLanguageMap.keys
-                  .toList();
-
               dynamic selectedSourceLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageList: sourceLanguageList,
+                    kLanguageListRegular:
+                        _voiceTextTransController.sourceLangListRegular,
+                    kLanguageListBeta:
+                        _voiceTextTransController.sourceLangListBeta,
                     kIsSourceLanguage: true,
                     selectedLanguage: _voiceTextTransController
                         .selectedSourceLanguageCode.value,
@@ -281,14 +282,21 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
               child: Obx(
                 () {
-                  String selectedSourceLanguage = _voiceTextTransController
-                          .selectedSourceLanguageCode.value.isNotEmpty
+                  String selectedSourceLangCode = _voiceTextTransController
+                          .selectedSourceLanguageCode.value,
+                      selectedSourceLang = "";
+
+                  selectedSourceLang = selectedSourceLangCode.isNotEmpty &&
+                          (_voiceTextTransController.sourceLangListRegular
+                                  .contains(selectedSourceLangCode) ||
+                              _voiceTextTransController.sourceLangListBeta
+                                  .contains(selectedSourceLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
                               .selectedSourceLanguageCode.value)
                       : kTranslateSourceTitle.tr;
                   return AutoSizeText(
-                    selectedSourceLanguage,
+                    selectedSourceLang,
                     maxLines: 2,
                     style: secondary16(context),
                   );
@@ -321,15 +329,13 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 return;
               }
 
-              List<dynamic> targetLanguageList = _languageModelController
-                  .sourceTargetLanguageMap[_voiceTextTransController
-                      .selectedSourceLanguageCode.value]!
-                  .toList();
-
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
-                    kLanguageList: targetLanguageList,
+                    kLanguageListRegular:
+                        _voiceTextTransController.targetLangListRegular,
+                    kLanguageListBeta:
+                        _voiceTextTransController.targetLangListBeta,
                     kIsSourceLanguage: false,
                     selectedLanguage: _voiceTextTransController
                         .selectedTargetLanguageCode.value,
@@ -356,14 +362,21 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               ),
               child: Obx(
                 () {
-                  String selectedTargetLanguage = _voiceTextTransController
-                          .selectedTargetLanguageCode.value.isNotEmpty
+                  String selectedTargetLangCode = _voiceTextTransController
+                          .selectedTargetLanguageCode.value,
+                      selectedTargetLang = "";
+
+                  selectedTargetLang = selectedTargetLangCode.isNotEmpty &&
+                          (_voiceTextTransController.targetLangListRegular
+                                  .contains(selectedTargetLangCode) ||
+                              _voiceTextTransController.targetLangListBeta
+                                  .contains(selectedTargetLangCode))
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
                               .selectedTargetLanguageCode.value)
                       : kTranslateTargetTitle.tr;
                   return AutoSizeText(
-                    selectedTargetLanguage,
+                    selectedTargetLang,
                     style: secondary16(context),
                     maxLines: 2,
                   );
@@ -374,6 +387,48 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         ),
       ],
     );
+  }
+
+  setSourceLanguageList() {
+    _voiceTextTransController.sourceLangListRegular =
+        _languageModelController.sourceTargetLanguageMap.keys.toList();
+
+    for (int i = 0;
+        i < _voiceTextTransController.sourceLangListRegular.length;
+        i++) {
+      var language = _voiceTextTransController.sourceLangListRegular[i];
+      if (voiceSkipSourceLang.contains(language)) {
+        _voiceTextTransController.sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (voiceBetaSourceLang.contains(language)) {
+        _voiceTextTransController.sourceLangListBeta
+            .add(_voiceTextTransController.sourceLangListRegular[i]);
+        _voiceTextTransController.sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    _voiceTextTransController.targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[
+            _voiceTextTransController.selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0;
+        i < _voiceTextTransController.targetLangListRegular.length;
+        i++) {
+      var language = _voiceTextTransController.targetLangListRegular[i];
+      if (voiceSkipTargetLang.contains(language)) {
+        _voiceTextTransController.targetLangListRegular.removeAt(i);
+        i--;
+      } else if (voiceBetaTargetLang.contains(language)) {
+        _voiceTextTransController.targetLangListBeta
+            .add(_voiceTextTransController.targetLangListRegular[i]);
+        _voiceTextTransController.targetLangListRegular.removeAt(i);
+        i--;
+      }
+    }
   }
 
   Widget _buildMicButton() {

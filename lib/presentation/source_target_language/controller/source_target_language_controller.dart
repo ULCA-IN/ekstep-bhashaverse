@@ -3,8 +3,11 @@ import 'package:get/get.dart';
 import '../../../utils/constants/language_map_translated.dart';
 
 class SourceTargetLanguageController extends GetxController {
-  final RxList<dynamic> _languagesList = [].obs;
-  final _selectedLanguageIndex = Rxn<int>();
+  final RxList<dynamic> _languagesListRegular = [].obs;
+  final RxList<dynamic> _languagesListBeta = [].obs;
+  final _selectedRegularLangIndex = Rxn<int>();
+  final _selectedBetaLangIndex = Rxn<int>();
+  RxBool isAdvanceMenuOpened = false.obs;
 
   Map<String, String>? selectedLanguageMap = {};
 
@@ -15,20 +18,37 @@ class SourceTargetLanguageController extends GetxController {
     super.onInit();
   }
 
-  List<dynamic> getLanguageList() {
-    return _languagesList;
+  List<dynamic> getLanguageListRegular() {
+    return _languagesListRegular;
   }
 
-  void setLanguageList(List<dynamic> languageList) {
-    _languagesList.clear();
-    _languagesList.addAll(languageList);
+  List<dynamic> getLanguageListBeta() {
+    return _languagesListBeta;
   }
 
-  int? getSelectedLanguageIndex() {
-    return _selectedLanguageIndex.value;
+  void setLanguageListRegular(List<dynamic> languageList) {
+    _languagesListRegular.clear();
+    _languagesListRegular.addAll(languageList);
   }
 
-  void setSelectedLanguageIndex(int? index) {
-    _selectedLanguageIndex.value = index;
+  void setLanguageListBeta(List<dynamic> languageList) {
+    _languagesListBeta.clear();
+    _languagesListBeta.addAll(languageList);
+  }
+
+  int? getSelectedRegularLangIndex() {
+    return _selectedRegularLangIndex.value;
+  }
+
+  void setSelectedRegularLangIndex(int? index) {
+    _selectedRegularLangIndex.value = index;
+  }
+
+  int? getSelectedBetaLangIndex() {
+    return _selectedBetaLangIndex.value;
+  }
+
+  void setSelectedBetaLangIndex(int? index) {
+    _selectedBetaLangIndex.value = index;
   }
 }

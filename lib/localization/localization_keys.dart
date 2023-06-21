@@ -99,3 +99,7 @@ const String suggestedOutputTextTranslate = 'suggestedOutputTextTranslate';
 const String realTimeResponse = 'realTimeResponse';
 const String realTimeResponseInfo = 'realTimeResponseInfo';
 const String computeCallLoadingText = 'computeCallLoadingText';
+const String generalLanguages = 'generalLanguages';
+const String generalLanguagesBrief = 'generalLanguagesBrief';
+const String betaLanguages = 'betaLanguages';
+const String betaLanguagesBrief = 'betaLanguagesBrief';

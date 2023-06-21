@@ -23,9 +23,6 @@ class LanguageSelectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70.w,
-      margin: EdgeInsets.only(right: 8.w, left: 8.w, bottom: 16.h),
-      padding: EdgeInsets.only(right: 16.w, left: 16.w, top: 4.h),
       decoration: BoxDecoration(
         color: (selectedIndex != null && selectedIndex == index)
             ? context.appTheme.lightBGColor
@@ -42,6 +39,7 @@ class LanguageSelectionWidget extends StatelessWidget {
       child: InkWell(
         onTap: onItemTap,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (title.isNotEmpty)

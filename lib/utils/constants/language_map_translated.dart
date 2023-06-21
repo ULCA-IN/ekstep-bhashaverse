@@ -27,6 +27,69 @@ List<String> languagesCodeList = [
   'sat',
 ];
 
+//Voice Screen
+
+Set<String> voiceBetaSourceLang = {
+  languagesCodeList[14],
+};
+Set<String> voiceBetaTargetLang = {
+  languagesCodeList[21],
+};
+
+Set<String> voiceSkipSourceLang = {
+  languagesCodeList[10],
+};
+Set<String> voiceSkipTargetLang = {
+  languagesCodeList[20],
+};
+
+//Converse Screen
+
+Set<String> converseBetaSourceLang = {
+  languagesCodeList[14],
+};
+Set<String> converseBetaTargetLang = {
+  languagesCodeList[21],
+};
+
+Set<String> converseSkipSourceLang = {
+  languagesCodeList[10],
+};
+Set<String> converseSkipTargetLang = {
+  languagesCodeList[20],
+};
+
+//Text Screen
+
+Set<String> textBetaSourceLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[20],
+  languagesCodeList[22],
+  languagesCodeList[24],
+  languagesCodeList[25],
+  languagesCodeList[23],
+};
+
+Set<String> textBetaTargetLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[20],
+  languagesCodeList[22],
+  languagesCodeList[24],
+  languagesCodeList[25],
+  languagesCodeList[23],
+};
+
+Set<String> textSkipSourceLang = <String>{};
+Set<String> textSkipTargetLang = <String>{};
+
 class TranslatedLanguagesMap {
   static Map<String, Map<String, String>> language = {
     // English

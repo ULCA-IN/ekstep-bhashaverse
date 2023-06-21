@@ -18,6 +18,7 @@ import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
+import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/snackbar_utils.dart';
@@ -35,7 +36,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
   late ConversationController _translationController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
-
   late final Box _hiveDBInstance;
 
   @override
@@ -45,7 +45,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _translationController.getSourceTargetLangFromDB();
-
+    setSourceLanguageList();
+    setTargetLanguageList();
     super.initState();
   }
 
@@ -234,8 +235,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
           Positioned(
             left: 20,
             child: Obx(() {
-              String selectedSourceLanguage = _translationController
-                      .selectedSourceLanguageCode.value.isNotEmpty
+              String sourceLangCode =
+                      _translationController.selectedSourceLanguageCode.value,
+                  selectedSourceLang = "";
+
+              selectedSourceLang = sourceLangCode.isNotEmpty &&
+                      (_translationController.sourceLangListRegular
+                              .contains(sourceLangCode) ||
+                          _translationController.sourceLangListBeta
+                              .contains(sourceLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedSourceLanguageCode.value)
                   : kTranslateSourceTitle.tr;
@@ -245,7 +253,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     ? _translationController.micButtonStatus.value
                     : MicButtonStatus.released,
                 showLanguage: true,
-                languageName: selectedSourceLanguage,
+                languageName: selectedSourceLang,
                 onMicButtonTap: (isPressed) {
                   if (_translationController.currentMic.value ==
                           CurrentlySelectedMic.target &&
@@ -255,14 +263,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   micButtonActions(startMicRecording: isPressed);
                 },
                 onLanguageTap: () async {
-                  List<dynamic> sourceLanguageList = _languageModelController
-                      .sourceTargetLanguageMap.keys
-                      .toList();
-
                   dynamic selectedSourceLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
-                        kLanguageList: sourceLanguageList,
+                        kLanguageListRegular:
+                            _translationController.sourceLangListRegular,
+                        kLanguageListBeta:
+                            _translationController.sourceLangListBeta,
                         kIsSourceLanguage: true,
                         selectedLanguage: _translationController
                             .selectedSourceLanguageCode.value,
@@ -306,8 +313,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
           Positioned(
             right: 20,
             child: Obx(() {
-              String selectedTargetLanguage = _translationController
-                      .selectedTargetLanguageCode.value.isNotEmpty
+              String targetLangCode =
+                      _translationController.selectedTargetLanguageCode.value,
+                  selectedTargetLang = "";
+
+              selectedTargetLang = targetLangCode.isNotEmpty &&
+                      (_translationController.targetLangListRegular
+                              .contains(targetLangCode) ||
+                          _translationController.targetLangListBeta
+                              .contains(targetLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedTargetLanguageCode.value)
                   : kTranslateTargetTitle.tr;
@@ -317,7 +331,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     ? _translationController.micButtonStatus.value
                     : MicButtonStatus.released,
                 showLanguage: true,
-                languageName: selectedTargetLanguage,
+                languageName: selectedTargetLang,
                 onMicButtonTap: (isPressed) {
                   if (_translationController.currentMic.value ==
                           CurrentlySelectedMic.source &&
@@ -333,15 +347,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     return;
                   }
 
-                  List<dynamic> targetLanguageList = _languageModelController
-                      .sourceTargetLanguageMap[_translationController
-                          .selectedSourceLanguageCode.value]!
-                      .toList();
-
                   dynamic selectedTargetLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
-                        kLanguageList: targetLanguageList,
+                        kLanguageListRegular:
+                            _translationController.targetLangListRegular,
+                        kLanguageListBeta:
+                            _translationController.targetLangListBeta,
                         kIsSourceLanguage: false,
                         selectedLanguage: _translationController
                             .selectedTargetLanguageCode.value,
@@ -374,6 +386,48 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ],
       ),
     );
+  }
+
+  setSourceLanguageList() {
+    _translationController.sourceLangListRegular =
+        _languageModelController.sourceTargetLanguageMap.keys.toList();
+
+    for (int i = 0;
+        i < _translationController.sourceLangListRegular.length;
+        i++) {
+      var language = _translationController.sourceLangListRegular[i];
+      if (converseSkipSourceLang.contains(language)) {
+        _translationController.sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (converseBetaSourceLang.contains(language)) {
+        _translationController.sourceLangListBeta
+            .add(_translationController.sourceLangListRegular[i]);
+        _translationController.sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    _translationController.targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[
+            _translationController.selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0;
+        i < _translationController.targetLangListRegular.length;
+        i++) {
+      var language = _translationController.targetLangListRegular[i];
+      if (converseSkipTargetLang.contains(language)) {
+        _translationController.targetLangListRegular.removeAt(i);
+        i--;
+      } else if (converseBetaTargetLang.contains(language)) {
+        _translationController.targetLangListBeta
+            .add(_translationController.targetLangListRegular[i]);
+        _translationController.targetLangListRegular.removeAt(i);
+        i--;
+      }
+    }
   }
 
   Widget _buildLoadingAnimation() {
