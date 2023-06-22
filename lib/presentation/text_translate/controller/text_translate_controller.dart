@@ -10,6 +10,7 @@ import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/constants/language_map_translated.dart';
 import '../../../utils/snackbar_utils.dart';
 
 class TextTranslateController extends GetxController {
@@ -123,8 +124,9 @@ class TextTranslateController extends GetxController {
     }
 
     if (_languageModelController.translationLanguageMap.keys
-        .toList()
-        .contains(selectedSourceLanguage)) {
+            .toList()
+            .contains(selectedSourceLanguage) &&
+        !textSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
@@ -135,7 +137,9 @@ class TextTranslateController extends GetxController {
         _hiveDBInstance.get(preferredTargetLangTextScreen);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        _languageModelController.translationLanguageMap.keys
+        selectedSourceLanguageCode.value.isNotEmpty &&
+        _languageModelController
+            .translationLanguageMap[selectedSourceLanguageCode.value]!
             .toList()
             .contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
@@ -144,13 +148,11 @@ class TextTranslateController extends GetxController {
 
   void swapSourceAndTargetLanguage() {
     if (isSourceAndTargetLangSelected()) {
-      bool isTargetLangAvailableInSourceList =
-          sourceLangListRegular.contains(selectedTargetLanguageCode.value) ||
-              sourceLangListBeta.contains(selectedTargetLanguageCode.value);
+      bool isTargetLangSkippedInSource =
+          textSkipTargetLang.contains(selectedSourceLanguageCode.value);
 
-      bool isSourceLangAvailableInTargetList =
-          targetLangListRegular.contains(selectedSourceLanguageCode.value) ||
-              targetLangListBeta.contains(selectedSourceLanguageCode.value);
+      bool isSourceLangSkippedInTarget =
+          textSkipSourceLang.contains(selectedTargetLanguageCode.value);
 
       if (_languageModelController.translationLanguageMap.keys
               .contains(selectedTargetLanguageCode.value) &&
@@ -160,8 +162,8 @@ class TextTranslateController extends GetxController {
           _languageModelController
               .translationLanguageMap[selectedTargetLanguageCode.value]!
               .contains(selectedSourceLanguageCode.value) &&
-          isTargetLangAvailableInSourceList &&
-          isSourceLangAvailableInTargetList) {
+          !isTargetLangSkippedInSource &&
+          !isSourceLangSkippedInTarget) {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;
@@ -169,6 +171,8 @@ class TextTranslateController extends GetxController {
             preferredSourceLangTextScreen, selectedSourceLanguageCode.value);
         _hiveDBInstance.put(
             preferredTargetLangTextScreen, selectedTargetLanguageCode.value);
+        setSourceLanguageList();
+        setTargetLanguageList();
         resetAllValues();
       } else {
         String sourceLanguage = APIConstants.getLanguageNameFromCode(
@@ -520,6 +524,51 @@ class TextTranslateController extends GetxController {
   void clearTransliterationHints() {
     transliterationWordHints.clear();
     currentlyTypedWordForTransliteration = '';
+  }
+
+  setSourceLanguageList() {
+    sourceLangListRegular.clear();
+    sourceLangListBeta.clear();
+
+    sourceLangListRegular =
+        _languageModelController.translationLanguageMap.keys.toList();
+
+    for (int i = 0; i < sourceLangListRegular.length; i++) {
+      var language = sourceLangListRegular[i];
+      if (textSkipSourceLang.contains(language)) {
+        sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (textBetaSourceLang.contains(language)) {
+        sourceLangListBeta.add(sourceLangListRegular[i]);
+        sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    if (selectedSourceLanguageCode.value.isEmpty) {
+      return;
+    }
+
+    targetLangListRegular.clear();
+    targetLangListBeta.clear();
+
+    targetLangListRegular = _languageModelController
+        .translationLanguageMap[selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0; i < targetLangListRegular.length; i++) {
+      var language = targetLangListRegular[i];
+      if (textSkipTargetLang.contains(language)) {
+        targetLangListRegular.removeAt(i);
+        i--;
+      } else if (textBetaTargetLang.contains(language)) {
+        targetLangListBeta.add(targetLangListRegular[i]);
+        targetLangListRegular.removeAt(i);
+        i--;
+      }
+    }
   }
 
   Future<void> resetAllValues() async {

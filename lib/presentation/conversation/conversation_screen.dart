@@ -19,7 +19,6 @@ import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
@@ -45,8 +44,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _translationController.getSourceTargetLangFromDB();
-    setSourceLanguageList();
-    setTargetLanguageList();
+    _translationController.setSourceLanguageList();
+    _translationController.setTargetLanguageList();
     super.initState();
   }
 
@@ -347,6 +346,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     return;
                   }
 
+                  _translationController.setTargetLanguageList();
+
                   dynamic selectedTargetLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
@@ -386,48 +387,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ],
       ),
     );
-  }
-
-  setSourceLanguageList() {
-    _translationController.sourceLangListRegular =
-        _languageModelController.sourceTargetLanguageMap.keys.toList();
-
-    for (int i = 0;
-        i < _translationController.sourceLangListRegular.length;
-        i++) {
-      var language = _translationController.sourceLangListRegular[i];
-      if (converseSkipSourceLang.contains(language)) {
-        _translationController.sourceLangListRegular.removeAt(i);
-        i--;
-      } else if (converseBetaSourceLang.contains(language)) {
-        _translationController.sourceLangListBeta
-            .add(_translationController.sourceLangListRegular[i]);
-        _translationController.sourceLangListRegular.removeAt(i);
-        i--;
-      }
-    }
-  }
-
-  void setTargetLanguageList() {
-    _translationController.targetLangListRegular = _languageModelController
-        .sourceTargetLanguageMap[
-            _translationController.selectedSourceLanguageCode.value]!
-        .toList();
-
-    for (int i = 0;
-        i < _translationController.targetLangListRegular.length;
-        i++) {
-      var language = _translationController.targetLangListRegular[i];
-      if (converseSkipTargetLang.contains(language)) {
-        _translationController.targetLangListRegular.removeAt(i);
-        i--;
-      } else if (converseBetaTargetLang.contains(language)) {
-        _translationController.targetLangListBeta
-            .add(_translationController.targetLangListRegular[i]);
-        _translationController.targetLangListRegular.removeAt(i);
-        i--;
-      }
-    }
   }
 
   Widget _buildLoadingAnimation() {

@@ -23,6 +23,7 @@ import '../../../services/socket_io_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/constants/language_map_translated.dart';
 import '../../../utils/file_helper.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
@@ -219,8 +220,9 @@ class VoiceTextTranslateController extends GetxController {
     }
 
     if (_languageModelController.sourceTargetLanguageMap.keys
-        .toList()
-        .contains(selectedSourceLanguage)) {
+            .toList()
+            .contains(selectedSourceLanguage) &&
+        !voiceSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
@@ -231,21 +233,22 @@ class VoiceTextTranslateController extends GetxController {
         _hiveDBInstance.get(preferredTargetLanguage);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        _languageModelController.sourceTargetLanguageMap.keys
+        selectedSourceLanguageCode.value.isNotEmpty &&
+        _languageModelController
+            .sourceTargetLanguageMap[selectedSourceLanguageCode.value]!
             .toList()
-            .contains(selectedTargetLanguage)) {
+            .contains(selectedTargetLanguage) &&
+        !voiceSkipTargetLang.contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }
 
   void swapSourceAndTargetLanguage() {
-    bool isTargetLangAvailableInSourceList =
-        sourceLangListRegular.contains(selectedTargetLanguageCode.value) ||
-            sourceLangListBeta.contains(selectedTargetLanguageCode.value);
+    bool isTargetLangSkippedInSource =
+        voiceSkipTargetLang.contains(selectedSourceLanguageCode.value);
 
-    bool isSourceLangAvailableInTargetList =
-        targetLangListRegular.contains(selectedSourceLanguageCode.value) ||
-            targetLangListBeta.contains(selectedSourceLanguageCode.value);
+    bool isSourceLangSkippedInTarget =
+        voiceSkipSourceLang.contains(selectedTargetLanguageCode.value);
 
     if (isSourceAndTargetLangSelected()) {
       if (_languageModelController.sourceTargetLanguageMap.keys
@@ -256,8 +259,8 @@ class VoiceTextTranslateController extends GetxController {
           _languageModelController
               .sourceTargetLanguageMap[selectedTargetLanguageCode.value]!
               .contains(selectedSourceLanguageCode.value) &&
-          isTargetLangAvailableInSourceList &&
-          isSourceLangAvailableInTargetList) {
+          !isTargetLangSkippedInSource &&
+          !isSourceLangSkippedInTarget) {
         String tempSourceLanguage = selectedSourceLanguageCode.value;
         selectedSourceLanguageCode.value = selectedTargetLanguageCode.value;
         selectedTargetLanguageCode.value = tempSourceLanguage;
@@ -265,6 +268,8 @@ class VoiceTextTranslateController extends GetxController {
             preferredSourceLanguage, selectedSourceLanguageCode.value);
         _hiveDBInstance.put(
             preferredTargetLanguage, selectedTargetLanguageCode.value);
+        setSourceLanguageList();
+        setTargetLanguageList();
         resetAllValues();
       } else {
         showDefaultSnackbar(
@@ -797,6 +802,51 @@ class VoiceTextTranslateController extends GetxController {
       await preparePlayerAndWaveforms(audioPath,
           isRecordedAudio: isPlayingSource && isRecordedViaMic.value,
           isTargetLanguage: !isPlayingSource);
+    }
+  }
+
+  setSourceLanguageList() {
+    sourceLangListRegular.clear();
+    sourceLangListBeta.clear();
+
+    sourceLangListRegular =
+        _languageModelController.sourceTargetLanguageMap.keys.toList();
+
+    for (int i = 0; i < sourceLangListRegular.length; i++) {
+      var language = sourceLangListRegular[i];
+      if (voiceSkipSourceLang.contains(language)) {
+        sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (voiceBetaSourceLang.contains(language)) {
+        sourceLangListBeta.add(sourceLangListRegular[i]);
+        sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    if (selectedSourceLanguageCode.value.isEmpty) {
+      return;
+    }
+
+    targetLangListRegular.clear();
+    targetLangListBeta.clear();
+
+    targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0; i < targetLangListRegular.length; i++) {
+      var language = targetLangListRegular[i];
+      if (voiceSkipTargetLang.contains(language)) {
+        targetLangListRegular.removeAt(i);
+        i--;
+      } else if (voiceBetaTargetLang.contains(language)) {
+        targetLangListBeta.add(targetLangListRegular[i]);
+        targetLangListRegular.removeAt(i);
+        i--;
+      }
     }
   }
 
