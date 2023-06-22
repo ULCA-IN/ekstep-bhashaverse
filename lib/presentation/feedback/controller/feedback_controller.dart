@@ -260,7 +260,7 @@ class FeedbackController extends GetxController {
   Map<String, dynamic> createFeedbackSubmitPayload() {
     Map<String, dynamic> submissionPayload = {};
     submissionPayload['feedbackTimeStamp'] =
-        DateTime.timestamp().millisecondsSinceEpoch;
+        DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
     submissionPayload['feedbackLanguage'] =
         Get.locale?.languageCode ?? defaultLangCode;
     submissionPayload['pipelineInput'] = computePayload;
