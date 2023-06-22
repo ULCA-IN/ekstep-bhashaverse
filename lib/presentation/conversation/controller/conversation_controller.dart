@@ -24,6 +24,7 @@ import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
+import '../../../utils/constants/language_map_translated.dart';
 import '../../../utils/file_helper.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
@@ -211,9 +212,8 @@ class ConversationController extends GetxController {
       selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
-    if (_languageModelController.sourceTargetLanguageMap.keys
-        .toList()
-        .contains(selectedSourceLanguage)) {
+    if (sourceLangListRegular.contains(selectedSourceLanguage) ||
+        sourceLangListBeta.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
     }
 
@@ -221,9 +221,8 @@ class ConversationController extends GetxController {
         _hiveDBInstance.get(preferredTargetLanguage);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        _languageModelController.sourceTargetLanguageMap.keys
-            .toList()
-            .contains(selectedTargetLanguage)) {
+        (targetLangListRegular.contains(selectedTargetLanguage) ||
+            targetLangListBeta.contains(selectedTargetLanguage))) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }
@@ -731,6 +730,51 @@ class ConversationController extends GetxController {
 
       await prepareWaveforms(audioPath,
           isRecordedAudio: true, isTargetLanguage: !isPlayingSource);
+    }
+  }
+
+  setSourceLanguageList() {
+    sourceLangListRegular.clear();
+    sourceLangListBeta.clear();
+
+    sourceLangListRegular =
+        _languageModelController.sourceTargetLanguageMap.keys.toList();
+
+    for (int i = 0; i < sourceLangListRegular.length; i++) {
+      var language = sourceLangListRegular[i];
+      if (converseSkipSourceLang.contains(language)) {
+        sourceLangListRegular.removeAt(i);
+        i--;
+      } else if (converseBetaSourceLang.contains(language)) {
+        sourceLangListBeta.add(sourceLangListRegular[i]);
+        sourceLangListRegular.removeAt(i);
+        i--;
+      }
+    }
+  }
+
+  void setTargetLanguageList() {
+    if (selectedSourceLanguageCode.value.isEmpty) {
+      return;
+    }
+
+    targetLangListRegular.clear();
+    targetLangListBeta.clear();
+
+    targetLangListRegular = _languageModelController
+        .sourceTargetLanguageMap[selectedSourceLanguageCode.value]!
+        .toList();
+
+    for (int i = 0; i < targetLangListRegular.length; i++) {
+      var language = targetLangListRegular[i];
+      if (converseSkipTargetLang.contains(language)) {
+        targetLangListRegular.removeAt(i);
+        i--;
+      } else if (converseBetaTargetLang.contains(language)) {
+        targetLangListBeta.add(targetLangListRegular[i]);
+        targetLangListRegular.removeAt(i);
+        i--;
+      }
     }
   }
 

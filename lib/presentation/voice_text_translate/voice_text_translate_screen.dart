@@ -22,7 +22,6 @@ import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
@@ -55,9 +54,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _languageModelController = Get.find();
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _voiceTextTransController.setSourceLanguageList();
+    _voiceTextTransController.setTargetLanguageList();
     _voiceTextTransController.getSourceTargetLangFromDB();
-    setSourceLanguageList();
-    setTargetLanguageList();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -330,6 +329,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 return;
               }
 
+              //update list if source language changed and user select target language
+              _voiceTextTransController.setTargetLanguageList();
+
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
@@ -388,48 +390,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         ),
       ],
     );
-  }
-
-  setSourceLanguageList() {
-    _voiceTextTransController.sourceLangListRegular =
-        _languageModelController.sourceTargetLanguageMap.keys.toList();
-
-    for (int i = 0;
-        i < _voiceTextTransController.sourceLangListRegular.length;
-        i++) {
-      var language = _voiceTextTransController.sourceLangListRegular[i];
-      if (voiceSkipSourceLang.contains(language)) {
-        _voiceTextTransController.sourceLangListRegular.removeAt(i);
-        i--;
-      } else if (voiceBetaSourceLang.contains(language)) {
-        _voiceTextTransController.sourceLangListBeta
-            .add(_voiceTextTransController.sourceLangListRegular[i]);
-        _voiceTextTransController.sourceLangListRegular.removeAt(i);
-        i--;
-      }
-    }
-  }
-
-  void setTargetLanguageList() {
-    _voiceTextTransController.targetLangListRegular = _languageModelController
-        .sourceTargetLanguageMap[
-            _voiceTextTransController.selectedSourceLanguageCode.value]!
-        .toList();
-
-    for (int i = 0;
-        i < _voiceTextTransController.targetLangListRegular.length;
-        i++) {
-      var language = _voiceTextTransController.targetLangListRegular[i];
-      if (voiceSkipTargetLang.contains(language)) {
-        _voiceTextTransController.targetLangListRegular.removeAt(i);
-        i--;
-      } else if (voiceBetaTargetLang.contains(language)) {
-        _voiceTextTransController.targetLangListBeta
-            .add(_voiceTextTransController.targetLangListRegular[i]);
-        _voiceTextTransController.targetLangListRegular.removeAt(i);
-        i--;
-      }
-    }
   }
 
   Widget _buildMicButton() {

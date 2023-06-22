@@ -19,7 +19,6 @@ import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/constants/language_map_translated.dart';
 import '../../utils/network_utils.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
@@ -47,9 +46,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     _textTranslationController = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _textTranslationController.setSourceLanguageList();
+    _textTranslationController.setTargetLanguageList();
     _textTranslationController.getSourceTargetLangFromDB();
-    setSourceLanguageList();
-    setTargetLanguageList();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -468,6 +467,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                 return;
               }
 
+              //update list if source language changed and user select target language
+              _textTranslationController.setTargetLanguageList();
+
               dynamic selectedTargetLangCode = await Get.toNamed(
                   AppRoutes.languageSelectionRoute,
                   arguments: {
@@ -525,48 +527,6 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ),
       ],
     );
-  }
-
-  setSourceLanguageList() {
-    _textTranslationController.sourceLangListRegular =
-        _languageModelController.translationLanguageMap.keys.toList();
-
-    for (int i = 0;
-        i < _textTranslationController.sourceLangListRegular.length;
-        i++) {
-      var language = _textTranslationController.sourceLangListRegular[i];
-      if (textSkipSourceLang.contains(language)) {
-        _textTranslationController.sourceLangListRegular.removeAt(i);
-        i--;
-      } else if (textBetaSourceLang.contains(language)) {
-        _textTranslationController.sourceLangListBeta
-            .add(_textTranslationController.sourceLangListRegular[i]);
-        _textTranslationController.sourceLangListRegular.removeAt(i);
-        i--;
-      }
-    }
-  }
-
-  void setTargetLanguageList() {
-    _textTranslationController.targetLangListRegular = _languageModelController
-        .translationLanguageMap[
-            _textTranslationController.selectedSourceLanguageCode.value]!
-        .toList();
-
-    for (int i = 0;
-        i < _textTranslationController.targetLangListRegular.length;
-        i++) {
-      var language = _textTranslationController.targetLangListRegular[i];
-      if (textSkipTargetLang.contains(language)) {
-        _textTranslationController.targetLangListRegular.removeAt(i);
-        i--;
-      } else if (textBetaTargetLang.contains(language)) {
-        _textTranslationController.targetLangListBeta
-            .add(_textTranslationController.targetLangListRegular[i]);
-        _textTranslationController.targetLangListRegular.removeAt(i);
-        i--;
-      }
-    }
   }
 
   Widget _buildLoadingAnimation() {
