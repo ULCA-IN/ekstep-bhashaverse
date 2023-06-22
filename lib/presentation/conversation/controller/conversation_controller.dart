@@ -212,8 +212,10 @@ class ConversationController extends GetxController {
       selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
-    if (sourceLangListRegular.contains(selectedSourceLanguage) ||
-        sourceLangListBeta.contains(selectedSourceLanguage)) {
+    if (_languageModelController.sourceTargetLanguageMap.keys
+            .toList()
+            .contains(selectedSourceLanguage) &&
+        !converseSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
     }
 
@@ -221,8 +223,11 @@ class ConversationController extends GetxController {
         _hiveDBInstance.get(preferredTargetLanguage);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        (targetLangListRegular.contains(selectedTargetLanguage) ||
-            targetLangListBeta.contains(selectedTargetLanguage))) {
+        selectedSourceLanguageCode.value.isNotEmpty &&
+        _languageModelController
+            .sourceTargetLanguageMap[selectedSourceLanguageCode.value]!
+            .toList()
+            .contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }

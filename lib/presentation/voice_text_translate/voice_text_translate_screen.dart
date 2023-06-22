@@ -54,9 +54,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _languageModelController = Get.find();
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _voiceTextTransController.getSourceTargetLangFromDB();
     _voiceTextTransController.setSourceLanguageList();
     _voiceTextTransController.setTargetLanguageList();
-    _voiceTextTransController.getSourceTargetLangFromDB();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }

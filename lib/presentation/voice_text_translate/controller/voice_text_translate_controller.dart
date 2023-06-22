@@ -219,8 +219,10 @@ class VoiceTextTranslateController extends GetxController {
       selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
-    if (sourceLangListRegular.contains(selectedSourceLanguage) ||
-        sourceLangListBeta.contains(selectedSourceLanguage)) {
+    if (_languageModelController.sourceTargetLanguageMap.keys
+            .toList()
+            .contains(selectedSourceLanguage) &&
+        !voiceSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
@@ -231,8 +233,12 @@ class VoiceTextTranslateController extends GetxController {
         _hiveDBInstance.get(preferredTargetLanguage);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        (targetLangListRegular.contains(selectedTargetLanguage) ||
-            targetLangListBeta.contains(selectedTargetLanguage))) {
+        selectedSourceLanguageCode.value.isNotEmpty &&
+        _languageModelController
+            .sourceTargetLanguageMap[selectedSourceLanguageCode.value]!
+            .toList()
+            .contains(selectedTargetLanguage) &&
+        !voiceSkipTargetLang.contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }

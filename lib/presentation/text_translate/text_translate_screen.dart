@@ -46,9 +46,9 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
     _textTranslationController = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _textTranslationController.getSourceTargetLangFromDB();
     _textTranslationController.setSourceLanguageList();
     _textTranslationController.setTargetLanguageList();
-    _textTranslationController.getSourceTargetLangFromDB();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }

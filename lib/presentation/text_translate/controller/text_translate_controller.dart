@@ -123,8 +123,10 @@ class TextTranslateController extends GetxController {
       selectedSourceLanguage = _hiveDBInstance.get(preferredAppLocale);
     }
 
-    if (sourceLangListRegular.contains(selectedSourceLanguage) ||
-        sourceLangListBeta.contains(selectedSourceLanguage)) {
+    if (_languageModelController.translationLanguageMap.keys
+            .toList()
+            .contains(selectedSourceLanguage) &&
+        !textSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
       if (isTransliterationEnabled()) {
         setModelForTransliteration();
@@ -135,8 +137,11 @@ class TextTranslateController extends GetxController {
         _hiveDBInstance.get(preferredTargetLangTextScreen);
     if (selectedTargetLanguage != null &&
         selectedTargetLanguage.isNotEmpty &&
-        (targetLangListRegular.contains(selectedTargetLanguage) ||
-            targetLangListBeta.contains(selectedTargetLanguage))) {
+        selectedSourceLanguageCode.value.isNotEmpty &&
+        _languageModelController
+            .translationLanguageMap[selectedSourceLanguageCode.value]!
+            .toList()
+            .contains(selectedTargetLanguage)) {
       selectedTargetLanguageCode.value = selectedTargetLanguage;
     }
   }

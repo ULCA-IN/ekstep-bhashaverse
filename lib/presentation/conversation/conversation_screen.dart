@@ -43,9 +43,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _languageModelController = Get.find();
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    _translationController.getSourceTargetLangFromDB();
     _translationController.setSourceLanguageList();
     _translationController.setTargetLanguageList();
-    _translationController.getSourceTargetLangFromDB();
     super.initState();
   }
 
