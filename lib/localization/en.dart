@@ -106,5 +106,5 @@ final Map<String, String> en = {
   generalLanguagesBrief: 'These languages working perfectly',
   betaLanguages: 'Beta Languages',
   betaLanguagesBrief:
-      'These languages are still in production and may not generate proper result'
+      'These languages are still in beta and are continuously improved for better results'
 };
