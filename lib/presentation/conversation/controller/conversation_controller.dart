@@ -263,7 +263,8 @@ class ConversationController extends GetxController {
                   srcLanguage: sourceLangCode,
                   targetLanguage: targetLangCode,
                   preferredGender:
-                      _hiveDBInstance.get(preferredVoiceAssistantGender))
+                      _hiveDBInstance.get(preferredVoiceAssistantGender)),
+              {'responseFrequencyInSecs': 1}
             ],
             isDataToSend: true,
           );
