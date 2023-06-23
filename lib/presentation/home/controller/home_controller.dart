@@ -114,8 +114,7 @@ class HomeController extends GetxController {
       }),
       failure: (error) {
         isMainConfigCallLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }
@@ -139,8 +138,7 @@ class HomeController extends GetxController {
       }),
       failure: (error) {
         isTransConfigCallLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }
@@ -163,8 +161,7 @@ class HomeController extends GetxController {
             transliterationModel: data);
       }),
       failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }

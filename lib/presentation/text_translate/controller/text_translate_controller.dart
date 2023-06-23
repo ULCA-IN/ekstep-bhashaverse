@@ -286,8 +286,7 @@ class TextTranslateController extends GetxController {
       },
       failure: (error) {
         isLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }
@@ -357,7 +356,7 @@ class TextTranslateController extends GetxController {
             ? targetSpeakerStatus.value = SpeakerStatus.stopped
             : sourceSpeakerStatus.value = SpeakerStatus.stopped;
         showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+            message: somethingWentWrong.tr);
         return;
       },
     );

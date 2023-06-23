@@ -449,8 +449,7 @@ class ConversationController extends GetxController {
       },
       failure: (error) {
         isLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }
@@ -521,8 +520,7 @@ class ConversationController extends GetxController {
         }
       },
       failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
         return;
       },
     );

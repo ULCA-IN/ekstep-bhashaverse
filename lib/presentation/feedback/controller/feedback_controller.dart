@@ -10,7 +10,6 @@ import '../../../localization/localization_keys.dart';
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
-import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../common/controller/language_model_controller.dart';
 import '../../../utils/network_utils.dart';
@@ -159,8 +158,7 @@ class FeedbackController extends GetxController {
         isLoading.value = false;
       }),
       failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
         isLoading.value = false;
       },
     );
@@ -180,8 +178,7 @@ class FeedbackController extends GetxController {
         showDefaultSnackbar(message: response['message']);
       }),
       failure: (error) {
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
         isLoading.value = false;
       },
     );

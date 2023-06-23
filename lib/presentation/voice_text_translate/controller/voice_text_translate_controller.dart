@@ -504,8 +504,7 @@ class VoiceTextTranslateController extends GetxController {
       },
       failure: (error) {
         isLoading.value = false;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
       },
     );
   }
@@ -565,8 +564,7 @@ class VoiceTextTranslateController extends GetxController {
         isTargetLanguage
             ? targetSpeakerStatus.value = SpeakerStatus.stopped
             : sourceSpeakerStatus.value = SpeakerStatus.stopped;
-        showDefaultSnackbar(
-            message: error.message ?? APIConstants.kErrorMessageGenericError);
+        showDefaultSnackbar(message: somethingWentWrong.tr);
         return;
       },
     );
