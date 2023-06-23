@@ -63,10 +63,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                 showLogo: false,
                                 onBackPress: () => Get.back(),
                               ),
-                              SizedBox(height: 45.h),
-                              _buildCommonFeedback(context),
-                              SizedBox(height: 14.h),
-                              _buildTaskFeedback(),
+                              _feedbackController.feedbackReqResponse != null
+                                  ? Column(
+                                      children: [
+                                        SizedBox(height: 45.h),
+                                        _buildCommonFeedback(context),
+                                        SizedBox(height: 14.h),
+                                        _buildTaskFeedback(),
+                                      ],
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         ),
@@ -79,7 +85,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
         ),
       ),
-      bottomNavigationBar: _buildSubmitButton(context),
+      bottomNavigationBar: _feedbackController.feedbackReqResponse != null
+          ? _buildSubmitButton(context)
+          : const SizedBox.shrink(),
     );
   }
 
