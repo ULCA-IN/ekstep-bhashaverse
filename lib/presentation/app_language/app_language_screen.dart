@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -51,6 +52,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isFirstTime =
+        !_hiveDBInstance.get(introShownAlreadyKey, defaultValue: false);
     return WillPopScope(
       onWillPop: () => _onWillPop(),
       child: Scaffold(
@@ -62,9 +65,33 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 16.w),
-                Text(
-                  selectAppLanguage.tr,
-                  style: semibold22(context),
+                Row(
+                  children: [
+                    if (!isFirstTime)
+                      InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => Get.back(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8).w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                width: 1.w,
+                                color: context.appTheme.containerColor),
+                          ),
+                          child: SvgPicture.asset(
+                            iconPrevious,
+                          ),
+                        ),
+                      ),
+                    SizedBox(width: isFirstTime ? 0 : 20.w),
+                    Expanded(
+                      child: Text(
+                        selectAppLanguage.tr,
+                        style: semibold22(context),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 8.w),
                 Text(
