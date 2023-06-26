@@ -22,10 +22,133 @@ List<String> languagesCodeList = [
   'brx',
   'mni',
   'ks',
-  'kok',
+  'gom',
   'sd',
   'sat',
 ];
+
+//Voice Screen
+
+Set<String> voiceBetaSourceLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+Set<String> voiceBetaTargetLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+
+Set<String> voiceSkipSourceLang = {
+  // languagesCodeList[10],
+};
+Set<String> voiceSkipTargetLang = {
+  // languagesCodeList[20],
+};
+
+//Converse Screen
+
+Set<String> converseBetaSourceLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+Set<String> converseBetaTargetLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+
+Set<String> converseSkipSourceLang = {
+  // languagesCodeList[10],
+};
+Set<String> converseSkipTargetLang = {
+  // languagesCodeList[20],
+};
+
+//Text Screen
+
+Set<String> textBetaSourceLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+
+Set<String> textBetaTargetLang = {
+  languagesCodeList[10],
+  languagesCodeList[11],
+  languagesCodeList[12],
+  languagesCodeList[13],
+  languagesCodeList[14],
+  languagesCodeList[16],
+  languagesCodeList[17],
+  languagesCodeList[19],
+  languagesCodeList[20],
+  languagesCodeList[21],
+  languagesCodeList[22],
+  languagesCodeList[23],
+  languagesCodeList[24],
+  languagesCodeList[25],
+};
+
+Set<String> textSkipSourceLang = <String>{};
+Set<String> textSkipTargetLang = <String>{};
 
 class TranslatedLanguagesMap {
   static Map<String, Map<String, String>> language = {

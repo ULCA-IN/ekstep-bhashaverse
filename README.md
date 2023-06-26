@@ -26,26 +26,31 @@ name: bhashaverse
   cupertino_icons: ^1.0.2
   get: ^4.6.5
   dio: ^4.0.6
+  provider: ^6.0.5
   permission_handler: ^10.2.0
   path_provider: ^2.0.12
-  connectivity_plus: ^3.0.2
+  connectivity_plus: ^3.0.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   freezed: ^2.3.2
   freezed_annotation: ^2.2.0
   json_serializable: ^6.5.4
   flutter_svg: ^1.1.6
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.4
   avatar_glow: ^2.0.2
   lottie: ^2.1.0
   share_plus: ^6.3.0
   audio_waveforms: ^1.0.0
   socket_io_client: ^2.0.1
-  mic_stream: ^0.6.4
   record: ^4.4.4
   auto_size_text: ^3.0.0
   vibration: ^1.7.6
   stop_watch_timer: ^2.0.0
+  custom_rating_bar: ^2.0.5
+  flutter_screenutil: ^5.8.4
+  sound_stream:
+    git:
+      url: https://github.com/JHM69/flutter-sound-stream.git
 ```
 
 * Dev Dependencies:
@@ -81,9 +86,8 @@ flutter_icons:
     - assets/images/app_language_img/
     - assets/images/common_icon/
     - assets/images/onboarding_image/
-    - assets/images/bottom_bar_icons/
+    - assets/images/menu_images/
     - assets/animation/lottie_animation/
-    - assets/audio/
 ```
 
 - Enter the terminal and execute following commands:
@@ -128,7 +132,8 @@ flutter_icons:
     installer.pods_project.targets.each do |target|
       flutter_additional_ios_build_settings(target)
       target.build_configurations.each do |config|
-              config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
           '$(inherited)',
 
           ## dart: PermissionGroup.calendar

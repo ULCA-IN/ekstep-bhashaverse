@@ -1,109 +1,161 @@
 class RESTComputeResponseModel {
-  final List<PipelineResponse>? pipelineResponse;
+  List<PipelineResponse>? pipelineResponse;
 
-  RESTComputeResponseModel({
-    this.pipelineResponse,
-  });
+  RESTComputeResponseModel({pipelineResponse});
 
-  RESTComputeResponseModel.fromJson(Map<String, dynamic> json)
-      : pipelineResponse = (json['pipelineResponse'] as List?)
-            ?.map((dynamic e) =>
-                PipelineResponse.fromJson(e as Map<String, dynamic>))
-            .toList();
+  RESTComputeResponseModel.fromJson(Map<String, dynamic> json) {
+    if (json['pipelineResponse'] != null) {
+      pipelineResponse = <PipelineResponse>[];
+      json['pipelineResponse'].forEach((v) {
+        pipelineResponse!.add(PipelineResponse.fromJson(v));
+      });
+    }
+  }
 
-  Map<String, dynamic> toJson() =>
-      {'pipelineResponse': pipelineResponse?.map((e) => e.toJson()).toList()};
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (pipelineResponse != null) {
+      data['pipelineResponse'] =
+          pipelineResponse!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class PipelineResponse {
-  final String? taskType;
-  final Config? config;
-  final List<Output>? output;
-  final dynamic audio;
+  String? taskType;
+  Config? config;
+  List<Output>? output;
+  List<Audio>? audio;
 
-  PipelineResponse({
-    this.taskType,
-    this.config,
-    this.output,
-    this.audio,
-  });
+  PipelineResponse({taskType, config, output, audio});
 
-  PipelineResponse.fromJson(Map<String, dynamic> json)
-      : taskType = json['taskType'] as String?,
-        config = (json['config'] as Map<String, dynamic>?) != null
-            ? Config.fromJson(json['config'] as Map<String, dynamic>)
-            : null,
-        output = (json['output'] as List?)
-            ?.map((dynamic e) => Output.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        audio = json['audio'];
+  PipelineResponse.fromJson(Map<String, dynamic> json) {
+    taskType = json['taskType'];
+    config = json['config'] != null ? Config.fromJson(json['config']) : null;
+    if (json['output'] != null) {
+      output = <Output>[];
+      json['output'].forEach((v) {
+        output!.add(Output.fromJson(v));
+      });
+    }
+    if (json['audio'] != null) {
+      audio = <Audio>[];
+      json['audio'].forEach((v) {
+        audio!.add(Audio.fromJson(v));
+      });
+    }
+  }
 
-  Map<String, dynamic> toJson() => {
-        'taskType': taskType,
-        'config': config?.toJson(),
-        'output': output?.map((e) => e.toJson()).toList(),
-        'audio': audio
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['taskType'] = taskType;
+    if (config != null) {
+      data['config'] = config!.toJson();
+    }
+    if (output != null) {
+      data['output'] = output!.map((v) => v.toJson()).toList();
+    }
+    if (audio != null) {
+      data['audio'] = audio!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class Config {
-  final Language? language;
-  final String? audioFormat;
-  final dynamic encoding;
-  final int? samplingRate;
-  final dynamic postProcessors;
+  String? serviceId;
+  Language? language;
+  String? audioFormat;
+  String? encoding;
+  int? samplingRate;
+  dynamic postProcessors;
 
-  Config({
-    this.language,
-    this.audioFormat,
-    this.encoding,
-    this.samplingRate,
-    this.postProcessors,
-  });
+  Config(
+      {serviceId,
+      language,
+      audioFormat,
+      encoding,
+      samplingRate,
+      postProcessors});
 
-  Config.fromJson(Map<String, dynamic> json)
-      : language = (json['language'] as Map<String, dynamic>?) != null
-            ? Language.fromJson(json['language'] as Map<String, dynamic>)
-            : null,
-        audioFormat = json['audioFormat'] as String?,
-        encoding = json['encoding'],
-        samplingRate = json['samplingRate'] as int?,
-        postProcessors = json['postProcessors'];
+  Config.fromJson(Map<String, dynamic> json) {
+    serviceId = json['serviceId'];
+    language =
+        json['language'] != null ? Language.fromJson(json['language']) : null;
+    audioFormat = json['audioFormat'];
+    encoding = json['encoding'];
+    samplingRate = json['samplingRate'];
+    postProcessors = json['postProcessors'];
+  }
 
-  Map<String, dynamic> toJson() => {
-        'language': language?.toJson(),
-        'audioFormat': audioFormat,
-        'encoding': encoding,
-        'samplingRate': samplingRate,
-        'postProcessors': postProcessors
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['serviceId'] = serviceId;
+    if (language != null) {
+      data['language'] = language!.toJson();
+    }
+    data['audioFormat'] = audioFormat;
+    data['encoding'] = encoding;
+    data['samplingRate'] = samplingRate;
+    data['postProcessors'] = postProcessors;
+    return data;
+  }
 }
 
 class Language {
-  final String? sourceLanguage;
+  String? sourceLanguage;
+  String? sourceScriptCode;
 
-  Language({
-    this.sourceLanguage,
-  });
+  Language({sourceLanguage, sourceScriptCode});
 
-  Language.fromJson(Map<String, dynamic> json)
-      : sourceLanguage = json['sourceLanguage'] as String?;
+  Language.fromJson(Map<String, dynamic> json) {
+    sourceLanguage = json['sourceLanguage'];
+    sourceScriptCode = json['sourceScriptCode'];
+  }
 
-  Map<String, dynamic> toJson() => {'sourceLanguage': sourceLanguage};
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['sourceLanguage'] = sourceLanguage;
+    data['sourceScriptCode'] = sourceScriptCode;
+    return data;
+  }
 }
 
 class Output {
-  final String? source;
-  final String? target;
+  String? source;
+  String? target;
 
-  Output({
-    this.source,
-    this.target,
-  });
+  Output({source, target});
 
-  Output.fromJson(Map<String, dynamic> json)
-      : source = json['source'] as String?,
-        target = json['target'] as String?;
+  Output.fromJson(Map<String, dynamic> json) {
+    source = json['source'];
+    target = json['target'];
+  }
 
-  Map<String, dynamic> toJson() => {'source': source};
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['source'] = source;
+    data['target'] = target;
+    return data;
+  }
+}
+
+class Audio {
+  String? audioContent;
+  dynamic audioUri;
+
+  Audio({audioContent, audioUri});
+
+  Audio.fromJson(Map<String, dynamic> json) {
+    audioContent = json['audioContent'];
+    audioUri = json['audioUri'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['audioContent'] = audioContent;
+    data['audioUri'] = audioUri;
+    return data;
+  }
 }

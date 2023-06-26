@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../common/elevated_button.dart';
+import '../../common/widgets/custom_elevated_button.dart';
 import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
-import '../../utils/screen_util/screen_util.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
+import 'data/onboarding_data.dart';
 import 'widgets/indicator.dart';
 import 'widgets/onboarding_content.dart';
 
@@ -29,7 +30,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void initState() {
     super.initState();
     _onboardingController = Get.put(OnboardingController());
-    ScreenUtil().init(allowFontScaling: true);
     _pageController = PageController(initialPage: 0);
   }
 
@@ -43,41 +43,38 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: AppEdgeInsets.instance.all(16),
+          padding: const EdgeInsets.all(16).w,
           child: Obx(
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _headerWidget(),
-                SizedBox(height: 33.toHeight),
+                SizedBox(height: 16.h),
                 _pageViewBuilder(),
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    _onboardingController.getOnboardingPageList().length,
+                    OnboardingData.onboardingPages.length,
                     (index) => IndicatorWidget(
                       currentIndex: _onboardingController.getCurrentPageIndex(),
                       indicatorIndex: index,
                     ),
                   ),
                 ),
-                SizedBox(height: 32.toHeight),
-                elevatedButton(
+                SizedBox(height: 16.h),
+                CustomElevatedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
-                          _onboardingController.getOnboardingPageList().length -
-                              1)
+                          OnboardingData.onboardingPages.length - 1)
                       ? getStarted.tr
                       : next.tr,
-                  textStyle: AppTextStyle()
-                      .semibold24BalticSea
-                      .copyWith(fontSize: 18.toFont),
-                  backgroundColor: primaryColor,
+                  backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
-                          _onboardingController.getOnboardingPageList().length -
-                              1)
+                          OnboardingData.onboardingPages.length - 1)
                       ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
@@ -85,7 +82,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                               curve: Curves.easeInOut);
                         },
                 ),
-                SizedBox(height: 48.toHeight),
+                SizedBox(height: 20.h),
               ],
             ),
           ),
@@ -107,10 +104,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       curve: Curves.easeInOut);
                 },
           child: Container(
-            padding: AppEdgeInsets.instance.all(8),
+            padding: const EdgeInsets.all(8).w,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(width: 1.toWidth, color: goastWhite),
+              border: Border.all(
+                  width: 1.w, color: context.appTheme.containerColor),
             ),
             child: SvgPicture.asset(
               iconPrevious,
@@ -120,20 +118,19 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         const Spacer(),
         Visibility(
           visible: (_onboardingController.getCurrentPageIndex() ==
-                  _onboardingController.getOnboardingPageList().length - 1)
+                  OnboardingData.onboardingPages.length - 1)
               ? false
               : true,
           child: InkWell(
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
               skip.tr,
-              style: AppTextStyle().light16BalticSea.copyWith(
-                    color: japaneseLaurel,
-                  ),
+              style: regular14(context).copyWith(
+                color: context.appTheme.highlightedBGColor,
+              ),
             ),
           ),
         ),
-        SizedBox(width: 4.toWidth),
       ],
     );
   }
@@ -148,21 +145,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           onPageChanged: (index) {
             _onboardingController.setCurrentPageIndex(index);
           },
-          itemCount: _onboardingController.getOnboardingPageList().length,
+          itemCount: OnboardingData.onboardingPages.length,
           itemBuilder: (context, index) {
             return OnBoardingContentWidget(
-                imagePath: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .imagePath ??
-                    '',
-                headerText: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .headerText ??
-                    '',
-                bodyText: _onboardingController
-                        .getOnboardingPageList()[index]
-                        .bodyText ??
-                    '');
+                image: OnboardingData.onboardingPages[index].imageWidget,
+                headerText: OnboardingData.onboardingPages[index].headerText,
+                bodyText: OnboardingData.onboardingPages[index].bodyText);
           },
         ),
       ),

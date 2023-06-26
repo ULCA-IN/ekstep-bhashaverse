@@ -52,6 +52,7 @@ final Map<String, String> en = {
   kTranslate: 'Translate',
   kReset: 'Reset',
   kErrorNoSourceText: 'Please enter text first',
+  errorSelectSourceLangFirst: 'Please select source language first',
   kErrorSelectSourceAndTargetScreen:
       'Please select source and target language first',
   errorMicPermission: 'Mic permission required for recording sound',
@@ -78,4 +79,32 @@ final Map<String, String> en = {
   translationNotPossible: 'translation not possible at the moment',
   bhashiniTitle: 'Bhashini',
   noAudioFoundToShare: 'No audio found to share',
+  text: 'Text',
+  converse: 'Converse',
+  voice: 'Voice',
+  video: 'Video',
+  documents: 'Documents',
+  images: 'Images',
+  converseHintText: 'Press mic to begin conversation',
+  textTranslateHintText: 'Start typing to begin',
+  errorNoInternetTitle: 'No Internet Connection',
+  errorNoInternetSubTitle: 'Please check your internet and try again',
+  feedback: 'Feedback',
+  writeReviewHere: 'Write your review here',
+  submit: 'Submit',
+  loading: 'Loading',
+  errorGiveRating: 'Please give a rating',
+  suggestedOutputTextASR:
+      'If speech was not recognized properly, please edit it below:',
+  suggestedOutputTextTranslate:
+      'If translation was not correct, please edit it below:',
+  realTimeResponse: 'Real Time Response',
+  realTimeResponseInfo:
+      'With this switched On, Transcriptions and Translations response can be obtained in real-time.',
+  computeCallLoadingText: 'Hold on, we are generating the output',
+  generalLanguages: 'General Languages',
+  generalLanguagesBrief: 'These languages working perfectly',
+  betaLanguages: 'Beta Languages',
+  betaLanguagesBrief:
+      'These languages are still in beta and are continuously improved for better results'
 };

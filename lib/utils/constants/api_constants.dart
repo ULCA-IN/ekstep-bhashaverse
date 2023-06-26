@@ -1,15 +1,20 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
+import 'package:get/get.dart';
+
 import '../../enums/language_enum.dart';
+import '../../models/task_sequence_response_model.dart';
 import 'language_map_translated.dart';
 
 class APIConstants {
   static const String ULCA_CONFIG_API_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis/v0';
-  static const String ULCA_CONFIG_API_STREAMING_URL =
-      'wss://api.dhruva.ai4bharat.org';
-  static const String STS_BASE_URL =
+
+  static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
+
+  static const String FEEDBACK_BASE_URL_DEV =
+      "https://dev-auth.ulcacontrib.org/ulca/mdms";
 
   static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
@@ -17,6 +22,7 @@ class APIConstants {
   static const String ASR_REQ_URL = '/asr/v1/model/compute';
   static const String TRANS_REQ_URL = '/v0/model/compute';
   static const String TTS_REQ_URL = '/v0/model/compute';
+  static const String FEEDBACK_REQ_URL = '/v0/pipelineQuestions';
 
   static const int kApiUnknownErrorCode = 0;
   static const int kApiCanceledCode = -1;
@@ -50,13 +56,19 @@ class APIConstants {
       'UnAuthorized. Please login again';
 
   // Payload for available Languages request
+
+  static const String kTaskType = "taskType";
+  static const String kASR = "asr";
+  static const String kTranslation = "translation";
+  static const String kTTS = "tts";
+
   static var payloadForLanguageConfig = {
     "pipelineTasks": [
-      {"taskType": "asr"},
-      {"taskType": "translation"},
-      {"taskType": "tts"}
+      {kTaskType: kASR},
+      {kTaskType: kTranslation},
+      {kTaskType: kTTS}
     ],
-    "pipelineRequestConfig": {"submitter": "AI4Bharat"}
+    "pipelineRequestConfig": {"pipelineId": "64392f96daac500b55c543cd"}
   };
 
   // payload for Compute request
@@ -75,22 +87,22 @@ class APIConstants {
       "pipelineTasks": [
         if (isRecorded)
           {
-            "serviceId": asrServiceID ?? "",
             "taskType": "asr",
             "config": {
               "language": {"sourceLanguage": srcLanguage},
+              "serviceId": asrServiceID ?? "",
               "audioFormat": audioFormat,
               "samplingRate": samplingRate,
             }
           },
         {
-          "serviceId": translationServiceID ?? "",
           "taskType": "translation",
           "config": {
             "language": {
               "sourceLanguage": srcLanguage,
               "targetLanguage": targetLanguage
-            }
+            },
+            "serviceId": translationServiceID ?? ""
           }
         },
       ],
@@ -110,16 +122,18 @@ class APIConstants {
     required String srcLanguage,
     required String preferredGender,
     required String inputData,
+    required int samplingRate,
     String? ttsServiceID,
   }) {
     var computeRequestToSend = {
       "pipelineTasks": [
         {
-          "serviceId": ttsServiceID ?? "",
           "taskType": "tts",
           "config": {
             "language": {"sourceLanguage": srcLanguage},
-            "gender": preferredGender
+            "serviceId": ttsServiceID ?? "",
+            "gender": preferredGender,
+            "samplingRate": samplingRate
           }
         }
       ],
@@ -133,21 +147,21 @@ class APIConstants {
     return computeRequestToSend;
   }
 
-  static List<Map<String, Map<String, dynamic>>> createSocketIOComputePayload({
+  static List<Map<String, dynamic>> createSocketIOComputePayload({
     required String srcLanguage,
     required String targetLanguage,
     required String preferredGender,
   }) {
     return [
       {
-        "task": {"type": "asr"},
+        "taskType": "asr",
         "config": {
           "language": {"sourceLanguage": srcLanguage},
-          "samplingRate": 44100,
+          "samplingRate": 16000,
         }
       },
       {
-        "task": {"type": "translation"},
+        "taskType": "translation",
         "config": {
           "language": {
             "sourceLanguage": srcLanguage,
@@ -156,13 +170,34 @@ class APIConstants {
         }
       },
       {
-        "task": {"type": "tts"},
+        "taskType": "tts",
         "config": {
           "language": {"sourceLanguage": targetLanguage},
           "gender": preferredGender
         }
       }
     ];
+  }
+
+  static String? getTaskTypeServiceID(TaskSequenceResponse sequenceResponse,
+      String taskType, String sourceLanguageCode,
+      [String? targetLanguageCode]) {
+    List<Config>? configs = sequenceResponse.pipelineResponseConfig
+        ?.firstWhere((element) => element.taskType == taskType)
+        .config;
+    for (var config in configs!) {
+      if (config.language?.sourceLanguage == sourceLanguageCode) {
+        // sends translation service id
+        if (targetLanguageCode != null) {
+          if (config.language?.targetLanguage == targetLanguageCode) {
+            return config.serviceId;
+          }
+        } else {
+          return config.serviceId; // sends ASR, TTS service id
+        }
+      }
+    }
+    return '';
   }
 
 // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
@@ -293,13 +328,13 @@ class APIConstants {
       //   kLanguageCode: languagesCodeList[19],
       //   kEnglishName: 'Rajasthani'
       // },
-      // {
-      //   kNativeName: 'Bodo',
-      //   kLanguageCode: languagesCodeList[20],
-      //   kEnglishName: 'Bodo'
-      // },
       {
-        kNativeName: 'মানিপুরি',
+        kNativeName: 'बड़ो',
+        kLanguageCode: languagesCodeList[20],
+        kEnglishName: 'Bodo'
+      },
+      {
+        kNativeName: 'ꯃꯩꯇꯩꯂꯣꯟ',
         kLanguageCode: languagesCodeList[21],
         kEnglishName: 'Manipuri'
       },
@@ -376,5 +411,20 @@ class APIConstants {
     } catch (e) {
       return '';
     }
+  }
+
+  static String getLanguageNameFromCode(String languageCode) {
+    return getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: LANGUAGE_CODE_MAP);
+  }
+
+  static String getLanNameInAppLang(String languageCode) {
+    return getLanguageCodeOrName(
+        value: languageCode,
+        returnWhat: LanguageMap.languageNameInAppLanguage,
+        lang_code_map: LANGUAGE_CODE_MAP,
+        langCode: Get.locale?.languageCode);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../utils/screen_util/screen_util.dart';
-import '../../../utils/theme/app_colors.dart';
+import '../../../utils/theme/app_theme_provider.dart';
 
 class IndicatorWidget extends StatelessWidget {
   final int currentIndex;
@@ -12,14 +12,15 @@ class IndicatorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil().init();
     return Container(
-      height: 8.toHeight,
-      width: currentIndex == indicatorIndex ? 30.toWidth : 10.toWidth,
-      margin: AppEdgeInsets.instance.only(right: 5),
+      height: 8.w,
+      width: currentIndex == indicatorIndex ? 30.w : 8.w,
+      margin: EdgeInsets.only(right: 5.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        color: currentIndex == indicatorIndex ? japaneseLaurel : sassyGreen,
+        color: currentIndex == indicatorIndex
+            ? context.appTheme.highlightedBGColor
+            : context.appTheme.lightBGColor,
       ),
     );
   }

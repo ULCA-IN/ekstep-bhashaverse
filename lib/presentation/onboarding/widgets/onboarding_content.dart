@@ -1,39 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../utils/theme/app_text_style.dart';
-import '/utils/screen_util/screen_util.dart';
 
 class OnBoardingContentWidget extends StatelessWidget {
-  final String imagePath;
+  final Image image;
   final String headerText;
   final String bodyText;
   const OnBoardingContentWidget(
       {Key? key,
-      required this.imagePath,
+      required this.image,
       required this.headerText,
       required this.bodyText})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil().init();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           headerText,
           textAlign: TextAlign.left,
-          style: AppTextStyle().semibold24BalticSea.copyWith(
-                fontSize: 36.toFont,
-              ),
+          style: semibold30(context),
         ),
-        SizedBox(height: 8.toHeight),
+        SizedBox(height: 8.w),
         Text(
           bodyText,
-          style: AppTextStyle().regular18DolphinGrey,
+          style: secondary14(context),
         ),
-        SizedBox(height: 100.toHeight),
-        Image.asset(imagePath, height: 300.toHeight),
+        Expanded(child: image),
       ],
     );
   }

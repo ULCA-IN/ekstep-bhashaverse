@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
-import '../utils/screen_util/screen_util.dart';
-import '../utils/theme/app_colors.dart';
+import '../utils/theme/app_theme_provider.dart';
 import '../utils/theme/app_text_style.dart';
 
 class LottieAnimation extends StatelessWidget {
@@ -33,10 +33,10 @@ class LottieAnimation extends StatelessWidget {
           alignment: Alignment.center,
           child: Container(
             width: MediaQuery.of(context).size.width,
-            margin: AppEdgeInsets.instance.symmetric(horizontal: 22),
-            padding: AppEdgeInsets.instance.all(22),
+            margin: const EdgeInsets.symmetric(horizontal: 22).w,
+            padding: const EdgeInsets.all(22).w,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.appTheme.cardBGColor,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -45,17 +45,15 @@ class LottieAnimation extends StatelessWidget {
               children: [
                 LottieBuilder.asset(
                   lottieAsset,
-                  width: 80.toWidth,
+                  width: 60.w,
                   fit: BoxFit.cover,
                 ),
-                SizedBox(height: 14.toHeight),
+                SizedBox(height: 14.w),
                 Text(
                   footerText,
-                  style: AppTextStyle()
-                      .regular18DolphinGrey
-                      .copyWith(color: balticSea),
+                  style: regular16(context),
                 ),
-                SizedBox(height: 20.toHeight)
+                SizedBox(height: 8.w)
               ],
             ),
           ),

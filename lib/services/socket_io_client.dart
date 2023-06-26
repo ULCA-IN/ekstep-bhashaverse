@@ -1,14 +1,20 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
-import '../models/socket_io_compute_response_model.dart';
-import '../utils/constants/api_constants.dart';
-import '../utils/environment/streaming_api_key_env.dart';
+import '../common/controller/language_model_controller.dart';
 
 class SocketIOClient extends GetxService {
   Socket? _socket;
   RxBool isMicConnected = false.obs, hasError = false.obs;
-  RxString socketResponseText = ''.obs;
+  String? socketError;
+  Rx<dynamic> socketResponse = Rx(null);
+  late LanguageModelController _languageModelController;
+
+  @override
+  void onInit() {
+    _languageModelController = Get.find();
+    super.onInit();
+  }
 
   void socketEmit(
       {required String emittingStatus,
@@ -21,13 +27,24 @@ class SocketIOClient extends GetxService {
 
   void socketConnect() {
     hasError.value = false;
+    socketError = null;
     _socket = io(
-        APIConstants.ULCA_CONFIG_API_STREAMING_URL,
+        _languageModelController.taskSequenceResponse
+            .pipelineInferenceSocketAPIEndPoint?.callbackUrl,
         OptionBuilder()
             .setTransports(['websocket', 'polling'])
             .disableAutoConnect()
             .setAuth({
-              APIConstants.kAuthorizationKeyStreaming: streamingAPIKey,
+              _languageModelController
+                      .taskSequenceResponse
+                      .pipelineInferenceSocketAPIEndPoint
+                      ?.inferenceApiKey
+                      ?.name:
+                  _languageModelController
+                      .taskSequenceResponse
+                      .pipelineInferenceSocketAPIEndPoint
+                      ?.inferenceApiKey
+                      ?.value,
             })
             .build());
 
@@ -44,28 +61,37 @@ class SocketIOClient extends GetxService {
     _socket?.onConnect((data) {
       isMicConnected.value = true;
       hasError.value = false;
+      socketError = null;
     });
 
     _socket?.on('ready', (data) {});
 
     _socket?.on('response', (data) {
       if (data != null) {
-        SocketIOComputeResponseModel response =
-            SocketIOComputeResponseModel.fromJson(data);
-        socketResponseText.value = response.results?[0].output?[0].source ?? '';
+        if (data[0]['detail'] == null) {
+          socketResponse.value = data;
+        } else {
+          socketError = data[0]['detail']['message'];
+          hasError.value = true;
+        }
       }
     });
 
     _socket?.on('terminate', (data) {
+      socketError = data;
       isMicConnected.value = false;
       hasError.value = true;
     });
 
     _socket?.on('abort', (data) {
+      socketError = data;
+      isMicConnected.value = false;
       hasError.value = true;
     });
 
     _socket?.on('connect_error', (data) {
+      socketError = data.message;
+      isMicConnected.value = false;
       hasError.value = true;
     });
 

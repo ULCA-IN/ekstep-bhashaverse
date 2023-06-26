@@ -3,4 +3,5 @@ enum SpeakerStatus {
   loading,
   stopped,
   playing,
+  hidden,
 }

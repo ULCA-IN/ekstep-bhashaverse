@@ -8,7 +8,7 @@ import 'en.dart';
 import 'gu.dart';
 import 'hi.dart';
 import 'kn.dart';
-import 'kok.dart';
+import 'gom.dart';
 import 'ks.dart';
 import 'mai.dart';
 import 'ml.dart';
@@ -47,7 +47,7 @@ class AppLocalization extends Translations {
         'ml': ml,
         'mni': mni,
         'ks': ks,
-        'kok': kok,
+        'gom': gom,
         'sd': sd,
         'sat': sat,
       };

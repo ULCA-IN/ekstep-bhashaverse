@@ -3,177 +3,250 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../enums/speaker_status.dart';
 import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
-import '../../utils/screen_util/screen_util.dart';
 import '../../utils/snackbar_utils.dart';
-import '../../utils/theme/app_colors.dart';
+import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
+import '../custom_circular_loading.dart';
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
     required String textToCopy,
-    String? audioPathToShare,
-    required PlayerController playerController,
     required bool isRecordedAudio,
-    required String currentDuration,
-    required String totalDuration,
-    required Function onMusicPlayOrStop,
+    required bool expandFeedbackIcon,
+    required bool showFeedbackIcon,
     required SpeakerStatus speakerStatus,
+    bool isShareButtonLoading = false,
+    String? currentDuration,
+    String? totalDuration,
+    Function? onMusicPlayOrStop,
+    Function? onFileShare,
+    PlayerController? playerController,
+    Function? onFeedbackButtonTap,
   })  : _textToCopy = textToCopy,
-        _audioPathToShare = audioPathToShare,
         _playerController = playerController,
         _isRecordedAudio = isRecordedAudio,
+        _expandFeedbackIcon = expandFeedbackIcon,
+        _showFeedbackIcon = showFeedbackIcon,
+        _isShareButtonLoading = isShareButtonLoading,
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
+        _speakerStatus = speakerStatus,
         _onAudioPlayOrStop = onMusicPlayOrStop,
-        _speakerStatus = speakerStatus;
+        _onFileShare = onFileShare,
+        _onFeedbackButtonTap = onFeedbackButtonTap;
 
-  final bool _isRecordedAudio;
+  final bool _isRecordedAudio,
+      _isShareButtonLoading,
+      _expandFeedbackIcon,
+      _showFeedbackIcon;
   final String _textToCopy;
-  final String? _audioPathToShare;
-  final Function _onAudioPlayOrStop;
-  final PlayerController _playerController;
-  final String _currentDuration;
-  final String _totalDuration;
+  final PlayerController? _playerController;
+  final String? _currentDuration;
+  final String? _totalDuration;
   final SpeakerStatus _speakerStatus;
+  final Function? _onFileShare;
+  final Function? _onAudioPlayOrStop, _onFeedbackButtonTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Visibility(
-          visible: _speakerStatus != SpeakerStatus.playing,
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () async {
-                  if (_audioPathToShare == null || _audioPathToShare!.isEmpty) {
-                    showDefaultSnackbar(message: noAudioFoundToShare.tr);
-                    return;
-                  } else {
-                    await Share.shareXFiles(
-                      [XFile(_audioPathToShare!)],
-                      sharePositionOrigin: Rect.fromLTWH(0, 0,
-                          ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
-                    );
-                  }
-                },
-                child: Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: SvgPicture.asset(
-                    iconShare,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
-                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
-                  ),
-                ),
-              ),
-              SizedBox(width: 12.toWidth),
-              InkWell(
-                onTap: () async {
-                  if (_textToCopy.isEmpty) {
-                    showDefaultSnackbar(message: noTextForCopy.tr);
-                    return;
-                  } else {
-                    await Clipboard.setData(ClipboardData(text: _textToCopy));
-                    showDefaultSnackbar(message: textCopiedToClipboard.tr);
-                  }
-                },
-                child: Padding(
-                  padding: AppEdgeInsets.instance.symmetric(vertical: 8),
-                  child: SvgPicture.asset(
-                    iconCopy,
-                    height: 24.toWidth,
-                    width: 24.toWidth,
-                    color: _textToCopy.isNotEmpty ? brightGrey : americanSilver,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Visibility(
-            visible: _speakerStatus == SpeakerStatus.playing,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+    return SizedBox(
+      height: 42.h,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Visibility(
+            visible: _speakerStatus != SpeakerStatus.playing,
+            child: Row(
               children: [
-                AudioFileWaveforms(
-                  size: Size(WaveformStyle.getDefaultWidth,
-                      WaveformStyle.getDefaultHeight),
-                  playerController: _playerController,
-                  waveformType: WaveformType.fitWidth,
-                  playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                    isRecordedAudio: _isRecordedAudio,
+                Visibility(
+                  visible: _speakerStatus != SpeakerStatus.hidden,
+                  child: InkWell(
+                    onTap: () async {
+                      if (_onFileShare != null) _onFileShare!();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      child: _isShareButtonLoading
+                          ? SizedBox(
+                              height: 20.w,
+                              width: 20.w,
+                              child: const CustomCircularLoading(),
+                            )
+                          : SvgPicture.asset(
+                              iconShare,
+                              height: 20.w,
+                              width: 20.w,
+                              color: _textToCopy.isNotEmpty
+                                  ? context.appTheme.disabledTextColor
+                                  : context.appTheme.disabledIconOutlineColor,
+                            ),
+                    ),
                   ),
                 ),
-                SizedBox(width: 8.toWidth),
-                SizedBox(
-                  width: WaveformStyle.getDefaultWidth,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(_currentDuration,
-                          style: AppTextStyle()
-                              .regular12Arsenic
-                              .copyWith(color: manateeGray),
-                          textAlign: TextAlign.start),
-                      Text(_totalDuration,
-                          style: AppTextStyle()
-                              .regular12Arsenic
-                              .copyWith(color: manateeGray),
-                          textAlign: TextAlign.end),
-                    ],
+                SizedBox(width: 12.w),
+                InkWell(
+                  onTap: () async {
+                    if (_textToCopy.isEmpty) {
+                      showDefaultSnackbar(message: noTextForCopy.tr);
+                      return;
+                    } else {
+                      await Clipboard.setData(ClipboardData(text: _textToCopy));
+                      showDefaultSnackbar(message: textCopiedToClipboard.tr);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    child: SvgPicture.asset(
+                      iconCopy,
+                      height: 20.w,
+                      width: 20.w,
+                      color: _textToCopy.isNotEmpty
+                          ? context.appTheme.disabledTextColor
+                          : context.appTheme.disabledIconOutlineColor,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-        SizedBox(width: 12.toWidth),
-        InkWell(
-          onTap: () {
-            if (_speakerStatus != SpeakerStatus.disabled) {
-              _onAudioPlayOrStop();
-            } else {
-              showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
-            }
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _speakerStatus != SpeakerStatus.disabled
-                  ? flushOrangeColor
-                  : goastWhite,
-            ),
-            padding: AppEdgeInsets.instance.all(8),
-            child: SizedBox(
-              height: 24.toWidth,
-              width: 24.toWidth,
-              child: _speakerStatus == SpeakerStatus.loading
-                  ? CircularProgressIndicator(
-                      color: balticSea,
-                      strokeWidth: 2,
+          SizedBox(width: 8.w),
+          _speakerStatus != SpeakerStatus.playing
+              ? _showFeedbackIcon
+                  ? Expanded(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: _onFeedbackButtonTap != null
+                                ? () => _onFeedbackButtonTap!()
+                                : null,
+                            child: AnimatedContainer(
+                              duration: feedbackButtonCloseTime,
+                              curve: Curves.fastOutSlowIn,
+                              decoration: BoxDecoration(
+                                  color: _expandFeedbackIcon
+                                      ? context.appTheme.feedbackBGColor
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20)),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5.h, horizontal: 15.w),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SvgPicture.asset(
+                                    iconLikeDislike,
+                                    height: 20.w,
+                                    width: 20.w,
+                                    color: _expandFeedbackIcon
+                                        ? context.appTheme.feedbackIconColor
+                                        : context
+                                            .appTheme.feedbackIconClosedColor,
+                                  ),
+                                  AnimatedCrossFade(
+                                    duration: feedbackButtonCloseTime,
+                                    firstChild: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          feedback.tr,
+                                          style: regular14(context).copyWith(
+                                              color: context
+                                                  .appTheme.feedbackTextColor),
+                                        ),
+                                      ],
+                                    ),
+                                    secondChild: const SizedBox.shrink(),
+                                    crossFadeState: _expandFeedbackIcon
+                                        ? CrossFadeState.showFirst
+                                        : CrossFadeState.showSecond,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const Spacer()
+                        ],
+                      ),
                     )
-                  : SvgPicture.asset(
-                      _speakerStatus == SpeakerStatus.playing
-                          ? iconStopPlayback
-                          : iconSound,
-                      color: _speakerStatus != SpeakerStatus.disabled
-                          ? balticSea
-                          : americanSilver,
-                    ),
+                  : const Spacer()
+              : Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AudioFileWaveforms(
+                        size: Size(WaveformStyle.getDefaultWidth, 25.h),
+                        playerController:
+                            _playerController ?? PlayerController(),
+                        waveformType: WaveformType.fitWidth,
+                        playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
+                          isRecordedAudio: _isRecordedAudio,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      SizedBox(
+                        width: WaveformStyle.getDefaultWidth,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_currentDuration ?? '',
+                                style: secondary12(context).copyWith(
+                                    color: context.appTheme.titleTextColor),
+                                textAlign: TextAlign.start),
+                            Text(_totalDuration ?? '',
+                                style: secondary12(context).copyWith(
+                                    color: context.appTheme.titleTextColor),
+                                textAlign: TextAlign.end),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          SizedBox(width: 12.w),
+          Visibility(
+            visible: _speakerStatus != SpeakerStatus.hidden,
+            child: InkWell(
+              onTap: () {
+                if (_speakerStatus != SpeakerStatus.disabled) {
+                  if (_onAudioPlayOrStop != null) _onAudioPlayOrStop!();
+                } else {
+                  showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _speakerStatus != SpeakerStatus.disabled
+                      ? context.appTheme.buttonSelectedColor
+                      : context.appTheme.speakerColor,
+                ),
+                padding: const EdgeInsets.all(6).w,
+                child: SizedBox(
+                  height: 20.w,
+                  width: 20.w,
+                  child: _speakerStatus == SpeakerStatus.loading
+                      ? const CustomCircularLoading()
+                      : SvgPicture.asset(
+                          _speakerStatus == SpeakerStatus.playing
+                              ? iconStopPlayback
+                              : iconSound,
+                          color: _speakerStatus != SpeakerStatus.disabled
+                              ? context.appTheme.iconOutlineColor
+                              : context.appTheme.disabledIconOutlineColor,
+                        ),
+                ),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
