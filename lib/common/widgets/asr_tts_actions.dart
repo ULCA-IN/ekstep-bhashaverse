@@ -12,7 +12,7 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
-import '../custom_circular_loading.dart';
+import 'custom_circular_loading.dart';
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
