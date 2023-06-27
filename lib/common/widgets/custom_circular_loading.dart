@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/theme/app_theme_provider.dart';
+import '../../utils/theme/app_theme_provider.dart';
 
 class CustomCircularLoading extends StatelessWidget {
   const CustomCircularLoading({
