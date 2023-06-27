@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/theme/app_theme_provider.dart';
+import '../global_key.dart';
 
 class GenericTextField extends StatelessWidget {
   const GenericTextField({
@@ -50,6 +51,18 @@ class GenericTextField extends StatelessWidget {
         contentPadding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 12.w),
         filled: true,
       ),
+      onTapOutside: (PointerDownEvent event) {
+        RenderBox? box =
+            transliterationKey.currentContext?.findRenderObject() as RenderBox?;
+        if (box != null) {
+          Offset boxPosition = box.localToGlobal(Offset.zero);
+          if (event.position.dy > boxPosition.dy &&
+              event.position.dy < (boxPosition.dy + box.size.height)) {
+            return;
+          }
+        }
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
       onChanged: _onChange,
     );
   }
