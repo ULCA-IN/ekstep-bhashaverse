@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/theme/app_theme_provider.dart';
-import '../global_key.dart';
+import '../transliteration_global_key.dart';
 
 class GenericTextField extends StatelessWidget {
   const GenericTextField({

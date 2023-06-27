@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../animation/lottie_animation.dart';
-import '../../common/global_key.dart';
+import '../../common/transliteration_global_key.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../localization/localization_keys.dart';
 import '../../models/feedback_type_model.dart';
