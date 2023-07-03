@@ -48,6 +48,11 @@ name: bhashaverse
   stop_watch_timer: ^2.0.0
   custom_rating_bar: ^2.0.5
   flutter_screenutil: ^5.8.4
+  slang: ^3.19.0
+  slang_flutter: ^3.19.0
+  intl: any
+  flutter_localizations:
+    sdk: flutter
   sound_stream:
     git:
       url: https://github.com/JHM69/flutter-sound-stream.git
@@ -94,7 +99,8 @@ flutter_icons:
 
     - flutter clean
     - flutter pub get
-    - flutter pub run build_runner build --delete-conflicting-outputs
+    - dart run slang --delete-conflicting-outputs    
+    - dart run build_runner build --delete-conflicting-outputs
     - flutter pub run flutter_launcher_icons:main
     
 ------------
