@@ -17,7 +17,6 @@ import '../../common/widgets/text_field_with_actions.dart';
 import '../../common/widgets/transliteration_hints.dart';
 import '../../enums/mic_button_status.dart';
 import '../../enums/speaker_status.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
@@ -28,6 +27,7 @@ import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
 import 'controller/voice_text_translate_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class VoiceTextTranslateScreen extends StatefulWidget {
   const VoiceTextTranslateScreen({super.key});
@@ -89,7 +89,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               child: Column(
                 children: [
                   SizedBox(height: 18.w),
-                  CommonAppBar(title: voice.tr, onBackPress: () => Get.back()),
+                  CommonAppBar(
+                      title: i18n.Translations.of(context).voice,
+                      onBackPress: () => Get.back()),
                   SizedBox(height: 24.w),
                   Expanded(
                     child: Column(
@@ -127,6 +129,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildSourceTextField() {
+    final translation = i18n.Translations.of(context);
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
@@ -137,12 +140,12 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           hintText: _voiceTextTransController.isTranslateCompleted.value
               ? null
               : isRecordingStarted()
-                  ? kListeningHintText.tr
+                  ? translation.kListeningHintText
                   : _voiceTextTransController.micButtonStatus.value ==
                           MicButtonStatus.pressed
-                      ? connecting.tr
-                      : kTranslationHintText.tr,
-          translateButtonTitle: kTranslate.tr,
+                      ? translation.connecting
+                      : translation.kTranslationHintText,
+          translateButtonTitle: translation.kTranslate,
           currentDuration: _voiceTextTransController.currentDuration.value,
           totalDuration: _voiceTextTransController.maxDuration.value,
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
@@ -232,6 +235,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildSourceTargetLangButtons() {
+    final translation = i18n.Translations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -294,7 +298,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
                               .selectedSourceLanguageCode.value)
-                      : kTranslateSourceTitle.tr;
+                      : translation.kTranslateSourceTitle;
                   return AutoSizeText(
                     selectedSourceLang,
                     maxLines: 2,
@@ -325,7 +329,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
               _targetLangFocusNode.unfocus();
               if (_voiceTextTransController
                   .selectedSourceLanguageCode.value.isEmpty) {
-                showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
+                showDefaultSnackbar(
+                    message: translation.errorSelectSourceLangFirst);
                 return;
               }
 
@@ -377,7 +382,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                       ? APIConstants.getLanNameInAppLang(
                           _voiceTextTransController
                               .selectedTargetLanguageCode.value)
-                      : kTranslateTargetTitle.tr;
+                      : translation.kTranslateTargetTitle;
                   return AutoSizeText(
                     selectedTargetLang,
                     style: secondary16(context),
@@ -423,14 +428,15 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildLoadingAnimation() {
+    final translation = i18n.Translations.of(context);
     return Obx(() {
       if (_voiceTextTransController.isLoading.value) {
         return LottieAnimation(
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _voiceTextTransController.isLoading.value
-                ? computeCallLoadingText.tr
-                : kTranslationLoadingAnimationText.tr);
+                ? translation.computeCallLoadingText
+                : translation.kTranslationLoadingAnimationText);
       } else {
         return const SizedBox.shrink();
       }
@@ -501,10 +507,11 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   void _onTranslateButtonTap() async {
+    final translation = i18n.Translations.of(context);
     unFocusTextFields();
 
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetTitle.tr);
+      showDefaultSnackbar(message: translation.errorNoInternetTitle);
       return;
     }
 
@@ -512,14 +519,15 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _voiceTextTransController.targetLangTTSPath.value = '';
 
     if (_voiceTextTransController.sourceLangTextController.text.isEmpty) {
-      showDefaultSnackbar(message: kErrorNoSourceText.tr);
+      showDefaultSnackbar(message: translation.kErrorNoSourceText);
     } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
       _voiceTextTransController.getComputeResponseASRTrans(
         isRecorded: false,
       );
       _voiceTextTransController.isRecordedViaMic.value = false;
     } else {
-      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+      showDefaultSnackbar(
+          message: translation.kErrorSelectSourceAndTargetScreen);
     }
   }
 
@@ -576,8 +584,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   void micButtonActions({required bool startMicRecording}) async {
+    final translation = i18n.Translations.of(context);
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetTitle.tr);
+      showDefaultSnackbar(message: translation.errorNoInternetTitle);
     } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
       unFocusTextFields();
 
@@ -594,7 +603,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
         }
       }
     } else if (startMicRecording) {
-      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+      showDefaultSnackbar(
+          message: translation.kErrorSelectSourceAndTargetScreen);
     }
   }
 }
