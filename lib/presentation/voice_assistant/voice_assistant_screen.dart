@@ -5,13 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/custom_elevated_button.dart';
 import '../../enums/gender_enum.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/voice_assistant_controller.dart';
-import 'data/voice_assistant_data.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class VoiceAssistantScreen extends StatefulWidget {
   const VoiceAssistantScreen({super.key});
@@ -32,6 +31,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(
@@ -42,12 +42,12 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             children: [
               SizedBox(height: 16.w),
               Text(
-                selectVoiceAssistant.tr,
+                translation.selectVoiceAssistant,
                 style: semibold24(context),
               ),
               SizedBox(height: 8.w),
               Text(
-                youWillHearTheTranslationText.tr,
+                translation.youWillHearTheTranslationText,
                 style: regular14(context)
                     .copyWith(color: context.appTheme.secondaryTextColor),
               ),
@@ -56,20 +56,20 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
                 children: [
                   _avatarWidgetBuilder(
                     GenderEnum.male,
-                    VoiceAssistantData.maleImgWidget,
-                    male.tr,
+                    imgMaleAvatar,
+                    translation.male,
                   ),
                   SizedBox(width: 10.w),
                   _avatarWidgetBuilder(
                     GenderEnum.female,
-                    VoiceAssistantData.femaleImgWidget,
-                    female.tr,
+                    imgFemaleAvatar,
+                    translation.female,
                   ),
                 ],
               ),
               const Spacer(),
               CustomElevatedButton(
-                buttonText: letsTranslate.tr,
+                buttonText: translation.letsTranslate,
                 backgroundColor: context.appTheme.primaryColor,
                 borderRadius: 16,
                 onButtonTap: () {
@@ -87,7 +87,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
 
   Widget _avatarWidgetBuilder(
     GenderEnum gender,
-    Image avatarImage,
+    String avatarPath,
     String avatarTitle,
   ) {
     return Expanded(
@@ -111,7 +111,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
             ),
             child: Column(
               children: [
-                avatarImage,
+                Image.asset(avatarPath),
                 SizedBox(height: 16.w),
                 Text(
                   avatarTitle,

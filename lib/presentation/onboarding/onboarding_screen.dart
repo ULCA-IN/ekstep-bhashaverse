@@ -4,16 +4,16 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/custom_elevated_button.dart';
-import '../../localization/localization_keys.dart';
+import '../../models/onboarding_model.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
-import 'data/onboarding_data.dart';
 import 'widgets/indicator.dart';
 import 'widgets/onboarding_content.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -25,12 +25,47 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   late OnboardingController _onboardingController;
   PageController? _pageController;
+  final List<OnboardingModel> onboardingPages = [];
 
   @override
   void initState() {
     super.initState();
     _onboardingController = Get.put(OnboardingController());
     _pageController = PageController(initialPage: 0);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    onboardingPages.addAll([
+      OnboardingModel(
+        imagePath: imgOnboarding1,
+        headerText: i18n.Translations.of(context).speechRecognition,
+        bodyText:
+            i18n.Translations.of(context).automaticallyRecognizeAndConvert,
+      ),
+      OnboardingModel(
+        imagePath: imgOnboarding2,
+        headerText: i18n.Translations.of(context).speechToSpeechTranslation,
+        bodyText:
+            i18n.Translations.of(context).translateYourVoiceInOneIndianLanguage,
+      ),
+      OnboardingModel(
+        imagePath: imgOnboarding3,
+        headerText: i18n.Translations.of(context).languageTranslation,
+        bodyText: i18n.Translations.of(context)
+            .translateSentencesFromOneIndianLanguageToAnother,
+      ),
+      // TODO: uncomment after chat feature added
+      // OnboardingModel(
+      //   image: Image.asset(
+      //     imgOnboarding4,
+      //     fit: BoxFit.fitWidth,
+      //   ),
+      //   headerText: bhashaverseChatBot.tr,
+      //   bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
+      // )
+    ]);
   }
 
   @override
@@ -42,6 +77,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
@@ -51,14 +87,14 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _headerWidget(),
+                _headerWidget(context),
                 SizedBox(height: 16.h),
                 _pageViewBuilder(),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    OnboardingData.onboardingPages.length,
+                    onboardingPages.length,
                     (index) => IndicatorWidget(
                       currentIndex: _onboardingController.getCurrentPageIndex(),
                       indicatorIndex: index,
@@ -68,13 +104,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 SizedBox(height: 16.h),
                 CustomElevatedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
-                          OnboardingData.onboardingPages.length - 1)
-                      ? getStarted.tr
-                      : next.tr,
+                          onboardingPages.length - 1)
+                      ? translation.getStarted
+                      : translation.next,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
-                          OnboardingData.onboardingPages.length - 1)
+                          onboardingPages.length - 1)
                       ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
@@ -91,7 +127,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     );
   }
 
-  Widget _headerWidget() {
+  Widget _headerWidget(BuildContext context) {
     return Row(
       children: [
         InkWell(
@@ -118,13 +154,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         const Spacer(),
         Visibility(
           visible: (_onboardingController.getCurrentPageIndex() ==
-                  OnboardingData.onboardingPages.length - 1)
+                  onboardingPages.length - 1)
               ? false
               : true,
           child: InkWell(
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
-              skip.tr,
+              i18n.Translations.of(context).skip,
               style: regular14(context).copyWith(
                 color: context.appTheme.highlightedBGColor,
               ),
@@ -145,12 +181,15 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           onPageChanged: (index) {
             _onboardingController.setCurrentPageIndex(index);
           },
-          itemCount: OnboardingData.onboardingPages.length,
+          itemCount: onboardingPages.length,
           itemBuilder: (context, index) {
             return OnBoardingContentWidget(
-                image: OnboardingData.onboardingPages[index].imageWidget,
-                headerText: OnboardingData.onboardingPages[index].headerText,
-                bodyText: OnboardingData.onboardingPages[index].bodyText);
+                image: Image.asset(
+                  onboardingPages[index].imagePath,
+                  fit: BoxFit.fitWidth,
+                ),
+                headerText: onboardingPages[index].headerText,
+                bodyText: onboardingPages[index].bodyText);
           },
         ),
       ),
