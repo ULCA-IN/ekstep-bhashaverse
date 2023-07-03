@@ -3,15 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../localization/localization_keys.dart';
+import '../../i18n/strings.g.dart' as i18n;
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/voice_recorder.dart';
-import '../home/data/home_data.dart';
-import '../onboarding/data/onboarding_data.dart';
-import '../voice_assistant/data/voice_assistant_data.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -49,26 +46,26 @@ class _SplashScreenState extends State<SplashScreen> {
     // Precache splash screen logo
     precacheImage(appLogo.image, context);
     // Precache home screen menu images
-    for (var i = 0; i < HomeData.menuItems.length; i++) {
-      precacheImage(HomeData.menuItems[i].imageWidget.image, context);
-    }
+    precacheImage(Image.asset(imgText).image, context);
+    precacheImage(Image.asset(imgVoiceSpeaking).image, context);
+    precacheImage(Image.asset(imgMic).image, context);
 
     if (!isIntroShownAlready) {
       // Precache Onboarding screen images
-      for (var i = 0; i < OnboardingData.onboardingPages.length; i++) {
-        precacheImage(
-            OnboardingData.onboardingPages[i].imageWidget.image, context);
-      }
+      precacheImage(Image.asset(imgOnboarding1).image, context);
+      precacheImage(Image.asset(imgOnboarding2).image, context);
+      precacheImage(Image.asset(imgOnboarding3).image, context);
 
       // Precache voice assistant screen images
-      precacheImage(VoiceAssistantData.maleImgWidget.image, context);
-      precacheImage(VoiceAssistantData.femaleImgWidget.image, context);
+      precacheImage(Image.asset(imgMaleAvatar).image, context);
+      precacheImage(Image.asset(imgFemaleAvatar).image, context);
     }
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.splashScreenBGColor,
       body: SafeArea(
@@ -81,7 +78,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 height: 24.h,
               ),
               Text(
-                bhashiniTitle.tr,
+                translation.bhashiniTitle,
                 textAlign: TextAlign.center,
                 style: bold24(context),
               ),
