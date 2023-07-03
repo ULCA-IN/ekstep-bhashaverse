@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
 class OnboardingModel {
-  Image imageWidget;
+  String imagePath;
   String headerText;
   String bodyText;
 
   OnboardingModel({
-    required this.imageWidget,
+    required this.imagePath,
     required this.headerText,
     required this.bodyText,
   });
