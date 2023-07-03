@@ -1,0 +1,10 @@
+# The slang config file which works without build_runner.
+# 'dart run slang' will pick up this file.
+# In this example, no configuration is needed.
+#
+base_locale: en
+fallback_strategy: base_locale
+# input_directory: lib/i18n
+# maps:
+#   - locales
+  
