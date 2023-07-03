@@ -2,20 +2,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'enums/gender_enum.dart';
-import 'localization/app_localization.dart';
-import 'localization/localization_keys.dart';
+import 'i18n/strings.g.dart';
+import 'localization/common_cupertino_localization_delegate.dart';
+import 'localization/common_localization_delegate.dart';
 import 'presentation/splash/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
+import 'utils/app_locale_helper.dart';
 import 'utils/constants/app_constants.dart';
 import 'utils/theme/app_theme.dart';
 import 'utils/theme/app_theme_provider.dart';
 import 'utils/theme/app_theme_utils.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,13 +33,26 @@ void main() async {
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Hive.initFlutter();
   await Hive.openBox(hiveDBName);
+  late String? appLocale;
+
+  Box hiveDBInstance = Hive.box(hiveDBName);
+
+  // Localization preference
+  appLocale = hiveDBInstance.get(preferredAppLocale);
+  if (appLocale == null || appLocale.isEmpty) {
+    LocaleSettings.useDeviceLocale();
+    appLocale = LocaleSettings.currentLocale.languageCode;
+    hiveDBInstance.put(preferredAppLocale, appLocale);
+  }
+
+  setAppLocale(appLocale);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
         create: (_) => AppThemeProvider(),
       ),
     ],
-    child: const MyApp(),
+    child: TranslationProvider(child: const MyApp()),
   ));
 }
 
@@ -48,19 +65,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Box hiveDBInstance;
-  late String appLocale;
 
   @override
   void initState() {
     super.initState();
     hiveDBInstance = Hive.box(hiveDBName);
-
-    // Localization preference
-    appLocale = hiveDBInstance.get(preferredAppLocale,
-        defaultValue: Get.deviceLocale?.languageCode);
-    if (appLocale.isEmpty) {
-      hiveDBInstance.put(preferredAppLocale, appLocale);
-    }
 
     // Set user selected theme (from Settings screen)
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -108,11 +117,17 @@ class _MyAppState extends State<MyApp> {
         minTextAdapt: true,
         builder: (context, child) {
           return GetMaterialApp(
-            onGenerateTitle: (context) => bhashiniTitle.tr,
+            onGenerateTitle: (context) =>
+                i18n.Translations.of(context).bhashiniTitle,
             debugShowCheckedModeBanner: false,
-            translations: AppLocalization(),
-            locale: Locale(appLocale),
-            fallbackLocale: const Locale(defaultLangCode, defaultCountry),
+            locale: TranslationProvider.of(context).flutterLocale,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              CommonLocalizationDelegate(),
+              CommonCupertinoLocalizationDelegate()
+            ],
+            supportedLocales: AppLocaleUtils.supportedLocales,
             themeMode: context.appThemeMode,
             theme: lightMaterialThemeData(),
             darkTheme: darkMaterialThemeData(),
