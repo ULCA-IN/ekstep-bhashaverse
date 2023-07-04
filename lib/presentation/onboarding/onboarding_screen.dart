@@ -4,16 +4,16 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/custom_elevated_button.dart';
-import '../../localization/localization_keys.dart';
+import '../../models/onboarding_model.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/onboarding_controller.dart';
-import 'data/onboarding_data.dart';
 import 'widgets/indicator.dart';
 import 'widgets/onboarding_content.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});
@@ -25,12 +25,43 @@ class OnBoardingScreen extends StatefulWidget {
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   late OnboardingController _onboardingController;
   PageController? _pageController;
+  final List<OnboardingModel> onboardingPages = [];
+  late dynamic translation;
 
   @override
   void initState() {
     super.initState();
     _onboardingController = Get.put(OnboardingController());
     _pageController = PageController(initialPage: 0);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
+    onboardingPages.addAll([
+      OnboardingModel(
+        imagePath: imgOnboarding1,
+        headerText: translation.speechRecognition,
+        bodyText: translation.automaticallyRecognizeAndConvert,
+      ),
+      OnboardingModel(
+        imagePath: imgOnboarding2,
+        headerText: translation.speechToSpeechTranslation,
+        bodyText: translation.translateYourVoiceInOneIndianLanguage,
+      ),
+      OnboardingModel(
+        imagePath: imgOnboarding3,
+        headerText: translation.languageTranslation,
+        bodyText: translation.translateSentencesFromOneIndianLanguageToAnother,
+      ),
+      // TODO: uncomment after chat feature added
+      /*    OnboardingModel(
+        imagePath: imgOnboarding4,
+        headerText: translation.bhashaverseChatBot,
+        bodyText: translation.translateSentencesFromOneIndianLanguageToAnother,
+      ) */
+    ]);
   }
 
   @override
@@ -58,7 +89,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    OnboardingData.onboardingPages.length,
+                    onboardingPages.length,
                     (index) => IndicatorWidget(
                       currentIndex: _onboardingController.getCurrentPageIndex(),
                       indicatorIndex: index,
@@ -68,13 +99,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 SizedBox(height: 16.h),
                 CustomElevatedButton(
                   buttonText: (_onboardingController.getCurrentPageIndex() ==
-                          OnboardingData.onboardingPages.length - 1)
-                      ? getStarted.tr
-                      : next.tr,
+                          onboardingPages.length - 1)
+                      ? translation.getStarted
+                      : translation.next,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: (_onboardingController.getCurrentPageIndex() ==
-                          OnboardingData.onboardingPages.length - 1)
+                          onboardingPages.length - 1)
                       ? () => Get.offNamed(AppRoutes.voiceAssistantRoute)
                       : () {
                           _pageController?.nextPage(
@@ -118,13 +149,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
         const Spacer(),
         Visibility(
           visible: (_onboardingController.getCurrentPageIndex() ==
-                  OnboardingData.onboardingPages.length - 1)
+                  onboardingPages.length - 1)
               ? false
               : true,
           child: InkWell(
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
-              skip.tr,
+              translation.skip,
               style: regular14(context).copyWith(
                 color: context.appTheme.highlightedBGColor,
               ),
@@ -145,12 +176,15 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           onPageChanged: (index) {
             _onboardingController.setCurrentPageIndex(index);
           },
-          itemCount: OnboardingData.onboardingPages.length,
+          itemCount: onboardingPages.length,
           itemBuilder: (context, index) {
             return OnBoardingContentWidget(
-                image: OnboardingData.onboardingPages[index].imageWidget,
-                headerText: OnboardingData.onboardingPages[index].headerText,
-                bodyText: OnboardingData.onboardingPages[index].bodyText);
+                image: Image.asset(
+                  onboardingPages[index].imagePath,
+                  fit: BoxFit.fitWidth,
+                ),
+                headerText: onboardingPages[index].headerText,
+                bodyText: onboardingPages[index].bodyText);
           },
         ),
       ),

@@ -2,17 +2,16 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../enums/speaker_status.dart';
-import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import '../../utils/waveform_style.dart';
 import 'custom_circular_loading.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
@@ -56,6 +55,7 @@ class ASRAndTTSActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final translation = i18n.Translations.of(context);
     return SizedBox(
       height: 42.h,
       child: Row(
@@ -94,11 +94,12 @@ class ASRAndTTSActions extends StatelessWidget {
                 InkWell(
                   onTap: () async {
                     if (_textToCopy.isEmpty) {
-                      showDefaultSnackbar(message: noTextForCopy.tr);
+                      showDefaultSnackbar(message: translation.noTextForCopy);
                       return;
                     } else {
                       await Clipboard.setData(ClipboardData(text: _textToCopy));
-                      showDefaultSnackbar(message: textCopiedToClipboard.tr);
+                      showDefaultSnackbar(
+                          message: translation.textCopiedToClipboard);
                     }
                   },
                   child: Padding(
@@ -155,7 +156,7 @@ class ASRAndTTSActions extends StatelessWidget {
                                       children: [
                                         SizedBox(width: 8.w),
                                         Text(
-                                          feedback.tr,
+                                          translation.feedback,
                                           style: regular14(context).copyWith(
                                               color: context
                                                   .appTheme.feedbackTextColor),
@@ -217,7 +218,8 @@ class ASRAndTTSActions extends StatelessWidget {
                 if (_speakerStatus != SpeakerStatus.disabled) {
                   if (_onAudioPlayOrStop != null) _onAudioPlayOrStop!();
                 } else {
-                  showDefaultSnackbar(message: cannotPlayAudioAtTheMoment.tr);
+                  showDefaultSnackbar(
+                      message: translation.cannotPlayAudioAtTheMoment);
                 }
               },
               child: Container(

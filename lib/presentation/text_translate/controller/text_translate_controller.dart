@@ -5,13 +5,13 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import '../../../common/controller/language_model_controller.dart';
-import '../../../localization/localization_keys.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/constants/language_map_translated.dart';
 import '../../../utils/snackbar_utils.dart';
+import '../../../i18n/strings.g.dart' as i18n;
 
 class TextTranslateController extends GetxController {
   TextEditingController sourceLangTextController = TextEditingController(),
@@ -181,10 +181,10 @@ class TextTranslateController extends GetxController {
             selectedTargetLanguageCode.value);
         showDefaultSnackbar(
             message:
-                '$targetLanguage - $sourceLanguage ${translationNotPossible.tr}');
+                '$targetLanguage - $sourceLanguage ${i18n.t.translationNotPossible}');
       }
     } else {
-      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+      showDefaultSnackbar(message: i18n.t.kErrorSelectSourceAndTargetScreen);
     }
   }
 
@@ -269,7 +269,7 @@ class TextTranslateController extends GetxController {
             '';
         if (targetOutputText.value.isEmpty) {
           isLoading.value = false;
-          showDefaultSnackbar(message: responseNotReceived.tr);
+          showDefaultSnackbar(message: i18n.t.responseNotReceived);
           return;
         }
         targetLangTextController.text = targetOutputText.value;
@@ -286,7 +286,7 @@ class TextTranslateController extends GetxController {
       },
       failure: (error) {
         isLoading.value = false;
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
       },
     );
   }
@@ -347,7 +347,7 @@ class TextTranslateController extends GetxController {
               ? targetLangTTSPath.value = ttsFilePath
               : sourceLangTTSPath.value = ttsFilePath;
         } else {
-          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+          showDefaultSnackbar(message: i18n.t.noVoiceAssistantAvailable);
           return;
         }
       },
@@ -356,7 +356,7 @@ class TextTranslateController extends GetxController {
             ? targetSpeakerStatus.value = SpeakerStatus.stopped
             : sourceSpeakerStatus.value = SpeakerStatus.stopped;
         showDefaultSnackbar(
-            message: somethingWentWrong.tr);
+            message: i18n.t.somethingWentWrong);
         return;
       },
     );
@@ -373,7 +373,7 @@ class TextTranslateController extends GetxController {
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         sourceSpeakerStatus.value = SpeakerStatus.loading;
@@ -388,7 +388,7 @@ class TextTranslateController extends GetxController {
     } else {
       if (targetLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         targetSpeakerStatus.value = SpeakerStatus.loading;
@@ -419,7 +419,7 @@ class TextTranslateController extends GetxController {
 
       if (audioPathToShare.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         String sourceText = isSourceLang
@@ -431,7 +431,7 @@ class TextTranslateController extends GetxController {
             : selectedTargetLanguageCode.value;
 
         if (sourceText.isEmpty) {
-          showDefaultSnackbar(message: noAudioFoundToShare.tr);
+          showDefaultSnackbar(message: i18n.t.noAudioFoundToShare);
           return;
         }
 
@@ -457,7 +457,7 @@ class TextTranslateController extends GetxController {
             0, 0, ScreenUtil.screenWidth, ScreenUtil.screenHeight / 2),
       );
     } else {
-      showDefaultSnackbar(message: noAudioFoundToShare.tr);
+      showDefaultSnackbar(message:i18n.t. noAudioFoundToShare);
     }
   }
   

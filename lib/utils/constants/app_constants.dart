@@ -1,3 +1,5 @@
+import 'language_map_translated.dart';
+
 //common
 const introShownAlreadyKey = 'is_intro_shown_already';
 const errorRetrievingRecordingFile = 'Error Retrieving recording file';
@@ -8,7 +10,7 @@ const tapAndHoldMinDuration = 600;
 const keyboardHideDuration = Duration(milliseconds: 200);
 const textCharMaxLength = 500;
 const recordingMaxTimeLimit = 30000;
-const defaultLangCode = 'en';
+const defaultLangCode = en;
 const defaultCountry = 'in';
 const defaultAnimationTime = Duration(milliseconds: 300);
 const feedbackButtonCloseTime = Duration(milliseconds: 450);

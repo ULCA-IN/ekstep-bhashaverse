@@ -9,12 +9,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/common_app_bar.dart';
 import '../../enums/gender_enum.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/settings_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -28,6 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   late SettingsController _settingsController;
   late AnimationController _controller;
   late Animation<double> _animation;
+  late dynamic translation;
 
   @override
   void initState() {
@@ -42,6 +43,12 @@ class _SettingsScreenState extends State<SettingsScreen>
       begin: 0.0,
       end: pi,
     ).animate(_controller);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -65,13 +72,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                 children: [
                   SizedBox(height: 16.h),
                   CommonAppBar(
-                      title: kSettings.tr,
+                      title: translation.kSettings,
                       onBackPress: () async => _onWillPop()),
                   SizedBox(height: 36.h),
                   _settingHeading(
                     action: _popupMenuBuilder(),
-                    title: appTheme.tr,
-                    subtitle: appInterfaceWillChange.tr,
+                    title: translation.appTheme,
+                    subtitle: translation.appInterfaceWillChange,
                   ),
                   SizedBox(height: 20.w),
                   Obx(
@@ -99,8 +106,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                             ),
                           ],
                         ),
-                        title: appLanguage.tr,
-                        subtitle: appInterfaceWillChangeInSelected.tr,
+                        title: translation.appLanguage,
+                        subtitle: translation.appInterfaceWillChangeInSelected,
                       ),
                     ),
                   ),
@@ -118,13 +125,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                             .changeTransliterationPref(value),
                       ),
                     ),
-                    title: transLiteration.tr,
-                    subtitle: transLiterationWillInitiateWord.tr,
+                    title: translation.transLiteration,
+                    subtitle: translation.transLiterationWillInitiateWord,
                   ),
                   SizedBox(height: 20.w),
                   Obx(
                     () => _expandableSettingHeading(
-                        title: advanceSettings.tr,
+                        title: translation.advanceSettings,
                         isExpanded:
                             _settingsController.isAdvanceMenuOpened.value,
                         onTitleClick: () {
@@ -149,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 child: Row(
                                   children: [
                                     Text(
-                                      realTimeResponse.tr,
+                                      translation.realTimeResponse,
                                       style: regular18Primary(context).copyWith(
                                         fontSize: 18.sp,
                                         color:
@@ -177,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                               SizedBox(height: 14.h),
                               Text(
                                 _settingsController.isAdvanceMenuOpened.value
-                                    ? realTimeResponseInfo.tr
+                                    ? translation.realTimeResponseInfo
                                     : '',
                                 style: regular14(context).copyWith(
                                   color: context.appTheme.secondaryTextColor,
@@ -315,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         children: [
           Expanded(
             child: Text(
-              voiceAssistant.tr,
+              translation.voiceAssistant,
               style: regular16(context).copyWith(
                 color: context.appTheme.primaryTextColor,
               ),
@@ -323,12 +330,12 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
           _radioWidgetBuilder(
             GenderEnum.male,
-            male.tr,
+            translation.male,
           ),
           SizedBox(width: 8.w),
           _radioWidgetBuilder(
             GenderEnum.female,
-            female.tr,
+            translation.female,
           ),
         ],
       ),
@@ -406,15 +413,15 @@ class _SettingsScreenState extends State<SettingsScreen>
         itemBuilder: (context) => [
           PopupMenuItem(
             value: ThemeMode.light,
-            child: Text(light.tr),
+            child: Text(translation.light),
           ),
           PopupMenuItem(
             value: ThemeMode.dark,
-            child: Text(dark.tr),
+            child: Text(translation.dark),
           ),
           PopupMenuItem(
             value: ThemeMode.system,
-            child: Text(systemDefault.tr),
+            child: Text(translation.systemDefault),
           ),
         ],
       ),
@@ -424,11 +431,11 @@ class _SettingsScreenState extends State<SettingsScreen>
   String _getThemeModeName(ThemeMode themeMode) {
     switch (themeMode) {
       case ThemeMode.system:
-        return systemDefault.tr;
+        return translation.systemDefault;
       case ThemeMode.light:
-        return light.tr;
+        return translation.light;
       case ThemeMode.dark:
-        return dark.tr;
+        return translation.dark;
     }
   }
 

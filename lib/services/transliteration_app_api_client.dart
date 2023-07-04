@@ -1,12 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
 
-import '../localization/localization_keys.dart';
 import '../models/search_model.dart';
 import '../utils/constants/api_constants.dart';
 import 'data_source_manager/exception/app_exceptions.dart';
 import 'data_source_manager/models/api_result.dart';
 import 'network_error.dart';
+import '../i18n/strings.g.dart' as i18n;
 
 class TransliterationAppAPIClient {
   late Dio _dio;
@@ -42,7 +41,7 @@ class TransliterationAppAPIClient {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 
@@ -64,7 +63,7 @@ class TransliterationAppAPIClient {
         return null;
       }
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 }

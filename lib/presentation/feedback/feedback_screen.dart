@@ -8,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../animation/lottie_animation.dart';
 import '../../common/transliteration_global_key.dart';
 import '../../common/widgets/common_app_bar.dart';
-import '../../localization/localization_keys.dart';
 import '../../models/feedback_type_model.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
@@ -20,6 +19,7 @@ import 'controller/feedback_controller.dart';
 import '../../common/widgets/custom_elevated_button.dart';
 import '../../common/widgets/transliteration_hints.dart';
 import 'widgets/rating_widget.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
@@ -30,11 +30,18 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   late final FeedbackController _feedbackController;
+  late dynamic translation;
 
   @override
   void initState() {
     _feedbackController = Get.find();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -47,7 +54,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               ? LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
-                  footerText: loading.tr)
+                  footerText: translation.loading)
               : Stack(
                   children: [
                     ScrollConfiguration(
@@ -60,7 +67,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                             children: [
                               SizedBox(height: 4.h),
                               CommonAppBar(
-                                title: feedback.tr,
+                                title: translation.feedback,
                                 showLogo: false,
                                 onBackPress: () => Get.back(),
                               ),
@@ -157,7 +164,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(12.0).w,
                 child: CustomElevatedButton(
-                  buttonText: submit.tr,
+                  buttonText: translation.submit,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
@@ -166,7 +173,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       _feedbackController.submitFeedbackPayload();
                       Get.back();
                     } else {
-                      showDefaultSnackbar(message: errorGiveRating.tr);
+                      showDefaultSnackbar(message: translation.errorGiveRating);
                     }
                   },
                 ),

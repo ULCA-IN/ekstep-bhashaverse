@@ -15,7 +15,6 @@ import '../../common/widgets/custom_outline_button.dart';
 import '../../common/widgets/text_field_with_actions.dart';
 import '../../common/widgets/transliteration_hints.dart';
 import '../../enums/speaker_status.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
@@ -24,6 +23,7 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/text_translate_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class TextTranslateScreen extends StatefulWidget {
   const TextTranslateScreen({super.key});
@@ -40,6 +40,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
   final FocusNode _targetLangFocusNode = FocusNode();
   late final Box _hiveDBInstance;
   String oldSourceText = '';
+  late dynamic translation;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       _textTranslationController.isKeyboardVisible.value = newValue;
     }
     super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -85,7 +87,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                       children: [
                         SizedBox(height: 18.w),
                         CommonAppBar(
-                            title: text.tr, onBackPress: () => Get.back()),
+                            title: translation.text,
+                            onBackPress: () => Get.back()),
                         SizedBox(height: 24.w),
                         _buildSourceTargetLangButtons(),
                         SizedBox(height: 18.w),
@@ -193,7 +196,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
       decoration: InputDecoration(
         hintText: _textTranslationController.isTranslateCompleted.value
             ? null
-            : textTranslateHintText.tr,
+            : translation.textTranslateHintText,
         hintStyle:
             regular22(context).copyWith(color: context.appTheme.hintTextColor),
         hintMaxLines: 4,
@@ -341,13 +344,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
         ),
         Obx(
           () => CustomOutlineButton(
-            title: kTranslate.tr,
+            title: translation.kTranslate,
             isDisabled: _textTranslationController.sourceTextCharLimit.value >
                 textCharMaxLength,
             onTap: () async {
               unFocusTextFields();
               if (!await isNetworkConnected()) {
-                showDefaultSnackbar(message: errorNoInternetTitle.tr);
+                showDefaultSnackbar(message: translation.errorNoInternetTitle);
                 return;
               }
               // TODO:  uncomment when TTS feature added
@@ -356,13 +359,13 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
 
               if (_textTranslationController
                   .sourceLangTextController.text.isEmpty) {
-                showDefaultSnackbar(message: kErrorNoSourceText.tr);
+                showDefaultSnackbar(message: translation.kErrorNoSourceText);
               } else if (_textTranslationController
                   .isSourceAndTargetLangSelected()) {
                 _textTranslationController.getComputeResponseASRTrans();
               } else {
                 showDefaultSnackbar(
-                    message: kErrorSelectSourceAndTargetScreen.tr);
+                    message: translation.kErrorSelectSourceAndTargetScreen);
               }
             },
           ),
@@ -432,7 +435,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                       ? APIConstants.getLanNameInAppLang(
                           _textTranslationController
                               .selectedSourceLanguageCode.value)
-                      : kTranslateSourceTitle.tr;
+                      : translation.kTranslateSourceTitle;
                   return AutoSizeText(
                     selectedSourceLang,
                     maxLines: 2,
@@ -463,7 +466,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
               _targetLangFocusNode.unfocus();
               if (_textTranslationController
                   .selectedSourceLanguageCode.value.isEmpty) {
-                showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
+                showDefaultSnackbar(
+                    message: translation.errorSelectSourceLangFirst);
                 return;
               }
 
@@ -514,7 +518,7 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
                       ? APIConstants.getLanNameInAppLang(
                           _textTranslationController
                               .selectedTargetLanguageCode.value)
-                      : kTranslateTargetTitle.tr;
+                      : translation.kTranslateTargetTitle;
                   return AutoSizeText(
                     selectedTargetLang,
                     style: secondary16(context),
@@ -536,8 +540,8 @@ class _TextTranslateScreenState extends State<TextTranslateScreen>
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _textTranslationController.isLoading.value
-                ? computeCallLoadingText.tr
-                : kTranslationLoadingAnimationText.tr);
+                ? translation.computeCallLoadingText
+                : translation.kTranslationLoadingAnimationText);
       } else {
         return const SizedBox.shrink();
       }

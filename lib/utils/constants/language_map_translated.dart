@@ -1,30 +1,57 @@
+const String en = 'en';
+const String hi = 'hi';
+const String mr = 'mr';
+const String bn = 'bn';
+const String pa = 'pa';
+const String gu = 'gu';
+const String or = 'or';
+const String ta = 'ta';
+const String te = 'te';
+const String kn = 'kn';
+const String ur = 'ur';
+const String doi = 'doi';
+const String ne = 'ne';
+const String si = 'si';
+const String sa = 'sa';
+const String as = 'as';
+const String mai = 'mai';
+const String bho = 'bho';
+const String ml = 'ml';
+const String raj = 'raj';
+const String brx = 'brx';
+const String mni = 'mni';
+const String ks = 'ks';
+const String gom = 'gom';
+const String sd = 'sd';
+const String sat = 'sat';
+
 List<String> languagesCodeList = [
-  'en',
-  'hi',
-  'mr',
-  'bn',
-  'pa',
-  'gu',
-  'or',
-  'ta',
-  'te',
-  'kn',
-  'ur',
-  'doi',
-  'ne',
-  'si',
-  'sa',
-  'as',
-  'mai',
-  'bho',
-  'ml',
-  'raj',
-  'brx',
-  'mni',
-  'ks',
-  'gom',
-  'sd',
-  'sat',
+  en,
+  hi,
+  mr,
+  bn,
+  pa,
+  gu,
+  or,
+  ta,
+  te,
+  kn,
+  ur,
+  doi,
+  ne,
+  si,
+  sa,
+  as,
+  mai,
+  bho,
+  ml,
+  raj,
+  brx,
+  mni,
+  ks,
+  gom,
+  sd,
+  sat,
 ];
 
 //Voice Screen

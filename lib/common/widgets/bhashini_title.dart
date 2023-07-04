@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
-import '../../localization/localization_keys.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_text_style.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class BhashiniTitle extends StatelessWidget {
   const BhashiniTitle({
@@ -28,7 +27,7 @@ class BhashiniTitle extends StatelessWidget {
           width: 0.01.sh,
         ),
         Text(
-          bhashiniTitle.tr,
+          i18n.Translations.of(context).bhashiniTitle,
           textAlign: TextAlign.center,
           style: semibold22(context),
         ),

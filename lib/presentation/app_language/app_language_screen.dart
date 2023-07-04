@@ -7,8 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../common/widgets/custom_elevated_button.dart';
 import '../../common/widgets/language_selection_widget.dart';
 import '../../enums/language_enum.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
+import '../../utils/app_locale_helper.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
@@ -16,6 +16,7 @@ import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/app_language_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class AppLanguageScreen extends StatefulWidget {
   const AppLanguageScreen({super.key});
@@ -29,6 +30,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
   late TextEditingController _languageSearchController;
   final FocusNode _focusNodeLanguageSearch = FocusNode();
   late final Box _hiveDBInstance;
+  late dynamic translation;
 
   @override
   void initState() {
@@ -36,8 +38,13 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
     _languageSearchController = TextEditingController();
     _hiveDBInstance = Hive.box(hiveDBName);
     setSelectedLanguageFromArg();
-
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -70,7 +77,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                     if (!isFirstTime)
                       InkWell(
                         borderRadius: BorderRadius.circular(8),
-                        onTap: () => Get.back(),
+                        onTap: () => _onWillPop(),
                         child: Container(
                           padding: const EdgeInsets.all(8).w,
                           decoration: BoxDecoration(
@@ -87,7 +94,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                     SizedBox(width: isFirstTime ? 0 : 20.w),
                     Expanded(
                       child: Text(
-                        selectAppLanguage.tr,
+                        translation.selectAppLanguage,
                         style: semibold22(context),
                       ),
                     ),
@@ -95,7 +102,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 ),
                 SizedBox(height: 8.w),
                 Text(
-                  youCanAlwaysChange.tr,
+                  translation.youCanAlwaysChange,
                   style: secondary14(context),
                 ),
                 SizedBox(height: 24.w),
@@ -132,6 +139,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                               onItemTap: () {
                                 _appLanguageController
                                     .setSelectedLanguageIndex(index);
+                                setAppLocale(_appLanguageController
+                                    .getSelectedLanguageCode());
                               },
                               index: index,
                               selectedIndex: _appLanguageController
@@ -145,7 +154,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                 ),
                 SizedBox(height: 16.w),
                 CustomElevatedButton(
-                  buttonText: continueText.tr,
+                  buttonText: translation.continueText,
                   backgroundColor: context.appTheme.primaryColor,
                   borderRadius: 16,
                   onButtonTap: () {
@@ -160,8 +169,8 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                                 .length) {
                       _languageSearchController.clear();
                       _appLanguageController.saveSelectedLocaleInDB();
-                      Get.updateLocale(Locale(
-                          _appLanguageController.getSelectedLanguageCode()));
+                      setAppLocale(
+                          _appLanguageController.getSelectedLanguageCode());
                       if (_hiveDBInstance.get(introShownAlreadyKey,
                           defaultValue: false)) {
                         Get.back();
@@ -170,7 +179,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
                       }
                     } else {
                       showDefaultSnackbar(
-                          message: errorPleaseSelectLanguage.tr);
+                          message: translation.errorPleaseSelectLanguage);
                     }
                   },
                 ),
@@ -202,7 +211,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
             Icons.search,
             color: context.appTheme.secondaryTextColor,
           ),
-          hintText: searchLanguage.tr,
+          hintText: translation.searchLanguage,
           hintStyle: light16(context)
               .copyWith(fontSize: 18, color: context.appTheme.titleTextColor),
         ),
@@ -238,7 +247,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       _appLanguageController.setSelectedLanguageIndex(null);
       for (var i = 0; i < searchedLanguageList.length; i++) {
         if (searchedLanguageList[i][APIConstants.kLanguageCode] ==
-            Get.locale?.languageCode) {
+            i18n.LocaleSettings.currentLocale.languageCode) {
           _appLanguageController.setSelectedLanguageIndex(i);
         }
       }
@@ -272,9 +281,7 @@ class _AppLanguageScreenState extends State<AppLanguageScreen> {
       _languageSearchController.clear();
       _appLanguageController.setAllLanguageList();
     } else {
-      Get.updateLocale(
-        Locale(_hiveDBInstance.get(preferredAppLocale)),
-      );
+      setAppLocale(_hiveDBInstance.get(preferredAppLocale));
       Get.back();
     }
     return Future.value(false);
