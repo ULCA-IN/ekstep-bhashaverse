@@ -82,7 +82,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _headerWidget(context),
+                _headerWidget(),
                 SizedBox(height: 16.h),
                 _pageViewBuilder(),
                 SizedBox(height: 12.h),
@@ -122,7 +122,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     );
   }
 
-  Widget _headerWidget(BuildContext context) {
+  Widget _headerWidget() {
     return Row(
       children: [
         InkWell(
