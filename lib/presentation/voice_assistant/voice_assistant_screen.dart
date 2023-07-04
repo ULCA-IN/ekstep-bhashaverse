@@ -21,6 +21,7 @@ class VoiceAssistantScreen extends StatefulWidget {
 
 class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   late VoiceAssistantController _voiceAssistantController;
+  late dynamic translation;
 
   @override
   void initState() {
@@ -30,8 +31,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.listingScreenBGColor,
       body: SafeArea(

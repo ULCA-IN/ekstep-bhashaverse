@@ -26,6 +26,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   late OnboardingController _onboardingController;
   PageController? _pageController;
   final List<OnboardingModel> onboardingPages = [];
+  late dynamic translation;
 
   @override
   void initState() {
@@ -37,34 +38,29 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
     onboardingPages.addAll([
       OnboardingModel(
         imagePath: imgOnboarding1,
-        headerText: i18n.Translations.of(context).speechRecognition,
-        bodyText:
-            i18n.Translations.of(context).automaticallyRecognizeAndConvert,
+        headerText: translation.speechRecognition,
+        bodyText: translation.automaticallyRecognizeAndConvert,
       ),
       OnboardingModel(
         imagePath: imgOnboarding2,
-        headerText: i18n.Translations.of(context).speechToSpeechTranslation,
-        bodyText:
-            i18n.Translations.of(context).translateYourVoiceInOneIndianLanguage,
+        headerText: translation.speechToSpeechTranslation,
+        bodyText: translation.translateYourVoiceInOneIndianLanguage,
       ),
       OnboardingModel(
         imagePath: imgOnboarding3,
-        headerText: i18n.Translations.of(context).languageTranslation,
-        bodyText: i18n.Translations.of(context)
-            .translateSentencesFromOneIndianLanguageToAnother,
+        headerText: translation.languageTranslation,
+        bodyText: translation.translateSentencesFromOneIndianLanguageToAnother,
       ),
       // TODO: uncomment after chat feature added
-      // OnboardingModel(
-      //   image: Image.asset(
-      //     imgOnboarding4,
-      //     fit: BoxFit.fitWidth,
-      //   ),
-      //   headerText: bhashaverseChatBot.tr,
-      //   bodyText: translateSentencesFromOneIndianLanguageToAnother.tr,
-      // )
+      /*    OnboardingModel(
+        imagePath: imgOnboarding4,
+        headerText: translation.bhashaverseChatBot,
+        bodyText: translation.translateSentencesFromOneIndianLanguageToAnother,
+      ) */
     ]);
   }
 
@@ -77,7 +73,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.backgroundColor,
       body: SafeArea(
@@ -160,7 +155,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           child: InkWell(
             onTap: () => Get.offNamed(AppRoutes.voiceAssistantRoute),
             child: Text(
-              i18n.Translations.of(context).skip,
+              translation.skip,
               style: regular14(context).copyWith(
                 color: context.appTheme.highlightedBGColor,
               ),

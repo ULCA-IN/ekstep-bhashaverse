@@ -20,11 +20,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   late final Box _hiveDBInstance;
   bool isIntroShownAlready = false;
-  Image appLogo = Image.asset(
-    imgAppLogoSmall,
-    height: 100.h,
-    width: 100.w,
-  );
+  late dynamic translation;
 
   @override
   void initState() {
@@ -44,28 +40,33 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void didChangeDependencies() {
     // Precache splash screen logo
-    precacheImage(appLogo.image, context);
+    precacheImage(Image.asset(imgAppLogoSmall).image, context);
+
     // Precache home screen menu images
     precacheImage(Image.asset(imgText).image, context);
     precacheImage(Image.asset(imgVoiceSpeaking).image, context);
     precacheImage(Image.asset(imgMic).image, context);
+/*     precacheImage(Image.asset(imgVideo).image, context);
+    precacheImage(Image.asset(imgDocuments).image, context);
+    precacheImage(Image.asset(imgImages).image, context); */
 
     if (!isIntroShownAlready) {
       // Precache Onboarding screen images
       precacheImage(Image.asset(imgOnboarding1).image, context);
       precacheImage(Image.asset(imgOnboarding2).image, context);
       precacheImage(Image.asset(imgOnboarding3).image, context);
+      // precacheImage(Image.asset(imgOnboarding4).image, context);
 
       // Precache voice assistant screen images
       precacheImage(Image.asset(imgMaleAvatar).image, context);
       precacheImage(Image.asset(imgFemaleAvatar).image, context);
     }
     super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.splashScreenBGColor,
       body: SafeArea(
@@ -73,7 +74,11 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              appLogo,
+              Image.asset(
+                imgAppLogoSmall,
+                height: 100.h,
+                width: 100.w,
+              ),
               SizedBox(
                 height: 24.h,
               ),
