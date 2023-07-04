@@ -1,79 +1,79 @@
-import '../i18n/strings.g.dart';
+import '../i18n/strings.g.dart' as i18n;
 import 'constants/language_map_translated.dart';
 
 setAppLocale(String locale) {
   switch (locale) {
     case en:
-      LocaleSettings.setLocale(AppLocale.en);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.en);
       break;
     case hi:
-      LocaleSettings.setLocale(AppLocale.hi);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.hi);
       break;
     case mr:
-      LocaleSettings.setLocale(AppLocale.mr);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.mr);
       break;
     case bn:
-      LocaleSettings.setLocale(AppLocale.bn);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.bn);
       break;
     case pa:
-      LocaleSettings.setLocale(AppLocale.pa);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.pa);
       break;
     case gu:
-      LocaleSettings.setLocale(AppLocale.gu);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.gu);
       break;
     case or:
-      LocaleSettings.setLocale(AppLocale.or);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.or);
       break;
     case ta:
-      LocaleSettings.setLocale(AppLocale.ta);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.ta);
       break;
     case te:
-      LocaleSettings.setLocale(AppLocale.te);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.te);
       break;
     case kn:
-      LocaleSettings.setLocale(AppLocale.kn);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.kn);
       break;
     case ur:
-      LocaleSettings.setLocale(AppLocale.ur);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.ur);
       break;
     case doi:
-      LocaleSettings.setLocale(AppLocale.doi);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.doi);
       break;
     case ne:
-      LocaleSettings.setLocale(AppLocale.ne);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.ne);
       break;
     case sa:
-      LocaleSettings.setLocale(AppLocale.sa);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.sa);
       break;
     case as:
-      LocaleSettings.setLocale(AppLocale.as);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.as);
       break;
     case mai:
-      LocaleSettings.setLocale(AppLocale.mai);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.mai);
       break;
     case bho:
-      LocaleSettings.setLocale(AppLocale.bho);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.bho);
       break;
     case ml:
-      LocaleSettings.setLocale(AppLocale.ml);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.ml);
       break;
     case mni:
-      LocaleSettings.setLocale(AppLocale.mni);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.mni);
       break;
     case ks:
-      LocaleSettings.setLocale(AppLocale.ks);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.ks);
       break;
     case gom:
-      LocaleSettings.setLocale(AppLocale.gom);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.gom);
       break;
     case sd:
-      LocaleSettings.setLocale(AppLocale.sd);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.sd);
       break;
     case sat:
-      LocaleSettings.setLocale(AppLocale.sat);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.sat);
       break;
     default:
-      LocaleSettings.setLocale(AppLocale.en);
+      i18n.LocaleSettings.setLocale(i18n.AppLocale.en);
       break;
   }
 }

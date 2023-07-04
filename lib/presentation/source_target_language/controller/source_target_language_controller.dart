@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../../i18n/strings.g.dart';
+import '../../../i18n/strings.g.dart' as i18n;
 import '../../../utils/constants/language_map_translated.dart';
 
 class SourceTargetLanguageController extends GetxController {
@@ -15,7 +15,7 @@ class SourceTargetLanguageController extends GetxController {
   @override
   void onInit() {
     selectedLanguageMap = TranslatedLanguagesMap
-        .language[LocaleSettings.currentLocale.languageCode];
+        .language[i18n.LocaleSettings.currentLocale.languageCode];
     super.onInit();
   }
 

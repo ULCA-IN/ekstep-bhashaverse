@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../../i18n/strings.g.dart';
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
@@ -260,7 +259,7 @@ class FeedbackController extends GetxController {
     submissionPayload['feedbackTimeStamp'] =
         DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
     submissionPayload['feedbackLanguage'] =
-        LocaleSettings.currentLocale.languageCode;
+        i18n.LocaleSettings.currentLocale.languageCode;
     submissionPayload['pipelineInput'] = computePayload;
     submissionPayload['pipelineOutput'] = computeResponse;
 

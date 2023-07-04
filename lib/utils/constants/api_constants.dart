@@ -1,7 +1,7 @@
 // ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 import '../../enums/language_enum.dart';
-import '../../i18n/strings.g.dart';
+import '../../i18n/strings.g.dart' as i18n;
 import '../../models/task_sequence_response_model.dart';
 import 'language_map_translated.dart';
 
@@ -424,6 +424,6 @@ class APIConstants {
         value: languageCode,
         returnWhat: LanguageMap.languageNameInAppLanguage,
         lang_code_map: LANGUAGE_CODE_MAP,
-        langCode: LocaleSettings.currentLocale.languageCode);
+        langCode: i18n.LocaleSettings.currentLocale.languageCode);
   }
 }

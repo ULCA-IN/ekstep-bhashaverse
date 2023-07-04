@@ -9,7 +9,6 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 
 import 'enums/gender_enum.dart';
-import 'i18n/strings.g.dart';
 import 'utils/localization_delegates/common_cupertino_localization_delegate.dart';
 import 'utils/localization_delegates/common_material_localization_delegate.dart';
 import 'presentation/splash/binding/splash_binding.dart';
@@ -40,8 +39,8 @@ void main() async {
   // Localization preference
   appLocale = hiveDBInstance.get(preferredAppLocale);
   if (appLocale == null || appLocale.isEmpty) {
-    LocaleSettings.useDeviceLocale();
-    appLocale = LocaleSettings.currentLocale.languageCode;
+    i18n.LocaleSettings.useDeviceLocale();
+    appLocale = i18n.LocaleSettings.currentLocale.languageCode;
     hiveDBInstance.put(preferredAppLocale, appLocale);
   }
 
@@ -52,7 +51,7 @@ void main() async {
         create: (_) => AppThemeProvider(),
       ),
     ],
-    child: TranslationProvider(child: const MyApp()),
+    child: i18n.TranslationProvider(child: const MyApp()),
   ));
 }
 
@@ -120,14 +119,14 @@ class _MyAppState extends State<MyApp> {
             onGenerateTitle: (context) =>
                 i18n.Translations.of(context).bhashiniTitle,
             debugShowCheckedModeBanner: false,
-            locale: TranslationProvider.of(context).flutterLocale,
+            locale: i18n.TranslationProvider.of(context).flutterLocale,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               CommonMaterialLocalizationDelegate(),
               CommonCupertinoLocalizationDelegate()
             ],
-            supportedLocales: AppLocaleUtils.supportedLocales,
+            supportedLocales: i18n.AppLocaleUtils.supportedLocales,
             themeMode: context.appThemeMode,
             theme: lightMaterialThemeData(),
             darkTheme: darkMaterialThemeData(),
