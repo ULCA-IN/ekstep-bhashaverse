@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
 
-import '../localization/localization_keys.dart';
 import '../models/task_sequence_response_model.dart';
 import '../models/rest_compute_response_model.dart';
 import '../utils/constants/api_constants.dart';
@@ -9,6 +7,7 @@ import '../utils/environment/rest_api_key_env.dart';
 import 'data_source_manager/exception/app_exceptions.dart';
 import 'data_source_manager/models/api_result.dart';
 import 'network_error.dart';
+import '../i18n/strings.g.dart' as i18n;
 
 class DHRUVAAPIClient {
   late Dio _dio;
@@ -43,14 +42,14 @@ class DHRUVAAPIClient {
         data: requestPayload,
       );
       if (response.data == null) {
-        return Result.failure(AppException(somethingWentWrong.tr));
+        return Result.failure(AppException(i18n.t.somethingWentWrong));
       }
       return Result.success(TaskSequenceResponse.fromJson(response.data));
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 
@@ -74,14 +73,14 @@ class DHRUVAAPIClient {
       );
 
       if (response.data == null) {
-        return Result.failure(AppException(somethingWentWrong.tr));
+        return Result.failure(AppException(i18n.t.somethingWentWrong));
       }
       return Result.success(RESTComputeResponseModel.fromJson(response.data));
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 
@@ -101,14 +100,14 @@ class DHRUVAAPIClient {
         data: requestPayload,
       );
       if (response.data == null) {
-        return Result.failure(AppException(somethingWentWrong.tr));
+        return Result.failure(AppException(i18n.t.somethingWentWrong));
       }
       return Result.success(response.data);
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 
@@ -130,14 +129,14 @@ class DHRUVAAPIClient {
         data: requestPayload,
       );
       if (response.data == null) {
-        return Result.failure(AppException(somethingWentWrong.tr));
+        return Result.failure(AppException(i18n.t.somethingWentWrong));
       }
       return Result.success(response.data);
     } on DioError catch (error) {
       return Result.failure(
           AppException(NetworkError(error).getErrorModel().errorMessage));
     } on Exception catch (_) {
-      return Result.failure(AppException(somethingWentWrong.tr));
+      return Result.failure(AppException(i18n.t.somethingWentWrong));
     }
   }
 }
