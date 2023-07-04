@@ -23,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeController _homeController;
   final List<HomeMenuModel> menuItems = [];
+  late dynamic translation;
 
   @override
   void initState() {
@@ -33,30 +34,30 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
     menuItems.clear();
     menuItems.addAll([
       HomeMenuModel(
-          name: i18n.Translations.of(context).text,
-          imagePath: imgText,
-          isDisabled: false),
+          name: translation.text, imagePath: imgText, isDisabled: false),
       HomeMenuModel(
-          name: i18n.Translations.of(context).converse,
+          name: translation.converse,
           imagePath: imgVoiceSpeaking,
           isDisabled: false),
       HomeMenuModel(
-          name: i18n.Translations.of(context).voice,
-          imagePath: imgMic,
-          isDisabled: false),
-      // HomeMenuModel(name: video, preCachedImage: Image.asset(imgVideo), isDisabled: true),
-      // HomeMenuModel(
-      //     name: documents, preCachedImage: Image.asset(imgDocuments), isDisabled: true),
-      // HomeMenuModel(name: images, preCachedImage: Image.asset(imgImages), isDisabled: true),
+          name: translation.voice, imagePath: imgMic, isDisabled: false),
+/*       HomeMenuModel(
+          name: translation.video, imagePath: imgVideo, isDisabled: true),
+      HomeMenuModel(
+          name: translation.documents,
+          imagePath: imgDocuments,
+          isDisabled: true),
+      HomeMenuModel(
+          name: translation.images, imagePath: imgImages, isDisabled: true), */
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    final translation = i18n.Translations.of(context);
     return Scaffold(
       backgroundColor: context.appTheme.backgroundColor,
       body: Stack(

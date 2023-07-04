@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 import '../../../common/controller/language_model_controller.dart';
-import '../../../localization/localization_keys.dart';
 import '../../../models/task_sequence_response_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
@@ -14,6 +13,7 @@ import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
+import '../../../i18n/strings.g.dart' as i18n;
 
 class HomeController extends GetxController {
   RxBool isMainConfigCallLoading = false.obs,
@@ -52,7 +52,7 @@ class HomeController extends GetxController {
         if (isConnected) {
           getAvailableLanguagesInTask();
         } else {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
       if (subscription == null) listenNetworkChange();
@@ -80,7 +80,7 @@ class HomeController extends GetxController {
         if (isConnected) {
           getAvailableLangTranslation();
         } else {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
       if (subscription == null) listenNetworkChange();
@@ -114,7 +114,7 @@ class HomeController extends GetxController {
       }),
       failure: (error) {
         isMainConfigCallLoading.value = false;
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
       },
     );
   }
@@ -138,7 +138,7 @@ class HomeController extends GetxController {
       }),
       failure: (error) {
         isTransConfigCallLoading.value = false;
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
       },
     );
   }
@@ -161,7 +161,7 @@ class HomeController extends GetxController {
             transliterationModel: data);
       }),
       failure: (error) {
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
       },
     );
   }
