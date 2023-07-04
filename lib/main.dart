@@ -10,8 +10,8 @@ import 'package:provider/provider.dart';
 
 import 'enums/gender_enum.dart';
 import 'i18n/strings.g.dart';
-import 'localization/common_cupertino_localization_delegate.dart';
-import 'localization/common_localization_delegate.dart';
+import 'utils/localization_delegates/common_cupertino_localization_delegate.dart';
+import 'utils/localization_delegates/common_material_localization_delegate.dart';
 import 'presentation/splash/binding/splash_binding.dart';
 import 'routes/app_routes.dart';
 import 'utils/app_locale_helper.dart';
@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> {
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
-              CommonLocalizationDelegate(),
+              CommonMaterialLocalizationDelegate(),
               CommonCupertinoLocalizationDelegate()
             ],
             supportedLocales: AppLocaleUtils.supportedLocales,
