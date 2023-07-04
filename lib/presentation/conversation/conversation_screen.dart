@@ -14,7 +14,6 @@ import '../../common/widgets/text_field_with_actions.dart';
 import '../../enums/current_mic.dart';
 import '../../enums/mic_button_status.dart';
 import '../../enums/speaker_status.dart';
-import '../../localization/localization_keys.dart';
 import '../../routes/app_routes.dart';
 import '../../services/socket_io_client.dart';
 import '../../utils/constants/api_constants.dart';
@@ -23,6 +22,7 @@ import '../../utils/network_utils.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import 'controller/conversation_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({super.key});
@@ -36,6 +36,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   late final Box _hiveDBInstance;
+  late dynamic translation;
 
   @override
   void initState() {
@@ -47,6 +48,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _translationController.setSourceLanguageList();
     _translationController.setTargetLanguageList();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -64,7 +71,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     height: 16.h,
                   ),
                   CommonAppBar(
-                      title: converse.tr, onBackPress: () => Get.back()),
+                      title: translation.converse,
+                      onBackPress: () => Get.back()),
                   SizedBox(
                     height: 8.h,
                   ),
@@ -110,13 +118,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
             hintText: isCurrentlyRecording()
                 ? _translationController.currentMic.value ==
                         CurrentlySelectedMic.source
-                    ? kListeningHintText.tr
+                    ? translation.kListeningHintText
                     : ''
                 : _translationController.micButtonStatus.value ==
                         MicButtonStatus.pressed
-                    ? connecting.tr
-                    : converseHintText.tr,
-            translateButtonTitle: kTranslate.tr,
+                    ? translation.connecting
+                    : translation.converseHintText,
+            translateButtonTitle: translation.kTranslate,
             currentDuration: _translationController.currentDuration.value,
             totalDuration: _translationController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
@@ -168,13 +176,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
           hintText: isCurrentlyRecording()
               ? _translationController.currentMic.value ==
                       CurrentlySelectedMic.target
-                  ? kListeningHintText.tr
+                  ? translation.kListeningHintText
                   : ''
               : _translationController.micButtonStatus.value ==
                       MicButtonStatus.pressed
-                  ? connecting.tr
-                  : converseHintText.tr,
-          translateButtonTitle: kTranslate.tr,
+                  ? translation.connecting
+                  : translation.converseHintText,
+          translateButtonTitle: translation.kTranslate,
           currentDuration: _translationController.currentDuration.value,
           totalDuration: _translationController.maxDuration.value,
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
@@ -245,7 +253,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               .contains(sourceLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedSourceLanguageCode.value)
-                  : kTranslateSourceTitle.tr;
+                  : translation.kTranslateSourceTitle;
               return MicButton(
                 micButtonStatus: _translationController.currentMic.value ==
                         CurrentlySelectedMic.source
@@ -323,7 +331,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               .contains(targetLangCode))
                   ? APIConstants.getLanNameInAppLang(
                       _translationController.selectedTargetLanguageCode.value)
-                  : kTranslateTargetTitle.tr;
+                  : translation.kTranslateTargetTitle;
               return MicButton(
                 micButtonStatus: _translationController.currentMic.value ==
                         CurrentlySelectedMic.target
@@ -342,7 +350,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 onLanguageTap: () async {
                   if (_translationController
                       .selectedSourceLanguageCode.value.isEmpty) {
-                    showDefaultSnackbar(message: errorSelectSourceLangFirst.tr);
+                    showDefaultSnackbar(
+                        message: translation.errorSelectSourceLangFirst);
                     return;
                   }
 
@@ -396,8 +405,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
             context: context,
             lottieAsset: animationLoadingLine,
             footerText: _translationController.isLoading.value
-                ? computeCallLoadingText.tr
-                : kTranslationLoadingAnimationText.tr);
+                ? translation.computeCallLoadingText
+                : translation.kTranslationLoadingAnimationText);
       } else {
         return const SizedBox.shrink();
       }
@@ -422,7 +431,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   void micButtonActions({required bool startMicRecording}) async {
     if (!await isNetworkConnected()) {
-      showDefaultSnackbar(message: errorNoInternetTitle.tr);
+      showDefaultSnackbar(message: translation.errorNoInternetTitle);
     } else if (_translationController.isSourceAndTargetLangSelected()) {
       if (startMicRecording) {
         _translationController.micButtonStatus.value = MicButtonStatus.pressed;
@@ -436,7 +445,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         }
       }
     } else if (startMicRecording) {
-      showDefaultSnackbar(message: kErrorSelectSourceAndTargetScreen.tr);
+      showDefaultSnackbar(
+          message: translation.kErrorSelectSourceAndTargetScreen);
     }
   }
 }

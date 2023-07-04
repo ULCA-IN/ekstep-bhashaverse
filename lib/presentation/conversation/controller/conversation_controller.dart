@@ -18,7 +18,6 @@ import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/current_mic.dart';
 import '../../../enums/speaker_status.dart';
 import '../../../enums/mic_button_status.dart';
-import '../../../localization/localization_keys.dart';
 
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
@@ -31,6 +30,7 @@ import '../../../utils/permission_handler.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../utils/voice_recorder.dart';
 import '../../../utils/waveform_style.dart';
+import '../../../i18n/strings.g.dart' as i18n;
 
 class ConversationController extends GetxController {
   late DHRUVAAPIClient _dhruvaapiClient;
@@ -186,7 +186,7 @@ class ConversationController extends GetxController {
       if (isAborted && micButtonStatus.value == MicButtonStatus.pressed) {
         micButtonStatus.value = MicButtonStatus.released;
         showDefaultSnackbar(
-            message: _socketIOClient.socketError ?? somethingWentWrong.tr);
+            message: _socketIOClient.socketError ?? i18n.t.somethingWentWrong);
       }
     }, condition: !_socketIOClient.isConnected());
   }
@@ -292,7 +292,7 @@ class ConversationController extends GetxController {
         }
       }
     } else {
-      showDefaultSnackbar(message: errorMicPermission.tr);
+      showDefaultSnackbar(message: i18n.t.errorMicPermission);
     }
   }
 
@@ -304,7 +304,7 @@ class ConversationController extends GetxController {
 
     if (timeTakenForLastRecording < tapAndHoldMinDuration &&
         isMicPermissionGranted) {
-      showDefaultSnackbar(message: tapAndHoldForRecording.tr);
+      showDefaultSnackbar(message: i18n.t.tapAndHoldForRecording);
       if (!_hiveDBInstance.get(isStreamingPreferred)) {
         return;
       }
@@ -336,7 +336,7 @@ class ConversationController extends GetxController {
             : targetLangTTSPath.value = recordedAudioPath;
         if (base64EncodedAudioContent == null ||
             (base64EncodedAudioContent ?? '').isEmpty) {
-          showDefaultSnackbar(message: errorInRecording.tr);
+          showDefaultSnackbar(message: i18n.t.errorInRecording);
           return;
         } else {
           await getComputeResponseASRTrans(
@@ -405,7 +405,7 @@ class ConversationController extends GetxController {
         if (targetOutputText.isEmpty) {
           // something went wrong in API call
           isLoading.value = false;
-          showDefaultSnackbar(message: responseNotReceived.tr);
+          showDefaultSnackbar(message: i18n.t.responseNotReceived);
           return;
         }
 
@@ -449,7 +449,7 @@ class ConversationController extends GetxController {
       },
       failure: (error) {
         isLoading.value = false;
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
       },
     );
   }
@@ -515,12 +515,12 @@ class ConversationController extends GetxController {
           Future.delayed(const Duration(seconds: 3))
               .then((value) => expandFeedbackIcon.value = false);
         } else {
-          showDefaultSnackbar(message: noVoiceAssistantAvailable.tr);
+          showDefaultSnackbar(message: i18n.t.noVoiceAssistantAvailable);
           return;
         }
       },
       failure: (error) {
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
         return;
       },
     );
@@ -533,7 +533,7 @@ class ConversationController extends GetxController {
 
       if (audioPathToShare.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         String sourceText = isSourceLang
@@ -545,7 +545,7 @@ class ConversationController extends GetxController {
             : selectedTargetLanguageCode.value;
 
         if (sourceText.isEmpty) {
-          showDefaultSnackbar(message: noAudioFoundToShare.tr);
+          showDefaultSnackbar(message: i18n.t.noAudioFoundToShare);
           return;
         }
 
@@ -571,7 +571,7 @@ class ConversationController extends GetxController {
             0, 0, ScreenUtil().screenWidth, ScreenUtil().screenHeight / 2),
       );
     } else {
-      showDefaultSnackbar(message: noAudioFoundToShare.tr);
+      showDefaultSnackbar(message: i18n.t.noAudioFoundToShare);
     }
   }
 
@@ -698,7 +698,7 @@ class ConversationController extends GetxController {
     if (isPlayingSource) {
       if (sourceLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         sourceSpeakerStatus.value = SpeakerStatus.loading;
@@ -713,7 +713,7 @@ class ConversationController extends GetxController {
     } else {
       if (targetLangTTSPath.value.isEmpty) {
         if (!await isNetworkConnected()) {
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
           return;
         }
         targetSpeakerStatus.value = SpeakerStatus.loading;

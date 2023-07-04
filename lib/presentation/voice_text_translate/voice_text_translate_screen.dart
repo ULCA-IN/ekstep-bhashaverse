@@ -45,8 +45,8 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   final FocusNode _sourceLangFocusNode = FocusNode();
   final FocusNode _targetLangFocusNode = FocusNode();
   String oldSourceText = '';
-
   late final Box _hiveDBInstance;
+  late dynamic translation;
 
   @override
   void initState() {
@@ -69,6 +69,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
       _voiceTextTransController.isKeyboardVisible.value = newValue;
     }
     super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -90,8 +91,7 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 children: [
                   SizedBox(height: 18.w),
                   CommonAppBar(
-                      title: i18n.Translations.of(context).voice,
-                      onBackPress: () => Get.back()),
+                      title: translation.voice, onBackPress: () => Get.back()),
                   SizedBox(height: 24.w),
                   Expanded(
                     child: Column(
@@ -129,7 +129,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildSourceTextField() {
-    final translation = i18n.Translations.of(context);
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
@@ -235,7 +234,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildSourceTargetLangButtons() {
-    final translation = i18n.Translations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -428,7 +426,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   Widget _buildLoadingAnimation() {
-    final translation = i18n.Translations.of(context);
     return Obx(() {
       if (_voiceTextTransController.isLoading.value) {
         return LottieAnimation(
@@ -507,7 +504,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   void _onTranslateButtonTap() async {
-    final translation = i18n.Translations.of(context);
     unFocusTextFields();
 
     if (!await isNetworkConnected()) {
@@ -584,7 +580,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
   }
 
   void micButtonActions({required bool startMicRecording}) async {
-    final translation = i18n.Translations.of(context);
     if (!await isNetworkConnected()) {
       showDefaultSnackbar(message: translation.errorNoInternetTitle);
     } else if (_voiceTextTransController.isSourceAndTargetLangSelected()) {
