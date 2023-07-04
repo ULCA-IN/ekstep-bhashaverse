@@ -7,13 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../common/widgets/language_selection_widget.dart';
 import '../../enums/language_enum.dart';
-import '../../localization/localization_keys.dart';
 import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
 import 'controller/source_target_language_controller.dart';
+import '../../i18n/strings.g.dart' as i18n;
 
 class SourceTargetLanguageScreen extends StatefulWidget {
   const SourceTargetLanguageScreen({super.key});
@@ -32,6 +32,7 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
   late AnimationController _controller;
   late Animation<double> _animation;
   final ScrollController _scrollController = ScrollController();
+  late dynamic translation;
 
   @override
   void initState() {
@@ -48,6 +49,12 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
       begin: 0.0,
       end: pi,
     ).animate(_controller);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    translation = i18n.Translations.of(context);
   }
 
   @override
@@ -105,12 +112,12 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          generalLanguages.tr,
+          translation.generalLanguages,
           style: semibold18(context),
         ),
         SizedBox(height: 8.w),
         Text(
-          generalLanguagesBrief.tr,
+          translation.generalLanguagesBrief,
           style: secondary14(context),
         ),
         SizedBox(height: 16.w),
@@ -184,12 +191,12 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        betaLanguages.tr,
+                        translation.betaLanguages,
                         style: semibold18(context),
                       ),
                       SizedBox(height: 8.w),
                       Text(
-                        betaLanguagesBrief.tr,
+                        translation.betaLanguagesBrief,
                         style: secondary14(context),
                       ),
                     ],
@@ -280,7 +287,7 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
             Icons.search,
             color: context.appTheme.secondaryTextColor,
           ),
-          hintText: searchLanguage.tr,
+          hintText: translation.searchLanguage,
           hintStyle: light16(context)
               .copyWith(fontSize: 18, color: context.appTheme.titleTextColor),
         ),
@@ -314,8 +321,8 @@ class _SourceTargetLanguageScreenState extends State<SourceTargetLanguageScreen>
         SizedBox(width: 24.w),
         Text(
           Get.arguments[kIsSourceLanguage]
-              ? kTranslateSourceTitle.tr
-              : kTranslateTargetTitle.tr,
+              ? translation.kTranslateSourceTitle
+              : translation.kTranslateTargetTitle,
           style: semibold24(context),
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
+import '../../../i18n/strings.g.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 
@@ -48,7 +49,8 @@ class AppLanguageController extends GetxController {
       var language =
           APIConstants.LANGUAGE_CODE_MAP[APIConstants.kLanguageCodeList]![i];
       _languageList.add(language);
-      if (language[APIConstants.kLanguageCode] == Get.locale?.languageCode) {
+      if (language[APIConstants.kLanguageCode] ==
+          LocaleSettings.currentLocale.languageCode) {
         setSelectedLanguageIndex(i);
         _selectedLanguageCode = language[APIConstants.kLanguageCode]!;
       }

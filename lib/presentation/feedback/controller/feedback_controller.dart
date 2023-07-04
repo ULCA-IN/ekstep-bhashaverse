@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
-import '../../../localization/localization_keys.dart';
+import '../../../i18n/strings.g.dart';
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
@@ -14,6 +14,7 @@ import '../../../utils/constants/app_constants.dart';
 import '../../../common/controller/language_model_controller.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
+import '../../../i18n/strings.g.dart' as i18n;
 
 class FeedbackController extends GetxController {
   RxDouble mainRating = 0.0.obs;
@@ -87,7 +88,7 @@ class FeedbackController extends GetxController {
           getFeedbackPipelines();
         } else {
           isLoading.value = false;
-          showDefaultSnackbar(message: errorNoInternetTitle.tr);
+          showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
     }
@@ -158,7 +159,7 @@ class FeedbackController extends GetxController {
         isLoading.value = false;
       }),
       failure: (error) {
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
         isLoading.value = false;
       },
     );
@@ -178,7 +179,7 @@ class FeedbackController extends GetxController {
         showDefaultSnackbar(message: response['message']);
       }),
       failure: (error) {
-        showDefaultSnackbar(message: somethingWentWrong.tr);
+        showDefaultSnackbar(message: i18n.t.somethingWentWrong);
         isLoading.value = false;
       },
     );
@@ -215,11 +216,11 @@ class FeedbackController extends GetxController {
         switch (task?['taskType']) {
           case 'asr':
             pipelineTaskValue = task?['output'][0]['source'];
-            suggestedOutputTitle = suggestedOutputTextASR.tr;
+            suggestedOutputTitle = i18n.t.suggestedOutputTextASR;
             break;
           case 'translation':
             pipelineTaskValue = task?['output'][0]['target'];
-            suggestedOutputTitle = suggestedOutputTextTranslate.tr;
+            suggestedOutputTitle = i18n.t.suggestedOutputTextTranslate;
             break;
         }
         TextEditingController feedbackTextController =
@@ -259,7 +260,7 @@ class FeedbackController extends GetxController {
     submissionPayload['feedbackTimeStamp'] =
         DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
     submissionPayload['feedbackLanguage'] =
-        Get.locale?.languageCode ?? defaultLangCode;
+        LocaleSettings.currentLocale.languageCode;
     submissionPayload['pipelineInput'] = computePayload;
     submissionPayload['pipelineOutput'] = computeResponse;
 
