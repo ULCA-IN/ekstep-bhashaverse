@@ -31,6 +31,8 @@ class APIConstants {
   static const int kApiSendTimeoutCode = -5;
   static const int kApiUnAuthorizedExceptionErrorCode = 401;
   static const int kApiDataConflictCode = 409;
+  static const int kApiErrorCodeRangeStarting = 400;
+  static const int kApiErrorCodeRangeEnding = 511;
 
   static const String kUserIdREST = 'userID';
   static const String kULCAAPIKeyREST = 'ulcaApiKey';
