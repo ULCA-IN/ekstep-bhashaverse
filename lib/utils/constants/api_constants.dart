@@ -12,8 +12,8 @@ class APIConstants {
   static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
-  static const String FEEDBACK_BASE_URL_DEV =
-      "https://dev-auth.ulcacontrib.org/ulca/mdms";
+  static const String FEEDBACK_BASE_URL =
+      "https://meity-auth.ulcacontrib.org/ulca/mdms";
 
   static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
