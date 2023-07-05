@@ -87,7 +87,7 @@ class DHRUVAAPIClient {
   Future<Result<AppException, dynamic>> sendFeedbackRequest(
       {required requestPayload}) async {
     Dio dio = Dio(BaseOptions(
-        baseUrl: APIConstants.FEEDBACK_BASE_URL_DEV,
+        baseUrl: APIConstants.FEEDBACK_BASE_URL,
         connectTimeout: 80000,
         receiveTimeout: 50000,
         headers: {

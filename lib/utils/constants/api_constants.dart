@@ -12,8 +12,8 @@ class APIConstants {
   static const String TRANSLITERATION_BASE_URL =
       'https://meity-auth.ulcacontrib.org/ulca/apis';
 
-  static const String FEEDBACK_BASE_URL_DEV =
-      "https://dev-auth.ulcacontrib.org/ulca/mdms";
+  static const String FEEDBACK_BASE_URL =
+      "https://meity-auth.ulcacontrib.org/ulca/mdms";
 
   static const String TASK_SEQUENCE_ENDPOINT = '/model/getModelsPipeline';
   static const String SEARCH_REQ_URL = '/v0/model/search';
@@ -31,6 +31,8 @@ class APIConstants {
   static const int kApiSendTimeoutCode = -5;
   static const int kApiUnAuthorizedExceptionErrorCode = 401;
   static const int kApiDataConflictCode = 409;
+  static const int kApiErrorCodeRangeStarting = 400;
+  static const int kApiErrorCodeRangeEnding = 511;
 
   static const String kUserIdREST = 'userID';
   static const String kULCAAPIKeyREST = 'ulcaApiKey';

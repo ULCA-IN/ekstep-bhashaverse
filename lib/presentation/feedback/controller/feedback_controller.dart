@@ -9,8 +9,10 @@ import 'package:hive/hive.dart';
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/transliteration_app_api_client.dart';
+import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../common/controller/language_model_controller.dart';
+import '../../../utils/constants/language_map_translated.dart';
 import '../../../utils/network_utils.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../i18n/strings.g.dart' as i18n;
@@ -19,7 +21,9 @@ class FeedbackController extends GetxController {
   RxDouble mainRating = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
   RxBool isLoading = false.obs;
-  String transliterationModelToUse = '', oldSourceText = '';
+  String transliterationModelToUse = '',
+      oldSourceText = '',
+      feedbackLanguage = '';
   dynamic feedbackReqResponse;
 
   late TransliterationAppAPIClient _translationAppAPIClient;
@@ -67,13 +71,16 @@ class FeedbackController extends GetxController {
     }
 
     super.onInit();
+    feedbackLanguage = i18n.LocaleSettings.currentLocale.languageCode;
     DateTime? feedbackCacheTime =
         _hiveDBInstance?.get(feedbackCacheLastUpdatedKey);
     dynamic feedbackResponseFromCache = _hiveDBInstance?.get(feedbackCacheKey);
 
     if (feedbackCacheTime != null &&
         feedbackResponseFromCache != null &&
-        feedbackCacheTime.isAfter(DateTime.now())) {
+        feedbackCacheTime.isAfter(DateTime.now()) &&
+        feedbackResponseFromCache["feedbackLanguage"] ==
+            i18n.LocaleSettings.currentLocale.languageCode) {
       // load data from cache
       feedbackReqResponse = feedbackResponseFromCache;
       getFeedbackQuestions();
@@ -145,13 +152,23 @@ class FeedbackController extends GetxController {
 
   Future<void> getFeedbackPipelines() async {
     Map<String, dynamic> requestConfig = {
-      "feedbackLanguage": "en",
+      "feedbackLanguage": feedbackLanguage,
       "supportedTasks": ["asr", "translation", "tts"]
     };
     var languageRequestResponse = await _dhruvaapiClient.sendFeedbackRequest(
         requestPayload: requestConfig);
     languageRequestResponse.when(
       success: ((dynamic response) async {
+        if (feedbackLanguage != en &&
+            response["code"] != null &&
+            (response["code"] >= APIConstants.kApiErrorCodeRangeStarting ||
+                response["code"] <= APIConstants.kApiErrorCodeRangeEnding)) {
+          // if feedback api failed in current language, then retrieve using English language
+          feedbackLanguage = en;
+          getFeedbackPipelines();
+          return;
+        }
+
         await addFeedbackResponseInCache(response);
         feedbackReqResponse = response;
         getFeedbackQuestions();
