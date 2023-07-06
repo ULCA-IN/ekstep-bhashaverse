@@ -22,6 +22,7 @@ class APIConstants {
   static const String TRANS_REQ_URL = '/v0/model/compute';
   static const String TTS_REQ_URL = '/v0/model/compute';
   static const String FEEDBACK_REQ_URL = '/v0/pipelineQuestions';
+  static const String CONFIG_CALL_PIPELINE_ID = "64392f96daac500b55c543cd";
 
   static const int kApiUnknownErrorCode = 0;
   static const int kApiCanceledCode = -1;
@@ -50,6 +51,7 @@ class APIConstants {
   // common keys
   static const String kFlac = 'flac';
   static const String kWav = 'wav';
+  static const String kGender = 'gender';
 
   // Socket IO keys:
 
@@ -120,6 +122,9 @@ class APIConstants {
   static const String kIsMultilingualEnabled = 'isMultilingualEnabled';
   static const String kIsSyncApi = 'isSyncApi';
   static const String kValue = 'value';
+  static const String kPipelineRequestConfig = 'pipelineRequestConfig';
+  static const String kPipelineId = 'pipelineId';
+  static const String kInputData = 'inputData';
 
   // Feedback API keys
   static const String kFeedbackTimeStamp = 'feedbackTimeStamp';
@@ -161,12 +166,12 @@ class APIConstants {
   static const String kTransliteration = "transliteration";
 
   static var payloadForLanguageConfig = {
-    "pipelineTasks": [
+    kPipelineTasks: [
       {kTaskType: kASR},
       {kTaskType: kTranslation},
       {kTaskType: kTTS}
     ],
-    "pipelineRequestConfig": {"pipelineId": "64392f96daac500b55c543cd"}
+    kPipelineRequestConfig: {kPipelineId: CONFIG_CALL_PIPELINE_ID}
   };
 
   // payload for Compute request
@@ -176,38 +181,38 @@ class APIConstants {
     required String preferredGender,
     required bool isRecorded,
     required String inputData,
-    String audioFormat = 'wav',
+    String audioFormat = kWav,
     int samplingRate = 16000, // default
     String? asrServiceID,
     String? translationServiceID,
   }) {
     var computeRequestToSend = {
-      "pipelineTasks": [
+      kPipelineTasks: [
         if (isRecorded)
           {
-            "taskType": "asr",
-            "config": {
-              "language": {"sourceLanguage": srcLanguage},
-              "serviceId": asrServiceID ?? "",
-              "audioFormat": audioFormat,
-              "samplingRate": samplingRate,
+            kTaskType: kASR,
+            kConfig: {
+              kLanguage: {kSourceLanguage: srcLanguage},
+              kServiceId: asrServiceID ?? "",
+              kAudioFormat: audioFormat,
+              kSamplingRate: samplingRate,
             }
           },
         {
-          "taskType": "translation",
-          "config": {
-            "language": {
-              "sourceLanguage": srcLanguage,
-              "targetLanguage": targetLanguage
+          kTaskType: kTranslation,
+          kConfig: {
+            kLanguage: {
+              kSourceLanguage: srcLanguage,
+              kTargetLanguage: targetLanguage
             },
-            "serviceId": translationServiceID ?? ""
+            kServiceId: translationServiceID ?? ""
           }
         },
       ],
-      "inputData": {
-        isRecorded ? 'audio' : 'input': [
+      kInputData: {
+        isRecorded ? kAudio : kInput: [
           {
-            isRecorded ? 'audioContent' : 'source': inputData,
+            isRecorded ? kAudioContent : kSource: inputData,
           }
         ]
       }
@@ -224,20 +229,20 @@ class APIConstants {
     String? ttsServiceID,
   }) {
     var computeRequestToSend = {
-      "pipelineTasks": [
+      kPipelineTasks: [
         {
-          "taskType": "tts",
-          "config": {
-            "language": {"sourceLanguage": srcLanguage},
-            "serviceId": ttsServiceID ?? "",
-            "gender": preferredGender,
-            "samplingRate": samplingRate
+          kTaskType: kTTS,
+          kConfig: {
+            kLanguage: {kSourceLanguage: srcLanguage},
+            kServiceId: ttsServiceID ?? "",
+            kGender: preferredGender,
+            kSamplingRate: samplingRate
           }
         }
       ],
-      "inputData": {
-        'input': [
-          {'source': inputData}
+      kInputData: {
+        kInput: [
+          {kSource: inputData}
         ]
       }
     };
@@ -252,26 +257,26 @@ class APIConstants {
   }) {
     return [
       {
-        "taskType": "asr",
-        "config": {
-          "language": {"sourceLanguage": srcLanguage},
-          "samplingRate": 16000,
+        kTaskType: kASR,
+        kConfig: {
+          kLanguage: {kSourceLanguage: srcLanguage},
+          kSamplingRate: 16000,
         }
       },
       {
-        "taskType": "translation",
-        "config": {
-          "language": {
-            "sourceLanguage": srcLanguage,
-            "targetLanguage": targetLanguage
+        kTaskType: kTranslation,
+        kConfig: {
+          kLanguage: {
+            kSourceLanguage: srcLanguage,
+            kTargetLanguage: targetLanguage
           }
         }
       },
       {
-        "taskType": "tts",
-        "config": {
-          "language": {"sourceLanguage": targetLanguage},
-          "gender": preferredGender
+        kTaskType: kTTS,
+        kConfig: {
+          kLanguage: {kSourceLanguage: targetLanguage},
+          kGender: preferredGender
         }
       }
     ];
@@ -300,10 +305,10 @@ class APIConstants {
 
 // This shall be same as keys in DEFAULT_MODEL_ID, DEFAULT_MODEL_TYPES
   static final List<String> TYPES_OF_MODELS_LIST = [
-    'asr',
-    'translation',
-    'tts',
-    'transliteration',
+    kASR,
+    kTranslation,
+    kTTS,
+    kTransliteration,
   ];
 
   // Keys shall be same as values in TYPES_OF_MODELS_LIST
@@ -313,11 +318,6 @@ class APIConstants {
     TYPES_OF_MODELS_LIST[2]: 'AI4Bharat,',
     TYPES_OF_MODELS_LIST[3]: 'AI4Bharat,',
   };
-
-  static final ASR_MODEL_TYPES = [
-    'streaming',
-    'batch',
-  ];
 
   static const kNativeName = 'native_name';
   static const kEnglishName = 'english_name';
