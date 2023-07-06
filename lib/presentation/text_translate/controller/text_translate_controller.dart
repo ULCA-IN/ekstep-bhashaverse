@@ -200,13 +200,15 @@ class TextTranslateController extends GetxController {
       return;
     }
     var transliterationPayloadToSend = {};
-    transliterationPayloadToSend['input'] = [
-      {'source': sourceText}
+    transliterationPayloadToSend[APIConstants.kInput] = [
+      {APIConstants.kSource: sourceText}
     ];
 
-    transliterationPayloadToSend['modelId'] = transliterationModelToUse;
-    transliterationPayloadToSend['task'] = 'transliteration';
-    transliterationPayloadToSend['userId'] = null;
+    transliterationPayloadToSend[APIConstants.kModelId] =
+        transliterationModelToUse;
+    transliterationPayloadToSend[APIConstants.kTask] =
+        APIConstants.kTransliteration;
+    transliterationPayloadToSend[APIConstants.kUserId] = null;
 
     var response =
         await _transliterationAppAPIClient.sendTransliterationRequest(
@@ -215,8 +217,9 @@ class TextTranslateController extends GetxController {
     response?.when(
       success: (data) async {
         if (currentlyTypedWordForTransliteration ==
-            data['output'][0]['source']) {
-          transliterationWordHints.value = data['output'][0]['target'];
+            data[APIConstants.kOutput][0][APIConstants.kSource]) {
+          transliterationWordHints.value =
+              data[APIConstants.kOutput][0][APIConstants.kTarget];
           if (!transliterationWordHints
               .contains(currentlyTypedWordForTransliteration)) {
             transliterationWordHints.add(currentlyTypedWordForTransliteration);
@@ -233,7 +236,7 @@ class TextTranslateController extends GetxController {
 
     translationServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.translationConfigResponse,
-            'translation',
+            APIConstants.kTranslation,
             selectedSourceLanguageCode.value,
             selectedTargetLanguageCode.value) ??
         '';
@@ -261,7 +264,8 @@ class TextTranslateController extends GetxController {
       success: (taskResponse) async {
         lastComputeResponse = taskResponse.toJson();
         targetOutputText.value = taskResponse.pipelineResponse
-                ?.firstWhere((element) => element.taskType == 'translation')
+                ?.firstWhere(
+                    (element) => element.taskType == APIConstants.kTranslation)
                 .output
                 ?.first
                 .target
@@ -319,21 +323,21 @@ class TextTranslateController extends GetxController {
             .pipelineInferenceAPIEndPoint?.inferenceApiKey?.value,
         computePayload: asrPayloadToSend);
 
-    if (lastComputeRequest['pipelineTasks'] != null &&
-        lastComputeRequest['pipelineTasks'].isNotEmpty) {
-      (lastComputeRequest['pipelineTasks'])
-          .removeWhere((element) => element['taskType'] == 'tts');
+    if (lastComputeRequest[APIConstants.kPipelineTasks] != null &&
+        lastComputeRequest[APIConstants.kPipelineTasks].isNotEmpty) {
+      (lastComputeRequest[APIConstants.kPipelineTasks])
+          .removeWhere((element) => element[APIConstants.kTaskType] == 'tts');
     }
 
-    lastComputeRequest['pipelineTasks']
-        .addAll(asrPayloadToSend['pipelineTasks']);
+    lastComputeRequest[APIConstants.kPipelineTasks]
+        .addAll(asrPayloadToSend[APIConstants.kPipelineTasks]);
 
     await response.when(
       success: (taskResponse) async {
-        lastComputeResponse['pipelineResponse']
-            .removeWhere((element) => element['taskType'] == 'tts');
-        lastComputeResponse['pipelineResponse']
-            .addAll(taskResponse.toJson()['pipelineResponse']);
+        lastComputeResponse[APIConstants.kPipelineResponse]
+            .removeWhere((element) => element[APIConstants.kTaskType] == 'tts');
+        lastComputeResponse[APIConstants.kPipelineResponse]
+            .addAll(taskResponse.toJson()[APIConstants.kPipelineResponse]);
 
         ttsResponse = taskResponse.pipelineResponse
             ?.firstWhere((element) => element.taskType == 'tts')

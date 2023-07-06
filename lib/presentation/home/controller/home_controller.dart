@@ -124,8 +124,8 @@ class HomeController extends GetxController {
     Map<String, dynamic> transPayload =
         json.decode(json.encode(APIConstants.payloadForLanguageConfig));
 
-    (transPayload['pipelineTasks'])
-        .removeWhere((element) => element['taskType'] != 'translation');
+    (transPayload[APIConstants.kPipelineTasks]).removeWhere((element) =>
+        element[APIConstants.kTaskType] != APIConstants.kTranslation);
     var languageRequestResponse =
         await _dhruvaapiClient.getTaskSequence(requestPayload: transPayload);
     languageRequestResponse.when(
@@ -145,12 +145,12 @@ class HomeController extends GetxController {
 
   Future<void> getTransliterationModels() async {
     Map<String, dynamic> taskPayloads = {
-      "task": APIConstants.TYPES_OF_MODELS_LIST[3],
-      "sourceLanguage": "",
-      "targetLanguage": "",
-      "domain": "All",
-      "submitter": "All",
-      "userId": null
+      APIConstants.kTask: APIConstants.TYPES_OF_MODELS_LIST[3],
+      APIConstants.kSourceLanguage: "",
+      APIConstants.kTargetLanguage: "",
+      APIConstants.kDomain: APIConstants.kAll,
+      APIConstants.kSubmitters: APIConstants.kAll,
+      APIConstants.kUserId: null
     };
 
     var transliterationResponse = await _translationAppAPIClient

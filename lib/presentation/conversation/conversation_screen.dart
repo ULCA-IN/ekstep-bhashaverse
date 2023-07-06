@@ -149,9 +149,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
             onFeedbackButtonTap: () {
               Get.toNamed(AppRoutes.feedbackRoute, arguments: {
                 // Fixes Dart shallow copy issue:
-                'requestPayload': json.decode(
+                APIConstants.kRequestPayload: json.decode(
                     json.encode(_translationController.lastComputeRequest)),
-                'requestResponse': json.decode(
+                APIConstants.kRequestResponse: json.decode(
                     json.encode(_translationController.lastComputeResponse))
               });
             },
@@ -212,9 +212,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
           onFeedbackButtonTap: () {
             Get.toNamed(AppRoutes.feedbackRoute, arguments: {
               // Fixes Dart shallow copy issue:
-              'requestPayload': json.decode(
+              APIConstants.kRequestPayload: json.decode(
                   json.encode(_translationController.lastComputeRequest)),
-              'requestResponse': json.decode(
+              APIConstants.kRequestResponse: json.decode(
                   json.encode(_translationController.lastComputeResponse))
             });
           },

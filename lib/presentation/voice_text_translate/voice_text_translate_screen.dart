@@ -168,9 +168,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           onFeedbackButtonTap: () {
             Get.toNamed(AppRoutes.feedbackRoute, arguments: {
               // Fixes Dart shallow copy issue:
-              'requestPayload': json.decode(
+              APIConstants.kRequestPayload: json.decode(
                   json.encode(_voiceTextTransController.lastComputeRequest)),
-              'requestResponse': json.decode(
+              APIConstants.kRequestResponse: json.decode(
                   json.encode(_voiceTextTransController.lastComputeResponse))
             });
           },

@@ -304,14 +304,14 @@ class VoiceTextTranslateController extends GetxController {
           connectToSocket();
 
           _socketIOClient.socketEmit(
-            emittingStatus: 'start',
+            emittingStatus: APIConstants.kStart,
             emittingData: [
               APIConstants.createSocketIOComputePayload(
                   srcLanguage: selectedSourceLanguageCode.value,
                   targetLanguage: selectedTargetLanguageCode.value,
                   preferredGender:
                       _hiveDBInstance.get(preferredVoiceAssistantGender)),
-              {'responseFrequencyInSecs': 1}
+              {APIConstants.kResFrequencyInSecs: 1}
             ],
             isDataToSend: true,
           );
@@ -319,14 +319,14 @@ class VoiceTextTranslateController extends GetxController {
           _recorder.start();
           micStreamSubscription = _recorder.audioStream.listen((value) {
             _socketIOClient.socketEmit(
-                emittingStatus: 'data',
+                emittingStatus: APIConstants.kData,
                 emittingData: [
                   {
-                    "audio": [
-                      {"audioContent": value.sublist(0)}
+                    APIConstants.kAudio: [
+                      {APIConstants.kAudioContent: value.sublist(0)}
                     ]
                   },
-                  {"responseTaskSequenceDepth": 2},
+                  {APIConstants.kResTaskSequenceDepth: 2},
                   false,
                   false
                 ],
@@ -363,10 +363,10 @@ class VoiceTextTranslateController extends GetxController {
       micStreamSubscription?.cancel();
       if (_socketIOClient.isMicConnected.value) {
         _socketIOClient.socketEmit(
-            emittingStatus: 'data',
+            emittingStatus: APIConstants.kData,
             emittingData: [
               null,
-              {"responseTaskSequenceDepth": 2},
+              {APIConstants.kResTaskSequenceDepth: 2},
               true,
               true
             ],
@@ -399,13 +399,15 @@ class VoiceTextTranslateController extends GetxController {
       return;
     }
     var transliterationPayloadToSend = {};
-    transliterationPayloadToSend['input'] = [
-      {'source': sourceText}
+    transliterationPayloadToSend[APIConstants.kInput] = [
+      {APIConstants.kSource: sourceText}
     ];
 
-    transliterationPayloadToSend['modelId'] = transliterationModelToUse;
-    transliterationPayloadToSend['task'] = 'transliteration';
-    transliterationPayloadToSend['userId'] = null;
+    transliterationPayloadToSend[APIConstants.kModelId] =
+        transliterationModelToUse;
+    transliterationPayloadToSend[APIConstants.kTask] =
+        APIConstants.kTransliteration;
+    transliterationPayloadToSend[APIConstants.kUserId] = null;
 
     var response = await _translationAppAPIClient.sendTransliterationRequest(
         transliterationPayload: transliterationPayloadToSend);
@@ -413,8 +415,9 @@ class VoiceTextTranslateController extends GetxController {
     response?.when(
       success: (data) async {
         if (currentlyTypedWordForTransliteration ==
-            data['output'][0]['source']) {
-          transliterationWordHints.value = data['output'][0]['target'];
+            data[APIConstants.kOutput][0][APIConstants.kSource]) {
+          transliterationWordHints.value =
+              data[APIConstants.kOutput][0][APIConstants.kTarget];
           if (!transliterationWordHints
               .contains(currentlyTypedWordForTransliteration)) {
             transliterationWordHints.add(currentlyTypedWordForTransliteration);
@@ -436,12 +439,12 @@ class VoiceTextTranslateController extends GetxController {
 
     asrServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
-            'asr',
+            APIConstants.kASR,
             selectedSourceLanguageCode.value) ??
         '';
     translationServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
-            'translation',
+            APIConstants.kTranslation,
             selectedSourceLanguageCode.value,
             selectedTargetLanguageCode.value) ??
         '';
@@ -451,7 +454,7 @@ class VoiceTextTranslateController extends GetxController {
         targetLanguage: selectedTargetLanguageCode.value,
         isRecorded: isRecorded,
         inputData: isRecorded ? base64Value! : sourceLangTextController.text,
-        audioFormat: Platform.isIOS ? 'flac' : 'wav',
+        audioFormat: Platform.isIOS ? APIConstants.kFlac : APIConstants.kWav,
         asrServiceID: asrServiceId,
         translationServiceID: translationServiceId,
         preferredGender: _hiveDBInstance.get(preferredVoiceAssistantGender),
@@ -473,7 +476,8 @@ class VoiceTextTranslateController extends GetxController {
         lastComputeResponse = taskResponse.toJson();
         if (isRecorded) {
           sourceLangTextController.text = taskResponse.pipelineResponse
-                  ?.firstWhere((element) => element.taskType == 'asr')
+                  ?.firstWhere(
+                      (element) => element.taskType == APIConstants.kASR)
                   .output
                   ?.first
                   .source
@@ -481,7 +485,8 @@ class VoiceTextTranslateController extends GetxController {
               '';
         }
         targetOutputText.value = taskResponse.pipelineResponse
-                ?.firstWhere((element) => element.taskType == 'translation')
+                ?.firstWhere(
+                    (element) => element.taskType == APIConstants.kTranslation)
                 .output
                 ?.first
                 .target
@@ -516,7 +521,7 @@ class VoiceTextTranslateController extends GetxController {
   }) async {
     String ttsServiceId = APIConstants.getTaskTypeServiceID(
             _languageModelController.taskSequenceResponse,
-            'tts',
+            APIConstants.kTTS,
             languageCode) ??
         '';
 
@@ -528,8 +533,8 @@ class VoiceTextTranslateController extends GetxController {
       samplingRate: samplingRate,
     );
 
-    lastComputeRequest['pipelineTasks']
-        .addAll(asrPayloadToSend['pipelineTasks']);
+    lastComputeRequest[APIConstants.kPipelineTasks]
+        .addAll(asrPayloadToSend[APIConstants.kPipelineTasks]);
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController
@@ -542,10 +547,10 @@ class VoiceTextTranslateController extends GetxController {
 
     await response.when(
       success: (taskResponse) async {
-        lastComputeResponse['pipelineResponse']
-            .addAll(taskResponse.toJson()['pipelineResponse']);
+        lastComputeResponse[APIConstants.kPipelineResponse]
+            .addAll(taskResponse.toJson()[APIConstants.kPipelineResponse]);
         dynamic ttsResponse = taskResponse.pipelineResponse
-            ?.firstWhere((element) => element.taskType == 'tts')
+            ?.firstWhere((element) => element.taskType == APIConstants.kTTS)
             .audio?[0]
             .audioContent;
 
@@ -694,20 +699,23 @@ class VoiceTextTranslateController extends GetxController {
   Future<void> displaySocketIOResponse(response) async {
     if (response != null) {
       //  used for get ASR
-      sourceLangTextController.text =
-          response[0]['pipelineResponse']?[0]['output']?[0]['source'] ?? '';
+      sourceLangTextController.text = response[0]
+                  [APIConstants.kPipelineResponse]?[0][APIConstants.kOutput]?[0]
+              [APIConstants.kSource] ??
+          '';
 
       // used for get Translation
-      if ((response[0]['pipelineResponse'].length ?? 0) > 1) {
-        String targetText =
-            response[0]['pipelineResponse'][1]['output']?[0]['target'] ?? '';
+      if ((response[0][APIConstants.kPipelineResponse].length ?? 0) > 1) {
+        String targetText = response[0][APIConstants.kPipelineResponse][1]
+                [APIConstants.kOutput]?[0][APIConstants.kTarget] ??
+            '';
         targetLangTextController.text = targetText;
         targetOutputText.value = targetText;
 
         //  used for get TTS
-        if ((response[0]['pipelineResponse'].length ?? 0) > 2) {
-          String ttsResponse =
-              response[0]['pipelineResponse'][2]['audio'][0]['audioContent'];
+        if ((response[0][APIConstants.kPipelineResponse].length ?? 0) > 2) {
+          String ttsResponse = response[0][APIConstants.kPipelineResponse][2]
+              [APIConstants.kAudio][0][APIConstants.kAudioContent];
           isTranslateCompleted.value = true;
           isLoading.value = false;
           Future.delayed(const Duration(seconds: 3))
