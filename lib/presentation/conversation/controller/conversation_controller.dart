@@ -177,6 +177,22 @@ class ConversationController extends GetxController {
             : targetLangTTSPath.value = recordedAudioPath;
         base64EncodedAudioContent =
             base64Encode(File(recordedAudioPath).readAsBytesSync());
+
+        var socketIOInputData = json.encode({
+          APIConstants.kData: [
+            {
+              APIConstants.kAudio: [
+                {APIConstants.kAudioContent: base64EncodedAudioContent}
+              ]
+            },
+            {APIConstants.kResTaskSequenceDepth: 2},
+            true,
+            true
+          ]
+        });
+        lastComputeRequest[APIConstants.kInputData] =
+            json.decode(socketIOInputData);
+        lastComputeResponse = response[0];
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
@@ -256,14 +272,19 @@ class ConversationController extends GetxController {
 
           getLanguageCodeBasedOnMic();
 
-          _socketIOClient.socketEmit(
-            emittingStatus: APIConstants.kStart,
-            emittingData: [
+          List<Map<String, dynamic>> initialRequestData =
               APIConstants.createSocketIOComputePayload(
                   srcLanguage: sourceLangCode,
                   targetLanguage: targetLangCode,
                   preferredGender:
-                      _hiveDBInstance.get(preferredVoiceAssistantGender)),
+                      _hiveDBInstance.get(preferredVoiceAssistantGender));
+
+          lastComputeRequest[APIConstants.kPipelineTasks] = initialRequestData;
+
+          _socketIOClient.socketEmit(
+            emittingStatus: APIConstants.kStart,
+            emittingData: [
+              initialRequestData,
               {APIConstants.kResFrequencyInSecs: 1}
             ],
             isDataToSend: true,
