@@ -182,6 +182,25 @@ class VoiceTextTranslateController extends GetxController {
         sourceSpeakerStatus.value = SpeakerStatus.stopped;
         sourceLangASRPath =
             await saveStreamAudioToFile(recordedData, samplingRate);
+
+        var socketIOInputData = json.encode({
+          APIConstants.kData: [
+            {
+              APIConstants.kAudio: [
+                {
+                  APIConstants.kAudioContent:
+                      base64Encode(File(sourceLangASRPath!).readAsBytesSync())
+                }
+              ]
+            },
+            {APIConstants.kResTaskSequenceDepth: 2},
+            true,
+            true
+          ]
+        });
+        lastComputeRequest[APIConstants.kInputData] =
+            json.decode(socketIOInputData);
+        lastComputeResponse = response[0];
       }
     }, condition: () => _socketIOClient.isMicConnected.value);
 
@@ -303,14 +322,19 @@ class VoiceTextTranslateController extends GetxController {
         if (_hiveDBInstance.get(isStreamingPreferred)) {
           connectToSocket();
 
-          _socketIOClient.socketEmit(
-            emittingStatus: APIConstants.kStart,
-            emittingData: [
+          List<Map<String, dynamic>> initialRequestData =
               APIConstants.createSocketIOComputePayload(
                   srcLanguage: selectedSourceLanguageCode.value,
                   targetLanguage: selectedTargetLanguageCode.value,
                   preferredGender:
-                      _hiveDBInstance.get(preferredVoiceAssistantGender)),
+                      _hiveDBInstance.get(preferredVoiceAssistantGender));
+
+          lastComputeRequest[APIConstants.kPipelineTasks] = initialRequestData;
+
+          _socketIOClient.socketEmit(
+            emittingStatus: APIConstants.kStart,
+            emittingData: [
+              initialRequestData,
               {APIConstants.kResFrequencyInSecs: 1}
             ],
             isDataToSend: true,

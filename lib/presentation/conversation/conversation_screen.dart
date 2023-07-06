@@ -134,8 +134,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             showASRTTSActionButtons: true,
             showFeedbackIcon: _converseController.isTranslateCompleted.value &&
                 _converseController.currentMic.value ==
-                    CurrentlySelectedMic.source &&
-                !_hiveDBInstance.get(isStreamingPreferred),
+                    CurrentlySelectedMic.source,
             expandFeedbackIcon: _converseController.expandFeedbackIcon.value,
             isReadOnly: true,
             isShareButtonLoading:
@@ -190,8 +189,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           showTranslateButton: false,
           showFeedbackIcon: _converseController.isTranslateCompleted.value &&
               _converseController.currentMic.value ==
-                  CurrentlySelectedMic.target &&
-              !_hiveDBInstance.get(isStreamingPreferred),
+                  CurrentlySelectedMic.target,
           expandFeedbackIcon: _converseController.expandFeedbackIcon.value,
           showASRTTSActionButtons: true,
           isReadOnly: true,
