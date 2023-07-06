@@ -150,7 +150,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
-          showFeedbackIcon: !_hiveDBInstance.get(isStreamingPreferred),
           expandFeedbackIcon:
               _voiceTextTransController.expandFeedbackIcon.value,
           showASRTTSActionButtons:
