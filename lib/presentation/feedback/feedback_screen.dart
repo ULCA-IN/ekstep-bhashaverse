@@ -94,9 +94,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
         ),
       ),
-      bottomNavigationBar: _feedbackController.feedbackReqResponse != null
-          ? _buildSubmitButton(context)
-          : const SizedBox.shrink(),
+      bottomNavigationBar: Obx(
+        () => !_feedbackController.isLoading.value ||
+                _feedbackController.feedbackReqResponse != null
+            ? _buildSubmitButton(context)
+            : const SizedBox.shrink(),
+      ),
     );
   }
 
