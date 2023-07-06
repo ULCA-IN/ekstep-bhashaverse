@@ -200,13 +200,13 @@ end
 - Run the project on emulator or physical device with following command (replace placeholders with appropriate values) :
 
 ```shell-script
-flutter run --debug --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY> --dart-define authorization=<ADD_AUTHORIZATION_KEY>
+flutter run --debug --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY>
 ```
 
 - You can also build apk/appbundle/ipa file with following command:
 
 ```shell-script
-flutter build apk/appbundle/ipa --release --obfuscate --split-debug-info=<PATH_WHERE_DEBUG_INFO_CAN_BE_SAVED> --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY> --dart-define authorization=<ADD_AUTHORIZATION_KEY>
+flutter build apk/appbundle/ipa --release --obfuscate --split-debug-info=<PATH_WHERE_DEBUG_INFO_CAN_BE_SAVED> --dart-define userID=<ADD_USER_ID> --dart-define ulcaApiKey=<ADD_ULCA_API_KEY>
 ```
 
 ------------
@@ -214,7 +214,7 @@ flutter build apk/appbundle/ipa --release --obfuscate --split-debug-info=<PATH_W
 ### launch.json file for VS Code (Optional)
 
 If you don't want to supply dart-define parameters every time when building the project, Add launch.json file.
-To do that, create .vscode folder inside root directory of the project. Then create launch.json file and paste below details inside it. Please replace userID and other required keys which you have obtained for authorization.
+To do that, create .vscode folder inside root directory of the project. Then create launch.json file and paste below details inside it. Please replace userID and ulcaApiKey which you have obtained for authorization.
 
 ```json
 {
