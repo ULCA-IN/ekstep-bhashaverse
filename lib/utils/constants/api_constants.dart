@@ -45,6 +45,102 @@ class APIConstants {
   static const String kApiSendTimeout = 'SEND_TIMEOUT';
   static const String kApiResponseError = 'RESPONSE_ERROR';
   static const String kApiDataConflict = 'DATA_CONFLICT';
+  static const String kCode = 'code';
+
+  // common keys
+  static const String kFlac = 'flac';
+  static const String kWav = 'wav';
+
+  // Socket IO keys:
+
+  static const String kWebsocket = 'websocket';
+  static const String kPolling = 'polling';
+  static const String kStart = 'start';
+  static const String kReady = 'ready';
+  static const String kResponse = 'response';
+  static const String kData = 'data';
+  static const String kDetail = 'detail';
+  static const String kResFrequencyInSecs = 'responseFrequencyInSecs';
+  static const String kAudio = 'audio';
+  static const String kAudioContent = 'audioContent';
+  static const String kResTaskSequenceDepth = 'responseTaskSequenceDepth';
+  static const String kTerminate = 'terminate';
+  static const String kAbort = 'abort';
+  static const String kConnectError = 'connect_error';
+
+  // REST API keys
+  static const String kInput = 'input';
+  static const String kSource = 'source';
+  static const String kTarget = 'target';
+  static const String kSourceLanguage = 'sourceLanguage';
+  static const String kTargetLanguage = 'targetLanguage';
+  static const String kModelId = 'modelId';
+  static const String kTask = 'task';
+  static const String kUserId = 'userId';
+  static const String kOutput = 'output';
+  static const String kPipelineTasks = 'pipelineTasks';
+  static const String kPipelineResponse = 'pipelineResponse';
+  static const String kServiceId = 'serviceId';
+  static const String kLanguage = 'language';
+  static const String kAudioFormat = 'audioFormat';
+  static const String kEncoding = 'encoding';
+  static const String kSamplingRate = 'samplingRate';
+  static const String kPostProcessors = 'postProcessors';
+  static const String kSourceScriptCode = 'sourceScriptCode';
+  static const String kAudioUri = 'audioUri';
+  static const String kConfig = 'config';
+  static const String kCount = 'count';
+  static const String kMessage = 'message';
+  static const String kAll = 'All';
+
+  // Config API keys
+  static const String kName = 'name';
+  static const String kDescription = 'description';
+  static const String kRefUrl = 'refUrl';
+  static const String kLanguages = 'languages';
+  static const String kSubmitters = 'submitter';
+  static const String kInferenceEndPoint = 'inferenceEndPoint';
+  static const String kType = 'type';
+  static const String kSourceLanguageName = 'sourceLanguageName';
+  static const String kTargetLanguageName = 'targetLanguageName';
+  static const String kAboutMe = 'aboutMe';
+  static const String kCallbackUrl = 'callbackUrl';
+  static const String kSchema = 'schema';
+  static const String kModelProcessingType = 'modelProcessingType';
+  static const String kPipelineResponseConfig = 'pipelineResponseConfig';
+  static const String kFeedbackUrl = 'feedbackUrl';
+  static const String kPipelineInferenceAPIEndPoint =
+      'pipelineInferenceAPIEndPoint';
+  static const String kPipelineInferenceSocketEndPoint =
+      'pipelineInferenceSocketEndPoint';
+  static const String kTargetLanguageList = 'targetLanguageList';
+  static const String kDomain = 'domain';
+  static const String kSupportedVoices = 'supportedVoices';
+  static const String kInferenceApiKey = 'inferenceApiKey';
+  static const String kIsMultilingualEnabled = 'isMultilingualEnabled';
+  static const String kIsSyncApi = 'isSyncApi';
+  static const String kValue = 'value';
+
+  // Feedback API keys
+  static const String kFeedbackTimeStamp = 'feedbackTimeStamp';
+  static const String kTaskFeedback = 'taskFeedback';
+  static const String kGranularFeedback = 'granularFeedback';
+  static const String kRating = 'rating';
+  static const String kRatingList = 'rating-list';
+  static const String kRequestPayload = 'requestPayload';
+  static const String kRequestResponse = 'requestResponse';
+  static const String kFeedbackLanguage = 'feedbackLanguage';
+  static const String kSupportedTasks = 'supportedTasks';
+  static const String kQuestion = 'question';
+  static const String kSupportedFeedbackTypes = 'supportedFeedbackTypes';
+  static const String kFeedbackType = 'feedbackType';
+  static const String kParameters = 'parameters';
+  static const String kCommonFeedback = 'commonFeedback';
+  static const String kPipelineInput = 'pipelineInput';
+  static const String kPipelineOutput = 'pipelineOutput';
+  static const String kSuggestedPipelineOutput = 'suggestedPipelineOutput';
+  static const String kPipelineFeedback = 'pipelineFeedback';
+  static const String kParameterName = 'parameterName';
 
   // Common masked error messages
   static const String kErrorMessageConnectionTimeout = 'Connection timed out';
@@ -62,6 +158,7 @@ class APIConstants {
   static const String kASR = "asr";
   static const String kTranslation = "translation";
   static const String kTTS = "tts";
+  static const String kTransliteration = "transliteration";
 
   static var payloadForLanguageConfig = {
     "pipelineTasks": [
