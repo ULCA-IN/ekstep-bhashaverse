@@ -94,9 +94,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
         ),
       ),
-      bottomNavigationBar: _feedbackController.feedbackReqResponse != null
-          ? _buildSubmitButton(context)
-          : const SizedBox.shrink(),
+      bottomNavigationBar: Obx(
+        () => !_feedbackController.isLoading.value &&
+                _feedbackController.feedbackReqResponse != null
+            ? _buildSubmitButton(context)
+            : const SizedBox.shrink(),
+      ),
     );
   }
 
@@ -117,8 +120,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           filledColor: context.appTheme.primaryColor,
           onRatingChanged: (value) {
             _feedbackController.mainRating.value = value;
-            for (var task in _feedbackController.feedbackTypeModels.value) {
-              task.value.taskRating.value = null;
+            if (value > 3) {
+              for (var task in _feedbackController.feedbackTypeModels.value) {
+                task.value.taskRating.value = null;
+                task.value.isExpanded.value = false;
+              }
             }
           },
           initialRating: 0,
