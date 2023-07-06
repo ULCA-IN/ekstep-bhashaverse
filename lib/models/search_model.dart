@@ -1,3 +1,5 @@
+import '../utils/constants/api_constants.dart';
+
 class SearchModel {
   late String message;
   late List<SearchModelData> data;
@@ -10,21 +12,21 @@ class SearchModel {
   });
 
   SearchModel.fromJson(Map<String, dynamic> json) {
-    message = json['message'];
-    if (json['data'] != null) {
+    message = json[APIConstants.kMessage];
+    if (json[APIConstants.kData] != null) {
       data = <SearchModelData>[];
-      json['data'].forEach((v) {
+      json[APIConstants.kData].forEach((v) {
         data.add(SearchModelData.fromJson(v));
       });
     }
-    count = json['count'];
+    count = json[APIConstants.kCount];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['message'] = message;
-    data['data'] = this.data.map((v) => v.toJson()).toList();
-    data['count'] = count;
+    data[APIConstants.kMessage] = message;
+    data[APIConstants.kData] = this.data.map((v) => v.toJson()).toList();
+    data[APIConstants.kCount] = count;
     return data;
   }
 }
@@ -55,35 +57,37 @@ class SearchModelData {
   late final String userId;
 
   SearchModelData.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+    name = json[APIConstants.kName];
 
-    description = json['description'];
-    refUrl = json['refUrl'];
-    task = Task.fromJson(json['task']);
-    languages =
-        List.from(json['languages']).map((e) => Languages.fromJson(e)).toList();
+    description = json[APIConstants.kDescription];
+    refUrl = json[APIConstants.kRefUrl];
+    task = Task.fromJson(json[APIConstants.kTask]);
+    languages = List.from(json[APIConstants.kLanguages])
+        .map((e) => Languages.fromJson(e))
+        .toList();
 
-    submitter = Submitter.fromJson(json['submitter']);
-    inferenceEndPoint = InferenceEndPoint.fromJson(json['inferenceEndPoint']);
+    submitter = Submitter.fromJson(json[APIConstants.kSubmitters]);
+    inferenceEndPoint =
+        InferenceEndPoint.fromJson(json[APIConstants.kInferenceEndPoint]);
 
-    modelId = json['modelId'];
-    userId = json['userId'];
+    modelId = json[APIConstants.kModelId];
+    userId = json[APIConstants.kUserId];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['name'] = name;
+    data[APIConstants.kName] = name;
 
-    data['description'] = description;
-    data['refUrl'] = refUrl;
-    data['task'] = task.toJson();
-    data['languages'] = languages.map((e) => e.toJson()).toList();
+    data[APIConstants.kDescription] = description;
+    data[APIConstants.kRefUrl] = refUrl;
+    data[APIConstants.kTask] = task.toJson();
+    data[APIConstants.kLanguages] = languages.map((e) => e.toJson()).toList();
 
-    data['submitter'] = submitter.toJson();
-    data['inferenceEndPoint'] = inferenceEndPoint.toJson();
+    data[APIConstants.kSubmitters] = submitter.toJson();
+    data[APIConstants.kInferenceEndPoint] = inferenceEndPoint.toJson();
 
-    data['modelId'] = modelId;
-    data['userId'] = userId;
+    data[APIConstants.kModelId] = modelId;
+    data[APIConstants.kUserId] = userId;
 
     return data;
   }
@@ -96,12 +100,12 @@ class Task {
   late final String type;
 
   Task.fromJson(Map<String, dynamic> json) {
-    type = json['type'];
+    type = json[APIConstants.kType];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['type'] = type;
+    data[APIConstants.kType] = type;
     return data;
   }
 }
@@ -119,18 +123,18 @@ class Languages {
   late final String? targetLanguage;
 
   Languages.fromJson(Map<String, dynamic> json) {
-    sourceLanguageName = json['sourceLanguageName'];
-    sourceLanguage = json['sourceLanguage'];
-    targetLanguageName = json['targetLanguageName'];
-    targetLanguage = json['targetLanguage'];
+    sourceLanguageName = json[APIConstants.kSourceLanguageName];
+    sourceLanguage = json[APIConstants.kSourceLanguage];
+    targetLanguageName = json[APIConstants.kTargetLanguageName];
+    targetLanguage = json[APIConstants.kTargetLanguage];
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['sourceLanguageName'] = sourceLanguageName;
-    data['sourceLanguage'] = sourceLanguage;
-    data['targetLanguageName'] = targetLanguageName;
-    data['targetLanguage'] = targetLanguage;
+    data[APIConstants.kSourceLanguageName] = sourceLanguageName;
+    data[APIConstants.kSourceLanguage] = sourceLanguage;
+    data[APIConstants.kTargetLanguageName] = targetLanguageName;
+    data[APIConstants.kTargetLanguage] = targetLanguage;
     return data;
   }
 }
@@ -144,14 +148,14 @@ class Submitter {
   late final String? aboutMe;
 
   Submitter.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+    name = json[APIConstants.kName];
     aboutMe = null;
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['name'] = name;
-    data['aboutMe'] = aboutMe;
+    data[APIConstants.kName] = name;
+    data[APIConstants.kAboutMe] = aboutMe;
     return data;
   }
 }
@@ -165,16 +169,17 @@ class InferenceEndPoint {
   late final String? modelProcessingType;
 
   InferenceEndPoint.fromJson(Map<String, dynamic> json) {
-    callbackUrl = json['callbackUrl'];
-    if (json['schema']['modelProcessingType'] != null) {
-      modelProcessingType = json['schema']['modelProcessingType']['type'];
+    callbackUrl = json[APIConstants.kCallbackUrl];
+    if (json[APIConstants.kSchema][APIConstants.kModelProcessingType] != null) {
+      modelProcessingType = json[APIConstants.kSchema]
+          [APIConstants.kModelProcessingType][APIConstants.kType];
     }
   }
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['callbackUrl'] = callbackUrl;
-    data['schema']['type'] = modelProcessingType;
+    data[APIConstants.kCallbackUrl] = callbackUrl;
+    data[APIConstants.kSchema][APIConstants.kType] = modelProcessingType;
 
     return data;
   }

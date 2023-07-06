@@ -9,6 +9,7 @@ import '../../animation/lottie_animation.dart';
 import '../../common/transliteration_global_key.dart';
 import '../../common/widgets/common_app_bar.dart';
 import '../../models/feedback_type_model.dart';
+import '../../utils/constants/api_constants.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/remove_glow_effect.dart';
 import '../../utils/snackbar_utils.dart';
@@ -103,8 +104,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     return Column(
       children: [
         Text(
-          _feedbackController.feedbackReqResponse['pipelineFeedback']
-              ['commonFeedback'][0]['question'],
+          _feedbackController
+                  .feedbackReqResponse[APIConstants.kPipelineFeedback]
+              [APIConstants.kCommonFeedback][0][APIConstants.kQuestion],
           textAlign: TextAlign.center,
           style: semibold20(context),
         ),
@@ -134,10 +136,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             _feedbackController.mainRating.value != 0.0,
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ..._feedbackController.feedbackTypeModels.value.map((taskFeedback) {
-            List<dynamic> taskList =
-                _feedbackController.computePayload?['pipelineTasks'];
+            List<dynamic> taskList = _feedbackController
+                .computePayload?[APIConstants.kPipelineTasks];
             bool? isTaskAvailable = taskList.firstWhereOrNull((element) =>
-                    element['taskType'] == taskFeedback.value.taskType) !=
+                    element[APIConstants.kTaskType] ==
+                    taskFeedback.value.taskType) !=
                 null;
             return isTaskAvailable
                 ? Obx(
@@ -229,9 +232,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     if (taskFeedback != null) {
       // get language code for transliteration
-      Map<String, dynamic>? task = (_feedbackController
-              .suggestedOutput?['pipelineResponse'] as List<dynamic>)
-          .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
+      Map<String, dynamic>? task =
+          (_feedbackController.suggestedOutput?[APIConstants.kPipelineResponse]
+                  as List<dynamic>)
+              .firstWhereOrNull(
+                  (e) => e[APIConstants.kTaskType] == taskFeedback.taskType);
       languageCode = getLanguageCodeFromPayload(task);
 
       // update suggestion payload
@@ -271,15 +276,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     TextEditingController controller,
   ) {
     Map<String, dynamic>? task = (_feedbackController
-            .suggestedOutput?['pipelineResponse'] as List<dynamic>)
-        .firstWhereOrNull((e) => e['taskType'] == taskFeedback.taskType);
+            .suggestedOutput?[APIConstants.kPipelineResponse] as List<dynamic>)
+        .firstWhereOrNull(
+            (e) => e[APIConstants.kTaskType] == taskFeedback.taskType);
 
-    switch (task?['taskType']) {
-      case 'asr':
-        task?['output'][0]['source'] = controller.text;
+    switch (task?[APIConstants.kTaskType]) {
+      case APIConstants.kASR:
+        task?[APIConstants.kOutput][0][APIConstants.kSource] = controller.text;
         break;
-      case 'translation':
-        task?['output'][0]['target'] = controller.text;
+      case APIConstants.kTranslation:
+        task?[APIConstants.kOutput][0][APIConstants.kTarget] = controller.text;
         break;
     }
   }
@@ -287,13 +293,15 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   String getLanguageCodeFromPayload(Map<String, dynamic>? task) {
     String languageCode = '';
 
-    String languageType =
-        task?['taskType'] == 'asr' ? 'sourceLanguage' : 'targetLanguage';
-    languageCode =
-        (_feedbackController.computePayload?['pipelineTasks'] as List<dynamic>)
-                .firstWhereOrNull(
-                    (e) => e['taskType'] == task?['taskType'])['config']
-            ['language'][languageType];
+    String languageType = task?[APIConstants.kTaskType] == APIConstants.kASR
+        ? APIConstants.kSourceLanguage
+        : APIConstants.kTargetLanguage;
+    languageCode = (_feedbackController
+                .computePayload?[APIConstants.kPipelineTasks] as List<dynamic>)
+            .firstWhereOrNull((e) =>
+                e[APIConstants.kTaskType] ==
+                task?[APIConstants.kTaskType])[APIConstants.kConfig]
+        [APIConstants.kLanguage][languageType];
 
     return languageCode;
   }

@@ -37,7 +37,7 @@ class FeedbackController extends GetxController {
 
   @override
   void onInit() {
-    (Get.arguments['requestPayload'] as Map<String, dynamic>)
+    (Get.arguments[APIConstants.kRequestPayload] as Map<String, dynamic>)
         .forEach((key, value) {
       computePayload?[key] = value;
     });
@@ -45,19 +45,19 @@ class FeedbackController extends GetxController {
     // Fixes Dart shallow copy issue:
 
     Map<String, dynamic> responseCopyForSuggestedRes =
-        json.decode(json.encode(Get.arguments['requestResponse']));
+        json.decode(json.encode(Get.arguments[APIConstants.kRequestResponse]));
 
     (responseCopyForSuggestedRes).forEach((key, value) {
       suggestedOutput?[key] = [];
       for (Map<String, dynamic> task in value) {
-        if (task['taskType'] != 'tts') {
+        if (task[APIConstants.kTaskType] != APIConstants.kTTS) {
           suggestedOutput?[key].add(task);
         }
       }
     });
 
     Map<String, dynamic> responseCopyForComputeRes =
-        json.decode(json.encode(Get.arguments['requestResponse']));
+        json.decode(json.encode(Get.arguments[APIConstants.kRequestResponse]));
 
     (responseCopyForComputeRes).forEach((key, value) {
       computeResponse?[key] = value;
@@ -79,7 +79,7 @@ class FeedbackController extends GetxController {
     if (feedbackCacheTime != null &&
         feedbackResponseFromCache != null &&
         feedbackCacheTime.isAfter(DateTime.now()) &&
-        feedbackResponseFromCache["feedbackLanguage"] ==
+        feedbackResponseFromCache[APIConstants.kFeedbackLanguage] ==
             i18n.LocaleSettings.currentLocale.languageCode) {
       // load data from cache
       feedbackReqResponse = feedbackResponseFromCache;
@@ -126,13 +126,15 @@ class FeedbackController extends GetxController {
       return [];
     }
     var transliterationPayloadToSend = {};
-    transliterationPayloadToSend['input'] = [
-      {'source': sourceText}
+    transliterationPayloadToSend[APIConstants.kInput] = [
+      {APIConstants.kSource: sourceText}
     ];
 
-    transliterationPayloadToSend['modelId'] = transliterationModelToUse;
-    transliterationPayloadToSend['task'] = 'transliteration';
-    transliterationPayloadToSend['userId'] = null;
+    transliterationPayloadToSend[APIConstants.kModelId] =
+        transliterationModelToUse;
+    transliterationPayloadToSend[APIConstants.kTask] =
+        APIConstants.kTransliteration;
+    transliterationPayloadToSend[APIConstants.kUserId] = null;
 
     var response = await _translationAppAPIClient.sendTransliterationRequest(
         transliterationPayload: transliterationPayloadToSend);
@@ -140,7 +142,8 @@ class FeedbackController extends GetxController {
     response?.when(
       success: (data) async {
         transliterationHints.value = [];
-        transliterationHints.assignAll(data['output'][0]['target']);
+        transliterationHints
+            .assignAll(data[APIConstants.kOutput][0][APIConstants.kTarget]);
         return transliterationHints;
       },
       failure: (_) {
@@ -152,17 +155,23 @@ class FeedbackController extends GetxController {
 
   Future<void> getFeedbackPipelines() async {
     Map<String, dynamic> requestConfig = {
-      "feedbackLanguage": feedbackLanguage,
-      "supportedTasks": ["asr", "translation", "tts"]
+      APIConstants.kFeedbackLanguage: feedbackLanguage,
+      APIConstants.kSupportedTasks: [
+        APIConstants.kASR,
+        APIConstants.kTranslation,
+        APIConstants.kTTS
+      ]
     };
     var languageRequestResponse = await _dhruvaapiClient.sendFeedbackRequest(
         requestPayload: requestConfig);
     languageRequestResponse.when(
       success: ((dynamic response) async {
         if (feedbackLanguage != en &&
-            response["code"] != null &&
-            (response["code"] >= APIConstants.kApiErrorCodeRangeStarting ||
-                response["code"] <= APIConstants.kApiErrorCodeRangeEnding)) {
+            response[APIConstants.kCode] != null &&
+            (response[APIConstants.kCode] >=
+                    APIConstants.kApiErrorCodeRangeStarting ||
+                response[APIConstants.kCode] <=
+                    APIConstants.kApiErrorCodeRangeEnding)) {
           // if feedback api failed in current language, then retrieve using English language
           feedbackLanguage = en;
           getFeedbackPipelines();
@@ -192,7 +201,7 @@ class FeedbackController extends GetxController {
     );
     feedbackSubmitResponse.when(
       success: ((dynamic response) async {
-        showDefaultSnackbar(message: response['message']);
+        showDefaultSnackbar(message: response[APIConstants.kMessage]);
       }),
       failure: (error) {
         showDefaultSnackbar(message: i18n.t.somethingWentWrong);
@@ -202,20 +211,22 @@ class FeedbackController extends GetxController {
   }
 
   void getFeedbackQuestions() {
-    if (feedbackReqResponse['taskFeedback'] != null &&
-        feedbackReqResponse['taskFeedback'] is List) {
-      for (var taskFeedback in feedbackReqResponse['taskFeedback']) {
+    if (feedbackReqResponse[APIConstants.kTaskFeedback] != null &&
+        feedbackReqResponse[APIConstants.kTaskFeedback] is List) {
+      for (var taskFeedback
+          in feedbackReqResponse[APIConstants.kTaskFeedback]) {
         List<GranularFeedback> granularFeedbacks = [];
-        if (taskFeedback['granularFeedback'] != null &&
-            taskFeedback['granularFeedback'].isNotEmpty) {
-          for (var granularFeedback in taskFeedback['granularFeedback']) {
+        if (taskFeedback[APIConstants.kGranularFeedback] != null &&
+            taskFeedback[APIConstants.kGranularFeedback].isNotEmpty) {
+          for (var granularFeedback
+              in taskFeedback[APIConstants.kGranularFeedback]) {
             granularFeedbacks.add(GranularFeedback(
-              question: granularFeedback['question'],
+              question: granularFeedback[APIConstants.kQuestion],
               mainRating: null,
               supportedFeedbackTypes:
-                  granularFeedback['supportedFeedbackTypes'],
-              parameters: granularFeedback['parameters'] != null
-                  ? granularFeedback['parameters']
+                  granularFeedback[APIConstants.kSupportedFeedbackTypes],
+              parameters: granularFeedback[APIConstants.kParameters] != null
+                  ? granularFeedback[APIConstants.kParameters]
                       .map((parameter) =>
                           Parameter(paramName: parameter, paramRating: null))
                       .toList()
@@ -224,18 +235,22 @@ class FeedbackController extends GetxController {
           }
         }
 
-        Map<String, dynamic>? task = (suggestedOutput?['pipelineResponse']
-                as List<dynamic>)
-            .firstWhereOrNull((e) => e['taskType'] == taskFeedback['taskType']);
+        Map<String, dynamic>? task =
+            (suggestedOutput?[APIConstants.kPipelineResponse] as List<dynamic>)
+                .firstWhereOrNull((e) =>
+                    e[APIConstants.kTaskType] ==
+                    taskFeedback[APIConstants.kTaskType]);
         String pipelineTaskValue = '';
         String? suggestedOutputTitle;
-        switch (task?['taskType']) {
-          case 'asr':
-            pipelineTaskValue = task?['output'][0]['source'];
+        switch (task?[APIConstants.kTaskType]) {
+          case APIConstants.kASR:
+            pipelineTaskValue =
+                task?[APIConstants.kOutput][0][APIConstants.kSource];
             suggestedOutputTitle = i18n.t.suggestedOutputTextASR;
             break;
-          case 'translation':
-            pipelineTaskValue = task?['output'][0]['target'];
+          case APIConstants.kTranslation:
+            pipelineTaskValue =
+                task?[APIConstants.kOutput][0][APIConstants.kTarget];
             suggestedOutputTitle = i18n.t.suggestedOutputTextTranslate;
             break;
         }
@@ -246,9 +261,10 @@ class FeedbackController extends GetxController {
           oldSourceText = feedbackTextController.text;
         });
         feedbackTypeModels.add(FeedbackTypeModel(
-                taskType: taskFeedback['taskType'],
-                question: taskFeedback['commonFeedback'].length > 0
-                    ? taskFeedback['commonFeedback'][0]['question']
+                taskType: taskFeedback[APIConstants.kTaskType],
+                question: taskFeedback[APIConstants.kCommonFeedback].length > 0
+                    ? taskFeedback[APIConstants.kCommonFeedback][0]
+                        [APIConstants.kQuestion]
                     : '',
                 suggestedOutputTitle: suggestedOutputTitle,
                 textController: feedbackTextController,
@@ -273,55 +289,67 @@ class FeedbackController extends GetxController {
 
   Map<String, dynamic> createFeedbackSubmitPayload() {
     Map<String, dynamic> submissionPayload = {};
-    submissionPayload['feedbackTimeStamp'] =
+    submissionPayload[APIConstants.kFeedbackTimeStamp] =
         DateTime.now().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
-    submissionPayload['feedbackLanguage'] =
+    submissionPayload[APIConstants.kFeedbackLanguage] =
         i18n.LocaleSettings.currentLocale.languageCode;
-    submissionPayload['pipelineInput'] = computePayload;
-    submissionPayload['pipelineOutput'] = computeResponse;
+    submissionPayload[APIConstants.kPipelineInput] = computePayload;
+    submissionPayload[APIConstants.kPipelineOutput] = computeResponse;
 
     // Suggested Output
 
     bool isUserSuggestedOutput = false;
 
-    for (Map<String, dynamic> task in suggestedOutput?['pipelineResponse']) {
-      if (task['taskType'] == "asr") {
-        String? outputTextSource = (computeResponse?['pipelineResponse']
-                    as List<dynamic>)
-                .firstWhere((e) => e['taskType'] == task['taskType'])['output']
-            [0]['source'];
-        String? userSuggestedOutputText = task['output'][0]['source'];
+    for (Map<String, dynamic> task
+        in suggestedOutput?[APIConstants.kPipelineResponse]) {
+      if (task[APIConstants.kTaskType] == APIConstants.kASR) {
+        String? outputTextSource =
+            (computeResponse?[APIConstants.kPipelineResponse] as List<dynamic>)
+                    .firstWhere((e) =>
+                        e[APIConstants.kTaskType] ==
+                        task[APIConstants.kTaskType])[APIConstants.kOutput][0]
+                [APIConstants.kSource];
+        String? userSuggestedOutputText =
+            task[APIConstants.kOutput][0][APIConstants.kSource];
         isUserSuggestedOutput = outputTextSource != userSuggestedOutputText;
 
         // update in translation as well
         if (isUserSuggestedOutput) {
-          (suggestedOutput?['pipelineResponse'] as List<dynamic>).firstWhere(
-                  (task) => task['taskType'] == 'translation')['output'][0]
-              ['source'] = userSuggestedOutputText;
+          (suggestedOutput?[APIConstants.kPipelineResponse] as List<dynamic>)
+                  .firstWhere((task) =>
+                      task[APIConstants.kTaskType] ==
+                      APIConstants.kTranslation)[APIConstants.kOutput][0]
+              [APIConstants.kSource] = userSuggestedOutputText;
         }
       }
-      if (!isUserSuggestedOutput && task['taskType'] == "translation") {
-        String outputTextSource = (computeResponse?['pipelineResponse']
-                    as List<dynamic>)
-                .firstWhere((e) => e['taskType'] == task['taskType'])['output']
-            [0]['target'];
-        String userSuggestedOutputText = task['output'][0]['target'];
+      if (!isUserSuggestedOutput &&
+          task[APIConstants.kTaskType] == APIConstants.kTranslation) {
+        String outputTextSource =
+            (computeResponse?[APIConstants.kPipelineResponse] as List<dynamic>)
+                    .firstWhere((e) =>
+                        e[APIConstants.kTaskType] ==
+                        task[APIConstants.kTaskType])[APIConstants.kOutput][0]
+                [APIConstants.kTarget];
+        String userSuggestedOutputText =
+            task[APIConstants.kOutput][0][APIConstants.kTarget];
         isUserSuggestedOutput = outputTextSource != userSuggestedOutputText;
       }
     }
     if (isUserSuggestedOutput) {
-      submissionPayload['suggestedPipelineOutput'] = suggestedOutput;
+      submissionPayload[APIConstants.kSuggestedPipelineOutput] =
+          suggestedOutput;
     }
 
     // Pipeline Feedback
 
-    submissionPayload['pipelineFeedback'] = {
-      'commonFeedback': [
+    submissionPayload[APIConstants.kPipelineFeedback] = {
+      APIConstants.kCommonFeedback: [
         {
-          'question': feedbackReqResponse['pipelineFeedback']['commonFeedback']
-              [0]['question'],
-          "feedbackType": "rating",
-          "rating": mainRating.value
+          APIConstants.kQuestion:
+              feedbackReqResponse[APIConstants.kPipelineFeedback]
+                  [APIConstants.kCommonFeedback][0][APIConstants.kQuestion],
+          APIConstants.kFeedbackType: APIConstants.kRating,
+          APIConstants.kRating: mainRating.value
         }
       ]
     };
@@ -337,17 +365,19 @@ class FeedbackController extends GetxController {
         List<Map<String, dynamic>> granularFeedback = [];
         if (task.value.taskRating.value! < 4) {
           for (var feedback in task.value.granularFeedbacks) {
-            bool isRating = feedback.supportedFeedbackTypes.contains("rating");
+            bool isRating =
+                feedback.supportedFeedbackTypes.contains(APIConstants.kRating);
 
             // Granular Feedback Rating questions
 
             Map<String, dynamic> question = {
-              "question": feedback.question,
-              "feedbackType": isRating ? "rating" : "rating-list",
+              APIConstants.kQuestion: feedback.question,
+              APIConstants.kFeedbackType:
+                  isRating ? APIConstants.kRating : APIConstants.kRatingList,
             };
 
             if (isRating && feedback.mainRating != null) {
-              question["rating"] = feedback.mainRating;
+              question[APIConstants.kRating] = feedback.mainRating;
             } else {
               // Granular Feedback questions parameter
 
@@ -356,39 +386,41 @@ class FeedbackController extends GetxController {
               for (var parameter in feedback.parameters) {
                 if (parameter.paramRating != null) {
                   Map<String, dynamic> singleParameter = {
-                    "parameterName": parameter.paramName,
-                    "rating": parameter.paramRating,
+                    APIConstants.kParameterName: parameter.paramName,
+                    APIConstants.kRating: parameter.paramRating,
                   };
                   parameters.add(singleParameter);
                 }
               }
 
               if (parameters.isNotEmpty) {
-                question["rating-list"] = parameters;
+                question[APIConstants.kRatingList] = parameters;
               }
             }
-            if (question["rating"] != null || question["rating-list"] != null) {
+            if (question[APIConstants.kRating] != null ||
+                question[APIConstants.kRatingList] != null) {
               granularFeedback.add(question);
             }
           }
         }
 
         taskFeedback.add({
-          "taskType": task.value.taskType,
-          "commonFeedback": [
+          APIConstants.kTaskType: task.value.taskType,
+          APIConstants.kCommonFeedback: [
             {
-              "question": task.value.question,
-              "feedbackType": "rating",
-              "rating": task.value.taskRating.value,
+              APIConstants.kQuestion: task.value.question,
+              APIConstants.kFeedbackType: APIConstants.kRating,
+              APIConstants.kRating: task.value.taskRating.value,
             }
           ],
-          if (granularFeedback.isNotEmpty) "granularFeedback": granularFeedback,
+          if (granularFeedback.isNotEmpty)
+            APIConstants.kGranularFeedback: granularFeedback,
         });
       }
     }
 
     if (taskFeedback.isNotEmpty) {
-      submissionPayload['taskFeedback'] = taskFeedback;
+      submissionPayload[APIConstants.kTaskFeedback] = taskFeedback;
     }
     return submissionPayload;
   }

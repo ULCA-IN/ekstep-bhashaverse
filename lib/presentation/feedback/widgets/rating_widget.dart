@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 
 import '../../../common/widgets/generic_text_filed.dart';
 import '../../../models/feedback_type_model.dart';
+import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/theme/app_text_style.dart';
 import '../../../utils/theme/app_theme_provider.dart';
@@ -124,9 +125,10 @@ class _RatingWidgetState extends State<RatingWidget>
                           child: Column(
                             children: [
                               SizedBox(height: 20.w),
-                              if (widget.feedbackTypeModel.taskType == 'asr' ||
+                              if (widget.feedbackTypeModel.taskType ==
+                                      APIConstants.kASR ||
                                   widget.feedbackTypeModel.taskType ==
-                                      'translation')
+                                      APIConstants.kTranslation)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -154,20 +156,21 @@ class _RatingWidgetState extends State<RatingWidget>
                               ...widget.feedbackTypeModel.granularFeedbacks
                                   .map((feedback) {
                                 return feedback.supportedFeedbackTypes
-                                            .contains('rating') ||
+                                            .contains(APIConstants.kRating) ||
                                         feedback.supportedFeedbackTypes
-                                            .contains('rating-list')
+                                            .contains(APIConstants.kRatingList)
                                     ? DepthRatings(
                                         question: feedback.question,
                                         rating: feedback.mainRating,
                                         isRating: feedback
                                             .supportedFeedbackTypes
-                                            .contains('rating'),
+                                            .contains(APIConstants.kRating),
                                         onRatingChanged: (value) =>
                                             feedback.mainRating = value,
                                         depthRatings: feedback
                                                 .supportedFeedbackTypes
-                                                .contains('rating-list')
+                                                .contains(
+                                                    APIConstants.kRatingList)
                                             ? feedback.parameters
                                                 .map((parameter) {
                                                 return DepthRatings(

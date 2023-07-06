@@ -1,3 +1,5 @@
+import '../utils/constants/api_constants.dart';
+
 class TaskSequenceResponse {
   List<Languages>? languages;
   List<PipelineResponseConfig>? pipelineResponseConfig;
@@ -12,46 +14,48 @@ class TaskSequenceResponse {
       pipelineInferenceAPIEndPoint});
 
   TaskSequenceResponse.fromJson(Map<dynamic, dynamic> json) {
-    if (json['languages'] != null) {
+    if (json[APIConstants.kLanguages] != null) {
       languages = <Languages>[];
-      json['languages'].forEach((v) {
+      json[APIConstants.kLanguages].forEach((v) {
         languages!.add(Languages.fromJson(v));
       });
     }
-    if (json['pipelineResponseConfig'] != null) {
+    if (json[APIConstants.kPipelineResponseConfig] != null) {
       pipelineResponseConfig = <PipelineResponseConfig>[];
-      json['pipelineResponseConfig'].forEach((v) {
+      json[APIConstants.kPipelineResponseConfig].forEach((v) {
         pipelineResponseConfig!.add(PipelineResponseConfig.fromJson(v));
       });
     }
-    feedbackUrl = json['feedbackUrl'];
-    pipelineInferenceAPIEndPoint = json['pipelineInferenceAPIEndPoint'] != null
-        ? PipelineInferenceAPIEndPoint.fromJson(
-            json['pipelineInferenceAPIEndPoint'])
-        : null;
+    feedbackUrl = json[APIConstants.kFeedbackUrl];
+    pipelineInferenceAPIEndPoint =
+        json[APIConstants.kPipelineInferenceAPIEndPoint] != null
+            ? PipelineInferenceAPIEndPoint.fromJson(
+                json[APIConstants.kPipelineInferenceAPIEndPoint])
+            : null;
     pipelineInferenceSocketAPIEndPoint =
-        json['pipelineInferenceSocketEndPoint'] != null
+        json[APIConstants.kPipelineInferenceSocketEndPoint] != null
             ? PipelineInferenceSocketAPIEndPoint.fromJson(
-                json['pipelineInferenceSocketEndPoint'])
+                json[APIConstants.kPipelineInferenceSocketEndPoint])
             : null;
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
     if (languages != null) {
-      data['languages'] = languages!.map((v) => v.toJson()).toList();
+      data[APIConstants.kLanguages] =
+          languages!.map((v) => v.toJson()).toList();
     }
     if (pipelineResponseConfig != null) {
-      data['pipelineResponseConfig'] =
+      data[APIConstants.kPipelineResponseConfig] =
           pipelineResponseConfig!.map((v) => v.toJson()).toList();
     }
-    data['feedbackUrl'] = feedbackUrl;
+    data[APIConstants.kFeedbackUrl] = feedbackUrl;
     if (pipelineInferenceAPIEndPoint != null) {
-      data['pipelineInferenceAPIEndPoint'] =
+      data[APIConstants.kPipelineInferenceAPIEndPoint] =
           pipelineInferenceAPIEndPoint!.toJson();
     }
     if (pipelineInferenceSocketAPIEndPoint != null) {
-      data['pipelineInferenceSocketEndPoint'] =
+      data[APIConstants.kPipelineInferenceSocketEndPoint] =
           pipelineInferenceSocketAPIEndPoint!.toJson();
     }
     return data;
@@ -65,14 +69,14 @@ class Languages {
   Languages({sourceLanguage, targetLanguageList});
 
   Languages.fromJson(Map<dynamic, dynamic> json) {
-    sourceLanguage = json['sourceLanguage'];
-    targetLanguageList = json['targetLanguageList'];
+    sourceLanguage = json[APIConstants.kSourceLanguage];
+    targetLanguageList = json[APIConstants.kTargetLanguageList];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['sourceLanguage'] = sourceLanguage;
-    data['targetLanguageList'] = targetLanguageList;
+    data[APIConstants.kSourceLanguage] = sourceLanguage;
+    data[APIConstants.kTargetLanguageList] = targetLanguageList;
     return data;
   }
 }
@@ -84,10 +88,10 @@ class PipelineResponseConfig {
   PipelineResponseConfig({taskType, config});
 
   PipelineResponseConfig.fromJson(Map<dynamic, dynamic> json) {
-    taskType = json['taskType'];
-    if (json['config'] != null) {
+    taskType = json[APIConstants.kTaskType];
+    if (json[APIConstants.kConfig] != null) {
       config = <Config>[];
-      json['config'].forEach((v) {
+      json[APIConstants.kConfig].forEach((v) {
         config!.add(Config.fromJson(v));
       });
     }
@@ -95,9 +99,9 @@ class PipelineResponseConfig {
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['taskType'] = taskType;
+    data[APIConstants.kTaskType] = taskType;
     if (config != null) {
-      data['config'] = config!.map((v) => v.toJson()).toList();
+      data[APIConstants.kConfig] = config!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -113,23 +117,24 @@ class Config {
   Config({serviceId, modelId, language, domain, supportedVoices});
 
   Config.fromJson(Map<dynamic, dynamic> json) {
-    serviceId = json['serviceId'];
-    modelId = json['modelId'];
-    language =
-        json['language'] != null ? Language.fromJson(json['language']) : null;
-    domain = json['domain'];
-    supportedVoices = json['supportedVoices'];
+    serviceId = json[APIConstants.kServiceId];
+    modelId = json[APIConstants.kModelId];
+    language = json[APIConstants.kLanguage] != null
+        ? Language.fromJson(json[APIConstants.kLanguage])
+        : null;
+    domain = json[APIConstants.kDomain];
+    supportedVoices = json[APIConstants.kSupportedVoices];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['serviceId'] = serviceId;
-    data['modelId'] = modelId;
+    data[APIConstants.kServiceId] = serviceId;
+    data[APIConstants.kModelId] = modelId;
     if (language != null) {
-      data['language'] = language!.toJson();
+      data[APIConstants.kLanguage] = language!.toJson();
     }
-    data['domain'] = domain;
-    data['supportedVoices'] = supportedVoices;
+    data[APIConstants.kDomain] = domain;
+    data[APIConstants.kSupportedVoices] = supportedVoices;
     return data;
   }
 }
@@ -141,14 +146,14 @@ class Language {
   Language({sourceLanguage, targetLanguage});
 
   Language.fromJson(Map<dynamic, dynamic> json) {
-    sourceLanguage = json['sourceLanguage'];
-    targetLanguage = json['targetLanguage'];
+    sourceLanguage = json[APIConstants.kSourceLanguage];
+    targetLanguage = json[APIConstants.kTargetLanguage];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['sourceLanguage'] = sourceLanguage;
-    data['targetLanguage'] = targetLanguage;
+    data[APIConstants.kSourceLanguage] = sourceLanguage;
+    data[APIConstants.kTargetLanguage] = targetLanguage;
     return data;
   }
 }
@@ -163,22 +168,22 @@ class PipelineInferenceAPIEndPoint {
       {callbackUrl, inferenceApiKey, isMultilingualEnabled, isSyncApi});
 
   PipelineInferenceAPIEndPoint.fromJson(Map<dynamic, dynamic> json) {
-    callbackUrl = json['callbackUrl'];
-    inferenceApiKey = json['inferenceApiKey'] != null
-        ? InferenceApiKey.fromJson(json['inferenceApiKey'])
+    callbackUrl = json[APIConstants.kCallbackUrl];
+    inferenceApiKey = json[APIConstants.kInferenceApiKey] != null
+        ? InferenceApiKey.fromJson(json[APIConstants.kInferenceApiKey])
         : null;
-    isMultilingualEnabled = json['isMultilingualEnabled'];
-    isSyncApi = json['isSyncApi'];
+    isMultilingualEnabled = json[APIConstants.kIsMultilingualEnabled];
+    isSyncApi = json[APIConstants.kIsSyncApi];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['callbackUrl'] = callbackUrl;
+    data[APIConstants.kCallbackUrl] = callbackUrl;
     if (inferenceApiKey != null) {
-      data['inferenceApiKey'] = inferenceApiKey!.toJson();
+      data[APIConstants.kInferenceApiKey] = inferenceApiKey!.toJson();
     }
-    data['isMultilingualEnabled'] = isMultilingualEnabled;
-    data['isSyncApi'] = isSyncApi;
+    data[APIConstants.kIsMultilingualEnabled] = isMultilingualEnabled;
+    data[APIConstants.kIsSyncApi] = isSyncApi;
     return data;
   }
 }
@@ -190,14 +195,14 @@ class InferenceApiKey {
   InferenceApiKey({name, value});
 
   InferenceApiKey.fromJson(Map<dynamic, dynamic> json) {
-    name = json['name'];
-    value = json['value'];
+    name = json[APIConstants.kName];
+    value = json[APIConstants.kValue];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['name'] = name;
-    data['value'] = value;
+    data[APIConstants.kName] = name;
+    data[APIConstants.kValue] = value;
     return data;
   }
 }
@@ -212,22 +217,22 @@ class PipelineInferenceSocketAPIEndPoint {
       {callbackUrl, inferenceApiKey, isMultilingualEnabled, isSyncApi});
 
   PipelineInferenceSocketAPIEndPoint.fromJson(Map<dynamic, dynamic> json) {
-    callbackUrl = json['callbackUrl'];
-    inferenceApiKey = json['inferenceApiKey'] != null
-        ? InferenceApiKey.fromJson(json['inferenceApiKey'])
+    callbackUrl = json[APIConstants.kCallbackUrl];
+    inferenceApiKey = json[APIConstants.kInferenceApiKey] != null
+        ? InferenceApiKey.fromJson(json[APIConstants.kInferenceApiKey])
         : null;
-    isMultilingualEnabled = json['isMultilingualEnabled'];
-    isSyncApi = json['isSyncApi'];
+    isMultilingualEnabled = json[APIConstants.kIsMultilingualEnabled];
+    isSyncApi = json[APIConstants.kIsSyncApi];
   }
 
   Map<dynamic, dynamic> toJson() {
     final Map<dynamic, dynamic> data = <dynamic, dynamic>{};
-    data['callbackUrl'] = callbackUrl;
+    data[APIConstants.kCallbackUrl] = callbackUrl;
     if (inferenceApiKey != null) {
-      data['inferenceApiKey'] = inferenceApiKey!.toJson();
+      data[APIConstants.kInferenceApiKey] = inferenceApiKey!.toJson();
     }
-    data['isMultilingualEnabled'] = isMultilingualEnabled;
-    data['isSyncApi'] = isSyncApi;
+    data[APIConstants.kIsMultilingualEnabled] = isMultilingualEnabled;
+    data[APIConstants.kIsSyncApi] = isSyncApi;
     return data;
   }
 }

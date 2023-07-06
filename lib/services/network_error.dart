@@ -22,7 +22,7 @@ class NetworkError extends ExceptionHandler {
         _errorModel = ErrorModel(
           response?.statusCode,
           APIConstants.kApiResponseError,
-          response?.data['message'] as String? ?? '',
+          response?.data[APIConstants.kMessage] as String? ?? '',
         );
         break;
       case 401:
@@ -36,14 +36,14 @@ class NetworkError extends ExceptionHandler {
         _errorModel = ErrorModel(
           response?.statusCode,
           APIConstants.kApiResponseError,
-          response?.data['message'] as String? ?? '',
+          response?.data[APIConstants.kMessage] as String? ?? '',
         );
         break;
       case 409:
         _errorModel = ErrorModel(
           response?.statusCode,
           APIConstants.kApiDataConflict,
-          response?.data['message'] as String? ?? '',
+          response?.data[APIConstants.kMessage] as String? ?? '',
         );
         break;
       // Exception 402,403, ...

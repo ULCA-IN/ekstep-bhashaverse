@@ -32,7 +32,7 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-  late ConversationController _translationController;
+  late ConversationController _converseController;
   late SocketIOClient _socketIOClient;
   late LanguageModelController _languageModelController;
   late final Box _hiveDBInstance;
@@ -40,13 +40,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void initState() {
-    _translationController = Get.find();
+    _converseController = Get.find();
     _languageModelController = Get.find();
     _socketIOClient = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    _translationController.getSourceTargetLangFromDB();
-    _translationController.setSourceLanguageList();
-    _translationController.setTargetLanguageList();
+    _converseController.getSourceTargetLangFromDB();
+    _converseController.setSourceLanguageList();
+    _converseController.setTargetLanguageList();
     super.initState();
   }
 
@@ -87,12 +87,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   ),
                   Obx(
                     () => SizedBox(
-                        height: _translationController.isKeyboardVisible.value
+                        height: _converseController.isKeyboardVisible.value
                             ? 12.h
                             : 20.h),
                   ),
                   Obx(
-                    () => _translationController.isKeyboardVisible.value
+                    () => _converseController.isKeyboardVisible.value
                         ? const SizedBox.shrink()
                         : _buildMicButton(),
                   ),
@@ -111,55 +111,54 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
-            textController: _translationController.sourceLangTextController,
+            textController: _converseController.sourceLangTextController,
             focusNode: FocusNode(),
             backgroundColor: context.appTheme.normalTextFieldColor,
             borderColor: context.appTheme.disabledBGColor,
             hintText: isCurrentlyRecording()
-                ? _translationController.currentMic.value ==
+                ? _converseController.currentMic.value ==
                         CurrentlySelectedMic.source
                     ? translation.kListeningHintText
                     : ''
-                : _translationController.micButtonStatus.value ==
+                : _converseController.micButtonStatus.value ==
                         MicButtonStatus.pressed
                     ? translation.connecting
                     : translation.converseHintText,
             translateButtonTitle: translation.kTranslate,
-            currentDuration: _translationController.currentDuration.value,
-            totalDuration: _translationController.maxDuration.value,
+            currentDuration: _converseController.currentDuration.value,
+            totalDuration: _converseController.maxDuration.value,
             isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: textFieldRadius,
             bottomBorderRadius: 0,
             showTranslateButton: false,
             showASRTTSActionButtons: true,
-            showFeedbackIcon:
-                _translationController.isTranslateCompleted.value &&
-                    _translationController.currentMic.value ==
-                        CurrentlySelectedMic.source &&
-                    !_hiveDBInstance.get(isStreamingPreferred),
-            expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
+            showFeedbackIcon: _converseController.isTranslateCompleted.value &&
+                _converseController.currentMic.value ==
+                    CurrentlySelectedMic.source &&
+                !_hiveDBInstance.get(isStreamingPreferred),
+            expandFeedbackIcon: _converseController.expandFeedbackIcon.value,
             isReadOnly: true,
             isShareButtonLoading:
-                _translationController.isTargetShareLoading.value,
-            textToCopy: _translationController.sourceOutputText.value,
+                _converseController.isTargetShareLoading.value,
+            textToCopy: _converseController.sourceOutputText.value,
             onMusicPlayOrStop: () =>
-                _translationController.playStopTTSOutput(true),
+                _converseController.playStopTTSOutput(true),
             onFileShare: () =>
-                _translationController.shareAudioFile(isSourceLang: true),
+                _converseController.shareAudioFile(isSourceLang: true),
             onFeedbackButtonTap: () {
               Get.toNamed(AppRoutes.feedbackRoute, arguments: {
                 // Fixes Dart shallow copy issue:
-                'requestPayload': json.decode(
-                    json.encode(_translationController.lastComputeRequest)),
-                'requestResponse': json.decode(
-                    json.encode(_translationController.lastComputeResponse))
+                APIConstants.kRequestPayload: json.decode(
+                    json.encode(_converseController.lastComputeRequest)),
+                APIConstants.kRequestResponse: json.decode(
+                    json.encode(_converseController.lastComputeResponse))
               });
             },
-            playerController: _translationController.playerController,
-            speakerStatus: _translationController.sourceSpeakerStatus.value,
-            rawTimeStream: _translationController.stopWatchTimer.rawTime,
+            playerController: _converseController.playerController,
+            speakerStatus: _converseController.sourceSpeakerStatus.value,
+            rawTimeStream: _converseController.stopWatchTimer.rawTime,
             showMicButton: isCurrentlyRecording() &&
-                _translationController.currentMic.value ==
+                _converseController.currentMic.value ==
                     CurrentlySelectedMic.source),
       ),
     );
@@ -169,53 +168,51 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Expanded(
       child: Obx(
         () => TextFieldWithActions(
-          textController: _translationController.targetLangTextController,
+          textController: _converseController.targetLangTextController,
           focusNode: FocusNode(),
           backgroundColor: context.appTheme.normalTextFieldColor,
           borderColor: context.appTheme.disabledBGColor,
           hintText: isCurrentlyRecording()
-              ? _translationController.currentMic.value ==
+              ? _converseController.currentMic.value ==
                       CurrentlySelectedMic.target
                   ? translation.kListeningHintText
                   : ''
-              : _translationController.micButtonStatus.value ==
+              : _converseController.micButtonStatus.value ==
                       MicButtonStatus.pressed
                   ? translation.connecting
                   : translation.converseHintText,
           translateButtonTitle: translation.kTranslate,
-          currentDuration: _translationController.currentDuration.value,
-          totalDuration: _translationController.maxDuration.value,
+          currentDuration: _converseController.currentDuration.value,
+          totalDuration: _converseController.maxDuration.value,
           isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: 0,
           bottomBorderRadius: textFieldRadius,
           showTranslateButton: false,
-          showFeedbackIcon: _translationController.isTranslateCompleted.value &&
-              _translationController.currentMic.value ==
+          showFeedbackIcon: _converseController.isTranslateCompleted.value &&
+              _converseController.currentMic.value ==
                   CurrentlySelectedMic.target &&
               !_hiveDBInstance.get(isStreamingPreferred),
-          expandFeedbackIcon: _translationController.expandFeedbackIcon.value,
+          expandFeedbackIcon: _converseController.expandFeedbackIcon.value,
           showASRTTSActionButtons: true,
           isReadOnly: true,
-          isShareButtonLoading:
-              _translationController.isSourceShareLoading.value,
-          textToCopy: _translationController.targetOutputText.value,
+          isShareButtonLoading: _converseController.isSourceShareLoading.value,
+          textToCopy: _converseController.targetOutputText.value,
           onFileShare: () =>
-              _translationController.shareAudioFile(isSourceLang: false),
-          onMusicPlayOrStop: () =>
-              _translationController.playStopTTSOutput(false),
-          playerController: _translationController.playerController,
-          speakerStatus: _translationController.targetSpeakerStatus.value,
-          rawTimeStream: _translationController.stopWatchTimer.rawTime,
+              _converseController.shareAudioFile(isSourceLang: false),
+          onMusicPlayOrStop: () => _converseController.playStopTTSOutput(false),
+          playerController: _converseController.playerController,
+          speakerStatus: _converseController.targetSpeakerStatus.value,
+          rawTimeStream: _converseController.stopWatchTimer.rawTime,
           showMicButton: isCurrentlyRecording() &&
-              _translationController.currentMic.value ==
+              _converseController.currentMic.value ==
                   CurrentlySelectedMic.target,
           onFeedbackButtonTap: () {
             Get.toNamed(AppRoutes.feedbackRoute, arguments: {
               // Fixes Dart shallow copy issue:
-              'requestPayload': json.decode(
-                  json.encode(_translationController.lastComputeRequest)),
-              'requestResponse': json.decode(
-                  json.encode(_translationController.lastComputeResponse))
+              APIConstants.kRequestPayload: json
+                  .decode(json.encode(_converseController.lastComputeRequest)),
+              APIConstants.kRequestResponse: json
+                  .decode(json.encode(_converseController.lastComputeResponse))
             });
           },
         ),
@@ -243,29 +240,29 @@ class _ConversationScreenState extends State<ConversationScreen> {
             left: 20,
             child: Obx(() {
               String sourceLangCode =
-                      _translationController.selectedSourceLanguageCode.value,
+                      _converseController.selectedSourceLanguageCode.value,
                   selectedSourceLang = "";
 
               selectedSourceLang = sourceLangCode.isNotEmpty &&
-                      (_translationController.sourceLangListRegular
+                      (_converseController.sourceLangListRegular
                               .contains(sourceLangCode) ||
-                          _translationController.sourceLangListBeta
+                          _converseController.sourceLangListBeta
                               .contains(sourceLangCode))
                   ? APIConstants.getLanNameInAppLang(
-                      _translationController.selectedSourceLanguageCode.value)
+                      _converseController.selectedSourceLanguageCode.value)
                   : translation.kTranslateSourceTitle;
               return MicButton(
-                micButtonStatus: _translationController.currentMic.value ==
+                micButtonStatus: _converseController.currentMic.value ==
                         CurrentlySelectedMic.source
-                    ? _translationController.micButtonStatus.value
+                    ? _converseController.micButtonStatus.value
                     : MicButtonStatus.released,
                 showLanguage: true,
                 languageName: selectedSourceLang,
                 onMicButtonTap: (isPressed) {
-                  if (_translationController.currentMic.value ==
+                  if (_converseController.currentMic.value ==
                           CurrentlySelectedMic.target &&
                       isCurrentlyRecording()) return;
-                  _translationController.currentMic.value =
+                  _converseController.currentMic.value =
                       CurrentlySelectedMic.source;
                   micButtonActions(startMicRecording: isPressed);
                 },
@@ -274,42 +271,41 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       AppRoutes.languageSelectionRoute,
                       arguments: {
                         kLanguageListRegular:
-                            _translationController.sourceLangListRegular,
+                            _converseController.sourceLangListRegular,
                         kLanguageListBeta:
-                            _translationController.sourceLangListBeta,
+                            _converseController.sourceLangListBeta,
                         kIsSourceLanguage: true,
-                        selectedLanguage: _translationController
+                        selectedLanguage: _converseController
                             .selectedSourceLanguageCode.value,
                       });
                   if (selectedSourceLangCode != null) {
-                    _translationController.selectedSourceLanguageCode.value =
+                    _converseController.selectedSourceLanguageCode.value =
                         selectedSourceLangCode;
                     _hiveDBInstance.put(
                         preferredSourceLanguage, selectedSourceLangCode);
                     String selectedTargetLangCode =
-                        _translationController.selectedTargetLanguageCode.value;
+                        _converseController.selectedTargetLanguageCode.value;
                     if (selectedTargetLangCode.isNotEmpty) {
                       if (!_languageModelController
                           .sourceTargetLanguageMap[selectedSourceLangCode]!
                           .contains(selectedTargetLangCode)) {
-                        _translationController
-                            .selectedTargetLanguageCode.value = '';
+                        _converseController.selectedTargetLanguageCode.value =
+                            '';
                         _hiveDBInstance.put(preferredTargetLanguage, null);
-                        await _translationController.resetAllValues();
-                      } else if (_translationController.currentMic.value ==
+                        await _converseController.resetAllValues();
+                      } else if (_converseController.currentMic.value ==
                               CurrentlySelectedMic.target &&
-                          _translationController
+                          _converseController
                               .selectedTargetLanguageCode.value.isNotEmpty &&
-                          (_translationController.base64EncodedAudioContent ??
-                                  '')
+                          (_converseController.base64EncodedAudioContent ?? '')
                               .isNotEmpty &&
                           await isNetworkConnected()) {
-                        _translationController.getComputeResponseASRTrans(
+                        _converseController.getComputeResponseASRTrans(
                             isRecorded: true,
-                            base64Value: _translationController
-                                .base64EncodedAudioContent);
+                            base64Value:
+                                _converseController.base64EncodedAudioContent);
                       } else {
-                        await _translationController.resetAllValues();
+                        await _converseController.resetAllValues();
                       }
                     }
                   }
@@ -321,72 +317,72 @@ class _ConversationScreenState extends State<ConversationScreen> {
             right: 20,
             child: Obx(() {
               String targetLangCode =
-                      _translationController.selectedTargetLanguageCode.value,
+                      _converseController.selectedTargetLanguageCode.value,
                   selectedTargetLang = "";
 
               selectedTargetLang = targetLangCode.isNotEmpty &&
-                      (_translationController.targetLangListRegular
+                      (_converseController.targetLangListRegular
                               .contains(targetLangCode) ||
-                          _translationController.targetLangListBeta
+                          _converseController.targetLangListBeta
                               .contains(targetLangCode))
                   ? APIConstants.getLanNameInAppLang(
-                      _translationController.selectedTargetLanguageCode.value)
+                      _converseController.selectedTargetLanguageCode.value)
                   : translation.kTranslateTargetTitle;
               return MicButton(
-                micButtonStatus: _translationController.currentMic.value ==
+                micButtonStatus: _converseController.currentMic.value ==
                         CurrentlySelectedMic.target
-                    ? _translationController.micButtonStatus.value
+                    ? _converseController.micButtonStatus.value
                     : MicButtonStatus.released,
                 showLanguage: true,
                 languageName: selectedTargetLang,
                 onMicButtonTap: (isPressed) {
-                  if (_translationController.currentMic.value ==
+                  if (_converseController.currentMic.value ==
                           CurrentlySelectedMic.source &&
                       isCurrentlyRecording()) return;
-                  _translationController.currentMic.value =
+                  _converseController.currentMic.value =
                       CurrentlySelectedMic.target;
                   micButtonActions(startMicRecording: isPressed);
                 },
                 onLanguageTap: () async {
-                  if (_translationController
+                  if (_converseController
                       .selectedSourceLanguageCode.value.isEmpty) {
                     showDefaultSnackbar(
                         message: translation.errorSelectSourceLangFirst);
                     return;
                   }
 
-                  _translationController.setTargetLanguageList();
+                  _converseController.setTargetLanguageList();
 
                   dynamic selectedTargetLangCode = await Get.toNamed(
                       AppRoutes.languageSelectionRoute,
                       arguments: {
                         kLanguageListRegular:
-                            _translationController.targetLangListRegular,
+                            _converseController.targetLangListRegular,
                         kLanguageListBeta:
-                            _translationController.targetLangListBeta,
+                            _converseController.targetLangListBeta,
                         kIsSourceLanguage: false,
-                        selectedLanguage: _translationController
+                        selectedLanguage: _converseController
                             .selectedTargetLanguageCode.value,
                       });
                   if (selectedTargetLangCode != null) {
-                    _translationController.selectedTargetLanguageCode.value =
+                    _converseController.selectedTargetLanguageCode.value =
                         selectedTargetLangCode;
                     _hiveDBInstance.put(
                         preferredTargetLanguage, selectedTargetLangCode);
 
-                    if (_translationController.currentMic.value ==
+                    if (_converseController.currentMic.value ==
                             CurrentlySelectedMic.source &&
-                        _translationController
+                        _converseController
                             .selectedSourceLanguageCode.value.isNotEmpty &&
-                        (_translationController.base64EncodedAudioContent ?? '')
+                        (_converseController.base64EncodedAudioContent ?? '')
                             .isNotEmpty &&
                         await isNetworkConnected()) {
-                      _translationController.getComputeResponseASRTrans(
+                      _converseController.getComputeResponseASRTrans(
                           isRecorded: true,
                           base64Value:
-                              _translationController.base64EncodedAudioContent);
+                              _converseController.base64EncodedAudioContent);
                     } else {
-                      await _translationController.resetAllValues();
+                      await _converseController.resetAllValues();
                     }
                   }
                 },
@@ -400,11 +396,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildLoadingAnimation() {
     return Obx(() {
-      if (_translationController.isLoading.value) {
+      if (_converseController.isLoading.value) {
         return LottieAnimation(
             context: context,
             lottieAsset: animationLoadingLine,
-            footerText: _translationController.isLoading.value
+            footerText: _converseController.isLoading.value
                 ? translation.computeCallLoadingText
                 : translation.kTranslationLoadingAnimationText);
       } else {
@@ -414,34 +410,30 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 
   bool isAudioPlaying() {
-    return (_translationController.targetSpeakerStatus.value ==
+    return (_converseController.targetSpeakerStatus.value ==
             SpeakerStatus.playing ||
-        _translationController.sourceSpeakerStatus.value ==
-            SpeakerStatus.playing);
+        _converseController.sourceSpeakerStatus.value == SpeakerStatus.playing);
   }
 
   bool isCurrentlyRecording() {
     return _hiveDBInstance.get(isStreamingPreferred)
         ? _socketIOClient.isMicConnected.value &&
-            _translationController.micButtonStatus.value ==
-                MicButtonStatus.pressed
-        : _translationController.micButtonStatus.value ==
-            MicButtonStatus.pressed;
+            _converseController.micButtonStatus.value == MicButtonStatus.pressed
+        : _converseController.micButtonStatus.value == MicButtonStatus.pressed;
   }
 
   void micButtonActions({required bool startMicRecording}) async {
     if (!await isNetworkConnected()) {
       showDefaultSnackbar(message: translation.errorNoInternetTitle);
-    } else if (_translationController.isSourceAndTargetLangSelected()) {
+    } else if (_converseController.isSourceAndTargetLangSelected()) {
       if (startMicRecording) {
-        _translationController.micButtonStatus.value = MicButtonStatus.pressed;
-        _translationController.startVoiceRecording();
+        _converseController.micButtonStatus.value = MicButtonStatus.pressed;
+        _converseController.startVoiceRecording();
       } else {
-        if (_translationController.micButtonStatus.value ==
+        if (_converseController.micButtonStatus.value ==
             MicButtonStatus.pressed) {
-          _translationController.micButtonStatus.value =
-              MicButtonStatus.released;
-          _translationController.stopVoiceRecordingAndGetResult();
+          _converseController.micButtonStatus.value = MicButtonStatus.released;
+          _converseController.stopVoiceRecordingAndGetResult();
         }
       }
     } else if (startMicRecording) {

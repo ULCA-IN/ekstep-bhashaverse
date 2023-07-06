@@ -1,12 +1,14 @@
+import '../utils/constants/api_constants.dart';
+
 class RESTComputeResponseModel {
   List<PipelineResponse>? pipelineResponse;
 
   RESTComputeResponseModel({pipelineResponse});
 
   RESTComputeResponseModel.fromJson(Map<String, dynamic> json) {
-    if (json['pipelineResponse'] != null) {
+    if (json[APIConstants.kPipelineResponse] != null) {
       pipelineResponse = <PipelineResponse>[];
-      json['pipelineResponse'].forEach((v) {
+      json[APIConstants.kPipelineResponse].forEach((v) {
         pipelineResponse!.add(PipelineResponse.fromJson(v));
       });
     }
@@ -15,7 +17,7 @@ class RESTComputeResponseModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (pipelineResponse != null) {
-      data['pipelineResponse'] =
+      data[APIConstants.kPipelineResponse] =
           pipelineResponse!.map((v) => v.toJson()).toList();
     }
     return data;
@@ -31,17 +33,19 @@ class PipelineResponse {
   PipelineResponse({taskType, config, output, audio});
 
   PipelineResponse.fromJson(Map<String, dynamic> json) {
-    taskType = json['taskType'];
-    config = json['config'] != null ? Config.fromJson(json['config']) : null;
-    if (json['output'] != null) {
+    taskType = json[APIConstants.kTaskType];
+    config = json[APIConstants.kConfig] != null
+        ? Config.fromJson(json[APIConstants.kConfig])
+        : null;
+    if (json[APIConstants.kOutput] != null) {
       output = <Output>[];
-      json['output'].forEach((v) {
+      json[APIConstants.kOutput].forEach((v) {
         output!.add(Output.fromJson(v));
       });
     }
-    if (json['audio'] != null) {
+    if (json[APIConstants.kAudio] != null) {
       audio = <Audio>[];
-      json['audio'].forEach((v) {
+      json[APIConstants.kAudio].forEach((v) {
         audio!.add(Audio.fromJson(v));
       });
     }
@@ -49,15 +53,15 @@ class PipelineResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['taskType'] = taskType;
+    data[APIConstants.kTaskType] = taskType;
     if (config != null) {
-      data['config'] = config!.toJson();
+      data[APIConstants.kConfig] = config!.toJson();
     }
     if (output != null) {
-      data['output'] = output!.map((v) => v.toJson()).toList();
+      data[APIConstants.kOutput] = output!.map((v) => v.toJson()).toList();
     }
     if (audio != null) {
-      data['audio'] = audio!.map((v) => v.toJson()).toList();
+      data[APIConstants.kAudio] = audio!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -80,25 +84,26 @@ class Config {
       postProcessors});
 
   Config.fromJson(Map<String, dynamic> json) {
-    serviceId = json['serviceId'];
-    language =
-        json['language'] != null ? Language.fromJson(json['language']) : null;
-    audioFormat = json['audioFormat'];
-    encoding = json['encoding'];
-    samplingRate = json['samplingRate'];
-    postProcessors = json['postProcessors'];
+    serviceId = json[APIConstants.kServiceId];
+    language = json[APIConstants.kLanguage] != null
+        ? Language.fromJson(json[APIConstants.kLanguage])
+        : null;
+    audioFormat = json[APIConstants.kAudioFormat];
+    encoding = json[APIConstants.kEncoding];
+    samplingRate = json[APIConstants.kSamplingRate];
+    postProcessors = json[APIConstants.kPostProcessors];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['serviceId'] = serviceId;
+    data[APIConstants.kServiceId] = serviceId;
     if (language != null) {
-      data['language'] = language!.toJson();
+      data[APIConstants.kLanguage] = language!.toJson();
     }
-    data['audioFormat'] = audioFormat;
-    data['encoding'] = encoding;
-    data['samplingRate'] = samplingRate;
-    data['postProcessors'] = postProcessors;
+    data[APIConstants.kAudioFormat] = audioFormat;
+    data[APIConstants.kEncoding] = encoding;
+    data[APIConstants.kSamplingRate] = samplingRate;
+    data[APIConstants.kPostProcessors] = postProcessors;
     return data;
   }
 }
@@ -110,14 +115,14 @@ class Language {
   Language({sourceLanguage, sourceScriptCode});
 
   Language.fromJson(Map<String, dynamic> json) {
-    sourceLanguage = json['sourceLanguage'];
-    sourceScriptCode = json['sourceScriptCode'];
+    sourceLanguage = json[APIConstants.kSourceLanguage];
+    sourceScriptCode = json[APIConstants.kSourceScriptCode];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['sourceLanguage'] = sourceLanguage;
-    data['sourceScriptCode'] = sourceScriptCode;
+    data[APIConstants.kSourceLanguage] = sourceLanguage;
+    data[APIConstants.kSourceScriptCode] = sourceScriptCode;
     return data;
   }
 }
@@ -129,14 +134,14 @@ class Output {
   Output({source, target});
 
   Output.fromJson(Map<String, dynamic> json) {
-    source = json['source'];
-    target = json['target'];
+    source = json[APIConstants.kSource];
+    target = json[APIConstants.kTarget];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['source'] = source;
-    data['target'] = target;
+    data[APIConstants.kSource] = source;
+    data[APIConstants.kTarget] = target;
     return data;
   }
 }
@@ -148,14 +153,14 @@ class Audio {
   Audio({audioContent, audioUri});
 
   Audio.fromJson(Map<String, dynamic> json) {
-    audioContent = json['audioContent'];
-    audioUri = json['audioUri'];
+    audioContent = json[APIConstants.kAudioContent];
+    audioUri = json[APIConstants.kAudioUri];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['audioContent'] = audioContent;
-    data['audioUri'] = audioUri;
+    data[APIConstants.kAudioContent] = audioContent;
+    data[APIConstants.kAudioUri] = audioUri;
     return data;
   }
 }
