@@ -95,7 +95,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ),
       ),
       bottomNavigationBar: Obx(
-        () => !_feedbackController.isLoading.value ||
+        () => !_feedbackController.isLoading.value &&
                 _feedbackController.feedbackReqResponse != null
             ? _buildSubmitButton(context)
             : const SizedBox.shrink(),
