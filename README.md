@@ -229,8 +229,6 @@ To do that, create .vscode folder inside root directory of the project. Then cre
                 "userID=<ADD_USER_ID>",
                 "--dart-define",
                 "ulcaApiKey=<ADD_ULCA_API_KEY>",
-                "--dart-define",
-                "authorization=<ADD_AUTHORIZATION_KEY>",
             ]
         },
         {
@@ -243,8 +241,6 @@ To do that, create .vscode folder inside root directory of the project. Then cre
                 "userID=<ADD_USER_ID>",
                 "--dart-define",
                 "ulcaApiKey=<ADD_ULCA_API_KEY>",
-                "--dart-define",
-                "authorization=<ADD_AUTHORIZATION_KEY>",
             ]
         },
         {
@@ -257,8 +253,6 @@ To do that, create .vscode folder inside root directory of the project. Then cre
                 "userID=<ADD_USER_ID>",
                 "--dart-define",
                 "ulcaApiKey=<ADD_ULCA_API_KEY>",
-                "--dart-define",
-                "authorization=<ADD_AUTHORIZATION_KEY>",
             ]
         }
     ]
