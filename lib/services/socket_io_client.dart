@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 import '../common/controller/language_model_controller.dart';
+import '../utils/constants/api_constants.dart';
 
 class SocketIOClient extends GetxService {
   Socket? _socket;
@@ -32,7 +33,7 @@ class SocketIOClient extends GetxService {
         _languageModelController.taskSequenceResponse
             .pipelineInferenceSocketAPIEndPoint?.callbackUrl,
         OptionBuilder()
-            .setTransports(['websocket', 'polling'])
+            .setTransports([APIConstants.kWebsocket, APIConstants.kPolling])
             .disableAutoConnect()
             .setAuth({
               _languageModelController
@@ -64,32 +65,32 @@ class SocketIOClient extends GetxService {
       socketError = null;
     });
 
-    _socket?.on('ready', (data) {});
+    _socket?.on(APIConstants.kReady, (data) {});
 
-    _socket?.on('response', (data) {
+    _socket?.on(APIConstants.kResponse, (data) {
       if (data != null) {
-        if (data[0]['detail'] == null) {
+        if (data[0][APIConstants.kDetail] == null) {
           socketResponse.value = data;
         } else {
-          socketError = data[0]['detail']['message'];
+          socketError = data[0][APIConstants.kDetail][APIConstants.kMessage];
           hasError.value = true;
         }
       }
     });
 
-    _socket?.on('terminate', (data) {
+    _socket?.on(APIConstants.kTerminate, (data) {
       socketError = data;
       isMicConnected.value = false;
       hasError.value = true;
     });
 
-    _socket?.on('abort', (data) {
+    _socket?.on(APIConstants.kAbort, (data) {
       socketError = data;
       isMicConnected.value = false;
       hasError.value = true;
     });
 
-    _socket?.on('connect_error', (data) {
+    _socket?.on(APIConstants.kConnectError, (data) {
       socketError = data.message;
       isMicConnected.value = false;
       hasError.value = true;
