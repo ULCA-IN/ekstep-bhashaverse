@@ -45,7 +45,7 @@ setAppLocale(String locale) {
     case sa:
       i18n.LocaleSettings.setLocale(i18n.AppLocale.sa);
       break;
-    case as:
+    case asm:
       i18n.LocaleSettings.setLocale(i18n.AppLocale.as);
       break;
     case mai:

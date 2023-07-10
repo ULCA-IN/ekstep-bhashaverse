@@ -13,7 +13,7 @@ const String doi = 'doi';
 const String ne = 'ne';
 const String si = 'si';
 const String sa = 'sa';
-const String as = 'as';
+const String asm = 'as';
 const String mai = 'mai';
 const String bho = 'bho';
 const String ml = 'ml';
@@ -41,7 +41,7 @@ List<String> languagesCodeList = [
   ne,
   si,
   sa,
-  as,
+  asm,
   mai,
   bho,
   ml,
