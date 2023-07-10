@@ -13,7 +13,9 @@ const String doi = 'doi';
 const String ne = 'ne';
 const String si = 'si';
 const String sa = 'sa';
-const String as = 'as';
+// build_runner showed issue while generating with 'as' language code
+// Hence, using asm instead
+const String asm = 'as';
 const String mai = 'mai';
 const String bho = 'bho';
 const String ml = 'ml';
@@ -41,7 +43,7 @@ List<String> languagesCodeList = [
   ne,
   si,
   sa,
-  as,
+  asm,
   mai,
   bho,
   ml,

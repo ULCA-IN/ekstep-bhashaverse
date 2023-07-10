@@ -32,9 +32,9 @@ name: bhashaverse
   connectivity_plus: ^3.0.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  freezed: ^2.3.2
+  freezed: ^2.3.5
   freezed_annotation: ^2.2.0
-  json_serializable: ^6.5.4
+  json_serializable: ^6.7.1
   flutter_svg: ^1.1.6
   google_fonts: ^4.0.4
   avatar_glow: ^2.0.2
@@ -60,7 +60,7 @@ name: bhashaverse
 
 * Dev Dependencies:
 ```yaml
-  build_runner: ^2.3.3
+  build_runner: ^2.4.6
   flutter_launcher_icons: ^0.11.0
 ```
 

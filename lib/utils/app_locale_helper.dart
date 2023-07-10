@@ -45,7 +45,9 @@ setAppLocale(String locale) {
     case sa:
       i18n.LocaleSettings.setLocale(i18n.AppLocale.sa);
       break;
-    case as:
+    // build_runner showed issue while generating with 'as' language code
+    // Hence, using asm instead
+    case asm:
       i18n.LocaleSettings.setLocale(i18n.AppLocale.as);
       break;
     case mai:
