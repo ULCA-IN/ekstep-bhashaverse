@@ -13,6 +13,8 @@ const String doi = 'doi';
 const String ne = 'ne';
 const String si = 'si';
 const String sa = 'sa';
+// build_runner showed issue while generating with 'as' language code
+// Hence, using asm instead
 const String asm = 'as';
 const String mai = 'mai';
 const String bho = 'bho';
