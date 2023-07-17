@@ -129,7 +129,7 @@ class Language {
 
 class Output {
   String? source;
-  String? target;
+  dynamic target;
 
   Output({source, target});
 
