@@ -191,7 +191,7 @@ class TextTranslateController extends GetxController {
     String transliterationServiceId = '';
 
     transliterationServiceId = APIConstants.getTaskTypeServiceID(
-          _languageModelController.transliterationConfigResponse,
+          _languageModelController.transliterationConfigResponse!,
           APIConstants.kTransliteration,
           defaultLangCode,
           selectedSourceLanguageCode.value,
@@ -208,12 +208,12 @@ class TextTranslateController extends GetxController {
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.callbackUrl,
+            ?.pipelineInferenceAPIEndPoint?.callbackUrl,
         authorizationKey: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+            ?.pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
         authorizationValue: _languageModelController
             .transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint
+            ?.pipelineInferenceAPIEndPoint
             ?.inferenceApiKey
             ?.value,
         computePayload: transliterationPayloadToSend);
@@ -239,7 +239,7 @@ class TextTranslateController extends GetxController {
     String translationServiceId = '';
 
     translationServiceId = APIConstants.getTaskTypeServiceID(
-            _languageModelController.translationConfigResponse,
+            _languageModelController.translationConfigResponse!,
             APIConstants.kTranslation,
             selectedSourceLanguageCode.value,
             selectedTargetLanguageCode.value) ??
@@ -522,6 +522,12 @@ class TextTranslateController extends GetxController {
     lastOffsetOfCursor = sourceLangTextController.selection.base.offset;
   }
 
+  bool isTransliterationEnabled() {
+    return _hiveDBInstance.get(enableTransliteration, defaultValue: true) &&
+        selectedSourceLanguageCode.value != defaultLangCode &&
+        _languageModelController.transliterationConfigResponse != null;
+  }
+
   void clearTransliterationHints() {
     transliterationWordHints.clear();
     currentlyTypedWordForTransliteration = '';
@@ -594,10 +600,5 @@ class TextTranslateController extends GetxController {
     if (isTransliterationEnabled()) {
       clearTransliterationHints();
     }
-  }
-
-  bool isTransliterationEnabled() {
-    return _hiveDBInstance.get(enableTransliteration, defaultValue: true) &&
-        selectedSourceLanguageCode.value != defaultLangCode;
   }
 }

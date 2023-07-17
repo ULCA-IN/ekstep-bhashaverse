@@ -111,14 +111,15 @@ class FeedbackController extends GetxController {
 
   Future<List<String>> getTransliterationOutput(
       String sourceText, String languageCode) async {
-    if (languageCode == defaultLangCode) {
+    if (languageCode == defaultLangCode ||
+        _languageModelController.transliterationConfigResponse == null) {
       return [];
     }
 
     String transliterationServiceId = '';
 
     transliterationServiceId = APIConstants.getTaskTypeServiceID(
-          _languageModelController.transliterationConfigResponse,
+          _languageModelController.transliterationConfigResponse!,
           APIConstants.kTransliteration,
           defaultLangCode,
           languageCode,
@@ -135,12 +136,12 @@ class FeedbackController extends GetxController {
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.callbackUrl,
+            ?.pipelineInferenceAPIEndPoint?.callbackUrl,
         authorizationKey: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+            ?.pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
         authorizationValue: _languageModelController
             .transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint
+            ?.pipelineInferenceAPIEndPoint
             ?.inferenceApiKey
             ?.value,
         computePayload: transliterationPayloadToSend);

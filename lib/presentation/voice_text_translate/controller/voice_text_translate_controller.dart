@@ -415,7 +415,7 @@ class VoiceTextTranslateController extends GetxController {
     String transliterationServiceId = '';
 
     transliterationServiceId = APIConstants.getTaskTypeServiceID(
-          _languageModelController.transliterationConfigResponse,
+          _languageModelController.transliterationConfigResponse!,
           APIConstants.kTransliteration,
           defaultLangCode,
           selectedSourceLanguageCode.value,
@@ -432,12 +432,12 @@ class VoiceTextTranslateController extends GetxController {
 
     var response = await _dhruvaapiClient.sendComputeRequest(
         baseUrl: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.callbackUrl,
+            ?.pipelineInferenceAPIEndPoint?.callbackUrl,
         authorizationKey: _languageModelController.transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+            ?.pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
         authorizationValue: _languageModelController
             .transliterationConfigResponse
-            .pipelineInferenceAPIEndPoint
+            ?.pipelineInferenceAPIEndPoint
             ?.inferenceApiKey
             ?.value,
         computePayload: transliterationPayloadToSend);
@@ -607,7 +607,8 @@ class VoiceTextTranslateController extends GetxController {
 
   bool isTransliterationEnabled() {
     return _hiveDBInstance.get(enableTransliteration, defaultValue: true) &&
-        selectedSourceLanguageCode.value != defaultLangCode;
+        selectedSourceLanguageCode.value != defaultLangCode &&
+        _languageModelController.transliterationConfigResponse != null;
   }
 
   void clearTransliterationHints() {
