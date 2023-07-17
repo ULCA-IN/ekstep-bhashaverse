@@ -13,7 +13,7 @@ class LanguageModelController extends GetxController {
 
   late final TaskSequenceResponse _taskSequenceResponse;
   late final TaskSequenceResponse _translationConfigResponse;
-  late final TaskSequenceResponse _transliterationConfigResponse;
+  TaskSequenceResponse? _transliterationConfigResponse;
 
   TaskSequenceResponse get taskSequenceResponse => _taskSequenceResponse;
   void setTaskSequenceResponse(TaskSequenceResponse taskSequenceResponse) =>
@@ -24,7 +24,7 @@ class LanguageModelController extends GetxController {
   void setTranslationConfigResponse(TaskSequenceResponse translationResponse) =>
       _translationConfigResponse = translationResponse;
 
-  TaskSequenceResponse get transliterationConfigResponse =>
+  TaskSequenceResponse? get transliterationConfigResponse =>
       _transliterationConfigResponse;
   void setTransliterationConfigResponse(
           TaskSequenceResponse translationResponse) =>
