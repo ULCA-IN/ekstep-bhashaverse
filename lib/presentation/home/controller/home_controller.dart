@@ -194,6 +194,16 @@ class HomeController extends GetxController {
             !isMainConfigCallLoading.value) {
           getAvailableLanguagesInTask();
         }
+
+        if (_languageModelController.translationLanguageMap.isEmpty &&
+            !isTransConfigCallLoading.value) {
+          getAvailableLangTranslation();
+        }
+
+        if (_languageModelController.transliterationConfigResponse == null &&
+            !isTransliterationConfigCallLoading.value) {
+          getTransliterationConfig();
+        }
       }
     });
   }
