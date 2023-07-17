@@ -35,6 +35,10 @@ const transConfigCacheKey = 'trans_config_cache_key';
 const transConfigCacheLastUpdatedKey =
     'trans_config_cache_key_last_updated_key';
 
+const transliterationConfigCacheKey = 'transliteration_config_cache_key';
+const transliterationConfigCacheLastUpdatedKey =
+    'transliteration_config_cache_key_last_updated_key';
+
 const feedbackCacheKey = 'feedback_cache_key';
 const feedbackCacheLastUpdatedKey = 'feedback_cache_key_last_updated_key';
 
