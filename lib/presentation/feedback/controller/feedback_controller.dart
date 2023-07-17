@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 
 import '../../../models/feedback_type_model.dart';
 import '../../../services/dhruva_api_client.dart';
-import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../common/controller/language_model_controller.dart';
@@ -21,12 +20,9 @@ class FeedbackController extends GetxController {
   RxDouble mainRating = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
   RxBool isLoading = false.obs;
-  String transliterationModelToUse = '',
-      oldSourceText = '',
-      feedbackLanguage = '';
+  String oldSourceText = '', feedbackLanguage = '';
   dynamic feedbackReqResponse;
 
-  late TransliterationAppAPIClient _translationAppAPIClient;
   late DHRUVAAPIClient _dhruvaapiClient;
   late LanguageModelController _languageModelController;
   final transliterationHints = RxList([]);
@@ -63,7 +59,6 @@ class FeedbackController extends GetxController {
       computeResponse?[key] = value;
     });
 
-    _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _dhruvaapiClient = DHRUVAAPIClient.getAPIClientInstance();
     if (_hiveDBInstance == null || !_hiveDBInstance!.isOpen) {
@@ -119,31 +114,42 @@ class FeedbackController extends GetxController {
     if (languageCode == defaultLangCode) {
       return [];
     }
-    transliterationModelToUse = _languageModelController
-            .getAvailableTransliterationModelsForLanguage(languageCode) ??
+
+    String transliterationServiceId = '';
+
+    transliterationServiceId = APIConstants.getTaskTypeServiceID(
+          _languageModelController.transliterationConfigResponse,
+          APIConstants.kTransliteration,
+          defaultLangCode,
+          languageCode,
+        ) ??
         '';
-    if (transliterationModelToUse.isEmpty) {
-      return [];
-    }
-    var transliterationPayloadToSend = {};
-    transliterationPayloadToSend[APIConstants.kInput] = [
-      {APIConstants.kSource: sourceText}
-    ];
 
-    transliterationPayloadToSend[APIConstants.kModelId] =
-        transliterationModelToUse;
-    transliterationPayloadToSend[APIConstants.kTask] =
-        APIConstants.kTransliteration;
-    transliterationPayloadToSend[APIConstants.kUserId] = null;
+    var transliterationPayloadToSend = APIConstants.createComputePayload(
+        srcLanguage: defaultLangCode,
+        targetLanguage: languageCode,
+        isRecorded: false,
+        inputData: sourceText,
+        transliterationServiceID: transliterationServiceId,
+        isTransliteration: true);
 
-    var response = await _translationAppAPIClient.sendTransliterationRequest(
-        transliterationPayload: transliterationPayloadToSend);
+    var response = await _dhruvaapiClient.sendComputeRequest(
+        baseUrl: _languageModelController.transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint?.callbackUrl,
+        authorizationKey: _languageModelController.transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+        authorizationValue: _languageModelController
+            .transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint
+            ?.inferenceApiKey
+            ?.value,
+        computePayload: transliterationPayloadToSend);
 
-    response?.when(
+    response.when(
       success: (data) async {
-        transliterationHints.value = [];
-        transliterationHints
-            .assignAll(data[APIConstants.kOutput][0][APIConstants.kTarget]);
+        transliterationHints.value.clear();
+        transliterationHints.value =
+            data.pipelineResponse?.first.output?.first.target;
         return transliterationHints;
       },
       failure: (_) {

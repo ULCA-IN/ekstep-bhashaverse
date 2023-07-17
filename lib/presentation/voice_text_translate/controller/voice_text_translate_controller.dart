@@ -19,7 +19,6 @@ import '../../../enums/speaker_status.dart';
 import '../../../enums/mic_button_status.dart';
 import '../../../services/dhruva_api_client.dart';
 import '../../../services/socket_io_client.dart';
-import '../../../services/transliteration_app_api_client.dart';
 import '../../../utils/constants/api_constants.dart';
 import '../../../utils/constants/app_constants.dart';
 import '../../../utils/constants/language_map_translated.dart';
@@ -33,7 +32,6 @@ import '../../../i18n/strings.g.dart' as i18n;
 
 class VoiceTextTranslateController extends GetxController {
   late DHRUVAAPIClient _dhruvaapiClient;
-  late TransliterationAppAPIClient _translationAppAPIClient;
   late LanguageModelController _languageModelController;
 
   TextEditingController sourceLangTextController = TextEditingController(),
@@ -56,7 +54,7 @@ class VoiceTextTranslateController extends GetxController {
       targetOutputText = ''.obs,
       sourceLangTTSPath = ''.obs,
       targetLangTTSPath = ''.obs;
-  String? sourceLangASRPath = '', transliterationModelToUse = '';
+  String? sourceLangASRPath = '';
   RxInt maxDuration = 0.obs,
       currentDuration = 0.obs,
       sourceTextCharLimit = 0.obs;
@@ -95,7 +93,6 @@ class VoiceTextTranslateController extends GetxController {
   void onInit() {
     _dhruvaapiClient = Get.find();
     _socketIOClient = Get.find();
-    _translationAppAPIClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
     _recorder.initialize();
@@ -243,9 +240,6 @@ class VoiceTextTranslateController extends GetxController {
             .contains(selectedSourceLanguage) &&
         !voiceSkipSourceLang.contains(selectedSourceLanguage)) {
       selectedSourceLanguageCode.value = selectedSourceLanguage ?? '';
-      if (isTransliterationEnabled()) {
-        setModelForTransliteration();
-      }
     }
 
     String? selectedTargetLanguage =
@@ -417,31 +411,43 @@ class VoiceTextTranslateController extends GetxController {
 
   Future<void> getTransliterationOutput(String sourceText) async {
     currentlyTypedWordForTransliteration = sourceText;
-    if (transliterationModelToUse == null ||
-        transliterationModelToUse!.isEmpty) {
-      clearTransliterationHints();
-      return;
-    }
-    var transliterationPayloadToSend = {};
-    transliterationPayloadToSend[APIConstants.kInput] = [
-      {APIConstants.kSource: sourceText}
-    ];
 
-    transliterationPayloadToSend[APIConstants.kModelId] =
-        transliterationModelToUse;
-    transliterationPayloadToSend[APIConstants.kTask] =
-        APIConstants.kTransliteration;
-    transliterationPayloadToSend[APIConstants.kUserId] = null;
+    String transliterationServiceId = '';
 
-    var response = await _translationAppAPIClient.sendTransliterationRequest(
-        transliterationPayload: transliterationPayloadToSend);
+    transliterationServiceId = APIConstants.getTaskTypeServiceID(
+          _languageModelController.transliterationConfigResponse,
+          APIConstants.kTransliteration,
+          defaultLangCode,
+          selectedSourceLanguageCode.value,
+        ) ??
+        '';
 
-    response?.when(
+    var transliterationPayloadToSend = APIConstants.createComputePayload(
+        srcLanguage: defaultLangCode,
+        targetLanguage: selectedSourceLanguageCode.value,
+        isRecorded: false,
+        inputData: sourceText,
+        transliterationServiceID: transliterationServiceId,
+        isTransliteration: true);
+
+    var response = await _dhruvaapiClient.sendComputeRequest(
+        baseUrl: _languageModelController.transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint?.callbackUrl,
+        authorizationKey: _languageModelController.transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint?.inferenceApiKey?.name,
+        authorizationValue: _languageModelController
+            .transliterationConfigResponse
+            .pipelineInferenceAPIEndPoint
+            ?.inferenceApiKey
+            ?.value,
+        computePayload: transliterationPayloadToSend);
+
+    response.when(
       success: (data) async {
         if (currentlyTypedWordForTransliteration ==
-            data[APIConstants.kOutput][0][APIConstants.kSource]) {
+            data.pipelineResponse?.first.output?.first.source) {
           transliterationWordHints.value =
-              data[APIConstants.kOutput][0][APIConstants.kTarget];
+              data.pipelineResponse?.first.output?.first.target;
           if (!transliterationWordHints
               .contains(currentlyTypedWordForTransliteration)) {
             transliterationWordHints.add(currentlyTypedWordForTransliteration);
@@ -473,7 +479,7 @@ class VoiceTextTranslateController extends GetxController {
             selectedTargetLanguageCode.value) ??
         '';
 
-    var asrPayloadToSend = APIConstants.createComputePayloadASRTrans(
+    var asrPayloadToSend = APIConstants.createComputePayload(
         srcLanguage: selectedSourceLanguageCode.value,
         targetLanguage: selectedTargetLanguageCode.value,
         isRecorded: isRecorded,
@@ -600,13 +606,8 @@ class VoiceTextTranslateController extends GetxController {
   }
 
   bool isTransliterationEnabled() {
-    return _hiveDBInstance.get(enableTransliteration, defaultValue: true);
-  }
-
-  void setModelForTransliteration() {
-    transliterationModelToUse =
-        _languageModelController.getAvailableTransliterationModelsForLanguage(
-            selectedSourceLanguageCode.value);
+    return _hiveDBInstance.get(enableTransliteration, defaultValue: true) &&
+        selectedSourceLanguageCode.value != defaultLangCode;
   }
 
   void clearTransliterationHints() {
@@ -903,7 +904,6 @@ class VoiceTextTranslateController extends GetxController {
     lastComputeResponse.clear();
     _socketIOClient.disconnect();
     if (isTransliterationEnabled()) {
-      setModelForTransliteration();
       clearTransliterationHints();
     }
   }
