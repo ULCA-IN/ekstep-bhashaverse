@@ -29,9 +29,20 @@ class HomeController extends GetxController {
     _dhruvaapiClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
+    getConfigData();
+    super.onInit();
+  }
 
-    // Get main config call response from cache
+  Future<void> getConfigData() async {
+    await setASRTTSTranslationLanguages();
+    await setTranslationOnlyLanguages();
+    if (_hiveDBInstance.get(enableTransliteration, defaultValue: true)) {
+      await setTransliteration();
+    }
+    if (subscription == null) listenNetworkChange();
+  }
 
+  Future<void> setASRTTSTranslationLanguages() async {
     DateTime? configCacheTime = _hiveDBInstance.get(configCacheLastUpdatedKey);
     dynamic taskSequenceResponse = _hiveDBInstance.get(configCacheKey);
 
@@ -44,20 +55,19 @@ class HomeController extends GetxController {
       _languageModelController.populateLanguagePairs();
     } else {
       // clear cache and get new data
-      _hiveDBInstance.put(configCacheLastUpdatedKey, null);
-      _hiveDBInstance.put(configCacheKey, null);
-      isNetworkConnected().then((isConnected) {
+      await _hiveDBInstance.put(configCacheLastUpdatedKey, null);
+      await _hiveDBInstance.put(configCacheKey, null);
+      await isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          getAvailableLanguagesInTask();
+          await getAvailableLanguagesInTask();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
-      if (subscription == null) listenNetworkChange();
     }
+  }
 
-    // Get translation config call response from cache
-
+  Future<void> setTranslationOnlyLanguages() async {
     DateTime? transConfigCacheTime =
         _hiveDBInstance.get(transConfigCacheLastUpdatedKey);
     dynamic transTaskSequenceResponse =
@@ -72,20 +82,19 @@ class HomeController extends GetxController {
       _languageModelController.populateTranslationLanguagePairs();
     } else {
       // clear cache and get new data
-      _hiveDBInstance.put(transConfigCacheLastUpdatedKey, null);
-      _hiveDBInstance.put(transConfigCacheKey, null);
-      isNetworkConnected().then((isConnected) {
+      await _hiveDBInstance.put(transConfigCacheLastUpdatedKey, null);
+      await _hiveDBInstance.put(transConfigCacheKey, null);
+      await isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          getAvailableLangTranslation();
+          await getAvailableLangTranslation();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
-      if (subscription == null) listenNetworkChange();
     }
+  }
 
-    // Get transliteration config call response from cache
-
+  Future<void> setTransliteration() async {
     DateTime? transliterationConfigCacheTime =
         _hiveDBInstance.get(transliterationConfigCacheLastUpdatedKey);
     dynamic transliterationTaskSequenceResponse =
@@ -99,19 +108,16 @@ class HomeController extends GetxController {
           TaskSequenceResponse.fromJson(transliterationTaskSequenceResponse));
     } else {
       // clear cache and get new data
-      _hiveDBInstance.put(transliterationConfigCacheLastUpdatedKey, null);
-      _hiveDBInstance.put(transliterationConfigCacheKey, null);
-      isNetworkConnected().then((isConnected) {
+      await _hiveDBInstance.put(transliterationConfigCacheLastUpdatedKey, null);
+      await _hiveDBInstance.put(transliterationConfigCacheKey, null);
+      await isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          getTransliterationConfig();
+          await getTransliterationConfig();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
       });
-      if (subscription == null) listenNetworkChange();
     }
-
-    super.onInit();
   }
 
   @override
@@ -201,6 +207,7 @@ class HomeController extends GetxController {
         }
 
         if (_languageModelController.transliterationConfigResponse == null &&
+            _hiveDBInstance.get(enableTransliteration) &&
             !isTransliterationConfigCallLoading.value) {
           getTransliterationConfig();
         }
