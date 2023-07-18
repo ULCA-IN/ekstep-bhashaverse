@@ -3,6 +3,7 @@
 import '../../enums/language_enum.dart';
 import '../../i18n/strings.g.dart' as i18n;
 import '../../models/task_sequence_response_model.dart';
+import 'app_constants.dart';
 import 'language_map_translated.dart';
 
 class APIConstants {
@@ -125,6 +126,8 @@ class APIConstants {
   static const String kPipelineRequestConfig = 'pipelineRequestConfig';
   static const String kPipelineId = 'pipelineId';
   static const String kInputData = 'inputData';
+  static const String kIsSentence = 'isSentence';
+  static const String kNumSuggestions = 'numSuggestions';
 
   // Feedback API keys
   static const String kFeedbackTimeStamp = 'feedbackTimeStamp';
@@ -173,20 +176,62 @@ class APIConstants {
     ],
     kPipelineRequestConfig: {kPipelineId: CONFIG_CALL_PIPELINE_ID}
   };
+  static var payloadForTransliterationConfig = {
+    kPipelineTasks: [
+      {
+        kTaskType: kTransliteration,
+        kConfig: {
+          kLanguage: {
+            kSourceLanguage: defaultLangCode,
+          }
+        }
+      }
+    ],
+    kPipelineRequestConfig: {kPipelineId: CONFIG_CALL_PIPELINE_ID}
+  };
 
   // payload for Compute request
-  static Map<String, dynamic> createComputePayloadASRTrans({
+  static Map<String, dynamic> createComputePayload({
     required String srcLanguage,
     required String targetLanguage,
-    required String preferredGender,
     required bool isRecorded,
     required String inputData,
     String audioFormat = kWav,
     int samplingRate = 16000, // default
+    String? preferredGender,
     String? asrServiceID,
     String? translationServiceID,
+    bool isTransliteration = false,
+    String? transliterationServiceID,
   }) {
-    var computeRequestToSend = {
+    Map<String, dynamic> computeRequestToSend = {};
+
+    if (isTransliteration) {
+      computeRequestToSend = {
+        kPipelineTasks: [
+          {
+            kTaskType: kTransliteration,
+            kConfig: {
+              kLanguage: {
+                kSourceLanguage: srcLanguage,
+                kTargetLanguage: targetLanguage
+              },
+              kServiceId: transliterationServiceID ?? "",
+              kIsSentence: false,
+              kNumSuggestions: 5
+            }
+          }
+        ],
+        kInputData: {
+          kInput: [
+            {kSource: inputData}
+          ]
+        }
+      };
+      return computeRequestToSend;
+    }
+
+    computeRequestToSend = {
       kPipelineTasks: [
         if (isRecorded)
           {

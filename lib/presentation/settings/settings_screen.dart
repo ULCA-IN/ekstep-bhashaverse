@@ -1,5 +1,6 @@
 import 'dart:math' show pi;
 
+import 'package:bhashaverse/presentation/home/controller/home_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -121,8 +122,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                             _settingsController.isTransLiterationEnabled.value,
                         activeColor: context.appTheme.highlightedBorderColor,
                         trackColor: context.appTheme.disabledBGColor,
-                        onChanged: (value) => _settingsController
-                            .changeTransliterationPref(value),
+                        onChanged: (isEnabled) {
+                          _settingsController
+                              .changeTransliterationPref(isEnabled);
+                          if (isEnabled) {
+                            Get.find<HomeController>().setTransliteration();
+                          }
+                        },
                       ),
                     ),
                     title: translation.transLiteration,

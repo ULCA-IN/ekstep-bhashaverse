@@ -391,7 +391,7 @@ class ConversationController extends GetxController {
             targetLangCode) ??
         '';
 
-    var asrPayloadToSend = APIConstants.createComputePayloadASRTrans(
+    var asrPayloadToSend = APIConstants.createComputePayload(
         srcLanguage: sourceLangCode,
         targetLanguage: targetLangCode,
         isRecorded: isRecorded,

@@ -118,12 +118,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Obx(() {
             if (_homeController.isMainConfigCallLoading.value ||
-                _homeController.isTransConfigCallLoading.value) {
+                _homeController.isTransConfigCallLoading.value ||
+                _homeController.isTransliterationConfigCallLoading.value) {
               return LottieAnimation(
                   context: context,
                   lottieAsset: animationLoadingLine,
                   footerText: _homeController.isMainConfigCallLoading.value ||
-                          _homeController.isTransConfigCallLoading.value
+                          _homeController.isTransConfigCallLoading.value ||
+                          _homeController
+                              .isTransliterationConfigCallLoading.value
                       ? translation.kHomeLoadingAnimationText
                       : translation.kTranslationLoadingAnimationText);
             } else {
