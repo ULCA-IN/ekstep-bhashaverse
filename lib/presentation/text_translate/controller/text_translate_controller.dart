@@ -239,7 +239,7 @@ class TextTranslateController extends GetxController {
     String translationServiceId = '';
 
     translationServiceId = APIConstants.getTaskTypeServiceID(
-            _languageModelController.translationConfigResponse!,
+            _languageModelController.translationConfigResponse,
             APIConstants.kTranslation,
             selectedSourceLanguageCode.value,
             selectedTargetLanguageCode.value) ??
