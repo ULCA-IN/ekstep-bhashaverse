@@ -129,7 +129,7 @@ class HomeController extends GetxController {
     languageRequestResponse.when(
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController.setTaskSequenceResponse(taskSequenceResponse);
-        addMainConfigResponseInCache(taskSequenceResponse.toJson());
+        await addMainConfigResponseInCache(taskSequenceResponse.toJson());
         _languageModelController.populateLanguagePairs();
         isMainConfigCallLoading.value = false;
       }),
@@ -153,7 +153,7 @@ class HomeController extends GetxController {
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController
             .setTranslationConfigResponse(taskSequenceResponse);
-        addTransConfigResponseInCache(taskSequenceResponse.toJson());
+        await addTransConfigResponseInCache(taskSequenceResponse.toJson());
         _languageModelController.populateTranslationLanguagePairs();
         isTransConfigCallLoading.value = false;
       }),
@@ -175,7 +175,8 @@ class HomeController extends GetxController {
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController
             .setTransliterationConfigResponse(taskSequenceResponse);
-        addTransliterationConfigResponseInCache(taskSequenceResponse.toJson());
+        await addTransliterationConfigResponseInCache(
+            taskSequenceResponse.toJson());
         isTransliterationConfigCallLoading.value = false;
       }),
       failure: (error) {
@@ -211,8 +212,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addMainConfigResponseInCache(responseData) async {
-    _hiveDBInstance.put(configCacheKey, responseData);
-    _hiveDBInstance.put(
+    await _hiveDBInstance.put(configCacheKey, responseData);
+    await _hiveDBInstance.put(
       configCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
@@ -221,8 +222,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addTransConfigResponseInCache(responseData) async {
-    _hiveDBInstance.put(transConfigCacheKey, responseData);
-    _hiveDBInstance.put(
+    await _hiveDBInstance.put(transConfigCacheKey, responseData);
+    await _hiveDBInstance.put(
       transConfigCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
@@ -231,8 +232,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addTransliterationConfigResponseInCache(responseData) async {
-    _hiveDBInstance.put(transliterationConfigCacheKey, responseData);
-    _hiveDBInstance.put(
+    await _hiveDBInstance.put(transliterationConfigCacheKey, responseData);
+    await _hiveDBInstance.put(
       transliterationConfigCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
