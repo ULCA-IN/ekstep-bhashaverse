@@ -29,17 +29,13 @@ class HomeController extends GetxController {
     _dhruvaapiClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    getConfigData();
-    super.onInit();
-  }
-
-  Future<void> getConfigData() async {
-    await setASRTTSTranslationLanguages();
-    await setTranslationOnlyLanguages();
+    setASRTTSTranslationLanguages();
+    setTranslationOnlyLanguages();
     if (_hiveDBInstance.get(enableTransliteration, defaultValue: true)) {
-      await setTransliteration();
+      setTransliteration();
     }
     if (subscription == null) listenNetworkChange();
+    super.onInit();
   }
 
   Future<void> setASRTTSTranslationLanguages() async {
@@ -55,11 +51,11 @@ class HomeController extends GetxController {
       _languageModelController.populateLanguagePairs();
     } else {
       // clear cache and get new data
-      await _hiveDBInstance.put(configCacheLastUpdatedKey, null);
-      await _hiveDBInstance.put(configCacheKey, null);
-      await isNetworkConnected().then((isConnected) async {
+      _hiveDBInstance.put(configCacheLastUpdatedKey, null);
+      _hiveDBInstance.put(configCacheKey, null);
+      isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          await getAvailableLanguagesInTask();
+          getAvailableLanguagesInTask();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
@@ -82,11 +78,11 @@ class HomeController extends GetxController {
       _languageModelController.populateTranslationLanguagePairs();
     } else {
       // clear cache and get new data
-      await _hiveDBInstance.put(transConfigCacheLastUpdatedKey, null);
-      await _hiveDBInstance.put(transConfigCacheKey, null);
-      await isNetworkConnected().then((isConnected) async {
+      _hiveDBInstance.put(transConfigCacheLastUpdatedKey, null);
+      _hiveDBInstance.put(transConfigCacheKey, null);
+      isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          await getAvailableLangTranslation();
+          getAvailableLangTranslation();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
@@ -108,11 +104,11 @@ class HomeController extends GetxController {
           TaskSequenceResponse.fromJson(transliterationTaskSequenceResponse));
     } else {
       // clear cache and get new data
-      await _hiveDBInstance.put(transliterationConfigCacheLastUpdatedKey, null);
-      await _hiveDBInstance.put(transliterationConfigCacheKey, null);
-      await isNetworkConnected().then((isConnected) async {
+      _hiveDBInstance.put(transliterationConfigCacheLastUpdatedKey, null);
+      _hiveDBInstance.put(transliterationConfigCacheKey, null);
+      isNetworkConnected().then((isConnected) async {
         if (isConnected) {
-          await getTransliterationConfig();
+          getTransliterationConfig();
         } else {
           showDefaultSnackbar(message: i18n.t.errorNoInternetTitle);
         }
@@ -133,7 +129,7 @@ class HomeController extends GetxController {
     languageRequestResponse.when(
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController.setTaskSequenceResponse(taskSequenceResponse);
-        await addMainConfigResponseInCache(taskSequenceResponse.toJson());
+        addMainConfigResponseInCache(taskSequenceResponse.toJson());
         _languageModelController.populateLanguagePairs();
         isMainConfigCallLoading.value = false;
       }),
@@ -157,7 +153,7 @@ class HomeController extends GetxController {
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController
             .setTranslationConfigResponse(taskSequenceResponse);
-        await addTransConfigResponseInCache(taskSequenceResponse.toJson());
+        addTransConfigResponseInCache(taskSequenceResponse.toJson());
         _languageModelController.populateTranslationLanguagePairs();
         isTransConfigCallLoading.value = false;
       }),
@@ -179,8 +175,7 @@ class HomeController extends GetxController {
       success: ((TaskSequenceResponse taskSequenceResponse) async {
         _languageModelController
             .setTransliterationConfigResponse(taskSequenceResponse);
-        await addTransliterationConfigResponseInCache(
-            taskSequenceResponse.toJson());
+        addTransliterationConfigResponseInCache(taskSequenceResponse.toJson());
         isTransliterationConfigCallLoading.value = false;
       }),
       failure: (error) {
@@ -216,8 +211,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addMainConfigResponseInCache(responseData) async {
-    await _hiveDBInstance.put(configCacheKey, responseData);
-    await _hiveDBInstance.put(
+    _hiveDBInstance.put(configCacheKey, responseData);
+    _hiveDBInstance.put(
       configCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
@@ -226,8 +221,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addTransConfigResponseInCache(responseData) async {
-    await _hiveDBInstance.put(transConfigCacheKey, responseData);
-    await _hiveDBInstance.put(
+    _hiveDBInstance.put(transConfigCacheKey, responseData);
+    _hiveDBInstance.put(
       transConfigCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
@@ -236,8 +231,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> addTransliterationConfigResponseInCache(responseData) async {
-    await _hiveDBInstance.put(transliterationConfigCacheKey, responseData);
-    await _hiveDBInstance.put(
+    _hiveDBInstance.put(transliterationConfigCacheKey, responseData);
+    _hiveDBInstance.put(
       transliterationConfigCacheLastUpdatedKey,
       DateTime.now().add(
         const Duration(days: 1),
