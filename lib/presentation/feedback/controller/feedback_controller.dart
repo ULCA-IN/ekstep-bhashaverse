@@ -20,7 +20,9 @@ class FeedbackController extends GetxController {
   RxDouble mainRating = 0.0.obs;
   RxList<Rx<FeedbackTypeModel>> feedbackTypeModels = RxList([]);
   RxBool isLoading = false.obs;
-  String oldSourceText = '', feedbackLanguage = '';
+  String oldSourceText = '',
+      feedbackLanguage = '',
+      currentlyTypedWordForTransliteration = '';
   dynamic feedbackReqResponse;
 
   late DHRUVAAPIClient _dhruvaapiClient;
@@ -111,6 +113,8 @@ class FeedbackController extends GetxController {
 
   Future<List<String>> getTransliterationOutput(
       String sourceText, String languageCode) async {
+    currentlyTypedWordForTransliteration = sourceText;
+
     if (languageCode == defaultLangCode ||
         _languageModelController.transliterationConfigResponse == null) {
       return [];
@@ -148,9 +152,18 @@ class FeedbackController extends GetxController {
 
     response.when(
       success: (data) async {
-        transliterationHints.value.clear();
-        transliterationHints.value =
-            data.pipelineResponse?.first.output?.first.target;
+        if (currentlyTypedWordForTransliteration ==
+            data.pipelineResponse?.first.output?.first.source) {
+          transliterationHints.value.clear();
+          transliterationHints.value =
+              data.pipelineResponse?.first.output?.first.target;
+          if (!transliterationHints
+              .contains(currentlyTypedWordForTransliteration)) {
+            transliterationHints.add(currentlyTypedWordForTransliteration);
+            currentlyTypedWordForTransliteration = '';
+          }
+        }
+
         return transliterationHints;
       },
       failure: (_) {
@@ -266,6 +279,7 @@ class FeedbackController extends GetxController {
         FocusNode feedbackFocusNode = FocusNode();
         feedbackFocusNode.addListener(() {
           oldSourceText = feedbackTextController.text;
+          transliterationHints.clear();
         });
         feedbackTypeModels.add(FeedbackTypeModel(
                 taskType: taskFeedback[APIConstants.kTaskType],
