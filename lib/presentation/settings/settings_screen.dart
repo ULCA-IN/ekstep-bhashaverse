@@ -1,6 +1,5 @@
 import 'dart:math' show pi;
 
-import 'package:bhashaverse/presentation/home/controller/home_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +13,7 @@ import '../../routes/app_routes.dart';
 import '../../utils/constants/app_constants.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
+import '../home/controller/home_controller.dart';
 import 'controller/settings_controller.dart';
 import '../../i18n/strings.g.dart' as i18n;
 
