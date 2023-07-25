@@ -1,4 +1,3 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,7 +19,6 @@ class TextFieldWithActions extends StatelessWidget {
     required String textToCopy,
     required Color backgroundColor,
     required Color borderColor,
-    required bool isRecordedAudio,
     required bool isReadOnly,
     required bool showASRTTSActionButtons,
     required double topBorderRadius,
@@ -29,7 +27,6 @@ class TextFieldWithActions extends StatelessWidget {
     bool isShareButtonLoading = false,
     int? currentDuration,
     int? totalDuration,
-    PlayerController? playerController,
     Function? onMusicPlayOrStop,
     Function? onFileShare,
     bool showFeedbackIcon = true,
@@ -53,7 +50,6 @@ class TextFieldWithActions extends StatelessWidget {
         _currentDuration = currentDuration,
         _totalDuration = totalDuration,
         _sourceCharLength = sourceCharLength,
-        _isRecordedAudio = isRecordedAudio,
         _showMicButton = showMicButton,
         _isReadOnly = isReadOnly,
         _isShareButtonLoading = isShareButtonLoading,
@@ -68,7 +64,6 @@ class TextFieldWithActions extends StatelessWidget {
         _onFileShare = onFileShare,
         _expandFeedbackIcon = expandFeedbackIcon,
         _showFeedbackIcon = showFeedbackIcon,
-        _playerController = playerController,
         _speakerStatus = speakerStatus,
         _rawTimeStream = rawTimeStream,
         _onFeedbackButtonTap = onFeedbackButtonTap;
@@ -80,8 +75,7 @@ class TextFieldWithActions extends StatelessWidget {
   final String? _hintText;
   final int _sourceCharLength;
   final int? _currentDuration, _totalDuration;
-  final bool _isRecordedAudio,
-      _showMicButton,
+  final bool _showMicButton,
       _showASRTTSActionButtons,
       _showTranslateButton,
       _isReadOnly,
@@ -96,7 +90,6 @@ class TextFieldWithActions extends StatelessWidget {
       _onSubmitted,
       _onFeedbackButtonTap;
 
-  final PlayerController? _playerController;
   final SpeakerStatus _speakerStatus;
   final Stream<int>? _rawTimeStream;
 
@@ -160,11 +153,9 @@ class TextFieldWithActions extends StatelessWidget {
                         ? DateTImeUtils().getTimeFromMilliseconds(
                             timeInMillisecond: _totalDuration!)
                         : '',
-                    isRecordedAudio: _isRecordedAudio,
                     showFeedbackIcon: _showFeedbackIcon,
                     expandFeedbackIcon: _expandFeedbackIcon,
                     isShareButtonLoading: _isShareButtonLoading,
-                    playerController: _playerController,
                     speakerStatus: _speakerStatus,
                     onMusicPlayOrStop: _onMusicPlayOrStop,
                     onFileShare: _onFileShare,
