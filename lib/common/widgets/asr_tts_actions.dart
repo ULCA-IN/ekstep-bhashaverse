@@ -1,4 +1,3 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,15 +8,14 @@ import '../../utils/constants/app_constants.dart';
 import '../../utils/snackbar_utils.dart';
 import '../../utils/theme/app_theme_provider.dart';
 import '../../utils/theme/app_text_style.dart';
-import '../../utils/waveform_style.dart';
 import 'custom_circular_loading.dart';
 import '../../i18n/strings.g.dart' as i18n;
+import 'static_waveform.dart';
 
 class ASRAndTTSActions extends StatelessWidget {
   const ASRAndTTSActions({
     super.key,
     required String textToCopy,
-    required bool isRecordedAudio,
     required bool expandFeedbackIcon,
     required bool showFeedbackIcon,
     required SpeakerStatus speakerStatus,
@@ -26,11 +24,8 @@ class ASRAndTTSActions extends StatelessWidget {
     String? totalDuration,
     Function? onMusicPlayOrStop,
     Function? onFileShare,
-    PlayerController? playerController,
     Function? onFeedbackButtonTap,
   })  : _textToCopy = textToCopy,
-        _playerController = playerController,
-        _isRecordedAudio = isRecordedAudio,
         _expandFeedbackIcon = expandFeedbackIcon,
         _showFeedbackIcon = showFeedbackIcon,
         _isShareButtonLoading = isShareButtonLoading,
@@ -41,12 +36,8 @@ class ASRAndTTSActions extends StatelessWidget {
         _onFileShare = onFileShare,
         _onFeedbackButtonTap = onFeedbackButtonTap;
 
-  final bool _isRecordedAudio,
-      _isShareButtonLoading,
-      _expandFeedbackIcon,
-      _showFeedbackIcon;
+  final bool _isShareButtonLoading, _expandFeedbackIcon, _showFeedbackIcon;
   final String _textToCopy;
-  final PlayerController? _playerController;
   final String? _currentDuration;
   final String? _totalDuration;
   final SpeakerStatus _speakerStatus;
@@ -181,18 +172,10 @@ class ASRAndTTSActions extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AudioFileWaveforms(
-                        size: Size(WaveformStyle.getDefaultWidth, 25.h),
-                        playerController:
-                            _playerController ?? PlayerController(),
-                        waveformType: WaveformType.fitWidth,
-                        playerWaveStyle: WaveformStyle.getDefaultPlayerStyle(
-                          isRecordedAudio: _isRecordedAudio,
-                        ),
-                      ),
+                      const Flexible(child: StaticWaveform()),
+                      const Spacer(),
                       SizedBox(width: 8.w),
                       SizedBox(
-                        width: WaveformStyle.getDefaultWidth,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
