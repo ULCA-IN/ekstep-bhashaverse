@@ -2,17 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:mic_stream/mic_stream.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sound_stream/sound_stream.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:vibration/vibration.dart';
+import 'package:just_audio/just_audio.dart' as just_audio;
 
 import '../../../common/controller/language_model_controller.dart';
 import '../../../enums/current_mic.dart';
@@ -29,7 +28,6 @@ import '../../../utils/network_utils.dart';
 import '../../../utils/permission_handler.dart';
 import '../../../utils/snackbar_utils.dart';
 import '../../../utils/voice_recorder.dart';
-import '../../../utils/waveform_style.dart';
 import '../../../i18n/strings.g.dart' as i18n;
 
 class ConversationController extends GetxController {
@@ -69,11 +67,11 @@ class ConversationController extends GetxController {
       targetLangListBeta = [];
 
   List<int> recordedData = [];
-  final RecorderStream _recorder = RecorderStream();
+  late StreamSubscription<List<int>> listener;
   final VoiceRecorder _voiceRecorder = VoiceRecorder();
   final stopWatchTimer = StopWatchTimer(mode: StopWatchMode.countUp);
-  late PlayerController playerController;
-  StreamSubscription<Uint8List>? micStreamSubscription;
+  late final just_audio.AudioPlayer player;
+  StreamSubscription<List<int>>? micStreamSubscription;
   DateTime? recordingStartTime;
   int samplingRate = 16000;
   late Worker streamingResponseListener,
@@ -94,11 +92,9 @@ class ConversationController extends GetxController {
     _socketIOClient = Get.find();
     _languageModelController = Get.find();
     _hiveDBInstance = Hive.box(hiveDBName);
-    playerController = PlayerController();
-    _recorder.initialize();
+    player = just_audio.AudioPlayer();
 
     //  Connectivity listener
-
     Connectivity().checkConnectivity().then((newConnectivity) {
       updateSamplingRate(newConnectivity);
     });
@@ -107,36 +103,20 @@ class ConversationController extends GetxController {
           (newConnectivity) => updateSamplingRate(newConnectivity),
         );
 
-    // Audio player listener
-
-    playerController.onCompletion.listen((event) {
-      sourceSpeakerStatus.value = SpeakerStatus.stopped;
-      targetSpeakerStatus.value = SpeakerStatus.stopped;
+    // Audio player current duration listener
+    player.positionStream.listen((duration) {
+      currentDuration.value = duration.inMilliseconds;
     });
 
-    playerController.onCurrentDurationChanged.listen((duration) {
-      currentDuration.value = duration;
-    });
-
-    playerController.onPlayerStateChanged.listen((_) {
-      switch (playerController.playerState) {
-        case PlayerState.initialized:
-          maxDuration.value = playerController.maxDuration;
-          break;
-        case PlayerState.paused:
-          sourceSpeakerStatus.value = SpeakerStatus.stopped;
-          targetSpeakerStatus.value = SpeakerStatus.stopped;
-          currentDuration.value = 0;
-          break;
-        case PlayerState.stopped:
-          currentDuration.value = 0;
-          break;
-        default:
+    player.playerStateStream.listen((state) {
+      if (state.processingState == just_audio.ProcessingState.completed) {
+        currentDuration.value = 0;
+        sourceSpeakerStatus.value = SpeakerStatus.stopped;
+        targetSpeakerStatus.value = SpeakerStatus.stopped;
       }
     });
 
     // Stopwatch listener for mic recording time
-
     stopWatchTimer.rawTime.listen((event) {
       if (micButtonStatus.value == MicButtonStatus.pressed &&
           (event + 1) >= recordingMaxTimeLimit) {
@@ -146,12 +126,9 @@ class ConversationController extends GetxController {
       }
     });
 
-// Init method call
-
     super.onInit();
 
 // Socket IO connection listeners
-
     socketConnectionListener =
         ever(_socketIOClient.isMicConnected, (isConnected) async {
       if (isConnected) {
@@ -160,7 +137,6 @@ class ConversationController extends GetxController {
     }, condition: () => _socketIOClient.isMicConnected.value);
 
 // Socket IO response listeners
-
     streamingResponseListener =
         ever(_socketIOClient.socketResponse, (response) async {
       await displaySocketIOResponse(response);
@@ -197,7 +173,6 @@ class ConversationController extends GetxController {
     }, condition: () => _socketIOClient.isMicConnected.value);
 
 // Socket IO error listeners
-
     socketIOErrorListener = ever(_socketIOClient.hasError, (isAborted) {
       if (isAborted && micButtonStatus.value == MicButtonStatus.pressed) {
         micButtonStatus.value = MicButtonStatus.released;
@@ -290,8 +265,12 @@ class ConversationController extends GetxController {
             isDataToSend: true,
           );
 
-          _recorder.start();
-          micStreamSubscription = _recorder.audioStream.listen((value) {
+          micStreamSubscription = MicStream.microphone(
+                  audioSource: AudioSource.DEFAULT,
+                  sampleRate: 44100,
+                  channelConfig: ChannelConfig.CHANNEL_IN_MONO,
+                  audioFormat: AudioFormat.ENCODING_PCM_16BIT)
+              .listen((value) {
             _socketIOClient.socketEmit(
                 emittingStatus: APIConstants.kData,
                 emittingData: [
@@ -597,7 +576,7 @@ class ConversationController extends GetxController {
     }
   }
 
-  Future<void> prepareWaveforms(
+  Future<void> preparePlayer(
     String filePath, {
     required bool isRecordedAudio,
     required bool isTargetLanguage,
@@ -608,27 +587,22 @@ class ConversationController extends GetxController {
     } else {
       sourceSpeakerStatus.value = SpeakerStatus.playing;
     }
-    await playerController.preparePlayer(
-        path: filePath,
-        noOfSamples: WaveformStyle.getDefaultPlayerStyle(
-                isRecordedAudio: isRecordedAudio)
-            .getSamplesForWidth(WaveformStyle.getDefaultWidth));
-    maxDuration.value = playerController.maxDuration;
-    startOrPausePlayer();
+    startOrPausePlayer(filePath);
   }
 
-  void startOrPausePlayer() async {
-    playerController.playerState.isPlaying
-        ? await playerController.pausePlayer()
-        : await playerController.startPlayer(
-            finishMode: FinishMode.pause,
-          );
+  void startOrPausePlayer(String filePath) async {
+    if (player.playing) {
+      await player.stop();
+    } else {
+      await player.setFilePath(filePath);
+      maxDuration.value = player.duration!.inMilliseconds;
+      await player.play();
+    }
   }
 
   Future<void> stopPlayer() async {
-    if (playerController.playerState.isPlaying ||
-        playerController.playerState == PlayerState.paused) {
-      await playerController.stopPlayer();
+    if (player.playing) {
+      await player.stop();
     }
     targetSpeakerStatus.value = SpeakerStatus.stopped;
     sourceSpeakerStatus.value = SpeakerStatus.stopped;
@@ -713,7 +687,7 @@ class ConversationController extends GetxController {
   }
 
   void playStopTTSOutput(bool isPlayingSource) async {
-    if (playerController.playerState.isPlaying) {
+    if (player.playing) {
       await stopPlayer();
       return;
     }
@@ -756,7 +730,7 @@ class ConversationController extends GetxController {
           ? sourceSpeakerStatus.value = SpeakerStatus.playing
           : targetSpeakerStatus.value = SpeakerStatus.playing;
 
-      await prepareWaveforms(audioPath,
+      await preparePlayer(audioPath,
           isRecordedAudio: true, isTargetLanguage: !isPlayingSource);
     }
   }
@@ -831,7 +805,7 @@ class ConversationController extends GetxController {
   }
 
   disposePlayer() async {
-    await stopPlayer();
-    playerController.dispose();
+    await player.stop();
+    await player.dispose();
   }
 }

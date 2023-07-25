@@ -127,7 +127,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
             translateButtonTitle: translation.kTranslate,
             currentDuration: _converseController.currentDuration.value,
             totalDuration: _converseController.maxDuration.value,
-            isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: textFieldRadius,
             bottomBorderRadius: 0,
             showTranslateButton: false,
@@ -153,7 +152,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     json.encode(_converseController.lastComputeResponse))
               });
             },
-            playerController: _converseController.playerController,
             speakerStatus: _converseController.sourceSpeakerStatus.value,
             rawTimeStream: _converseController.stopWatchTimer.rawTime,
             showMicButton: isCurrentlyRecording() &&
@@ -183,7 +181,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
           translateButtonTitle: translation.kTranslate,
           currentDuration: _converseController.currentDuration.value,
           totalDuration: _converseController.maxDuration.value,
-          isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: 0,
           bottomBorderRadius: textFieldRadius,
           showTranslateButton: false,
@@ -198,7 +195,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
           onFileShare: () =>
               _converseController.shareAudioFile(isSourceLang: false),
           onMusicPlayOrStop: () => _converseController.playStopTTSOutput(false),
-          playerController: _converseController.playerController,
           speakerStatus: _converseController.targetSpeakerStatus.value,
           rawTimeStream: _converseController.stopWatchTimer.rawTime,
           showMicButton: isCurrentlyRecording() &&

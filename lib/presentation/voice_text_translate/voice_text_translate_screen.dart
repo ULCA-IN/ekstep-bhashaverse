@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -147,7 +146,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
           translateButtonTitle: translation.kTranslate,
           currentDuration: _voiceTextTransController.currentDuration.value,
           totalDuration: _voiceTextTransController.maxDuration.value,
-          isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
           topBorderRadius: textFieldRadius,
           bottomBorderRadius: 0,
           expandFeedbackIcon:
@@ -173,7 +171,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                   json.encode(_voiceTextTransController.lastComputeResponse))
             });
           },
-          playerController: _voiceTextTransController.playerController,
           speakerStatus: _voiceTextTransController.sourceSpeakerStatus.value,
           rawTimeStream: _voiceTextTransController.stopWatchTimer.rawTime,
           sourceCharLength: _voiceTextTransController.sourceTextCharLimit.value,
@@ -194,7 +191,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
             borderColor: context.appTheme.disabledBGColor,
             currentDuration: _voiceTextTransController.currentDuration.value,
             totalDuration: _voiceTextTransController.maxDuration.value,
-            isRecordedAudio: !_hiveDBInstance.get(isStreamingPreferred),
             topBorderRadius: 0,
             bottomBorderRadius: textFieldRadius,
             showTranslateButton: false,
@@ -209,7 +205,6 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
                 _voiceTextTransController.shareAudioFile(isSourceLang: false),
             onMusicPlayOrStop: () =>
                 _voiceTextTransController.playStopTTSOutput(false),
-            playerController: _voiceTextTransController.playerController,
             speakerStatus: _voiceTextTransController.targetSpeakerStatus.value,
             showMicButton: false),
       ),
@@ -443,8 +438,9 @@ class _VoiceTextTranslateScreenState extends State<VoiceTextTranslateScreen>
     _voiceTextTransController.sourceTextCharLimit.value = newText.length;
     _voiceTextTransController.isTranslateCompleted.value = false;
     _voiceTextTransController.targetLangTextController.clear();
-    if (_voiceTextTransController.playerController.playerState ==
-        PlayerState.playing) _voiceTextTransController.stopPlayer();
+    if (_voiceTextTransController.player.playing) {
+      _voiceTextTransController.stopPlayer();
+    }
     if (_voiceTextTransController.targetSpeakerStatus.value !=
         SpeakerStatus.disabled) {
       _voiceTextTransController.targetSpeakerStatus.value =
