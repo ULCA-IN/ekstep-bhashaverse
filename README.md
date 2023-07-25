@@ -40,7 +40,6 @@ name: bhashaverse
   avatar_glow: ^2.0.2
   lottie: ^2.1.0
   share_plus: ^6.3.0
-  audio_waveforms: ^1.0.0
   socket_io_client: ^2.0.1
   record: ^4.4.4
   auto_size_text: ^3.0.0
@@ -53,9 +52,9 @@ name: bhashaverse
   intl: any
   flutter_localizations:
     sdk: flutter
-  sound_stream:
-    git:
-      url: https://github.com/JHM69/flutter-sound-stream.git
+  mic_stream: ^0.7.0-dev
+  audio_wave: ^0.1.5
+  just_audio: ^0.9.34
 ```
 
 * Dev Dependencies:
