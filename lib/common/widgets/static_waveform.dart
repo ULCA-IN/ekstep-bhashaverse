@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/theme/app_theme_provider.dart';
 
-class RecordingFeedbackPulseAndWave extends StatelessWidget {
-  const RecordingFeedbackPulseAndWave({super.key});
+class StaticWaveform extends StatelessWidget {
+  const StaticWaveform({super.key});
 
   @override
   Widget build(BuildContext context) {
